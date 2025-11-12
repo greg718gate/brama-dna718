@@ -82,16 +82,6 @@ const VectorM = () => {
   );
 };
 
-const RotatingCamera = () => {
-  useFrame(({ camera, clock }) => {
-    const time = clock.getElapsedTime() * 0.2;
-    camera.position.x = Math.cos(time) * 3;
-    camera.position.z = Math.sin(time) * 3;
-    camera.position.y = 1.5;
-    camera.lookAt(0, 0, 0);
-  });
-  return null;
-};
 
 export const PentagramSphere = () => {
   return (
@@ -115,13 +105,13 @@ export const PentagramSphere = () => {
         <Sphere />
         <Axes />
         <VectorM />
-        <RotatingCamera />
         
         <OrbitControls
           enableZoom={true}
           enablePan={true}
           enableRotate={true}
-          autoRotate={false}
+          autoRotate={true}
+          autoRotateSpeed={2}
         />
         
         <gridHelper args={[4, 8, "#444444", "#222222"]} />
