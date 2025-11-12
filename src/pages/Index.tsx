@@ -1,4 +1,5 @@
 import { DNAGateGenerator } from "@/components/DNAGateGenerator";
+import { PentagramSphere } from "@/components/PentagramSphere";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
@@ -7,7 +8,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
       <div className="fixed top-4 right-4 z-50">
         <Button
           onClick={() => navigate("/vault")}
@@ -18,7 +19,11 @@ const Index = () => {
           Skarbiec Odkryć
         </Button>
       </div>
-      <DNAGateGenerator />
+      
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <DNAGateGenerator />
+        <PentagramSphere />
+      </div>
     </div>
   );
 };
