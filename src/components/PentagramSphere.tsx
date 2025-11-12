@@ -97,25 +97,27 @@ export const PentagramSphere = () => {
           Normalizacja: α² + β² + γ² = {(alpha ** 2 + beta ** 2 + gamma ** 2).toFixed(6)} ≈ 1
         </p>
       </div>
-      <Canvas camera={{ position: [3, 1.5, 0], fov: 50 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} />
-        
-        <Sphere />
-        <Axes />
-        <VectorM />
-        
-        <OrbitControls
-          enableZoom={true}
-          enablePan={true}
-          enableRotate={true}
-          autoRotate={true}
-          autoRotateSpeed={2}
-        />
-        
-        <gridHelper args={[4, 8, "#444444", "#222222"]} />
-      </Canvas>
+      <div className="h-[calc(100%-140px)]">
+        <Canvas camera={{ position: [3, 1.5, 0], fov: 50 }}>
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} intensity={1} />
+          <pointLight position={[-10, -10, -10]} intensity={0.5} />
+          
+          <Sphere />
+          <Axes />
+          <VectorM />
+          
+          <OrbitControls
+            enableZoom={true}
+            enablePan={true}
+            enableRotate={true}
+            autoRotate={true}
+            autoRotateSpeed={2}
+          />
+          
+          <gridHelper args={[4, 8, "#444444", "#222222"]} />
+        </Canvas>
+      </div>
     </div>
   );
 };
