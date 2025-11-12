@@ -20,9 +20,11 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        <DNAGateGenerator />
-        <PentagramSphere />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DNAGateGenerator />
+          <PentagramSphere />
+        </div>
       </div>
     </div>
   );
