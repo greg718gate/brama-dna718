@@ -23,6 +23,7 @@ const translations = {
     'tabs.theory': 'Teoria',
     'tabs.schrodinger': 'Schrödinger',
     'tabs.matrix': 'Matryca Faza 1',
+    'tabs.evidence': 'Dowody Naukowe',
     
     // About section
     'about.title': 'Brama DNA i Pentagram Prawdy',
@@ -210,9 +211,6 @@ const translations = {
     'matrix.audio.truth2': '718 Hz nie jest przypadkowe – to rezonans z kodem GATCA w DNA mitochondrialnym (badania: 432–864 Hz w biologii).',
     'matrix.audio.truth3': '18.6 Hz / 7.83 ≈ 2.375 → to nie skok, to modulacja złotego pola – jak w FM radio.',
     
-    // Tabs
-    'tabs.evidence': 'Dowody Naukowe',
-    
     // Scientific Evidence
     'scientificEvidence.title': 'Dowody Naukowe – Publikacje 2020-2025',
     'scientificEvidence.study1': 'Badanie 2024 (Univ. Tokyo): 718 Hz zwiększa ekspresję telomerazy o 37% u ludzi z chronicznym stresem',
@@ -263,6 +261,7 @@ const translations = {
     'tabs.theory': 'Theory',
     'tabs.schrodinger': 'Schrödinger',
     'tabs.matrix': 'Matrix Phase 1',
+    'tabs.evidence': 'Scientific Evidence',
     
     // About section
     'about.title': 'DNA Gate and Pentagram of Truth',
@@ -449,9 +448,6 @@ const translations = {
     'matrix.audio.truth1': 'Sound is vibration → vibration is information → information is consciousness.',
     'matrix.audio.truth2': '718 Hz is not random – it\'s resonance with GATCA code in mitochondrial DNA (research: 432–864 Hz in biology).',
     'matrix.audio.truth3': '18.6 Hz / 7.83 ≈ 2.375 → not a jump, but golden field modulation – like FM radio.',
-    
-    // Tabs
-    'tabs.evidence': 'Scientific Evidence',
     
     // Scientific Evidence
     'scientificEvidence.title': 'Scientific Evidence – Publications 2020-2025',
