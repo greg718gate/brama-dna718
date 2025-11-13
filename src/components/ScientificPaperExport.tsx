@@ -41,7 +41,7 @@ export const ScientificPaperExport = () => {
     });
 
     toast.success("Dokument naukowy został wygenerowany!", {
-      description: "Zapisz jako PDF używając 'Drukuj do PDF' w przeglądarce"
+      description: "Plik HTML został pobrany. Otwórz go w przeglądarce."
     });
   };
 
@@ -136,7 +136,7 @@ export const ScientificPaperExport = () => {
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          Po wygenerowaniu użyj funkcji "Drukuj do PDF" w przeglądarce, aby zapisać jako PDF
+          Plik HTML zostanie pobrany automatycznie. Otwórz go w przeglądarce na komputerze lub telefonie.
         </p>
       </CardContent>
     </Card>
