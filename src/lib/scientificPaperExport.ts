@@ -570,14 +570,10 @@ phi = np.linspace(0, 2*np.pi, 100)
 </html>
   `;
 
-  // Create and download the file
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `Scientific_Paper_DNA_Pentagram_${data.author.replace(/\s/g, '_')}_${Date.now()}.html`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  // Open in new window for viewing and printing
+  const newWindow = window.open('', '_blank');
+  if (newWindow) {
+    newWindow.document.write(html);
+    newWindow.document.close();
+  }
 };
