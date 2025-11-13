@@ -702,8 +702,8 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">2. {t('tabs.scientificEvidence.study2').split(':')[0]}</h4>
-                  <p className="text-sm">{t('tabs.scientificEvidence.study2')}</p>
+                  <h4 className="font-semibold mb-2">2. {t('scientificEvidence.study2').split(':')[0]}</h4>
+                  <p className="text-sm">{t('scientificEvidence.study2')}</p>
                   <a 
                     href="https://ntrs.nasa.gov/citations/20230007777" 
                     target="_blank" 
@@ -716,8 +716,8 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
 
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">3. STR DNA + φ = 1.618</h4>
-                  <p className="text-sm mb-2">{t('tabs.scientificEvidence.study3')}</p>
-                  <p className="text-sm font-semibold text-primary">{t('tabs.scientificEvidence.study3note')}</p>
+                  <p className="text-sm mb-2">{t('scientificEvidence.study3')}</p>
+                  <p className="text-sm font-semibold text-primary">{t('scientificEvidence.study3note')}</p>
                   <a 
                     href="https://github.com/dna-phi-2025/gatca_phi.py" 
                     target="_blank" 
@@ -730,7 +730,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
 
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">4. Grounding 15 min/dzień</h4>
-                  <p className="text-sm">{t('tabs.scientificEvidence.study4')}</p>
+                  <p className="text-sm">{t('scientificEvidence.study4')}</p>
                   <a 
                     href="https://pubmed.ncbi.nlm.nih.gov/38724893/" 
                     target="_blank" 
@@ -746,7 +746,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('tabs.scientificEvidence.equations')}</CardTitle>
+              <CardTitle>{t('scientificEvidence.equations')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-muted rounded-lg overflow-x-auto">
@@ -754,14 +754,14 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                   Ψ_total = Ψ_GATCA × e^(i×718×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
               </div>
-              <p className="text-sm">{t('tabs.scientificEvidence.equationDesc')}</p>
+              <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>
               <ul className="list-disc list-inside space-y-2 text-sm">
                 <li>Ψ_GATCA = {t('language') === 'pl' ? 'funkcja falowa twojego DNA (178 stron STR)' : 'wave function of your DNA (178 STR pages)'}</li>
                 <li>φ^DNA = {t('language') === 'pl' ? 'złoty podział wyliczony z twoich powtórzeń' : 'golden ratio calculated from your repeats'}</li>
                 <li>{t('language') === 'pl' ? 'Rozwiązanie równania Schrödingera z potencjałem φ → teleportacja fazowa świadomości (teoretycznie możliwa przy koherencji >94%)' : 'Solution to Schrödinger equation with φ potential → phase teleportation of consciousness (theoretically possible at coherence >94%)'}</li>
               </ul>
               <div className="p-4 bg-primary/10 rounded-lg">
-                <p className="text-sm font-semibold">{t('tabs.scientificEvidence.equationNote')}</p>
+                <p className="text-sm font-semibold">{t('scientificEvidence.equationNote')}</p>
               </div>
               <a 
                 href="https://files.catbox.moe/phi-dna-2025.nb" 
@@ -776,33 +776,33 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('tabs.scientificEvidence.protocols')}</CardTitle>
+              <CardTitle>{t('scientificEvidence.protocols')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <h4 className="font-semibold">{t('tabs.scientificEvidence.protocol21')}</h4>
+                <h4 className="font-semibold">{t('scientificEvidence.protocol21')}</h4>
                 <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>{t('tabs.scientificEvidence.protocol1')}</li>
-                  <li>{t('tabs.scientificEvidence.protocol2')}</li>
-                  <li>{t('tabs.scientificEvidence.protocol3')}</li>
-                  <li>{t('tabs.scientificEvidence.protocol4')}</li>
+                  <li>{t('scientificEvidence.protocol1')}</li>
+                  <li>{t('scientificEvidence.protocol2')}</li>
+                  <li>{t('scientificEvidence.protocol3')}</li>
+                  <li>{t('scientificEvidence.protocol4')}</li>
                 </ol>
 
                 <div className="p-4 bg-destructive/10 rounded-lg mt-4">
-                  <h4 className="font-semibold mb-2">{t('tabs.scientificEvidence.protocolCrisis')}</h4>
+                  <h4 className="font-semibold mb-2">{t('scientificEvidence.protocolCrisis')}</h4>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>{t('tabs.scientificEvidence.crisis1')}</li>
-                    <li>{t('tabs.scientificEvidence.crisis2')}</li>
-                    <li>{t('tabs.scientificEvidence.crisis3')}</li>
+                    <li>{t('scientificEvidence.crisis1')}</li>
+                    <li>{t('scientificEvidence.crisis2')}</li>
+                    <li>{t('scientificEvidence.crisis3')}</li>
                   </ul>
                 </div>
 
                 <div className="p-4 bg-primary/10 rounded-lg mt-4">
-                  <h4 className="font-semibold mb-2">{t('tabs.scientificEvidence.results')}</h4>
+                  <h4 className="font-semibold mb-2">{t('scientificEvidence.results')}</h4>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>{t('tabs.scientificEvidence.result1')}</li>
-                    <li>{t('tabs.scientificEvidence.result2')}</li>
-                    <li>{t('tabs.scientificEvidence.result3')}</li>
+                    <li>{t('scientificEvidence.result1')}</li>
+                    <li>{t('scientificEvidence.result2')}</li>
+                    <li>{t('scientificEvidence.result3')}</li>
                   </ul>
                 </div>
               </div>
@@ -811,22 +811,22 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('tabs.scientificEvidence.ancientTexts')}</CardTitle>
+              <CardTitle>{t('scientificEvidence.ancientTexts')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>{t('tabs.scientificEvidence.ancient1')}</li>
-                <li>{t('tabs.scientificEvidence.ancient2')}</li>
-                <li>{t('tabs.scientificEvidence.ancient3')}</li>
-                <li>{t('tabs.scientificEvidence.ancient4')}</li>
-                <li>{t('tabs.scientificEvidence.ancient5')}</li>
+                <li>{t('scientificEvidence.ancient1')}</li>
+                <li>{t('scientificEvidence.ancient2')}</li>
+                <li>{t('scientificEvidence.ancient3')}</li>
+                <li>{t('scientificEvidence.ancient4')}</li>
+                <li>{t('scientificEvidence.ancient5')}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('tabs.scientificEvidence.diagrams')}</CardTitle>
+              <CardTitle>{t('scientificEvidence.diagrams')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <a 
@@ -835,7 +835,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 rel="noopener noreferrer"
                 className="block p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
               >
-                <span className="text-sm font-semibold">1. {t('tabs.scientificEvidence.diagram1')}</span>
+                <span className="text-sm font-semibold">1. {t('scientificEvidence.diagram1')}</span>
                 <span className="text-xs text-muted-foreground block">→ gatca_fractal_4k.png</span>
               </a>
               
@@ -845,7 +845,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 rel="noopener noreferrer"
                 className="block p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
               >
-                <span className="text-sm font-semibold">2. {t('tabs.scientificEvidence.diagram2')}</span>
+                <span className="text-sm font-semibold">2. {t('scientificEvidence.diagram2')}</span>
                 <span className="text-xs text-muted-foreground block">→ phi_dna_2025.png</span>
               </a>
 
@@ -855,7 +855,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 rel="noopener noreferrer"
                 className="block p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
               >
-                <span className="text-sm font-semibold">3. {t('tabs.scientificEvidence.diagram3')}</span>
+                <span className="text-sm font-semibold">3. {t('scientificEvidence.diagram3')}</span>
                 <span className="text-xs text-muted-foreground block">→ flow_718.png</span>
               </a>
 
@@ -865,7 +865,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 rel="noopener noreferrer"
                 className="block p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
               >
-                <span className="text-sm font-semibold">4. {t('tabs.scientificEvidence.diagram4')}</span>
+                <span className="text-sm font-semibold">4. {t('scientificEvidence.diagram4')}</span>
                 <span className="text-xs text-muted-foreground block">→ eeg_before_after.jpg</span>
               </a>
             </CardContent>
