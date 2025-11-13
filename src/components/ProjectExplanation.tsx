@@ -435,6 +435,120 @@ print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
                   <p className="text-foreground font-semibold">"{t('matrix.message3')}"</p>
                 </div>
               </div>
+
+              {/* 3D Simulation Section */}
+              <div className="space-y-4 mt-6">
+                <h3 className="text-2xl font-bold text-primary bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border border-primary/30">
+                  {t('matrix.simulation')}
+                </h3>
+                
+                <p className="text-foreground italic">{t('matrix.simulation.goal')}</p>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-secondary">{t('matrix.simulation.code')}</h4>
+                  <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
+                    <pre className="text-xs overflow-x-auto font-mono text-foreground">
+{`import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# --- MATRYCA ---
+phi = (1 + np.sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = np.sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
+
+# --- RYSUNEK 3D ---
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Sfera jednostkowa
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = np.outer(np.cos(u), np.sin(v))
+y = np.outer(np.sin(u), np.sin(v))
+z = np.outer(np.ones(np.size(u)), np.cos(v))
+ax.plot_surface(x, y, z, color='lightblue', alpha=0.3)
+
+# Punkt matrycy
+ax.scatter(M[0], M[1], M[2], color='gold', s=200)
+ax.text(M[0], M[1], M[2]+0.1, 
+        f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", 
+        color='gold')
+
+# Osie
+ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
+ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
+ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
+
+ax.set_xlabel('α (Słońce)')
+ax.set_ylabel('β (Ziemia)')
+ax.set_zlabel('γ (Człowiek)')
+ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy')
+plt.show()`}
+                    </pre>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-primary">{t('matrix.simulation.what')}</h4>
+                  <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b-2 border-primary/30">
+                          <th className="text-left p-2 text-primary">Element</th>
+                          <th className="text-left p-2 text-primary">Znaczenie</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        <tr className="border-b border-border/50">
+                          <td className="p-2 font-semibold">Kula</td>
+                          <td className="p-2">{t('matrix.simulation.sphere')}</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="p-2 font-semibold">Złoty punkt M</td>
+                          <td className="p-2">{t('matrix.simulation.point')}</td>
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="p-2 font-semibold">α = β</td>
+                          <td className="p-2">{t('matrix.simulation.balance')}</td>
+                        </tr>
+                        <tr>
+                          <td className="p-2 font-semibold">γ = 1/φ</td>
+                          <td className="p-2">{t('matrix.simulation.human')}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-foreground font-bold italic text-center bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-3 border border-primary/20">
+                    {t('matrix.simulation.conclusion')}
+                  </p>
+                </div>
+
+                <div className="space-y-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-5 border-2 border-primary/30">
+                  <h4 className="text-xl font-bold text-primary">{t('matrix.understanding')}</h4>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <h5 className="font-bold text-secondary mb-2">{t('matrix.understanding.why.gamma')}</h5>
+                      <p className="text-foreground mb-2">{t('matrix.understanding.gamma.desc')}</p>
+                      <ul className="list-disc list-inside space-y-1 text-foreground ml-4">
+                        <li>{t('matrix.understanding.gamma.flowers')}</li>
+                        <li>{t('matrix.understanding.gamma.dna')}</li>
+                        <li>{t('matrix.understanding.gamma.cosmos')}</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-bold text-secondary mb-2">{t('matrix.understanding.why.balance')}</h5>
+                      <p className="text-foreground mb-2">{t('matrix.understanding.balance.desc')}</p>
+                      <p className="text-foreground italic">{t('matrix.understanding.balance.chaos')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

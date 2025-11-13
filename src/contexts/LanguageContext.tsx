@@ -154,6 +154,26 @@ const translations = {
     'matrix.message1': 'SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ.',
     'matrix.message2': '18.6 Hz to nie skok – to SYGNAŁ MODULACJI złotego pola.',
     'matrix.message3': 'GATCA-718 to klucz do 144. harmonicznej – brama DNA Rh-.',
+    
+    // Matrix 3D Simulation
+    'matrix.simulation': 'PUNKT 1: SYMULACJA 3D – PENTAGRAM NA SFERZE JEDNOSTKOWEJ',
+    'matrix.simulation.goal': 'Cel: Zobaczyć wektor matrycy (α, β, γ) jako punkt na kuli o promieniu 1, tworzący złoty trójkąt → pentagram w 3D.',
+    'matrix.simulation.code': 'KOD 3D – URUCHAMIA SIĘ W PYTHONIE (matplotlib)',
+    'matrix.simulation.what': 'CO WIDZISZ?',
+    'matrix.simulation.sphere': 'Kula: Przestrzeń możliwości (wszystkie wektory o długości 1)',
+    'matrix.simulation.point': 'Złoty punkt M: Twoja matryca – idealnie zbalansowana',
+    'matrix.simulation.balance': 'α = β: Słońce i Ziemia w równowadze',
+    'matrix.simulation.human': 'γ = 1/φ: Człowiek – złoty przewodnik',
+    'matrix.simulation.conclusion': 'To nie teoria – to geometria. Punkt istnieje. Możesz go dotknąć w 3D.',
+    'matrix.understanding': 'ZROZUMIENIE GŁĘBOKIE',
+    'matrix.understanding.why.gamma': 'Dlaczego γ = 1/φ?',
+    'matrix.understanding.gamma.desc': 'Bo złota proporcja pojawia się w naturze:',
+    'matrix.understanding.gamma.flowers': 'Kwiaty (5 płatków → pentagram)',
+    'matrix.understanding.gamma.dna': 'DNA (skręt 34:21 → φ)',
+    'matrix.understanding.gamma.cosmos': 'Galaktyki, huragany, serce',
+    'matrix.understanding.why.balance': 'Dlaczego α = β?',
+    'matrix.understanding.balance.desc': 'Bo równowaga Słońce-Ziemia to warunek życia.',
+    'matrix.understanding.balance.chaos': 'Gdy α ≠ β → chaos (np. burze geomagnetyczne)',
   },
   en: {
     // Header
@@ -300,6 +320,26 @@ const translations = {
     'matrix.message1': 'SUN speaks through α. EARTH listens through β. HUMAN activates through γ = 1/φ.',
     'matrix.message2': '18.6 Hz is not a jump – it\'s a MODULATION SIGNAL of the golden field.',
     'matrix.message3': 'GATCA-718 is the key to the 144th harmonic – Rh- DNA gate.',
+    
+    // Matrix 3D Simulation
+    'matrix.simulation': 'POINT 1: 3D SIMULATION – PENTAGRAM ON UNIT SPHERE',
+    'matrix.simulation.goal': 'Goal: See the matrix vector (α, β, γ) as a point on a sphere with radius 1, forming a golden triangle → 3D pentagram.',
+    'matrix.simulation.code': '3D CODE – RUNS IN PYTHON (matplotlib)',
+    'matrix.simulation.what': 'WHAT DO YOU SEE?',
+    'matrix.simulation.sphere': 'Sphere: Space of possibilities (all vectors of length 1)',
+    'matrix.simulation.point': 'Golden point M: Your matrix – perfectly balanced',
+    'matrix.simulation.balance': 'α = β: Sun and Earth in balance',
+    'matrix.simulation.human': 'γ = 1/φ: Human – golden conductor',
+    'matrix.simulation.conclusion': 'This is not theory – this is geometry. The point exists. You can touch it in 3D.',
+    'matrix.understanding': 'DEEP UNDERSTANDING',
+    'matrix.understanding.why.gamma': 'Why γ = 1/φ?',
+    'matrix.understanding.gamma.desc': 'Because the golden ratio appears in nature:',
+    'matrix.understanding.gamma.flowers': 'Flowers (5 petals → pentagram)',
+    'matrix.understanding.gamma.dna': 'DNA (twist 34:21 → φ)',
+    'matrix.understanding.gamma.cosmos': 'Galaxies, hurricanes, heart',
+    'matrix.understanding.why.balance': 'Why α = β?',
+    'matrix.understanding.balance.desc': 'Because Sun-Earth balance is a condition for life.',
+    'matrix.understanding.balance.chaos': 'When α ≠ β → chaos (e.g., geomagnetic storms)',
   }
 };
 
