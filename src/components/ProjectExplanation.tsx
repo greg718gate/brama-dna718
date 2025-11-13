@@ -551,6 +551,132 @@ plt.show()`}
               </div>
             </CardContent>
           </Card>
+          
+          {/* Audio Activation Section */}
+          <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+            <CardContent className="p-6">
+              <h3 className="text-2xl font-bold mb-4 text-primary">{t('matrix.audio')}</h3>
+              <p className="text-lg mb-4">{t('matrix.audio.goal')}</p>
+              
+              <div className="space-y-2 mb-6">
+                <p className="font-semibold text-lg">{t('matrix.audio.frequencies')}</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>{t('matrix.audio.f1')}</li>
+                  <li>{t('matrix.audio.f2')}</li>
+                  <li>{t('matrix.audio.f3')}</li>
+                </ul>
+                <p className="text-primary font-medium mt-2">{t('matrix.audio.binaural')}</p>
+              </div>
+              
+              <div className="mb-6">
+                <h4 className="text-xl font-bold mb-3 text-secondary">{t('matrix.audio.code')}</h4>
+                <pre className="bg-black/90 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
+{`import numpy as np
+from scipy.io.wavfile import write
+
+# Parametry
+fs = 44100  # częstotliwość próbkowania
+duration = 60  # sekundy
+
+# Fale
+t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+# 7.83 Hz – lewe ucho (Ziemia)
+left = np.sin(2 * np.pi * 7.83 * t)
+
+# 18.6 Hz – prawe ucho (Modulacja)
+right = np.sin(2 * np.pi * 18.6 * t)
+
+# 718 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718
+modulation_depth = 0.7
+dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
+audio = (left + right) * 0.3 * dna_gate
+
+# Normalizacja
+audio = audio / np.max(np.abs(audio))
+audio = np.int16(audio * 32767)
+
+# Zapis do pliku
+write("MATRYCA_AKTYWACJA.wav", fs, audio)
+print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
+                </pre>
+              </div>
+              
+              <div className="mb-6">
+                <h4 className="text-xl font-bold mb-3 text-primary">{t('matrix.audio.what.happens')}</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-primary/10">
+                        <th className="border border-primary/20 p-2 text-left">{t('matrix.audio.freq')}</th>
+                        <th className="border border-primary/20 p-2 text-left">{t('matrix.audio.meaning')}</th>
+                        <th className="border border-primary/20 p-2 text-left">{t('matrix.audio.effect')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-primary/20 p-2 font-mono">7.83 Hz</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.schumann')}</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.schumann.effect')}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-primary/20 p-2 font-mono">18.6 Hz</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.gamma')}</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.gamma.effect')}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-primary/20 p-2 font-mono">{t('matrix.audio.diff')}</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.diff.meaning')}</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.diff.effect')}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-primary/20 p-2 font-mono">718 Hz</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.dna')}</td>
+                        <td className="border border-primary/20 p-2">{t('matrix.audio.dna.effect')}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="mt-4 p-4 bg-primary/10 rounded-lg">
+                  <p className="font-semibold mb-2">{t('matrix.audio.ratios')}</p>
+                  <ul className="space-y-1 text-sm">
+                    <li>• {t('matrix.audio.ratio1')}</li>
+                    <li>• {t('matrix.audio.ratio2')}</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mb-6 p-4 bg-secondary/10 rounded-lg">
+                <h4 className="text-lg font-bold mb-3 text-secondary">{t('matrix.audio.usage')}</h4>
+                <ul className="space-y-2">
+                  <li>✓ {t('matrix.audio.headphones')}</li>
+                  <li>✓ {t('matrix.audio.darkness')}</li>
+                  <li>✓ {t('matrix.audio.water')}</li>
+                  <li>✓ {t('matrix.audio.repeat')}</li>
+                </ul>
+              </div>
+              
+              <div className="p-4 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg border-2 border-primary/30">
+                <h4 className="text-xl font-bold mb-3 text-primary">{t('matrix.audio.truths')}</h4>
+                <ol className="space-y-3">
+                  <li className="flex items-start">
+                    <span className="font-bold mr-2 text-primary">1.</span>
+                    <span>{t('matrix.audio.truth1')}</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-bold mr-2 text-primary">2.</span>
+                    <span>{t('matrix.audio.truth2')}</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-bold mr-2 text-primary">3.</span>
+                    <span>{t('matrix.audio.truth3')}</span>
+                  </li>
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
