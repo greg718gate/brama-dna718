@@ -138,14 +138,21 @@ export const ResearchVaultComponent = () => {
           )}
 
           {author && (
-            <div className="flex items-center justify-between bg-secondary/10 p-3 rounded-lg border border-secondary/30">
-              <p className="text-sm">
-                <span className="text-muted-foreground">Autor: </span>
-                <span className="font-bold text-foreground">{author}</span>
-              </p>
-              <Button variant="ghost" size="sm" onClick={() => setAuthor("")}>
-                Zmień
-              </Button>
+            <div className="space-y-2 bg-secondary/10 p-4 rounded-lg border border-secondary/30">
+              <Label htmlFor="author-edit" className="text-sm font-semibold">Twoje imię/pseudonim (wymagane do watermarku)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="author-edit"
+                  value={author}
+                  onChange={(e) => {
+                    setAuthor(e.target.value);
+                    localStorage.setItem("research_author", e.target.value);
+                  }}
+                  placeholder="np. Jan Kowalski"
+                  className="font-medium"
+                  maxLength={100}
+                />
+              </div>
             </div>
           )}
         </Card>
