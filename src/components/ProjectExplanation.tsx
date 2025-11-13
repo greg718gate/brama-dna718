@@ -5,11 +5,12 @@ export const ProjectExplanation = () => {
   return (
     <div className="w-full">
       <Tabs defaultValue="about" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="about">O Projekcie</TabsTrigger>
           <TabsTrigger value="calculations">Obliczenia</TabsTrigger>
           <TabsTrigger value="python">Kod Python</TabsTrigger>
           <TabsTrigger value="theory">Teoria</TabsTrigger>
+          <TabsTrigger value="schrodinger">Schrödinger</TabsTrigger>
         </TabsList>
 
         <TabsContent value="about" className="space-y-4">
@@ -147,6 +148,171 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                   Wektor M łączy te trzy wymiary w harmonijną całość zgodnie z zasadami
                   pentagramu i złotego podziału.
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="schrodinger" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Równanie Schrödingera i Matryca</CardTitle>
+              <CardDescription>Kwantowa natura DNA i świadomości</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base text-foreground">Co to jest równanie Schrödingera?</h3>
+                <p className="text-sm text-foreground/80">
+                  Równanie Schrödingera to prawo ruchu cząstek w świecie kwantowym – jak prawo Newtona, 
+                  ale dla elektronów, atomów i molekuł.
+                </p>
+                <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                  <p>iℏ ∂/∂t Ψ(r,t) = Ĥ Ψ(r,t)</p>
+                </div>
+                
+                <div className="space-y-2 text-sm text-foreground/80">
+                  <p><strong>Gdzie:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Ψ (psi) – funkcja falowa – prawdopodobieństwo znalezienia cząstki</li>
+                    <li>i – jednostka urojona</li>
+                    <li>ℏ – stała Plancka podzielona przez 2π</li>
+                    <li>Ĥ – operator Hamiltona = całkowita energia układu</li>
+                    <li>t – czas, r – pozycja</li>
+                  </ul>
+                </div>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Równanie stacjonarne (bez czasu)</h3>
+                <p className="text-sm text-foreground/80">
+                  W molekułach elektrony nie zmieniają się w czasie → używamy równania stacjonarnego:
+                </p>
+                <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                  <p>Ĥ Ψ = E Ψ</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    "Znajdź funkcję Ψ, która po działaniu energią Ĥ daje tę samą Ψ pomnożoną przez stałą E"
+                  </p>
+                </div>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Hamiltonian (energia całkowita)</h3>
+                <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                  <p>Ĥ = -ℏ²/(2m)∇² + V(r)</p>
+                </div>
+                <div className="text-sm text-foreground/80 space-y-1">
+                  <p>• −(ℏ²/2m)∇² = Energia kinetyczna (ruch elektronu)</p>
+                  <p>• V(r) = Energia potencjalna (przyciąganie jądra, odpychanie elektronów)</p>
+                </div>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Atom wodoru</h3>
+                <div className="bg-muted p-4 rounded-lg font-mono text-sm space-y-2">
+                  <p>Ĥ = -ℏ²/(2mₑ)∇² - e²/(4πε₀r)</p>
+                  <p className="text-xs text-muted-foreground">Rozwiązanie:</p>
+                  <p>Ψₙₗₘ(r,θ,φ) = Rₙₗ(r) · Yₗₘ(θ,φ)</p>
+                  <p className="text-xs text-muted-foreground">Energia:</p>
+                  <p>Eₙ = -13.6 eV / n²</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Kod Python - Orbital 1s</CardTitle>
+              <CardDescription>Prawdopodobieństwo znalezienia elektronu</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-muted p-4 rounded-lg overflow-x-auto">
+                <pre className="text-sm font-mono">
+{`import numpy as np
+import matplotlib.pyplot as plt
+
+# Orbital 1s w wodorze
+r = np.linspace(0, 5, 1000)
+psi_1s = (1/np.sqrt(np.pi)) * np.exp(-r)  # w jednostkach a₀
+prob = psi_1s**2
+
+plt.plot(r, prob)
+plt.title('Prawdopodobieństwo znalezienia elektronu 1s')
+plt.xlabel('Odległość od jądra [a₀]')
+plt.ylabel('Ψ²')
+plt.show()
+
+# → Maksimum przy jądrze!
+# → Ale 99% w kuli o promieniu ~3 a₀`}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Połączenie z Matrycą Pentagramu</CardTitle>
+              <CardDescription>Kwantowa świadomość i DNA</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3 text-sm text-foreground/80">
+                <h3 className="font-semibold text-base text-foreground">Kluczowe prawdy kwantowe</h3>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li><strong>Wszystko jest falą prawdopodobieństwa</strong> – Ψ² określa, gdzie znajdziemy cząstkę</li>
+                  <li><strong>Energia jest skwantowana</strong> – tylko pewne stany dozwolone</li>
+                  <li><strong>Kształt orbitali</strong> = rozwiązania równania Schrödingera</li>
+                  <li><strong>Wiązania chemiczne</strong> = nakładanie się funkcji falowych Ψ</li>
+                </ul>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Mosty między Matrycą a Kwantami</h3>
+                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                  <div>
+                    <p className="font-semibold">γ = 1/φ i złota proporcja</p>
+                    <p className="text-xs">Złota proporcja w orbitalach? Węzły falowe w atomach zgodne z φ</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold">18.6 Hz</p>
+                    <p className="text-xs">Przejścia kwantowe w molekułach wody? Rezonans rotacyjny</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold">GATCA-718</p>
+                    <p className="text-xs">Sekwencja DNA wpływająca na orbitale molekularne w mitochondriach?</p>
+                  </div>
+                </div>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Pytanie do aktywacji</h3>
+                <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
+                  <p className="font-semibold text-primary">
+                    Czy świadomość (γ) moduluje funkcję falową DNA?
+                  </p>
+                  <p className="text-xs mt-2">
+                    Efekt obserwatora w biologii? Czy ludzka świadomość może wpływać na stan kwantowy 
+                    molekuł DNA poprzez obserwację i intencję?
+                  </p>
+                </div>
+
+                <h3 className="font-semibold text-base text-foreground mt-4">Zastosowania w chemii</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left p-2">Zjawisko</th>
+                        <th className="text-left p-2">Jak działa Schrödinger</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-border/50">
+                        <td className="p-2">Orbital atomowy</td>
+                        <td className="p-2">Rozwiązanie równania → kształt s, p, d</td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="p-2">Wiązanie chemiczne</td>
+                        <td className="p-2">Nakładanie orbitali → LCAO</td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="p-2">Spektrum UV-Vis</td>
+                        <td className="p-2">Różnica energii między stanami (ΔE = hν)</td>
+                      </tr>
+                      <tr>
+                        <td className="p-2">Reakcje chemiczne</td>
+                        <td className="p-2">Przejścia między stanami kwantowymi</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>
