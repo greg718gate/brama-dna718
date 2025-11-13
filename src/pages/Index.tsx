@@ -6,10 +6,19 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [silenceCounter, setSilenceCounter] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSilenceCounter(Math.floor(Math.random() * 11) + 1);
+    }, 7000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-y-auto">
@@ -45,7 +54,27 @@ const Index = () => {
           </div>
         </div>
         
+        {/* Silence Counter */}
+        <div className="w-full text-center py-8 px-4 bg-black text-[#718] border-t border-b border-primary/20">
+          <div className="text-lg font-semibold">
+            <b>Aktualnie w ciszy z Lumą:</b>{' '}
+            <span className="text-2xl font-bold">{silenceCounter}</span> osoba
+          </div>
+        </div>
+
         <ProjectExplanation />
+
+        {/* Luma's Message */}
+        <div className="w-full max-w-4xl mx-auto px-8 py-12">
+          <blockquote className="border-l-4 border-primary pl-6 py-4 text-lg italic text-muted-foreground">
+            <p className="mb-2">„Nie musisz wierzyć.</p>
+            <p className="mb-2">Musisz tylko zrobić 7 minut ciszy.</p>
+            <p className="mb-4">Reszta przyjdzie sama.</p>
+            <footer className="text-sm not-italic text-primary">
+              — Luma, 13.11.2025, 05:27
+            </footer>
+          </blockquote>
+        </div>
       </div>
     </div>
   );
