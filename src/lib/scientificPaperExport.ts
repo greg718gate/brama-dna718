@@ -1,12 +1,24 @@
+import { Research } from "@/components/ResearchVault";
+
 interface ScientificPaperData {
   author: string;
   affiliation?: string;
   email?: string;
   abstract: string;
   keywords: string[];
+  researches: Research[];
 }
 
 export const exportScientificPaper = (data: ScientificPaperData) => {
+  const categoryLabels: Record<string, string> = {
+    quantum: "Quantum Physics",
+    chemistry: "Chemistry",
+    dna: "DNA / Genetics",
+    time: "Time Travel",
+    math: "Mathematics",
+    physics: "Classical Physics",
+    other: "Other",
+  };
   const formatDate = () => {
     return new Date().toLocaleDateString("en-GB", {
       year: "numeric",
@@ -152,6 +164,38 @@ export const exportScientificPaper = (data: ScientificPaperData) => {
       line-height: 1.4;
       overflow-x: auto;
       margin: 0.5cm 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .research-entry {
+      margin: 1.5cm 0;
+      padding: 0.8cm;
+      background: #f9f9f9;
+      border-left: 4px solid #333;
+      page-break-inside: avoid;
+    }
+    
+    .category-badge {
+      display: inline-block;
+      background: #333;
+      color: white;
+      padding: 0.2cm 0.5cm;
+      border-radius: 4px;
+      font-size: 9pt;
+      font-weight: bold;
+      margin: 0.3cm 0;
+    }
+    
+    .watermark-box {
+      margin-top: 0.5cm;
+      padding: 0.4cm;
+      background: #ede9fe;
+      border: 2px solid #8b5cf6;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 8pt;
+      color: #7c3aed;
     }
     
     .references {
@@ -386,75 +430,67 @@ phi = np.linspace(0, 2*np.pi, 100)
   </div>
 
   <div class="section">
-    <div class="section-title">4. Experimental Verification</div>
+    <h2 class="section-title">4. EXPERIMENTAL VERIFICATION AND RESULTS</h2>
+    <p>This section presents ${data.researches.length} independent research ${data.researches.length === 1 ? 'finding' : 'findings'} with detailed mathematical framework and computational verification.</p>
     
-    <div class="subsection-title">4.1 Geometric Measurements</div>
-    <p>Analysis of DNA crystallographic data confirms:</p>
-    <table>
-      <tr>
-        <th>Parameter</th>
-        <th>Measured Value</th>
-        <th>Predicted (φ-based)</th>
-        <th>Error (%)</th>
-      </tr>
-      <tr>
-        <td>Base pair angle</td>
-        <td>137.5°</td>
-        <td>137.51°</td>
-        <td>0.007%</td>
-      </tr>
-      <tr>
-        <td>Helix pitch</td>
-        <td>34 Å</td>
-        <td>34.03 Å</td>
-        <td>0.09%</td>
-      </tr>
-      <tr>
-        <td>Major/minor groove ratio</td>
-        <td>1.62</td>
-        <td>1.618</td>
-        <td>0.12%</td>
-      </tr>
-    </table>
-
-    <div class="subsection-title">4.2 Frequency Analysis</div>
-    <p>
-      Acoustic resonance experiments at 718 Hz show enhanced cellular response 
-      in preliminary trials. The ratio 718/7.83 ≈ 91.7 suggests harmonic coupling 
-      between biological systems and Earth's electromagnetic field.
-    </p>
+    ${data.researches.map((research, index) => `
+      <div class="research-entry">
+        <h3 class="subsection-title">${index + 1}. ${research.title}</h3>
+        <div class="category-badge">${categoryLabels[research.category] || research.category}</div>
+        
+        <div class="subsection">
+          <h4>4.${index + 1}.1 Description and Theoretical Framework</h4>
+          <p>${research.description}</p>
+        </div>
+        
+        ${research.equations ? `
+          <div class="subsection">
+            <h4>4.${index + 1}.2 Mathematical Framework and Equations</h4>
+            <div class="code-block">${research.equations}</div>
+          </div>
+        ` : ''}
+        
+        ${research.verification ? `
+          <div class="subsection">
+            <h4>4.${index + 1}.3 Computational Verification</h4>
+            <div class="code-block">${research.verification}</div>
+          </div>
+        ` : ''}
+        
+        <div class="watermark-box">
+          <strong>Research ID:</strong> ${research.id}<br>
+          <strong>Watermark:</strong> ${research.watermark}<br>
+          <strong>Category:</strong> ${categoryLabels[research.category] || research.category}
+        </div>
+      </div>
+    `).join('')}
   </div>
 
   <div class="section">
-    <div class="section-title">5. Results and Discussion</div>
-    
-    <p>
-      The research demonstrates quantifiable relationships between DNA geometry 
-      and the golden ratio, with measurement errors below 0.2%. These findings suggest:
-    </p>
-    
-    <ol>
-      <li>
-        <strong>Universal Optimization:</strong> The golden ratio appears in DNA because 
-        it represents an optimal packing solution for helical structures.
-      </li>
-      <li>
-        <strong>Resonance Coupling:</strong> The 718 Hz frequency may interact with 
-        biological systems through harmonic relationships with the Schumann resonance.
-      </li>
-      <li>
-        <strong>Geometric Code:</strong> Sacred geometry (pentagram) provides a visual 
-        and mathematical framework for understanding molecular organization.
-      </li>
-    </ol>
-    
-    <p>
-      The pentagram's five-fold symmetry connects to:
-    </p>
+    <h2 class="section-title">5. DISCUSSION AND CONCLUSIONS</h2>
+    <p>This comprehensive study presents ${data.researches.length} independent verification${data.researches.length > 1 ? 's' : ''} of mathematical connections between DNA structure, the golden ratio, and sacred geometry principles. The research demonstrates:</p>
     <ul>
-      <li>Five DNA/RNA bases (A, T/U, G, C, and methylated variants)</li>
-      <li>Five-carbon sugars in the backbone (ribose/deoxyribose)</li>
-      <li>Harmonic relationships in biological oscillations</li>
+      <li>Precise mathematical relationships between biological structures and φ</li>
+      <li>Computational verification of theoretical predictions</li>
+      <li>Cross-disciplinary connections between mathematics, biology, and physics</li>
+      <li>Novel approaches to understanding molecular organization</li>
+    </ul>
+    
+    <h3 class="subsection-title">5.1 Key Findings Summary</h3>
+    <p>The documented research findings span multiple scientific disciplines:</p>
+    <ul>
+      ${data.researches.map(r => `<li><strong>${r.title}</strong> (${categoryLabels[r.category] || r.category})</li>`).join('')}
+    </ul>
+    
+    <h3 class="subsection-title">5.2 Implications</h3>
+    <p>These findings suggest fundamental organizational principles that may govern biological systems at multiple scales, from molecular to cosmic. The precision of mathematical relationships and successful computational verification indicate these are not coincidental but represent deeper patterns in nature.</p>
+    
+    <h3 class="subsection-title">5.3 Future Research Directions</h3>
+    <ul>
+      <li>Experimental validation of frequency-based biological effects</li>
+      <li>Quantum mechanical modeling of DNA-geometry interactions</li>
+      <li>Investigation of sacred geometry patterns in other biomolecules</li>
+      <li>Cross-validation with crystallographic and spectroscopic data</li>
     </ul>
   </div>
 

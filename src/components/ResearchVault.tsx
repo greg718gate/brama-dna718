@@ -22,7 +22,11 @@ export interface Research {
   watermark: string;
 }
 
-export const ResearchVaultComponent = () => {
+interface ResearchVaultProps {
+  onResearchesChange?: (researches: Research[]) => void;
+}
+
+export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProps = {}) => {
   const [researches, setResearches] = useState<Research[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [author, setAuthor] = useState("");
@@ -51,7 +55,10 @@ export const ResearchVaultComponent = () => {
     if (researches.length > 0) {
       localStorage.setItem("research_vault", JSON.stringify(researches));
     }
-  }, [researches]);
+    if (onResearchesChange) {
+      onResearchesChange(researches);
+    }
+  }, [researches, onResearchesChange]);
 
   const generateWatermark = (author: string, timestamp: number) => {
     const date = new Date(timestamp).toISOString();
