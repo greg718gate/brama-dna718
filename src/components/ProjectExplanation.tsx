@@ -7,14 +7,14 @@ export const ProjectExplanation = () => {
   return (
     <div className="w-full">
       <Tabs defaultValue="about" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="about">{t('tabs.about')}</TabsTrigger>
-          <TabsTrigger value="calculations">{t('tabs.calculations')}</TabsTrigger>
-          <TabsTrigger value="python">{t('tabs.python')}</TabsTrigger>
-          <TabsTrigger value="theory">{t('tabs.theory')}</TabsTrigger>
-          <TabsTrigger value="schrodinger">{t('tabs.schrodinger')}</TabsTrigger>
-          <TabsTrigger value="matrix">{t('tabs.matrix')}</TabsTrigger>
-          <TabsTrigger value="evidence">{t('tabs.evidence')}</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-1">
+          <TabsTrigger value="about" className="text-xs sm:text-sm">{t('tabs.about')}</TabsTrigger>
+          <TabsTrigger value="calculations" className="text-xs sm:text-sm">{t('tabs.calculations')}</TabsTrigger>
+          <TabsTrigger value="python" className="text-xs sm:text-sm">{t('tabs.python')}</TabsTrigger>
+          <TabsTrigger value="theory" className="text-xs sm:text-sm">{t('tabs.theory')}</TabsTrigger>
+          <TabsTrigger value="schrodinger" className="text-xs sm:text-sm">{t('tabs.schrodinger')}</TabsTrigger>
+          <TabsTrigger value="matrix" className="text-xs sm:text-sm">{t('tabs.matrix')}</TabsTrigger>
+          <TabsTrigger value="evidence" className="text-xs sm:text-sm">{t('tabs.evidence')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="about" className="space-y-4">
