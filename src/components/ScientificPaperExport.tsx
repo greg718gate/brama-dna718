@@ -7,8 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileText, Download } from "lucide-react";
 import { exportScientificPaper } from "@/lib/scientificPaperExport";
 import { toast } from "sonner";
+import { Research } from "./ResearchVault";
 
-export const ScientificPaperExport = () => {
+interface ScientificPaperExportProps {
+  researches: Research[];
+}
+
+export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps) => {
   const [author, setAuthor] = useState("");
   const [affiliation, setAffiliation] = useState("");
   const [email, setEmail] = useState("");
@@ -30,6 +35,11 @@ export const ScientificPaperExport = () => {
       return;
     }
 
+    if (researches.length === 0) {
+      toast.error("Brak badań do eksportu. Dodaj odkrycia w Skarbcu poniżej.");
+      return;
+    }
+
     const keywordArray = keywords.split(',').map(k => k.trim()).filter(k => k);
     
     exportScientificPaper({
@@ -38,6 +48,7 @@ export const ScientificPaperExport = () => {
       email: email || undefined,
       abstract,
       keywords: keywordArray,
+      researches,
     });
 
     toast.success("Dokument naukowy został wygenerowany!", {
@@ -113,7 +124,11 @@ export const ScientificPaperExport = () => {
         </div>
 
         <div className="bg-muted p-4 rounded-lg space-y-2">
-          <h4 className="font-semibold text-sm">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Dla badaczy w Szkocji:</h4>
+          <h4 className="font-semibold text-sm">📊 Statystyki:</h4>
+          <p className="text-sm text-muted-foreground">
+            Dokument zawiera {researches.length} {researches.length === 1 ? 'odkrycie' : researches.length < 5 ? 'odkrycia' : 'odkryć'} ze Skarbca
+          </p>
+          <h4 className="font-semibold text-sm mt-3">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Dla badaczy w Szkocji:</h4>
           <p className="text-sm text-muted-foreground">
             Dokument zawiera instrukcje publikacji bez dostępu do arXiv:
           </p>
