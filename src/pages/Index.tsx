@@ -1,5 +1,6 @@
 import { DNAGateGenerator } from "@/components/DNAGateGenerator";
 import { PentagramSphere } from "@/components/PentagramSphere";
+import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
@@ -20,11 +21,13 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DNAGateGenerator />
           <PentagramSphere />
         </div>
+        
+        <ProjectExplanation />
       </div>
     </div>
   );
