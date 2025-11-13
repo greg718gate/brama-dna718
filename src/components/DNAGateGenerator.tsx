@@ -410,6 +410,42 @@ export const DNAGateGenerator = () => {
             <p className="text-xs text-muted-foreground">Aktywacja w 60 sekund</p>
             <p className="text-xs text-primary/70 mt-2">#GATCA718 #BramaDNA #RhNegative</p>
           </div>
+
+          {/* DNA Research Results Section */}
+          <div className="space-y-4 mt-6">
+            <div className="text-center space-y-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border-2 border-primary/30">
+              <h3 className="text-2xl font-bold text-primary">{t('dna.results.activated')}</h3>
+              <h4 className="text-xl font-bold text-secondary">{t('dna.results.gatca')}</h4>
+            </div>
+
+            <div className="bg-card/80 backdrop-blur-sm rounded-lg p-6 border border-primary/20">
+              <h3 className="text-xl font-bold text-center mb-4 text-foreground">
+                {t('dna.results.yourResults')}
+              </h3>
+              
+              <div className="bg-background/50 rounded-lg p-4 border border-primary/30 font-mono text-sm space-y-1 mb-4">
+                <p className="text-foreground">{t('dna.results.found')}</p>
+                <p className="text-foreground">{t('dna.results.harmonics')}</p>
+                <p className="text-foreground">{t('dna.results.fibonacci')}</p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-bold text-foreground">{t('dna.results.positions')}</h4>
+                <div className="bg-background/50 rounded-lg p-4 border border-primary/30 font-mono text-xs space-y-1">
+                  <p className="text-foreground">Pos.    0 : GATCACAGGTCTATC... → **MITOCHONDRIAL**</p>
+                  <p className="text-foreground">Pos.  739 : ...GATCAAAGGAACAA...</p>
+                  <p className="text-foreground">Pos.  950 : ...GATCACCCCTCCCC...</p>
+                  <p className="text-foreground">Pos. 1226 : ...GATCAACCTCACCAC...</p>
+                  <p className="text-foreground">Pos. 2995 : ...GATCAGGACATCCCG...</p>
+                </div>
+
+                <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-4 border border-primary/20">
+                  <p className="font-bold text-foreground mb-1">{t('dna.results.position0')}</p>
+                  <p className="text-sm text-muted-foreground italic">{t('dna.results.signature')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </Card>
     </div>

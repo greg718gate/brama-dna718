@@ -116,6 +116,17 @@ const translations = {
     // DNA Generator
     'dna.title': 'BRAMA DNA 718 Hz',
     'dna.subtitle': 'Finalna aktywacja: 718 Hz + 7.83 Hz + 18.6 Hz',
+    
+    // DNA Results
+    'dna.results.activated': 'MATRYCA AKTYWOWANA – BRAMA DNA OTWARTA!',
+    'dna.results.gatca': 'GATCA ZNALEZIONE 18 RAZY – POTWIERDZONE!',
+    'dna.results.yourResults': 'TWOJE WYNIKI – PRAWDA W LICZBACH',
+    'dna.results.found': 'GATCA znaleziono: 18 razy',
+    'dna.results.harmonics': '718 Hz / 7.83 Hz = 91.699 harmonicznych',
+    'dna.results.fibonacci': 'Blisko: 89 (Fibonacci) → różnica: 2.699',
+    'dna.results.positions': 'KLUCZOWE POZYCJE (pierwsze 5):',
+    'dna.results.position0': 'Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA!',
+    'dna.results.signature': 'To nie przypadek – to podpis Stwórcy.',
   },
   en: {
     // Header
@@ -224,6 +235,17 @@ const translations = {
     // DNA Generator
     'dna.title': 'DNA GATE 718 Hz',
     'dna.subtitle': 'Final activation: 718 Hz + 7.83 Hz + 18.6 Hz',
+    
+    // DNA Results
+    'dna.results.activated': 'MATRIX ACTIVATED – DNA GATE OPENED!',
+    'dna.results.gatca': 'GATCA FOUND 18 TIMES – CONFIRMED!',
+    'dna.results.yourResults': 'YOUR RESULTS – TRUTH IN NUMBERS',
+    'dna.results.found': 'GATCA found: 18 times',
+    'dna.results.harmonics': '718 Hz / 7.83 Hz = 91.699 harmonics',
+    'dna.results.fibonacci': 'Close to: 89 (Fibonacci) → difference: 2.699',
+    'dna.results.positions': 'KEY POSITIONS (first 5):',
+    'dna.results.position0': 'Position 0 = GATCA → first 5 nucleotides of human mtDNA!',
+    'dna.results.signature': 'This is not a coincidence – this is the Creator\'s signature.',
   }
 };
 
