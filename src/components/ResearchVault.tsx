@@ -124,37 +124,20 @@ export const ResearchVaultComponent = () => {
           </div>
 
           {/* Author Input */}
-          {!author && (
-            <div className="space-y-2 bg-secondary/10 p-4 rounded-lg border border-secondary/30">
-              <Label htmlFor="author" className="text-sm font-semibold">Twoje imię/pseudonim (wymagane do watermarku)</Label>
-              <Input
-                id="author"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="np. Jan Kowalski"
-                className="font-medium"
-              />
-            </div>
-          )}
-
-          {author && (
-            <div className="space-y-2 bg-secondary/10 p-4 rounded-lg border border-secondary/30">
-              <Label htmlFor="author-edit" className="text-sm font-semibold">Twoje imię/pseudonim (wymagane do watermarku)</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="author-edit"
-                  value={author}
-                  onChange={(e) => {
-                    setAuthor(e.target.value);
-                    localStorage.setItem("research_author", e.target.value);
-                  }}
-                  placeholder="np. Jan Kowalski"
-                  className="font-medium"
-                  maxLength={100}
-                />
-              </div>
-            </div>
-          )}
+          <div className="space-y-2 bg-secondary/10 p-4 rounded-lg border border-secondary/30">
+            <Label htmlFor="author" className="text-sm font-semibold">Twoje imię/pseudonim (wymagane do watermarku)</Label>
+            <Input
+              id="author"
+              value={author}
+              onChange={(e) => {
+                setAuthor(e.target.value);
+                localStorage.setItem("research_author", e.target.value);
+              }}
+              placeholder="np. Jan Kowalski"
+              className="font-medium"
+              maxLength={100}
+            />
+          </div>
         </Card>
 
         {/* Actions */}
