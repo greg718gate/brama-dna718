@@ -34,21 +34,21 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="container mx-auto px-4 py-8 pb-16 space-y-8 max-w-7xl">
-        <div className="pt-12 md:pt-8">
-          <div className="text-center space-y-4 mb-12 animate-fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
+      <div className="container mx-auto px-4 py-8 pb-16 space-y-12 max-w-7xl">
+        <div className="pt-16 md:pt-12">
+          <div className="text-center space-y-6 mb-16 animate-fade-in">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight pb-2">
               {t('header.truth')}
             </h1>
-            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-500 via-primary to-purple-500 bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-500 via-primary to-purple-500 bg-clip-text text-transparent leading-tight pb-2">
               {t('header.matrix')}
             </h2>
-            <h3 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
+            <h3 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight pb-2">
               {t('header.wavefunction')}
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <DNAGateGenerator />
             <PentagramSphere />
           </div>
