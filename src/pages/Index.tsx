@@ -9,7 +9,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen overflow-y-auto">
       <div className="fixed top-4 right-4 z-50">
         <Button
           onClick={() => navigate("/vault")}
@@ -21,10 +21,12 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DNAGateGenerator />
-          <PentagramSphere />
+      <div className="container mx-auto px-4 py-8 pb-16 space-y-8 max-w-7xl">
+        <div className="pt-12 md:pt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DNAGateGenerator />
+            <PentagramSphere />
+          </div>
         </div>
         
         <ProjectExplanation />
