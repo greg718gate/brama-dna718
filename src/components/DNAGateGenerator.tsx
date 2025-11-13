@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Play, Pause, Download, Activity } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const DNAGateGenerator = () => {
+  const { t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -320,11 +322,11 @@ export const DNAGateGenerator = () => {
             <div className="flex items-center justify-center gap-3 mb-4">
               <Activity className="w-10 h-10 text-primary animate-pulse" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                BRAMA DNA 718 Hz
+                {t('dna.title')}
               </h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Finalna aktywacja: 718 Hz + 7.83 Hz + 18.6 Hz
+              {t('dna.subtitle')}
             </p>
           </div>
 

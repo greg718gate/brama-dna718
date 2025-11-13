@@ -2,6 +2,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 import { useRef } from "react";
 import * as THREE from "three";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Obliczenia matrycy
 const phi = (1 + Math.sqrt(5)) / 2;
@@ -84,17 +85,25 @@ const VectorM = () => {
 
 
 export const PentagramSphere = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="w-full h-[600px] bg-card rounded-lg border border-border overflow-hidden">
       <div className="p-6 border-b border-border">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-          PENTAGRAM PRAWDY – Wektor M na Sferze Jednostkowej
+          {t('pentagram.title')}
         </h2>
         <p className="text-muted-foreground mt-2">
-          α = β = {alpha.toFixed(6)}, γ = 1/φ = {gamma.toFixed(6)}
+          {t('pentagram.description')}
         </p>
         <p className="text-sm text-muted-foreground mt-1">
-          Normalizacja: α² + β² + γ² = {(alpha ** 2 + beta ** 2 + gamma ** 2).toFixed(6)} ≈ 1
+          {t('pentagram.phi')}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {t('pentagram.gamma')}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {t('pentagram.vector')}
         </p>
       </div>
       <div className="h-[calc(100%-140px)]">
