@@ -7,12 +7,13 @@ export const ProjectExplanation = () => {
   return (
     <div className="w-full">
       <Tabs defaultValue="about" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="about">{t('tabs.about')}</TabsTrigger>
           <TabsTrigger value="calculations">{t('tabs.calculations')}</TabsTrigger>
           <TabsTrigger value="python">{t('tabs.python')}</TabsTrigger>
           <TabsTrigger value="theory">{t('tabs.theory')}</TabsTrigger>
           <TabsTrigger value="schrodinger">{t('tabs.schrodinger')}</TabsTrigger>
+          <TabsTrigger value="matrix">{t('tabs.matrix')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="about" className="space-y-4">
@@ -308,6 +309,130 @@ plt.show()
                       </tr>
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="matrix" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                {t('matrix.title')}
+              </CardTitle>
+              <CardDescription className="text-base">
+                {t('matrix.trinity')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Step 1: Unit Vector */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-primary">{t('matrix.step1')}</h3>
+                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
+                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
+{`import numpy as np
+from sympy import sqrt, symbols, simplify
+
+phi = (1 + sqrt(5))/2
+gamma = 1/phi  # ≈ 0.6180339887
+gamma2 = gamma**2
+alpha2_beta2 = 1 - gamma2
+
+alpha = beta = sqrt(alpha2_beta2 / 2)
+
+print(f"α = β = {float(alpha):.15f}")
+print(f"γ = {float(gamma):.15f}")`}
+                  </pre>
+                </div>
+                <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
+                  <p className="font-mono text-sm text-foreground mb-2">{t('matrix.step1.result')}</p>
+                  <p className="font-bold text-lg text-primary">{t('matrix.step1.vector')}</p>
+                  <p className="text-sm text-muted-foreground mt-2 italic">{t('matrix.step1.conclusion')}</p>
+                </div>
+              </div>
+
+              {/* Step 2: Schumann Resonance */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-primary">{t('matrix.step2')}</h3>
+                <div className="space-y-2">
+                  <p className="text-foreground">✓ {t('matrix.step2.base')}</p>
+                  <p className="text-foreground">✓ {t('matrix.step2.target')}</p>
+                  <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
+                    <pre className="text-xs overflow-x-auto font-mono text-foreground">
+{`ratio = 18.6 / 7.83
+print(f"18.6 / 7.83 = {ratio:.6f}")
+
+harmonic = 7.83 * phi
+print(f"7.83 × φ = {harmonic:.3f}")`}
+                    </pre>
+                  </div>
+                  <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
+                    <p className="font-mono text-sm text-foreground mb-1">{t('matrix.step2.ratio')}</p>
+                    <p className="font-mono text-sm text-foreground mb-2">{t('matrix.step2.golden')}</p>
+                    <p className="font-bold text-secondary">{t('matrix.step2.key')}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: GATCA-718 */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-primary">{t('matrix.step3')}</h3>
+                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
+                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
+{`# 718 Hz → podziel przez γ
+print(718 / gamma)  # = 1161.8 Hz
+
+# 1161.8 / 7.83 = ?
+print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
+                  </pre>
+                </div>
+                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border-2 border-primary/30">
+                  <p className="font-bold text-lg text-primary mb-2">{t('matrix.step3.bridge')}</p>
+                  <p className="text-foreground">{t('matrix.step3.calc')}</p>
+                  <p className="text-sm text-muted-foreground mt-2 italic">{t('matrix.step3.meaning')}</p>
+                </div>
+              </div>
+
+              {/* Activation Code */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-primary">{t('matrix.activation')}</h3>
+                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
+                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
+{`# MATRYCA PENTAGRAMU PRAWDY v1.0
+import numpy as np
+from math import sqrt
+
+phi = (1 + sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print("WEKTOR MATRYCY:", M.round(6))
+
+f0 = 7.83
+f_target = 18.6
+modulation = f_target / f0
+
+freq_gate = 718 / gamma
+harmonics = freq_gate / f0
+print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
+                  </pre>
+                </div>
+                <div className="bg-background/50 rounded-lg p-4 border border-secondary/30 space-y-1">
+                  <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.vector')}</p>
+                  <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.modulation')}</p>
+                  <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.gate')}</p>
+                </div>
+              </div>
+
+              {/* Message */}
+              <div className="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg p-6 border-2 border-primary/40">
+                <h3 className="text-xl font-bold text-primary mb-4">{t('matrix.message')}</h3>
+                <div className="space-y-3">
+                  <p className="text-foreground font-semibold">"{t('matrix.message1')}"</p>
+                  <p className="text-foreground font-semibold">"{t('matrix.message2')}"</p>
+                  <p className="text-foreground font-semibold">"{t('matrix.message3')}"</p>
                 </div>
               </div>
             </CardContent>

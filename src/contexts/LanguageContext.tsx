@@ -22,6 +22,7 @@ const translations = {
     'tabs.python': 'Kod Python',
     'tabs.theory': 'Teoria',
     'tabs.schrodinger': 'Schrödinger',
+    'tabs.matrix': 'Matryca Faza 1',
     
     // About section
     'about.title': 'Brama DNA i Pentagram Prawdy',
@@ -127,6 +128,32 @@ const translations = {
     'dna.results.positions': 'KLUCZOWE POZYCJE (pierwsze 5):',
     'dna.results.position0': 'Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA!',
     'dna.results.signature': 'To nie przypadek – to podpis Stwórcy.',
+    
+    // Matrix Phase 1
+    'matrix.title': 'MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA',
+    'matrix.trinity': 'Słońce = α (akcelerator plazmy), Ziemia = β (antena rezonansowa), Człowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)',
+    'matrix.step1': 'KROK 1: WEKTOR JEDNOSTKOWY (α, β, γ)',
+    'matrix.step1.result': 'α = β = 0.437016024448821, γ = 0.618033988749895, Suma kwadratów: 1.0',
+    'matrix.step1.vector': 'WEKTOR MATRYCY: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)',
+    'matrix.step1.conclusion': 'To jest pentagram w 3D – złoty trójkąt na sferze jednostkowej.',
+    'matrix.step2': 'KROK 2: REZONANS SCHUMANNA → 18.6 Hz',
+    'matrix.step2.base': 'Podstawowa częstotliwość Schumanna: 7.83 Hz',
+    'matrix.step2.target': 'Twoja wartość: 18.6 Hz',
+    'matrix.step2.ratio': '18.6 / 7.83 = 2.375479',
+    'matrix.step2.golden': '7.83 × φ = 12.667 Hz',
+    'matrix.step2.key': 'ZŁOTY KLUCZ: 18.6 Hz ≈ 7.83 × (φ² – 0.24) → modulacja złotego pola',
+    'matrix.step3': 'KROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS',
+    'matrix.step3.calc': '718 / γ = 1161.8 Hz, 1161.8 / 7.83 = 148.35 ≈ 144',
+    'matrix.step3.bridge': 'ZŁOTY MOST: 718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144',
+    'matrix.step3.meaning': '144 = 12×12 = liczba wtajemniczenia w Biblii, piramidach, DNA',
+    'matrix.activation': 'WYNIK AKTYWACJI',
+    'matrix.activation.vector': 'WEKTOR MATRYCY: [0.437016 0.437016 0.618034]',
+    'matrix.activation.modulation': 'Modulacja: 2.375479',
+    'matrix.activation.gate': 'Brama DNA → 148.4 harmonicznych Schumanna',
+    'matrix.message': 'PRZEKAZ',
+    'matrix.message1': 'SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ.',
+    'matrix.message2': '18.6 Hz to nie skok – to SYGNAŁ MODULACJI złotego pola.',
+    'matrix.message3': 'GATCA-718 to klucz do 144. harmonicznej – brama DNA Rh-.',
   },
   en: {
     // Header
@@ -141,6 +168,7 @@ const translations = {
     'tabs.python': 'Python Code',
     'tabs.theory': 'Theory',
     'tabs.schrodinger': 'Schrödinger',
+    'tabs.matrix': 'Matrix Phase 1',
     
     // About section
     'about.title': 'DNA Gate and Pentagram of Truth',
@@ -246,6 +274,32 @@ const translations = {
     'dna.results.positions': 'KEY POSITIONS (first 5):',
     'dna.results.position0': 'Position 0 = GATCA → first 5 nucleotides of human mtDNA!',
     'dna.results.signature': 'This is not a coincidence – this is the Creator\'s signature.',
+    
+    // Matrix Phase 1
+    'matrix.title': 'PENTAGRAM TRUTH MATRIX – Phase 1: CONSTRUCTION',
+    'matrix.trinity': 'Sun = α (plasma accelerator), Earth = β (resonant antenna), Human = γ = 1/φ ≈ 0.618 (consciousness conductor)',
+    'matrix.step1': 'STEP 1: UNIT VECTOR (α, β, γ)',
+    'matrix.step1.result': 'α = β = 0.437016024448821, γ = 0.618033988749895, Sum of squares: 1.0',
+    'matrix.step1.vector': 'MATRIX VECTOR: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)',
+    'matrix.step1.conclusion': 'This is a 3D pentagram – golden triangle on a unit sphere.',
+    'matrix.step2': 'STEP 2: SCHUMANN RESONANCE → 18.6 Hz',
+    'matrix.step2.base': 'Base Schumann frequency: 7.83 Hz',
+    'matrix.step2.target': 'Your value: 18.6 Hz',
+    'matrix.step2.ratio': '18.6 / 7.83 = 2.375479',
+    'matrix.step2.golden': '7.83 × φ = 12.667 Hz',
+    'matrix.step2.key': 'GOLDEN KEY: 18.6 Hz ≈ 7.83 × (φ² – 0.24) → golden field modulation',
+    'matrix.step3': 'STEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE',
+    'matrix.step3.calc': '718 / γ = 1161.8 Hz, 1161.8 / 7.83 = 148.35 ≈ 144',
+    'matrix.step3.bridge': 'GOLDEN BRIDGE: 718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144',
+    'matrix.step3.meaning': '144 = 12×12 = initiation number in Bible, pyramids, DNA',
+    'matrix.activation': 'ACTIVATION RESULT',
+    'matrix.activation.vector': 'MATRIX VECTOR: [0.437016 0.437016 0.618034]',
+    'matrix.activation.modulation': 'Modulation: 2.375479',
+    'matrix.activation.gate': 'DNA Gate → 148.4 Schumann harmonics',
+    'matrix.message': 'MESSAGE',
+    'matrix.message1': 'SUN speaks through α. EARTH listens through β. HUMAN activates through γ = 1/φ.',
+    'matrix.message2': '18.6 Hz is not a jump – it\'s a MODULATION SIGNAL of the golden field.',
+    'matrix.message3': 'GATCA-718 is the key to the 144th harmonic – Rh- DNA gate.',
   }
 };
 
