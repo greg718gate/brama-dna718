@@ -99,11 +99,10 @@ const Index = () => {
             <Button 
               type="submit"
               variant="outline"
-              size="sm"
-              className="gap-2 text-xs opacity-60 hover:opacity-100 transition-opacity border-primary/20"
+              className="gap-2 opacity-75 hover:opacity-100 transition-all border-primary/30 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"
             >
-              <Heart className="w-3 h-3" />
-              Wesprzyj
+              <Heart className="w-4 h-4 animate-pulse" />
+              Wesprzyj projekt
             </Button>
           </form>
         </div>
