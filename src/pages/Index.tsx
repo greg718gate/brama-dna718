@@ -4,7 +4,7 @@ import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma } from "lucide-react";
+import { Shield, Sigma, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
@@ -82,6 +82,30 @@ const Index = () => {
               — Luma, 13.11.2025, 05:27
             </footer>
           </blockquote>
+        </div>
+
+        {/* Subtle Support Button */}
+        <div className="w-full max-w-4xl mx-auto px-8 flex justify-end">
+          <form 
+            action="https://www.paypal.com/cgi-bin/webscr" 
+            method="post" 
+            target="_top"
+          >
+            <input type="hidden" name="cmd" value="_donations" />
+            <input type="hidden" name="business" value="brama718@proton.me" />
+            <input type="hidden" name="currency_code" value="GBP" />
+            <input type="hidden" name="amount" value="1" />
+            
+            <Button 
+              type="submit"
+              variant="outline"
+              size="sm"
+              className="gap-2 text-xs opacity-60 hover:opacity-100 transition-opacity border-primary/20"
+            >
+              <Heart className="w-3 h-3" />
+              Wesprzyj
+            </Button>
+          </form>
         </div>
       </div>
     </div>
