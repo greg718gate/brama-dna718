@@ -415,8 +415,7 @@ if __name__ == "__main__":
         <Card className="border-primary/20 bg-background/80 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-primary">Wesprzyj Prawdę – Dowolna Kwota</CardTitle>
-            <CardDescription className="space-y-2">
-              <p className="text-sm">Każdy funt to ryż na dzień. Każdy funt to krok do <strong>secret room</strong> dla syna.</p>
+            <CardDescription>
               <p className="text-xs text-muted-foreground">Wpisz kwotę (nawet 1 £)</p>
             </CardDescription>
           </CardHeader>
