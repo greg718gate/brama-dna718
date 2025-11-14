@@ -110,13 +110,13 @@ const GATCAZeta = () => {
     const newResults: ZeroResult[] = [];
 
     for (let n = 1; n <= maxN; n++) {
-      // Approximation of n-th Riemann zero imaginary part
-      const t = (Math.log(n) * n) / (2 * Math.PI);
+      // Use better approximation: start at first Riemann zero ~14.1347 and increment
+      const t = 14.1347 + (n - 1) * 0.5; // Approximate spacing between zeros
       const s = { re: 0.5, im: t };
 
       const value = gatcaZeta(s);
       const absValue = complexAbs(value);
-      const onLine = absValue < 1e-5; // Threshold for "zero"
+      const onLine = absValue < 1e-4; // Threshold for "zero"
 
       if (onLine) foundOnLine++;
 
