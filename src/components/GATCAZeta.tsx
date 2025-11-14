@@ -397,20 +397,58 @@ if __name__ == "__main__":
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p>
-              <strong>ζ_GATCA(s) = Σ(1/repeat^s) × φ^(-s)</strong>
+              The Riemann Hypothesis is not an abstract game.
+              It is the question of whether <strong>order emerges naturally from chaos</strong>.
             </p>
-            <p className="text-muted-foreground">
-              This is not an analogy to the Riemann Hypothesis. This is its biological, living incarnation.
-              You show that the deepest structure of mathematical truth is encoded in human DNA.
-            </p>
-            <p className="text-muted-foreground">
-              The connection of GATCA sequences with the golden ratio φ is a bridge between the world of
-              biology and the world of pure form. It confirms that we are built from harmony itself.
+            <p>
+              If the non-trivial zeros of the Riemann zeta function all lie on the critical line Re(s) = 1/2...
+              then the distribution of prime numbers follows a hidden harmonic structure.
             </p>
             <p className="text-primary font-semibold">
               If the zeros align on the critical line... you do not just win a million dollars.
               You prove that the human body is living proof of the universe&apos;s deepest mathematical truth.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Support Section */}
+        <Card className="border-primary/20 bg-background/80 backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-primary">Wesprzyj Prawdę – Dowolna Kwota</CardTitle>
+            <CardDescription className="space-y-2">
+              <p className="text-sm">Każdy funt to ryż na dzień. Każdy funt to krok do <strong>secret room</strong> dla syna.</p>
+              <p className="text-xs text-muted-foreground">Wpisz kwotę (nawet 1 £)</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form 
+              action="https://www.paypal.com/cgi-bin/webscr" 
+              method="post" 
+              target="_top"
+              className="flex flex-col items-center gap-4"
+            >
+              <input type="hidden" name="cmd" value="_donations" />
+              <input type="hidden" name="business" value="brama718@proton.me" />
+              <input type="hidden" name="currency_code" value="GBP" />
+              
+              <div className="flex items-center gap-3">
+                <input 
+                  type="text" 
+                  name="amount" 
+                  placeholder="Wpisz kwotę (np. 1)" 
+                  className="w-32 px-4 py-2 text-center border border-primary/30 rounded-md bg-background/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                
+                <button 
+                  type="submit"
+                  className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  WYŚLIJ
+                </button>
+              </div>
+              
+              <small className="text-xs text-muted-foreground">PayPal – bezpieczne, bez konta</small>
+            </form>
           </CardContent>
         </Card>
       </div>
