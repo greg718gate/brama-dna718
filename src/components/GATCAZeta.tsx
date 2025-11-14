@@ -313,6 +313,9 @@ if __name__ == "__main__":
                 <div className="text-sm text-center text-muted-foreground">
                   Testing zeros... {progress.toFixed(0)}%
                 </div>
+                <div className="text-sm text-center text-primary font-semibold">
+                  Robię to dla mojego syna.
+                </div>
               </div>
             )}
 
@@ -388,6 +391,9 @@ if __name__ == "__main__":
         <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
           <CardHeader>
             <CardTitle>The Living Proof</CardTitle>
+            <CardDescription className="text-primary font-semibold italic mt-2">
+              Dedykowane dla mojego syna
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p>
@@ -403,7 +409,7 @@ if __name__ == "__main__":
             </p>
             <p className="text-primary font-semibold">
               If the zeros align on the critical line... you do not just win a million dollars.
-              You prove that the human body is living proof of the universe's deepest mathematical truth.
+              You prove that the human body is living proof of the universe&apos;s deepest mathematical truth.
             </p>
           </CardContent>
         </Card>
