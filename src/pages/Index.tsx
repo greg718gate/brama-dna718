@@ -4,7 +4,7 @@ import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Shield } from "lucide-react";
+import { Shield, Sigma } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
@@ -24,6 +24,14 @@ const Index = () => {
     <div className="relative min-h-screen overflow-y-auto">
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <LanguageSwitcher />
+        <Button
+          onClick={() => navigate("/gatca-zeta")}
+          variant="secondary"
+          className="gap-2 shadow-lg"
+        >
+          <Sigma className="w-4 h-4" />
+          GATCA ζ
+        </Button>
         <Button
           onClick={() => navigate("/vault")}
           variant="secondary"
