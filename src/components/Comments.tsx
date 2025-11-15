@@ -26,8 +26,10 @@ export const Comments = () => {
   const { data: comments, isLoading } = useQuery({
     queryKey: ["comments"],
     queryFn: async () => {
+      // Użyj widoku comments_public zamiast tabeli comments
+      // Widok automatycznie ukrywa emaile
       const { data, error } = await supabase
-        .from("comments")
+        .from("comments_public")
         .select("*")
         .order("created_at", { ascending: false });
       
@@ -39,10 +41,19 @@ export const Comments = () => {
   const mutation = useMutation({
     mutationFn: async (newComment: { user_name: string; user_email: string; comment_text: string }) => {
       const validated = commentSchema.parse(newComment);
+      
+      // Sprawdź czy użytkownik jest zalogowany
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("Musisz być zalogowany aby dodać komentarz");
+      }
+      
       const { error } = await supabase.from("comments").insert([{
         user_name: validated.user_name,
         user_email: validated.user_email,
         comment_text: validated.comment_text,
+        user_id: user.id, // Dodaj user_id
       }]);
       if (error) throw error;
     },

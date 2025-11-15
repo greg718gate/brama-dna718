@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "resend";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,23 +23,31 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending contact email from:", email, "name:", name);
 
-    const emailResponse = await resend.emails.send({
-      from: "Pentagram Prawdy <onboarding@resend.dev>",
-      to: ["bramadna718@gmail.com"],
-      replyTo: email,
-      subject: `Nowa wiadomość od ${name}`,
-      html: `
-        <h2>Nowa wiadomość kontaktowa</h2>
-        <p><strong>Od:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Wiadomość:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
+    const emailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Pentagram Prawdy <onboarding@resend.dev>",
+        to: ["bramadna718@gmail.com"],
+        reply_to: email,
+        subject: `Nowa wiadomość od ${name}`,
+        html: `
+          <h2>Nowa wiadomość kontaktowa</h2>
+          <p><strong>Od:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Wiadomość:</strong></p>
+          <p>${message.replace(/\n/g, '<br>')}</p>
+        `,
+      }),
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    const responseData = await emailResponse.json();
+    console.log("Email sent successfully:", responseData);
 
-    return new Response(JSON.stringify(emailResponse), {
+    return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
