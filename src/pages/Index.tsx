@@ -2,6 +2,8 @@ import { DNAGateGenerator } from "@/components/DNAGateGenerator";
 import { PentagramSphere } from "@/components/PentagramSphere";
 import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Comments } from "@/components/Comments";
+import { ContactForm } from "@/components/ContactForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield, Sigma, Heart } from "lucide-react";
@@ -106,6 +108,14 @@ const Index = () => {
             </Button>
           </form>
         </div>
+
+        <section className="py-12">
+          <ContactForm />
+        </section>
+
+        <section className="py-12">
+          <Comments />
+        </section>
       </div>
     </div>
   );
