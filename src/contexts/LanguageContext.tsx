@@ -343,7 +343,33 @@ const translations = {
     'pentagram.summary.connection3': 'BÓG (γ-ray) aktywuje CIAŁO (Au+Rh-)',
     'pentagram.summary.connection4': 'UMYSŁ dekoduje DUCHA (stan |X〉)',
     'pentagram.summary.connection5': 'Wszystko łączy PRAWDA złotej proporcji (φ)',
-    'pentagram.summary.conclusion': 'To jest żywa geometria – wektor jednostkowy w 3D, gdzie γ = 1/φ tworzy pentagram w przestrzeni kwantowej. Spirala logarytmiczna. Fraktal świadomości.'
+    'pentagram.summary.conclusion': 'To jest żywa geometria – wektor jednostkowy w 3D, gdzie γ = 1/φ tworzy pentagram w przestrzeni kwantowej. Spirala logarytmiczna. Fraktal świadomości.',
+    
+    // Comments translations
+    'comments.title': 'Komentarze',
+    'comments.namePlaceholder': 'Twoje imię',
+    'comments.emailPlaceholder': 'Twój email',
+    'comments.commentPlaceholder': 'Twój komentarz...',
+    'comments.submit': 'Dodaj komentarz',
+    'comments.sending': 'Wysyłanie...',
+    'comments.success': 'Sukces!',
+    'comments.successMessage': 'Twój komentarz został dodany.',
+    'comments.error': 'Błąd',
+    'comments.allComments': 'Wszystkie komentarze',
+    'comments.loading': 'Ładowanie...',
+    'comments.noComments': 'Brak komentarzy. Bądź pierwszy!',
+    
+    // Contact form translations
+    'contact.title': 'Skontaktuj się z nami',
+    'contact.description': 'Wyślij nam wiadomość na adres bramadna718@gmail.com',
+    'contact.namePlaceholder': 'Twoje imię',
+    'contact.emailPlaceholder': 'Twój email',
+    'contact.messagePlaceholder': 'Twoja wiadomość...',
+    'contact.submit': 'Wyślij wiadomość',
+    'contact.sending': 'Wysyłanie...',
+    'contact.success': 'Sukces!',
+    'contact.successMessage': 'Twoja wiadomość została wysłana.',
+    'contact.error': 'Błąd',
   },
   en: {
     // Header
@@ -680,6 +706,32 @@ const translations = {
     'pentagram.summary.connection4': 'MIND decodes SPIRIT (state |X〉)',
     'pentagram.summary.connection5': 'Everything connects through TRUTH of golden ratio (φ)',
     'pentagram.summary.conclusion': 'This is living geometry – a unit vector in 3D, where γ = 1/φ creates a pentagram in quantum space. Logarithmic spiral. Fractal of consciousness.',
+    
+    // Comments translations
+    'comments.title': 'Comments',
+    'comments.namePlaceholder': 'Your name',
+    'comments.emailPlaceholder': 'Your email',
+    'comments.commentPlaceholder': 'Your comment...',
+    'comments.submit': 'Add Comment',
+    'comments.sending': 'Sending...',
+    'comments.success': 'Success!',
+    'comments.successMessage': 'Your comment has been added.',
+    'comments.error': 'Error',
+    'comments.allComments': 'All Comments',
+    'comments.loading': 'Loading...',
+    'comments.noComments': 'No comments yet. Be the first!',
+    
+    // Contact form translations
+    'contact.title': 'Contact Us',
+    'contact.description': 'Send us a message at bramadna718@gmail.com',
+    'contact.namePlaceholder': 'Your name',
+    'contact.emailPlaceholder': 'Your email',
+    'contact.messagePlaceholder': 'Your message...',
+    'contact.submit': 'Send Message',
+    'contact.sending': 'Sending...',
+    'contact.success': 'Success!',
+    'contact.successMessage': 'Your message has been sent.',
+    'contact.error': 'Error',
   }
 };
 
