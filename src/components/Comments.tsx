@@ -42,18 +42,14 @@ export const Comments = () => {
     mutationFn: async (newComment: { user_name: string; user_email: string; comment_text: string }) => {
       const validated = commentSchema.parse(newComment);
       
-      // Sprawdź czy użytkownik jest zalogowany
+      // Sprawdź czy użytkownik jest zalogowany (opcjonalne)
       const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("Musisz być zalogowany aby dodać komentarz");
-      }
       
       const { error } = await supabase.from("comments").insert([{
         user_name: validated.user_name,
         user_email: validated.user_email,
         comment_text: validated.comment_text,
-        user_id: user.id, // Dodaj user_id
+        user_id: user?.id || null, // user_id jest opcjonalne
       }]);
       if (error) throw error;
     },
