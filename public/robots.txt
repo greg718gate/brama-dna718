@@ -1,3 +1,33 @@
+# Allow all AI and search engine bots
+User-agent: *
+Allow: /
+
+# AI Bots - explicitly allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Search engines
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +40,5 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Sitemap
+Sitemap: https://4c1af2ac-7f6f-4288-9475-15ed13915697.lovableproject.com/sitemap.xml
