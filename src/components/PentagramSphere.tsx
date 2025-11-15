@@ -91,19 +91,19 @@ export const PentagramSphere = () => {
     <div className="w-full h-[600px] bg-card rounded-lg border border-border overflow-hidden">
       <div className="p-6 border-b border-border">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-          {t('pentagram.title')}
+          {t('pentagramSphere.title')}
         </h2>
         <p className="text-muted-foreground mt-2">
-          {t('pentagram.description')}
+          {t('pentagramSphere.description')}
         </p>
         <p className="text-sm text-muted-foreground mt-1">
-          {t('pentagram.phi')}
+          {t('pentagramSphere.phi')}
         </p>
         <p className="text-sm text-muted-foreground">
-          {t('pentagram.gamma')}
+          {t('pentagramSphere.gamma')}
         </p>
         <p className="text-sm text-muted-foreground">
-          {t('pentagram.vector')}
+          {t('pentagramSphere.vector')}
         </p>
       </div>
       <div className="h-[calc(100%-140px)]">
