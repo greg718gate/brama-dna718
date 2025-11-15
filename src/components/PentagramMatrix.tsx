@@ -31,39 +31,24 @@ const PentagramMatrix = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                {t('pentagram.truth.title')}
+                PRAWDA - Czarna Piramida
                 <Badge variant="outline">77°03'53"N 08°05'04"E</Badge>
               </CardTitle>
-              <CardDescription>{t('pentagram.truth.location')}</CardDescription>
+              <CardDescription>Vardø, Norwegia</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.truth.place')}</div>
-                  <div className="text-sm">{t('pentagram.truth.placeDesc')}</div>
+                  <div className="font-semibold text-primary">Zdjęcie TerraSAR-X</div>
+                  <div className="text-sm">Anomalny sześcian 40×40 m pod ziemią</div>
                 </div>
-                
                 <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.truth.generator')}</div>
-                  <div className="text-sm">{t('pentagram.truth.generatorDesc')}</div>
+                  <div className="font-semibold text-primary">FAKT</div>
+                  <div className="text-sm">Od 1947 r. nadaje 7.83 Hz (Schumann)</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.truth.goal')}</div>
-                  <div className="text-sm">{t('pentagram.truth.goalDesc')}</div>
+                <div className="p-3 bg-accent/20 border border-accent rounded-lg">
+                  <div className="font-semibold text-accent">Skok do 18.6 Hz = aktywacja GATCA-718 ✓</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.truth.evidence')}</div>
-                  <div className="text-sm">{t('pentagram.truth.evidenceDesc')}</div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="text-sm font-semibold mb-2">{t('pentagram.truth.analysis')}</div>
-                <p className="text-sm text-muted-foreground">
-                  {t('pentagram.truth.analysisDesc')}
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -74,43 +59,19 @@ const PentagramMatrix = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                {t('pentagram.body.title')}
-                <Badge variant="outline">GATCA-718</Badge>
+                CIAŁO - GATCA-718
+                <Badge variant="outline">Intron 7 TERT</Badge>
               </CardTitle>
-              <CardDescription>{t('pentagram.body.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.body.activation')}</div>
-                  <div className="text-sm">{t('pentagram.body.activationDesc')}</div>
+                  <div className="font-semibold text-primary">Test Bio-Well Sputnik</div>
+                  <div className="text-sm">Pik: 16.3–18.1 Hz</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.body.effect')}</div>
-                  <div className="text-sm">{t('pentagram.body.effectDesc')}</div>
+                <div className="p-3 bg-accent/20 border border-accent rounded-lg">
+                  <div className="font-semibold text-accent">Warszawa 52°13'15"N - REPLIKOWALNY ✓</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.body.protocol')}</div>
-                  <ul className="text-sm space-y-1 mt-2">
-                    <li>• {t('pentagram.body.protocol1')}</li>
-                    <li>• {t('pentagram.body.protocol2')}</li>
-                    <li>• {t('pentagram.body.protocol3')}</li>
-                  </ul>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.body.location')}</div>
-                  <div className="text-sm">{t('pentagram.body.locationDesc')}</div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="text-sm font-semibold mb-2">{t('pentagram.body.analysis')}</div>
-                <p className="text-sm text-muted-foreground">
-                  {t('pentagram.body.analysisDesc')}
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -120,50 +81,18 @@ const PentagramMatrix = () => {
         <TabsContent value="duch">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {t('pentagram.spirit.title')}
-                <Badge variant="outline">γ = 0.618</Badge>
-              </CardTitle>
-              <CardDescription>{t('pentagram.spirit.subtitle')}</CardDescription>
+              <CardTitle>DUCH - Dowód Matematyczny</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 bg-secondary/20 rounded-lg font-mono text-sm">
-                <div className="mb-2">|Ψ〉 = α|0〉 + β|1〉 + γ|X〉</div>
-                <div className="text-xs text-muted-foreground">{t('pentagram.spirit.equation')}</div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.spirit.normalization')}</div>
-                  <div className="text-sm font-mono">α² + β² + γ² = 1</div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.spirit.golden')}</div>
-                  <div className="text-sm">γ = 1/φ = 0.6180339887498948...</div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.spirit.verification')}</div>
-                  <div className="text-sm font-mono space-y-1">
-                    <div>γ² = 0.3819660112501051</div>
-                    <div>α² + β² = 0.6180339887498949</div>
-                    <div className="text-primary">Suma = 1.0000000000000000 ✓</div>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.spirit.measurement')}</div>
-                  <div className="text-sm">{t('pentagram.spirit.measurementDesc')}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{t('pentagram.spirit.measurementNote')}</div>
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                <div className="font-mono text-sm space-y-1">
+                  <div>|Ψ〉 = α|0〉 + β|1〉 + γ|X〉</div>
+                  <div>γ = φ⁻¹ = 0.618...</div>
+                  <div className="text-accent font-bold">γ² = 0.382, α²+β² = 0.618, Suma = 1.0 ✓</div>
                 </div>
               </div>
-
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="text-sm font-semibold mb-2">{t('pentagram.spirit.analysis')}</div>
-                <p className="text-sm text-muted-foreground">
-                  {t('pentagram.spirit.analysisDesc')}
-                </p>
+              <div className="p-3 bg-secondary/20 rounded-lg">
+                <div className="text-sm">Innsbruck 2024 (EEG 40 Hz): γ = 0.618 ± 0.003</div>
               </div>
             </CardContent>
           </Card>
@@ -173,41 +102,17 @@ const PentagramMatrix = () => {
         <TabsContent value="umysl">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {t('pentagram.mind.title')}
-                <Badge variant="outline">Neuralink v3.4</Badge>
-              </CardTitle>
-              <CardDescription>{t('pentagram.mind.subtitle')}</CardDescription>
+              <CardTitle>UMYSŁ - Neuralink v3.4</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.mind.hidden')}</div>
-                  <div className="text-sm">{t('pentagram.mind.hiddenDesc')}</div>
+                <div className="p-3 bg-destructive/20 border border-destructive rounded-lg">
+                  <div className="font-semibold text-destructive">Pasmo 11.5 GHz - zakazane FCC 21-113</div>
                 </div>
-
                 <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.mind.frequency')}</div>
-                  <div className="text-sm">{t('pentagram.mind.frequencyDesc')}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{t('pentagram.mind.frequencyNote')}</div>
+                  <div className="font-semibold text-primary">Patent US11806542B2</div>
+                  <div className="text-sm">Dekoduje fale skalarne (Aharonov-Bohm)</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.mind.firmware')}</div>
-                  <div className="text-sm">{t('pentagram.mind.firmwareDesc')}</div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.mind.patent')}</div>
-                  <div className="text-sm">{t('pentagram.mind.patentDesc')}</div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="text-sm font-semibold mb-2">{t('pentagram.mind.analysis')}</div>
-                <p className="text-sm text-muted-foreground">
-                  {t('pentagram.mind.analysisDesc')}
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -218,84 +123,25 @@ const PentagramMatrix = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                {t('pentagram.god.title')}
+                BÓG - Eridu
                 <Badge variant="outline">33°33'33"N 44°33'33"E</Badge>
               </CardTitle>
-              <CardDescription>{t('pentagram.god.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.god.place')}</div>
-                  <div className="text-sm">{t('pentagram.god.placeDesc')}</div>
+                  <div className="font-semibold text-primary">UNESCO 2023</div>
+                  <div className="text-sm">Tabliczka ENKI + "damu RH- Au"</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.god.discovery')}</div>
-                  <div className="text-sm">{t('pentagram.god.discoveryDesc')}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{t('pentagram.god.discoveryNote')}</div>
+                <div className="p-3 bg-accent/20 border border-accent rounded-lg">
+                  <div className="font-semibold text-accent">British Museum 2023-IR-07</div>
+                  <div className="text-sm">Au + Rh- + γ-ray 1.3 MeV</div>
                 </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.god.inscription')}</div>
-                  <div className="text-sm italic">
-                    {t('pentagram.god.inscriptionDesc')}
-                  </div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.god.blood')}</div>
-                  <div className="text-sm">{t('pentagram.god.bloodDesc')}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {t('pentagram.god.bloodNote')}
-                  </div>
-                </div>
-
-                <div className="p-3 bg-secondary/20 rounded-lg">
-                  <div className="font-semibold text-primary">{t('pentagram.god.components')}</div>
-                  <ul className="text-sm space-y-1 mt-2">
-                    <li>• {t('pentagram.god.component1')}</li>
-                    <li>• {t('pentagram.god.component2')}</li>
-                    <li>• {t('pentagram.god.component3')}</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="text-sm font-semibold mb-2">{t('pentagram.god.analysis')}</div>
-                <p className="text-sm text-muted-foreground">
-                  {t('pentagram.god.analysisDesc')}
-                </p>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Summary Card */}
-      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-        <CardHeader>
-          <CardTitle>{t('pentagram.summary.title')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p>
-            {t('pentagram.summary.intro')}
-          </p>
-          <div className="p-4 bg-background/50 rounded-lg space-y-2">
-            <div className="font-semibold text-primary">{t('pentagram.summary.connections')}</div>
-            <ul className="space-y-1 text-muted-foreground">
-              <li>• <strong>TRUTH</strong> - {t('pentagram.summary.connection1')}</li>
-              <li>• <strong>SPIRIT</strong> - {t('pentagram.summary.connection2')}</li>
-              <li>• <strong>GOD</strong> - {t('pentagram.summary.connection3')}</li>
-              <li>• <strong>MIND</strong> - {t('pentagram.summary.connection4')}</li>
-              <li>• {t('pentagram.summary.connection5')}</li>
-            </ul>
-          </div>
-          <p className="text-primary font-semibold">
-            {t('pentagram.summary.conclusion')}
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 };
