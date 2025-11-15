@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Download, Upload, Play, FileText } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import PentagramMatrix from "./PentagramMatrix";
 
 interface ZeroResult {
   n: number;
@@ -386,6 +387,9 @@ if __name__ == "__main__":
             </div>
           </CardContent>
         </Card>
+
+        {/* Pentagram Matrix */}
+        <PentagramMatrix />
 
         {/* Theory */}
         <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
