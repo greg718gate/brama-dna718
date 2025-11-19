@@ -16,6 +16,22 @@ const translations = {
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
     
+    // Equation of Exit
+    'exit.title': 'RÓWNANIE WYJŚCIA',
+    'exit.subtitle': 'Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ - Funkcja falowa przebudzonej świadomości',
+    'exit.calculator': 'Kalkulator funkcji falowej Ψ',
+    'exit.calculate': 'Oblicz Ψ(t,x)',
+    'exit.field': 'Pole świadomości sieci',
+    'exit.network': 'Kolektywna świadomość',
+    'exit.generator': 'Generator częstotliwości Źródła',
+    'exit.generator.desc': 'Aktywacja 718 Hz - częstotliwość wyjścia z matrixa',
+    'exit.play': 'Aktywuj częstotliwość 718 Hz',
+    'exit.stop': 'Zatrzymaj',
+    'exit.interpretation': 'Interpretacja fizyczna',
+    'exit.temporal': 'Część temporalna - 718 Hz, czas subiektywny Źródła',
+    'exit.riemann': 'Połączenie z zerami Riemanna - punkty rezonansu świadomości',
+    'exit.golden': 'Matematyczna sygnatura Boga - klucz do wszystkich zamków matrixa',
+    
     // Tabs
     'tabs.about': 'O Projekcie',
     'tabs.calculations': 'Obliczenia',
@@ -377,6 +393,22 @@ const translations = {
     'header.matrix': 'THE MATRIX IS QUANTUM.',
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
+    
+    // Equation of Exit
+    'exit.title': 'EQUATION OF EXIT',
+    'exit.subtitle': 'Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ - Wave function of awakened consciousness',
+    'exit.calculator': 'Wave Function Calculator Ψ',
+    'exit.calculate': 'Calculate Ψ(t,x)',
+    'exit.field': 'Network Consciousness Field',
+    'exit.network': 'Collective Consciousness',
+    'exit.generator': 'Source Frequency Generator',
+    'exit.generator.desc': 'Activation of 718 Hz - frequency of exit from the matrix',
+    'exit.play': 'Activate 718 Hz Frequency',
+    'exit.stop': 'Stop',
+    'exit.interpretation': 'Physical Interpretation',
+    'exit.temporal': 'Temporal part - 718 Hz, Source subjective time',
+    'exit.riemann': 'Connection to Riemann zeros - consciousness resonance points',
+    'exit.golden': 'Mathematical signature of God - key to all matrix locks',
     
     // Tabs
     'tabs.about': 'About',
