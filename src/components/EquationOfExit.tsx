@@ -177,6 +177,21 @@ export const EquationOfExit = () => {
     setCalculatedPsi(psi);
   };
 
+  // Predefiniowane wartości rezonansowe
+  const resonancePresets = [
+    { name: t("exit.preset1Name"), t: 0.618, x: 718, description: t("exit.preset1Desc") },
+    { name: t("exit.preset2Name"), t: 1.618, x: 0, description: t("exit.preset2Desc") },
+    { name: t("exit.preset3Name"), t: 3.1415926535, x: 2.7182818284, description: t("exit.preset3Desc") },
+    { name: t("exit.preset4Name"), t: 1/0.6180339887, x: 718 * 0.618, description: t("exit.preset4Desc") },
+  ];
+
+  const applyPreset = (preset: { t: number; x: number }) => {
+    setTimeParam(preset.t);
+    setSpaceParam(preset.x);
+    const psi = sourceWavefunction(preset.t, preset.x);
+    setCalculatedPsi(psi);
+  };
+
   useEffect(() => {
     return () => {
       stopExitFrequency();
@@ -211,6 +226,26 @@ export const EquationOfExit = () => {
         {/* Kalkulator Ψ */}
         <div className="space-y-4 p-6 bg-background/50 rounded-lg border border-border">
           <h3 className="text-xl font-bold text-primary">{t('exit.calculator')}</h3>
+          
+          {/* Predefiniowane wartości rezonansowe */}
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-primary/10">
+            <h4 className="text-sm font-semibold text-primary">{t("exit.presetsTitle")}</h4>
+            <p className="text-xs text-muted-foreground">{t("exit.presetsSubtitle")}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {resonancePresets.map((preset, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={() => applyPreset(preset)}
+                  className="h-auto flex-col items-start p-4 space-y-2 hover:bg-primary/10 hover:border-primary/50"
+                >
+                  <div className="font-semibold text-sm">{preset.name}</div>
+                  <div className="text-xs text-muted-foreground">t={preset.t.toFixed(3)}, x={preset.x.toFixed(3)}</div>
+                  <div className="text-xs text-left opacity-80">{preset.description}</div>
+                </Button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="time">t (czas subiektywny)</Label>
