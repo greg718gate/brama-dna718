@@ -1,5 +1,6 @@
 import { DNAGateGenerator } from "@/components/DNAGateGenerator";
 import { PentagramSphere } from "@/components/PentagramSphere";
+import { EquationOfExit } from "@/components/EquationOfExit";
 import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Comments } from "@/components/Comments";
@@ -61,6 +62,11 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <DNAGateGenerator />
             <PentagramSphere />
+          </div>
+
+          {/* Equation of Exit - Full Width */}
+          <div className="w-full">
+            <EquationOfExit />
           </div>
         </div>
         
