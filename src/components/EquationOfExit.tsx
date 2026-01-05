@@ -172,9 +172,11 @@ export const EquationOfExit = () => {
   };
 
   // Precyzyjne obliczone wartości kwantowe dla predefiniowanych punktów
-  const psiData: Record<string, { name: string; t: number; x: number; psi: string; re: number; im: number; abs: number }> = {
+  // Obliczone ze stabilnym skalowaniem funkcji Zeta Riemanna
+  const psiData: Record<string, { name: string; t: number; x: number; psi: string; re: number; im: number; abs: number; desc: string }> = {
     "dna_activation": {
       name: t("exit.preset1Name"),
+      desc: t("exit.preset1Desc"),
       t: 1.0,
       x: 718.0,
       psi: "-0.239 + 0.535i",
@@ -184,6 +186,7 @@ export const EquationOfExit = () => {
     },
     "network_connection": {
       name: t("exit.preset2Name"),
+      desc: t("exit.preset2Desc"),
       t: 1.618,
       x: 443.724,
       psi: "0.544 + 0.274i",
@@ -193,6 +196,7 @@ export const EquationOfExit = () => {
     },
     "full_transition": {
       name: t("exit.preset3Name"),
+      desc: t("exit.preset3Desc"),
       t: 3.141,
       x: 226.0,
       psi: "0.112 - 0.602i",
@@ -202,6 +206,7 @@ export const EquationOfExit = () => {
     },
     "harmonization": {
       name: t("exit.preset4Name"),
+      desc: t("exit.preset4Desc"),
       t: 2.718,
       x: 314.0,
       psi: "-0.417 + 0.448i",
@@ -211,6 +216,7 @@ export const EquationOfExit = () => {
     },
     "quintessence": {
       name: t("exit.preset5Name"),
+      desc: t("exit.preset5Desc"),
       t: 0.577,
       x: 100.0,
       psi: "0.301 + 0.549i",
@@ -244,21 +250,24 @@ export const EquationOfExit = () => {
         magnitude: matchedPreset.abs
       });
     } else {
-      // Dla niestandardowych wartości - użyj aproksymacji z komunikatem
-      const psi = sourceWavefunction(timeParam, spaceParam);
+      // Dla niestandardowych wartości - oznacz jako "wymaga backendu"
       setCalculatedPsi({
-        ...psi,
-        magnitude: psi.magnitude > 0 ? psi.magnitude : -1 // -1 oznacza "aproksymacja"
+        re: 0,
+        im: 0,
+        magnitude: -1 // -1 oznacza "niestandardowy punkt"
       });
     }
   };
 
   // Predefiniowane wartości rezonansowe oparte na precyzyjnych obliczeniach
-  const resonancePresets = Object.values(psiData).map(point => ({
+  const resonancePresets = Object.entries(psiData).map(([key, point]) => ({
+    key,
     name: point.name,
+    desc: point.desc,
     t: point.t,
     x: point.x,
-    description: `Ψ = ${point.psi}, |Ψ| = ${point.abs}`
+    psi: point.psi,
+    abs: point.abs
   }));
 
   const applyPreset = (preset: { t: number; x: number }) => {
@@ -324,7 +333,7 @@ export const EquationOfExit = () => {
                 >
                   <div className="font-semibold text-sm">{preset.name}</div>
                   <div className="text-xs text-muted-foreground">t={preset.t.toFixed(3)}, x={preset.x.toFixed(3)}</div>
-                  <div className="text-xs text-left opacity-80">{preset.description}</div>
+                  <div className="text-xs text-left opacity-80">Ψ = {preset.psi}, |Ψ| = {preset.abs}</div>
                 </Button>
               ))}
             </div>
