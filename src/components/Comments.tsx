@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
@@ -8,55 +8,76 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { z } from "zod";
+import { User } from "@supabase/supabase-js";
 
 const commentSchema = z.object({
   user_name: z.string().trim().min(1, "Imię jest wymagane").max(100),
-  user_email: z.string().trim().email("Nieprawidłowy email").max(255),
   comment_text: z.string().trim().min(1, "Komentarz jest wymagany").max(1000),
 });
+
+interface Comment {
+  id: string;
+  user_name: string;
+  comment_text: string;
+  created_at: string;
+  user_id: string;
+}
 
 export const Comments = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
+  const [user, setUser] = useState<User | null>(null);
 
+  // Sprawdź stan logowania
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Pobierz komentarze - teraz bezpośrednio z tabeli comments (publiczny SELECT)
   const { data: comments, isLoading } = useQuery({
     queryKey: ["comments"],
     queryFn: async () => {
-      // Użyj widoku comments_public zamiast tabeli comments
-      // Widok automatycznie ukrywa emaile
       const { data, error } = await supabase
-        .from("comments_public")
-        .select("*")
+        .from("comments")
+        .select("id, user_name, comment_text, created_at")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as Comment[];
     },
   });
 
+  // Dodaj komentarz - wymaga zalogowania
   const mutation = useMutation({
-    mutationFn: async (newComment: { user_name: string; user_email: string; comment_text: string }) => {
-      const validated = commentSchema.parse(newComment);
+    mutationFn: async (newComment: { user_name: string; comment_text: string }) => {
+      if (!user) {
+        throw new Error("Musisz być zalogowany, aby dodać komentarz");
+      }
       
-      // Sprawdź czy użytkownik jest zalogowany (opcjonalne)
-      const { data: { user } } = await supabase.auth.getUser();
+      const validated = commentSchema.parse(newComment);
       
       const { error } = await supabase.from("comments").insert([{
         user_name: validated.user_name,
-        user_email: validated.user_email,
         comment_text: validated.comment_text,
-        user_id: user?.id || null, // user_id jest opcjonalne
+        user_id: user.id,
       }]);
+      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
       setName("");
-      setEmail("");
       setComment("");
       toast({
         title: t("comments.success"),
@@ -76,7 +97,6 @@ export const Comments = () => {
     e.preventDefault();
     mutation.mutate({
       user_name: name,
-      user_email: email,
       comment_text: comment,
     });
   };
@@ -88,34 +108,40 @@ export const Comments = () => {
           <CardTitle>{t("comments.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder={t("comments.namePlaceholder")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              maxLength={100}
-            />
-            <Input
-              type="email"
-              placeholder={t("comments.emailPlaceholder")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              maxLength={255}
-            />
-            <Textarea
-              placeholder={t("comments.commentPlaceholder")}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              required
-              maxLength={1000}
-              className="min-h-[100px]"
-            />
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? t("comments.sending") : t("comments.submit")}
-            </Button>
-          </form>
+          {user ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                placeholder={t("comments.namePlaceholder")}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                maxLength={100}
+              />
+              <Textarea
+                placeholder={t("comments.commentPlaceholder")}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                required
+                maxLength={1000}
+                className="min-h-[100px]"
+              />
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? t("comments.sending") : t("comments.submit")}
+              </Button>
+            </form>
+          ) : (
+            <div className="text-center py-6 space-y-4">
+              <p className="text-muted-foreground">
+                Zaloguj się, aby dodać komentarz
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => window.location.href = '/auth'}
+              >
+                Zaloguj się
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -124,17 +150,17 @@ export const Comments = () => {
         {isLoading ? (
           <p>{t("comments.loading")}</p>
         ) : comments && comments.length > 0 ? (
-          comments.map((comment) => (
-            <Card key={comment.id}>
+          comments.map((c) => (
+            <Card key={c.id}>
               <CardContent className="pt-6">
                 <div className="space-y-2">
                   <div className="flex justify-between items-start">
-                    <p className="font-semibold">{comment.user_name}</p>
+                    <p className="font-semibold">{c.user_name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(comment.created_at).toLocaleDateString()}
+                      {new Date(c.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <p className="text-muted-foreground">{comment.comment_text}</p>
+                  <p className="text-muted-foreground">{c.comment_text}</p>
                 </div>
               </CardContent>
             </Card>

@@ -19,51 +19,28 @@ export type Database = {
           comment_text: string
           created_at: string
           id: string
-          user_email: string
-          user_id: string | null
+          user_id: string
           user_name: string
         }
         Insert: {
           comment_text: string
           created_at?: string
           id?: string
-          user_email: string
-          user_id?: string | null
+          user_id: string
           user_name: string
         }
         Update: {
           comment_text?: string
           created_at?: string
           id?: string
-          user_email?: string
-          user_id?: string | null
+          user_id?: string
           user_name?: string
         }
         Relationships: []
       }
     }
     Views: {
-      comments_public: {
-        Row: {
-          comment_text: string | null
-          created_at: string | null
-          id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          comment_text?: string | null
-          created_at?: string | null
-          id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          comment_text?: string | null
-          created_at?: string | null
-          id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never
