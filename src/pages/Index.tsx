@@ -7,7 +7,7 @@ import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Heart } from "lucide-react";
+import { Shield, Sigma, Heart, Music } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
@@ -25,8 +25,16 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-y-auto">
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
+      <div className="fixed top-4 right-4 z-50 flex flex-wrap gap-2 justify-end">
         <LanguageSwitcher />
+        <Button
+          onClick={() => navigate("/symphony")}
+          variant="secondary"
+          className="gap-2 shadow-lg"
+        >
+          <Music className="w-4 h-4" />
+          Symfonia
+        </Button>
         <Button
           onClick={() => navigate("/gatca-zeta")}
           variant="secondary"
