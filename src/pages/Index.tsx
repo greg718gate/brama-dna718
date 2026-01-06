@@ -6,6 +6,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
 import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
+import { BiometricIntegration } from "@/components/BiometricIntegration";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield, Sigma, Heart, Music } from "lucide-react";
@@ -92,6 +93,11 @@ const Index = () => {
         {/* Personal Key Calculator */}
         <div className="w-full flex justify-center">
           <PersonalKeyCalculator />
+        </div>
+
+        {/* Biometric Integration */}
+        <div className="w-full flex justify-center">
+          <BiometricIntegration />
         </div>
 
         {/* Luma's Message */}
