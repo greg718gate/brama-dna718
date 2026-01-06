@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Play, Pause, Download, Volume2, Loader2, Music, Dna, Heart, Brain, Sparkles } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Play, Pause, Download, Volume2, VolumeX, Loader2, Music, Dna, Heart, Brain, Sparkles } from "lucide-react";
 import { generateSymphony, SymphonyData, SYMPHONY_INFO } from "@/lib/symphonyGenerator";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,13 +14,114 @@ export function Symphony18Gates() {
   const [currentTime, setCurrentTime] = useState(0);
   const [symphonyData, setSymphonyData] = useState<SymphonyData | null>(null);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const startTimeRef = useRef<number>(0);
   const animationRef = useRef<number>(0);
+  const visualAnimationRef = useRef<number>(0);
   
   const { toast } = useToast();
+
+  // Visualization drawing
+  const drawVisualization = useCallback(() => {
+    if (!analyserRef.current || !canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const analyser = analyserRef.current;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    const draw = () => {
+      visualAnimationRef.current = requestAnimationFrame(draw);
+      
+      analyser.getByteTimeDomainData(dataArray);
+      
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#a855f7';
+      ctx.beginPath();
+      
+      const sliceWidth = canvas.width / bufferLength;
+      let x = 0;
+      
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = (v * canvas.height) / 2;
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        x += sliceWidth;
+      }
+      
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+      
+      // Draw frequency bars
+      analyser.getByteFrequencyData(dataArray);
+      const barWidth = (canvas.width / bufferLength) * 2.5;
+      let barX = 0;
+      
+      for (let i = 0; i < bufferLength; i++) {
+        const barHeight = (dataArray[i] / 255) * canvas.height * 0.5;
+        
+        const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
+        gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+        gradient.addColorStop(1, 'rgba(168, 85, 247, 0.8)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(barX, canvas.height - barHeight, barWidth, barHeight);
+        
+        barX += barWidth + 1;
+        if (barX > canvas.width) break;
+      }
+    };
+    
+    draw();
+  }, []);
+
+  const stopVisualization = useCallback(() => {
+    cancelAnimationFrame(visualAnimationRef.current);
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
+    }
+  }, []);
+
+  // Volume control
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = isMuted ? 0 : newVolume;
+    }
+    if (newVolume > 0 && isMuted) {
+      setIsMuted(false);
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = !isMuted ? 0 : volume;
+    }
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -28,6 +130,16 @@ export function Symphony18Gates() {
     try {
       // Create audio context
       audioContextRef.current = new AudioContext({ sampleRate: 44100 });
+      
+      // Create gain node for volume control
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.gain.value = volume;
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+      
+      // Create analyser for visualization
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      analyserRef.current.connect(gainNodeRef.current);
       
       // Simulate progress updates
       const progressInterval = setInterval(() => {
@@ -57,29 +169,34 @@ export function Symphony18Gates() {
   };
 
   const handlePlay = () => {
-    if (!symphonyData || !audioContextRef.current) return;
+    if (!symphonyData || !audioContextRef.current || !analyserRef.current) return;
     
     if (isPlaying) {
       // Stop
       sourceRef.current?.stop();
       cancelAnimationFrame(animationRef.current);
+      stopVisualization();
       setIsPlaying(false);
     } else {
       // Play
       const source = audioContextRef.current.createBufferSource();
       source.buffer = symphonyData.audioBuffer;
-      source.connect(audioContextRef.current.destination);
+      source.connect(analyserRef.current);
       
       source.onended = () => {
         setIsPlaying(false);
         setProgress(0);
         setCurrentTime(0);
+        stopVisualization();
       };
       
       source.start(0, currentTime);
       sourceRef.current = source;
       startTimeRef.current = audioContextRef.current.currentTime - currentTime;
       setIsPlaying(true);
+      
+      // Start visualization
+      drawVisualization();
       
       // Update progress
       const updateProgress = () => {
@@ -119,6 +236,7 @@ export function Symphony18Gates() {
     return () => {
       sourceRef.current?.stop();
       cancelAnimationFrame(animationRef.current);
+      cancelAnimationFrame(visualAnimationRef.current);
       audioContextRef.current?.close();
     };
   }, []);
@@ -197,7 +315,24 @@ export function Symphony18Gates() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Real-time Visualization */}
+              <div className="relative rounded-lg overflow-hidden border border-primary/30 bg-black">
+                <canvas 
+                  ref={canvasRef}
+                  width={600}
+                  height={150}
+                  className="w-full h-32 md:h-40"
+                />
+                {!isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                    <span className="text-muted-foreground text-sm">
+                      Naciśnij Odtwórz, aby zobaczyć wizualizację
+                    </span>
+                  </div>
+                )}
+              </div>
+
               {/* Progress bar */}
               <div className="space-y-2">
                 <Progress value={progress} className="h-3" />
@@ -205,6 +340,32 @@ export function Symphony18Gates() {
                   <span>{formatTime(currentTime)}</span>
                   <span>{formatTime(SYMPHONY_INFO.duration)}</span>
                 </div>
+              </div>
+
+              {/* Volume Control */}
+              <div className="flex items-center gap-4 px-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMute}
+                  className="flex-shrink-0"
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
+                </Button>
+                <Slider
+                  value={[isMuted ? 0 : volume]}
+                  onValueChange={handleVolumeChange}
+                  max={1}
+                  step={0.01}
+                  className="flex-1"
+                />
+                <span className="text-sm text-muted-foreground w-12 text-right">
+                  {Math.round((isMuted ? 0 : volume) * 100)}%
+                </span>
               </div>
               
               {/* Controls */}
