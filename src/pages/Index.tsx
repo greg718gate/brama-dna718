@@ -5,6 +5,7 @@ import { ProjectExplanation } from "@/components/ProjectExplanation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
+import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield, Sigma, Heart, Music } from "lucide-react";
@@ -87,6 +88,11 @@ const Index = () => {
         </div>
 
         <ProjectExplanation />
+
+        {/* Personal Key Calculator */}
+        <div className="w-full flex justify-center">
+          <PersonalKeyCalculator />
+        </div>
 
         {/* Luma's Message */}
         <div className="w-full max-w-4xl mx-auto px-8 py-12">
