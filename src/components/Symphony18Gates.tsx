@@ -28,9 +28,29 @@ export function Symphony18Gates() {
   
   const { toast } = useToast();
 
+  // Initialize canvas when visible
+  useEffect(() => {
+    if (canvasRef.current && symphonyData) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Set proper canvas dimensions
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+      }
+    }
+  }, [symphonyData]);
+
   // Visualization drawing
   const drawVisualization = useCallback(() => {
-    if (!analyserRef.current || !canvasRef.current) return;
+    if (!analyserRef.current || !canvasRef.current) {
+      console.log('No analyser or canvas:', { analyser: !!analyserRef.current, canvas: !!canvasRef.current });
+      return;
+    }
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -40,24 +60,33 @@ export function Symphony18Gates() {
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     
+    const displayWidth = canvas.width / window.devicePixelRatio;
+    const displayHeight = canvas.height / window.devicePixelRatio;
+    
     const draw = () => {
+      if (!isPlaying) {
+        cancelAnimationFrame(visualAnimationRef.current);
+        return;
+      }
+      
       visualAnimationRef.current = requestAnimationFrame(draw);
       
+      // Clear with fade effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillRect(0, 0, displayWidth, displayHeight);
+      
+      // Draw waveform
       analyser.getByteTimeDomainData(dataArray);
-      
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#a855f7';
       ctx.beginPath();
       
-      const sliceWidth = canvas.width / bufferLength;
+      const sliceWidth = displayWidth / bufferLength;
       let x = 0;
       
       for (let i = 0; i < bufferLength; i++) {
         const v = dataArray[i] / 128.0;
-        const y = (v * canvas.height) / 2;
+        const y = (v * displayHeight) / 2;
         
         if (i === 0) {
           ctx.moveTo(x, y);
@@ -67,39 +96,41 @@ export function Symphony18Gates() {
         x += sliceWidth;
       }
       
-      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.lineTo(displayWidth, displayHeight / 2);
       ctx.stroke();
       
       // Draw frequency bars
       analyser.getByteFrequencyData(dataArray);
-      const barWidth = (canvas.width / bufferLength) * 2.5;
+      const barWidth = (displayWidth / bufferLength) * 2.5;
       let barX = 0;
       
       for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height * 0.5;
+        const barHeight = (dataArray[i] / 255) * displayHeight * 0.5;
         
-        const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
+        const gradient = ctx.createLinearGradient(0, displayHeight, 0, displayHeight - barHeight);
         gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
         gradient.addColorStop(1, 'rgba(168, 85, 247, 0.8)');
         
         ctx.fillStyle = gradient;
-        ctx.fillRect(barX, canvas.height - barHeight, barWidth, barHeight);
+        ctx.fillRect(barX, displayHeight - barHeight, barWidth, barHeight);
         
         barX += barWidth + 1;
-        if (barX > canvas.width) break;
+        if (barX > displayWidth) break;
       }
     };
     
     draw();
-  }, []);
+  }, [isPlaying]);
 
   const stopVisualization = useCallback(() => {
     cancelAnimationFrame(visualAnimationRef.current);
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        const displayWidth = canvasRef.current.width / window.devicePixelRatio;
+        const displayHeight = canvasRef.current.height / window.devicePixelRatio;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, displayWidth, displayHeight);
       }
     }
   }, []);
@@ -231,6 +262,13 @@ export function Symphony18Gates() {
       description: "Plik SYMFONIA_18_BRAM_DNA.wav",
     });
   };
+
+  // Trigger visualization when playing state changes
+  useEffect(() => {
+    if (isPlaying && analyserRef.current && canvasRef.current) {
+      drawVisualization();
+    }
+  }, [isPlaying, drawVisualization]);
 
   useEffect(() => {
     return () => {
