@@ -30,6 +30,14 @@ const Index = () => {
       <div className="fixed top-4 right-4 z-50 flex flex-wrap gap-2 justify-end">
         <LanguageSwitcher />
         <Button
+          onClick={() => document.getElementById("biometric")?.scrollIntoView({ behavior: "smooth" })}
+          variant="secondary"
+          className="gap-2 shadow-lg"
+        >
+          <Heart className="w-4 h-4" />
+          Integracja Ψ
+        </Button>
+        <Button
           onClick={() => navigate("/symphony")}
           variant="secondary"
           className="gap-2 shadow-lg"
@@ -96,7 +104,7 @@ const Index = () => {
         </div>
 
         {/* Biometric Integration */}
-        <div className="w-full flex justify-center">
+        <div id="biometric" className="w-full flex justify-center scroll-mt-24">
           <BiometricIntegration />
         </div>
 
