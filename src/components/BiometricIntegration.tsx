@@ -496,6 +496,82 @@ export const BiometricIntegration = () => {
           </div>
         )}
 
+        {/* MANIFEST JEDNOŚCI */}
+        <div className="pt-6 border-t border-[#ffd700]/30 space-y-6">
+          <div className="text-center space-y-2">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-[#ffd700] via-purple-400 to-[#00f2ff] bg-clip-text text-transparent uppercase tracking-widest">
+              ✦ MANIFEST JEDNOŚCI ✦
+            </h3>
+            <p className="text-lg text-[#ffd700]">NAUKA + BÓG = RZECZYWISTOŚĆ</p>
+            <p className="text-xs text-gray-500 italic">By: Grzegorz</p>
+          </div>
+
+          {/* 1. Jeden język, dwie dialekty */}
+          <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#00f2ff]/10 rounded-lg border border-purple-500/30">
+            <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">1.</span> JEDEN JĘZYK, DWIE DIALEKTY
+            </h4>
+            <div className="space-y-2 text-sm">
+              <p className="text-gray-300"><span className="text-[#00f2ff] font-semibold">Matematyka</span> to słownictwo Boga.</p>
+              <p className="text-gray-300"><span className="text-[#ffd700] font-semibold">Fizyka</span> to Jego gramatyka.</p>
+              <p className="text-gray-300"><span className="text-green-400 font-semibold">Biologia</span> to Jego poezja.</p>
+              <p className="text-gray-300"><span className="text-purple-400 font-semibold">Świadomość</span> to Jego głos.</p>
+            </div>
+          </div>
+
+          {/* 2. Mostek Kwantowy */}
+          <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-[#ffd700]/10 rounded-lg border border-[#00f2ff]/30">
+            <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">2.</span> MOSTEK KWANTOWY
+            </h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex gap-2">
+                <span className="text-[#ffd700] font-bold shrink-0">💡</span>
+                <p className="text-gray-300"><span className="text-[#ffd700]">"Niech stanie się światłość"</span> = Wielki Wybuch i inicjacja fotonów.</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-[#00f2ff] font-bold shrink-0">🧬</span>
+                <p className="text-gray-300"><span className="text-[#00f2ff]">"Obraz i podobieństwo"</span> = Złoty Podział (φ) w Twoim DNA.</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-purple-400 font-bold shrink-0">✨</span>
+                <p className="text-gray-300"><span className="text-purple-400">"Cuda"</span> = Dostęp do głębszych praw fizyki, których jeszcze nie nazwaliśmy.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Twoja rola w systemie */}
+          <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-purple-900/30 rounded-lg border border-[#ffd700]/30">
+            <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">3.</span> TWOJA ROLA W SYSTEMIE
+            </h4>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              Nie jesteś tylko biologiczną maszyną. Jesteś <span className="text-[#00f2ff] font-semibold">obserwatorem</span>, 
+              który poprzez swoją wiarę i częstotliwość (<span className="text-[#ffd700] font-bold">718 Hz</span>) 
+              wybiera rzeczywistość z nieskończonego pola potencjału.
+            </p>
+          </div>
+
+          {/* 4. Wniosek końcowy */}
+          <div className="p-5 bg-gradient-to-b from-black/60 to-purple-900/40 rounded-lg border border-[#ffd700]/50">
+            <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">4.</span> WNIOSEK KOŃCOWY
+            </h4>
+            <div className="space-y-3 text-sm text-gray-300 leading-relaxed">
+              <p>
+                <span className="text-purple-400 font-semibold">Laboratorium</span> to Twoja katedra. 
+                <span className="text-[#00f2ff] font-semibold"> Modlitwa</span> to Twój eksperyment. 
+                Gdy Twoje tętno synchronizuje się z Matrycą, przestajesz tylko wierzyć – zaczynasz <span className="text-[#ffd700] font-bold">WIEDZIEĆ</span>.
+              </p>
+            </div>
+            <blockquote className="mt-4 pt-4 border-t border-[#ffd700]/30 text-center">
+              <p className="text-[#ffd700] italic text-lg font-semibold">
+                "Tam, gdzie kończy się lęk przed nieznanym, zaczyna się matematyka cudów."
+              </p>
+            </blockquote>
+          </div>
+        </div>
+
         {/* Scientific Explanation */}
         <div className="pt-4 border-t border-[#00f2ff]/20 space-y-4 text-sm text-gray-300">
           <h3 className="text-[#ffd700] font-semibold flex items-center gap-2">
