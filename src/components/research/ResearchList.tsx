@@ -3,22 +3,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Research } from "@/components/ResearchVault";
 import { Trash2, Calendar, User, Fingerprint } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export { ResearchEntry };
 
-const categoryLabels: Record<string, string> = {
-  quantum: "Fizyka kwantowa",
-  chemistry: "Chemia",
-  dna: "DNA / Genetyka",
-  time: "Podróże w czasie",
-  math: "Matematyka",
-  physics: "Fizyka",
-  other: "Inne",
-};
-
 const ResearchEntry = ({ research, onDelete }: { research: Research; onDelete: (id: string) => void }) => {
+  const { t, language } = useLanguage();
+  
+  const categoryLabels: Record<string, string> = {
+    quantum: t('vault.category.quantum'),
+    chemistry: t('vault.category.chemistry'),
+    dna: t('vault.category.dna'),
+    time: t('vault.category.time'),
+    math: t('vault.category.math'),
+    physics: t('vault.category.physics'),
+    frequency: t('vault.category.frequency'),
+    geometry: t('vault.category.geometry'),
+    other: t('vault.category.other'),
+  };
+
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString("pl-PL", {
+    return new Date(timestamp).toLocaleString(language === 'pl' ? "pl-PL" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -32,7 +37,7 @@ const ResearchEntry = ({ research, onDelete }: { research: Research; onDelete: (
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary">{categoryLabels[research.category]}</Badge>
+            <Badge variant="secondary">{categoryLabels[research.category] || research.category}</Badge>
             <span className="text-xs text-muted-foreground">ID: {research.id}</span>
           </div>
           <h3 className="text-xl font-bold text-foreground mb-1">{research.title}</h3>
@@ -49,13 +54,13 @@ const ResearchEntry = ({ research, onDelete }: { research: Research; onDelete: (
 
       <div className="space-y-4">
         <div>
-          <p className="text-sm font-semibold text-muted-foreground mb-1">OPIS</p>
+          <p className="text-sm font-semibold text-muted-foreground mb-1">{t('vault.descriptionSection')}</p>
           <p className="text-foreground whitespace-pre-wrap">{research.description}</p>
         </div>
 
         {research.equations && (
           <div>
-            <p className="text-sm font-semibold text-muted-foreground mb-1">RÓWNANIA / WZORY</p>
+            <p className="text-sm font-semibold text-muted-foreground mb-1">{t('vault.equationsSection')}</p>
             <pre className="bg-secondary/20 p-3 rounded-lg text-xs overflow-x-auto border border-secondary/30">
               {research.equations}
             </pre>
@@ -64,7 +69,7 @@ const ResearchEntry = ({ research, onDelete }: { research: Research; onDelete: (
 
         {research.verification && (
           <div>
-            <p className="text-sm font-semibold text-muted-foreground mb-1">WERYFIKACJA</p>
+            <p className="text-sm font-semibold text-muted-foreground mb-1">{t('vault.verificationSection')}</p>
             <pre className="bg-secondary/20 p-3 rounded-lg text-xs overflow-x-auto border border-secondary/30">
               {research.verification}
             </pre>

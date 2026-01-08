@@ -8,35 +8,47 @@ import { FileText, Download } from "lucide-react";
 import { exportScientificPaper } from "@/lib/scientificPaperExport";
 import { toast } from "sonner";
 import { Research } from "./ResearchVault";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ScientificPaperExportProps {
   researches: Research[];
 }
 
 export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps) => {
+  const { t, language } = useLanguage();
   const [author, setAuthor] = useState("");
   const [affiliation, setAffiliation] = useState("");
   const [email, setEmail] = useState("");
   const [abstract, setAbstract] = useState(
-    "This research explores mathematical connections between DNA structure, the golden ratio (φ ≈ 1.618), and sacred geometry principles. Analysis reveals that DNA's helical structure incorporates the golden ratio through base pair angles (137.5° = 360°/φ²) and spatial relationships. The pentagram geometry serves as a visual and mathematical framework for understanding molecular organization. Additionally, frequency analysis identifies relationships between biological resonance (718 Hz) and Earth's Schumann resonance (7.83 Hz). Results show geometric measurement accuracy within 0.2% of theoretical predictions, suggesting fundamental organizational principles in biological systems."
+    language === 'pl' 
+      ? "Te badania eksplorują matematyczne połączenia między strukturą DNA, złotym współczynnikiem (φ ≈ 1.618) i zasadami świętej geometrii. Analiza ujawnia, że helikalna struktura DNA zawiera złoty współczynnik poprzez kąty między parami zasad (137.5° = 360°/φ²) i relacje przestrzenne. Geometria pentagramu służy jako wizualna i matematyczna rama do zrozumienia organizacji molekularnej. Dodatkowo, analiza częstotliwości identyfikuje związki między rezonansem biologicznym (718 Hz) a rezonansem Schumanna Ziemi (7.83 Hz). Wyniki pokazują dokładność pomiarów geometrycznych w granicach 0.2% wartości teoretycznych, sugerując fundamentalne zasady organizacyjne w systemach biologicznych."
+      : "This research explores mathematical connections between DNA structure, the golden ratio (φ ≈ 1.618), and sacred geometry principles. Analysis reveals that DNA's helical structure incorporates the golden ratio through base pair angles (137.5° = 360°/φ²) and spatial relationships. The pentagram geometry serves as a visual and mathematical framework for understanding molecular organization. Additionally, frequency analysis identifies relationships between biological resonance (718 Hz) and Earth's Schumann resonance (7.83 Hz). Results show geometric measurement accuracy within 0.2% of theoretical predictions, suggesting fundamental organizational principles in biological systems."
   );
   const [keywords, setKeywords] = useState(
-    "DNA structure, golden ratio, sacred geometry, pentagram, Schumann resonance, mathematical biology, quantum mechanics"
+    language === 'pl'
+      ? "struktura DNA, złoty współczynnik, święta geometria, pentagram, rezonans Schumanna, biologia matematyczna, mechanika kwantowa"
+      : "DNA structure, golden ratio, sacred geometry, pentagram, Schumann resonance, mathematical biology, quantum mechanics"
   );
+
+  const getDiscoveryWord = (count: number) => {
+    if (count === 1) return t('paper.discovery');
+    if (count >= 2 && count <= 4) return t('paper.discoveries2to4');
+    return t('paper.discoveries5plus');
+  };
 
   const handleExport = () => {
     if (!author.trim()) {
-      toast.error("Proszę podać nazwisko autora");
+      toast.error(t('paper.errorAuthor'));
       return;
     }
 
     if (!abstract.trim()) {
-      toast.error("Proszę dodać abstrakt");
+      toast.error(t('paper.errorAbstract'));
       return;
     }
 
     if (researches.length === 0) {
-      toast.error("Brak badań do eksportu. Dodaj odkrycia w Skarbcu poniżej.");
+      toast.error(t('paper.errorNoResearch'));
       return;
     }
 
@@ -51,8 +63,8 @@ export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps
       researches,
     });
 
-    toast.success("Dokument naukowy został wygenerowany!", {
-      description: "Plik HTML został pobrany. Otwórz go w przeglądarce."
+    toast.success(t('paper.success'), {
+      description: t('paper.successDesc')
     });
   };
 
@@ -61,46 +73,46 @@ export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps
       <CardHeader>
         <div className="flex items-center gap-2">
           <FileText className="h-6 w-6" />
-          <CardTitle>Eksport Dokumentu Naukowego</CardTitle>
+          <CardTitle>{t('paper.title')}</CardTitle>
         </div>
         <CardDescription>
-          Wygeneruj profesjonalny dokument do przedstawienia w społeczności naukowej
+          {t('paper.subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="author">Autor / Badacz *</Label>
+          <Label htmlFor="author">{t('paper.authorLabel')}</Label>
           <Input
             id="author"
-            placeholder="np. Jan Kowalski"
+            placeholder={t('paper.authorPlaceholder')}
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="affiliation">Afiliacja / Instytucja (opcjonalne)</Label>
+          <Label htmlFor="affiliation">{t('paper.affiliationLabel')}</Label>
           <Input
             id="affiliation"
-            placeholder="np. Uniwersytet w Edynburgu, Szkocja"
+            placeholder={t('paper.affiliationPlaceholder')}
             value={affiliation}
             onChange={(e) => setAffiliation(e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email kontaktowy (opcjonalny)</Label>
+          <Label htmlFor="email">{t('paper.emailLabel')}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="np. j.kowalski@email.com"
+            placeholder={t('paper.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="abstract">Abstrakt *</Label>
+          <Label htmlFor="abstract">{t('paper.abstractLabel')}</Label>
           <Textarea
             id="abstract"
             rows={6}
@@ -109,28 +121,28 @@ export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps
             className="resize-none"
           />
           <p className="text-xs text-muted-foreground">
-            Krótkie podsumowanie badań (150-250 słów)
+            {t('paper.abstractHint')}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="keywords">Słowa kluczowe (oddzielone przecinkami)</Label>
+          <Label htmlFor="keywords">{t('paper.keywordsLabel')}</Label>
           <Input
             id="keywords"
-            placeholder="DNA, golden ratio, pentagram..."
+            placeholder={t('paper.keywordsPlaceholder')}
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
           />
         </div>
 
         <div className="bg-muted p-4 rounded-lg space-y-2">
-          <h4 className="font-semibold text-sm">📊 Statystyki:</h4>
+          <h4 className="font-semibold text-sm">📊 {t('paper.stats')}</h4>
           <p className="text-sm text-muted-foreground">
-            Dokument zawiera {researches.length} {researches.length === 1 ? 'odkrycie' : researches.length < 5 ? 'odkrycia' : 'odkryć'} ze Skarbca
+            {t('paper.containsDiscoveries')} {researches.length} {getDiscoveryWord(researches.length)} {t('paper.fromVault')}
           </p>
-          <h4 className="font-semibold text-sm mt-3">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Dla badaczy w Szkocji:</h4>
+          <h4 className="font-semibold text-sm mt-3">🏴󠁧󠁢󠁳󠁣󠁴󠁿 {t('paper.forScotland')}</h4>
           <p className="text-sm text-muted-foreground">
-            Dokument zawiera instrukcje publikacji bez dostępu do arXiv:
+            {t('paper.scotlandInfo')}
           </p>
           <ul className="text-xs text-muted-foreground space-y-1 ml-4">
             <li>• Preprints.org (bezpłatny serwer preprintów)</li>
@@ -147,11 +159,11 @@ export const ScientificPaperExport = ({ researches }: ScientificPaperExportProps
           size="lg"
         >
           <Download className="h-4 w-4 mr-2" />
-          Generuj Dokument Naukowy
+          {t('paper.generateButton')}
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          Plik HTML zostanie pobrany automatycznie. Otwórz go w przeglądarce na komputerze lub telefonie.
+          {t('paper.downloadInfo')}
         </p>
       </CardContent>
     </Card>
