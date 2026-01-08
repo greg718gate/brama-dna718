@@ -35,16 +35,28 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Navigate from StartGuide to appropriate tab
+  // Navigate from StartGuide to appropriate tab/section
   const handleStartGuideNavigate = (section: string) => {
-    if (section === "biometric" || section === "ritual") {
-      // Stay on START tab, scroll to biometric
-      const biometricEl = document.getElementById("biometric-section");
-      biometricEl?.scrollIntoView({ behavior: "smooth" });
-    } else if (section === "gates") {
-      setActiveTab("bramy");
-    } else if (section === "practice") {
+    if (section === "biometric") {
+      // Scroll to biometric calculator on START tab
+      setTimeout(() => {
+        const biometricEl = document.getElementById("biometric-section");
+        if (biometricEl) {
+          biometricEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } else if (section === "ritual") {
+      // Go to Symfonia tab for the ritual/frequencies
       setActiveTab("symfonia");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (section === "gates") {
+      // Go to 18 Bram tab
+      setActiveTab("bramy");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (section === "practice") {
+      // Go to Symfonia tab for practice
+      setActiveTab("symfonia");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
