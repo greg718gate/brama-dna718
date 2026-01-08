@@ -7,10 +7,11 @@ import { Progress } from "@/components/ui/progress";
 import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type SyncStatus = {
-  label: string;
-  text: string;
+  labelKey: string;
+  textKey: string;
   type: "high" | "low" | "optimal";
 } | null;
 
@@ -19,20 +20,20 @@ type CoherenceState = "ideal" | "chaos" | "transitional" | null;
 const getSyncStatus = (bpm: number): SyncStatus => {
   if (bpm > 88) {
     return {
-      label: "STATUS: MODULACJA HARMONIZUJĄCA (e)",
-      text: "Twoje tętno wskazuje na wysoką dynamikę pola. System aktywuje algorytm wygładzający oparty na stałej e, aby przywrócić homeostazę wzdłuż 18 bram DNA.",
+      labelKey: "biometric.statusHigh",
+      textKey: "biometric.statusHighText",
       type: "high",
     };
   } else if (bpm < 66) {
     return {
-      label: "STATUS: GŁĘBOKA KOHERENCJA (GATCA-0)",
-      text: "Osiągnięto stan stabilności bazowej. Twoja funkcja falowa rezonuje bezpośrednio z punktem inicjacji mitochondrialnej. Maksymalna podatność na zapis rCRS.",
+      labelKey: "biometric.statusLow",
+      textKey: "biometric.statusLowText",
       type: "low",
     };
   } else {
     return {
-      label: "STATUS: REZONANS TOROIDALNY (π)",
-      text: "Optymalny przepływ energii. Twoje serce idealnie cyrkuluje informację między bazą 7.83 Hz a rezonansem 718 Hz. Pełna synchronizacja z geometrią złotej proporcji.",
+      labelKey: "biometric.statusOptimal",
+      textKey: "biometric.statusOptimalText",
       type: "optimal",
     };
   }
@@ -65,6 +66,7 @@ const getCoherenceState = (syncPercentage: number): CoherenceState => {
 };
 
 export const BiometricIntegration = () => {
+  const { t } = useLanguage();
   const [bpm, setBpm] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(null);
@@ -159,10 +161,10 @@ export const BiometricIntegration = () => {
       <CardHeader className="border-b border-[#00f2ff]/20 pb-5">
         <CardTitle className="text-center text-[#00f2ff] uppercase tracking-widest text-xl flex items-center justify-center gap-2">
           <Waves className="w-6 h-6" />
-          Integracja Biometryczna Ψ
+          {t('biometric.title')}
         </CardTitle>
         <p className="text-center text-muted-foreground text-sm mt-2">
-          System łączy Twoją stałą (data urodzenia) ze zmienną (tętno), aby pokazać drogę powrotną do harmonii.
+          {t('biometric.description')}
         </p>
       </CardHeader>
 
@@ -172,7 +174,7 @@ export const BiometricIntegration = () => {
           <div className="space-y-2">
             <Label className="text-xs text-[#ffd700] flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              DATA URODZENIA (Twoja stała):
+              {t('biometric.birthDate')}
             </Label>
             <Input
               type="date"
@@ -184,7 +186,7 @@ export const BiometricIntegration = () => {
           <div className="space-y-2">
             <Label className="text-xs text-[#ffd700] flex items-center gap-2">
               <Heart className="w-4 h-4" />
-              AKTUALNE BPM (Twoja zmienna):
+              {t('biometric.currentBpm')}
             </Label>
             <Input
               type="number"
@@ -204,7 +206,7 @@ export const BiometricIntegration = () => {
           className="w-full bg-gradient-to-r from-[#00f2ff] to-[#0072ff] hover:from-[#00d4e0] hover:to-[#0060dd] text-white font-bold shadow-[0_0_20px_rgba(0,242,255,0.4)] py-6 text-lg"
         >
           <Zap className="w-5 h-5 mr-2" />
-          AKTYWUJ DOSTROJENIE
+          {t('biometric.activate')}
         </Button>
 
         {/* Pulsating Wave Visualization */}
@@ -264,8 +266,8 @@ export const BiometricIntegration = () => {
         {/* Sync Status Message */}
         {syncStatus && (
           <div className="p-4 bg-black/50 rounded-lg border-l-4 border-[#ffd700] animate-fade-in">
-            <div className="text-[#ffd700] font-bold text-sm">{syncStatus.label}</div>
-            <div className="text-white text-sm mt-2">{syncStatus.text}</div>
+            <div className="text-[#ffd700] font-bold text-sm">{t(syncStatus.labelKey)}</div>
+            <div className="text-white text-sm mt-2">{t(syncStatus.textKey)}</div>
           </div>
         )}
 
