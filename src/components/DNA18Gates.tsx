@@ -1,199 +1,92 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const gates = [
-  // Bramy 1-6: REGENERACJA ŚWIĄTYNI
-  {
-    number: 1,
-    name: "Brama Oczyszczenia",
-    group: "regeneracja",
-    color: "green",
-    description: "Usuwa toksyny i programy destrukcji z pola komórkowego.",
-    effect: "Detoksykacja na poziomie mitochondrialnym. Przywrócenie czystości biologicznej."
-  },
-  {
-    number: 2,
-    name: "Brama Regeneracji",
-    group: "regeneracja",
-    color: "green",
-    description: "Aktywuje naturalne procesy naprawcze ciała.",
-    effect: "Przyspieszenie gojenia, odnowa tkanek, reset telomerów."
-  },
-  {
-    number: 3,
-    name: "Brama Harmonii",
-    group: "regeneracja",
-    color: "green",
-    description: "Synchronizuje wszystkie systemy ciała w jedną całość.",
-    effect: "Koherencja serca-mózgu, równowaga hormonalna."
-  },
-  {
-    number: 4,
-    name: "Brama Siły",
-    group: "regeneracja",
-    color: "green",
-    description: "Uwalnia zablokowaną energię życiową.",
-    effect: "Zwiększenie witalności, odporności, siły fizycznej."
-  },
-  {
-    number: 5,
-    name: "Brama Czasu",
-    group: "regeneracja",
-    color: "green",
-    description: "Spowalnia procesy starzenia na poziomie DNA.",
-    effect: "Optymalizacja ekspresji genów długowieczności."
-  },
-  {
-    number: 6,
-    name: "Brama Integralności",
-    group: "regeneracja",
-    color: "green",
-    description: "Zamyka lukę między ciałem a duchem.",
-    effect: "Pełna integracja fizyczno-duchowa. Koniec wewnętrznego konfliktu."
-  },
-  
-  // Bramy 7-12: OTWARCIE WZROKU
-  {
-    number: 7,
-    name: "Brama Intuicji",
-    group: "wzrok",
-    color: "cyan",
-    description: "Aktywuje szósty zmysł i wewnętrzne prowadzenie.",
-    effect: "Jasność decyzji, wyczucie sytuacji, synchroniczności."
-  },
-  {
-    number: 8,
-    name: "Brama Percepcji",
-    group: "wzrok",
-    color: "cyan",
-    description: "Rozszerza zakres postrzegania rzeczywistości.",
-    effect: "Widzenie wzorców, energii, aur. Rozpoznawanie prawdy."
-  },
-  {
-    number: 9,
-    name: "Brama Wizji",
-    group: "wzrok",
-    color: "cyan",
-    description: "Otwiera widzenie poza materią fizyczną.",
-    effect: "Dostrzeganie okazji niewidocznych dla innych. Wizje przyszłości."
-  },
-  {
-    number: 10,
-    name: "Brama Mądrości",
-    group: "wzrok",
-    color: "cyan",
-    description: "Łączy wiedzę z głębokim zrozumieniem.",
-    effect: "Dostęp do pola Akashy. Zrozumienie bez nauki."
-  },
-  {
-    number: 11,
-    name: "Brama Jasnowidzenia",
-    group: "wzrok",
-    color: "cyan",
-    description: "Aktywuje zdolności ekstrasensoryczne.",
-    effect: "Telepatia, prekognicja, widzenie na odległość."
-  },
-  {
-    number: 12,
-    name: "Brama Prawdy",
-    group: "wzrok",
-    color: "cyan",
-    description: "Pozwala rozpoznać iluzję od rzeczywistości.",
-    effect: "Niemożność bycia oszukanym. Widzenie esencji wszystkiego."
-  },
-  
-  // Bramy 13-18: JEDNOŚĆ ZE ŹRÓDŁEM
-  {
-    number: 13,
-    name: "Brama Wiary",
-    group: "zrodlo",
-    color: "gold",
-    description: "Transformuje wiarę w pewność absolutną.",
-    effect: "Koniec wątpliwości. Wiara jako siła sprawcza."
-  },
-  {
-    number: 14,
-    name: "Brama Miłości",
-    group: "zrodlo",
-    color: "gold",
-    description: "Otwiera serce na bezwarunkową miłość.",
-    effect: "Uzdrawianie relacji, przyciąganie prawdziwych połączeń."
-  },
-  {
-    number: 15,
-    name: "Brama Kreacji",
-    group: "zrodlo",
-    color: "gold",
-    description: "Aktywuje zdolność manifestacji myślą.",
-    effect: "Myśli zaczynają materializować się w rzeczywistości."
-  },
-  {
-    number: 16,
-    name: "Brama Mocy",
-    group: "zrodlo",
-    color: "gold",
-    description: "Uwalnia pełny potencjał woli.",
-    effect: "Słowo staje się czynem. Intencja = Rezultat."
-  },
-  {
-    number: 17,
-    name: "Brama Cudotwórcza",
-    group: "zrodlo",
-    color: "gold",
-    description: "Stan, w którym wpływasz na materię i ludzi wokół.",
-    effect: "Zdolność uzdrawiania, transformacji, 'niemożliwe' staje się możliwe."
-  },
-  {
-    number: 18,
-    name: "Brama Jedności",
-    group: "zrodlo",
-    color: "gold",
-    description: "Pełne połączenie ze Źródłem. Koniec iluzji oddzielenia.",
-    effect: "Jesteś Jednością. Bóg działa poprzez Ciebie. Pełna realizacja."
-  }
+type GateGroup = 'regeneracja' | 'wzrok' | 'zrodlo';
+
+interface Gate {
+  number: number;
+  nameKey: string;
+  group: GateGroup;
+  color: string;
+  descriptionKey: string;
+  effectKey: string;
+}
+
+const gates: Gate[] = [
+  // Gates 1-6: REGENERATION
+  { number: 1, nameKey: 'dna18gates.gate1.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate1.description', effectKey: 'dna18gates.gate1.effect' },
+  { number: 2, nameKey: 'dna18gates.gate2.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate2.description', effectKey: 'dna18gates.gate2.effect' },
+  { number: 3, nameKey: 'dna18gates.gate3.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate3.description', effectKey: 'dna18gates.gate3.effect' },
+  { number: 4, nameKey: 'dna18gates.gate4.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate4.description', effectKey: 'dna18gates.gate4.effect' },
+  { number: 5, nameKey: 'dna18gates.gate5.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate5.description', effectKey: 'dna18gates.gate5.effect' },
+  { number: 6, nameKey: 'dna18gates.gate6.name', group: 'regeneracja', color: 'green', descriptionKey: 'dna18gates.gate6.description', effectKey: 'dna18gates.gate6.effect' },
+  // Gates 7-12: SIGHT
+  { number: 7, nameKey: 'dna18gates.gate7.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate7.description', effectKey: 'dna18gates.gate7.effect' },
+  { number: 8, nameKey: 'dna18gates.gate8.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate8.description', effectKey: 'dna18gates.gate8.effect' },
+  { number: 9, nameKey: 'dna18gates.gate9.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate9.description', effectKey: 'dna18gates.gate9.effect' },
+  { number: 10, nameKey: 'dna18gates.gate10.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate10.description', effectKey: 'dna18gates.gate10.effect' },
+  { number: 11, nameKey: 'dna18gates.gate11.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate11.description', effectKey: 'dna18gates.gate11.effect' },
+  { number: 12, nameKey: 'dna18gates.gate12.name', group: 'wzrok', color: 'cyan', descriptionKey: 'dna18gates.gate12.description', effectKey: 'dna18gates.gate12.effect' },
+  // Gates 13-18: SOURCE
+  { number: 13, nameKey: 'dna18gates.gate13.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate13.description', effectKey: 'dna18gates.gate13.effect' },
+  { number: 14, nameKey: 'dna18gates.gate14.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate14.description', effectKey: 'dna18gates.gate14.effect' },
+  { number: 15, nameKey: 'dna18gates.gate15.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate15.description', effectKey: 'dna18gates.gate15.effect' },
+  { number: 16, nameKey: 'dna18gates.gate16.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate16.description', effectKey: 'dna18gates.gate16.effect' },
+  { number: 17, nameKey: 'dna18gates.gate17.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate17.description', effectKey: 'dna18gates.gate17.effect' },
+  { number: 18, nameKey: 'dna18gates.gate18.name', group: 'zrodlo', color: 'gold', descriptionKey: 'dna18gates.gate18.description', effectKey: 'dna18gates.gate18.effect' },
 ];
 
-const groupInfo = {
+interface GroupInfo {
+  titleKey: string;
+  subtitleKey: string;
+  color: string;
+  icon: string;
+  descriptionKey: string;
+}
+
+const groupInfo: Record<GateGroup, GroupInfo> = {
   regeneracja: {
-    title: "BRAMY 1-6: REGENERACJA ŚWIĄTYNI",
-    subtitle: "Oczyszczenie i odnowa ciała fizycznego",
-    color: "green",
-    icon: "🧬",
-    description: "Twoje ciało to Świątynia. Te bramy usuwają skazę chaosu, przywracając pierwotną czystość biologii. Aktywacja tych bram prowadzi do fizycznej regeneracji i optymalizacji wszystkich procesów życiowych."
+    titleKey: 'dna18gates.group.regeneration.title',
+    subtitleKey: 'dna18gates.group.regeneration.subtitle',
+    color: 'green',
+    icon: '🧬',
+    descriptionKey: 'dna18gates.group.regeneration.description'
   },
   wzrok: {
-    title: "BRAMY 7-12: OTWARCIE WZROKU",
-    subtitle: "Rozszerzenie percepcji i intuicji",
-    color: "cyan",
-    icon: "👁️",
-    description: "Widzenie poza materią. Zaczynasz dostrzegać okazje, powiązania i prawdy, których inni nie widzą. Te bramy otwierają dostęp do wyższych wymiarów percepcji."
+    titleKey: 'dna18gates.group.sight.title',
+    subtitleKey: 'dna18gates.group.sight.subtitle',
+    color: 'cyan',
+    icon: '👁️',
+    descriptionKey: 'dna18gates.group.sight.description'
   },
   zrodlo: {
-    title: "BRAMY 13-18: JEDNOŚĆ ZE ŹRÓDŁEM",
-    subtitle: "Połączenie z Boskim Potencjałem",
-    color: "gold",
-    icon: "✨",
-    description: "Moment, w którym Twoje pole Ψ jest tak silne, że wpływasz na materię i ludzi wokół Ciebie. Pełna realizacja Twojego Boskiego potencjału."
+    titleKey: 'dna18gates.group.source.title',
+    subtitleKey: 'dna18gates.group.source.subtitle',
+    color: 'gold',
+    icon: '✨',
+    descriptionKey: 'dna18gates.group.source.description'
   }
 };
 
 export const DNA18Gates = () => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="w-full max-w-4xl mx-auto bg-[rgba(10,11,30,0.95)] border-[#ffd700]/50">
       <CardHeader className="text-center border-b border-[#ffd700]/20">
         <CardTitle className="text-2xl font-bold bg-gradient-to-r from-green-400 via-[#00f2ff] to-[#ffd700] bg-clip-text text-transparent">
-          🧬 18 BRAM DNA 🧬
+          {t('dna18gates.title')}
         </CardTitle>
-        <p className="text-[#ffd700] mt-2">Klucze do Cudów – Pełny Przewodnik</p>
+        <p className="text-[#ffd700] mt-2">{t('dna18gates.subtitle')}</p>
         <p className="text-sm text-gray-400 mt-2">
-          Każda brama reprezentuje poziom świadomości i aktywacji w Twoim DNA.
-          Im więcej bram otwartych, tym bliżej jesteś pełnej realizacji.
+          {t('dna18gates.description')}
         </p>
       </CardHeader>
       
       <CardContent className="pt-6 space-y-8">
         {/* Group Sections */}
-        {Object.entries(groupInfo).map(([groupKey, group]) => (
+        {(Object.entries(groupInfo) as [GateGroup, GroupInfo][]).map(([groupKey, group]) => (
           <div key={groupKey} className="space-y-4">
             {/* Group Header */}
             <div className={`p-4 rounded-lg border ${
@@ -209,13 +102,13 @@ export const DNA18Gates = () => {
                     group.color === 'cyan' ? 'text-cyan-400' :
                     'text-amber-400'
                   }`}>
-                    {group.title}
+                    {t(group.titleKey)}
                   </h3>
-                  <p className="text-sm text-gray-400">{group.subtitle}</p>
+                  <p className="text-sm text-gray-400">{t(group.subtitleKey)}</p>
                 </div>
               </div>
               <p className="text-sm text-gray-300 leading-relaxed">
-                {group.description}
+                {t(group.descriptionKey)}
               </p>
             </div>
             
@@ -245,27 +138,27 @@ export const DNA18Gates = () => {
                         gate.color === 'cyan' ? 'text-cyan-400' :
                         'text-amber-400'
                       }`}>
-                        {gate.name}
+                        {t(gate.nameKey)}
                       </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pb-4">
                     <div className="space-y-3 pl-11">
                       <p className="text-gray-300 text-sm leading-relaxed">
-                        {gate.description}
+                        {t(gate.descriptionKey)}
                       </p>
                       <div className={`p-3 rounded-lg ${
                         gate.color === 'green' ? 'bg-green-900/30 border-l-2 border-green-500' :
                         gate.color === 'cyan' ? 'bg-cyan-900/30 border-l-2 border-cyan-500' :
                         'bg-amber-900/30 border-l-2 border-amber-500'
                       }`}>
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Efekt aktywacji:</span>
+                        <span className="text-xs text-gray-400 uppercase tracking-wider">{t('dna18gates.activationEffect')}</span>
                         <p className={`text-sm mt-1 ${
                           gate.color === 'green' ? 'text-green-300' :
                           gate.color === 'cyan' ? 'text-cyan-300' :
                           'text-amber-300'
                         }`}>
-                          {gate.effect}
+                          {t(gate.effectKey)}
                         </p>
                       </div>
                     </div>
@@ -279,11 +172,10 @@ export const DNA18Gates = () => {
         {/* Final Message */}
         <div className="p-5 bg-gradient-to-b from-purple-900/30 to-black/40 rounded-lg border border-purple-500/30 text-center">
           <p className="text-purple-300 italic leading-relaxed">
-            "18 bram to nie cel, to podróż. Każda otwarta brama zmienia Twoją rzeczywistość.
-            Nie musisz otworzyć wszystkich naraz – każda przynosi błogosławieństwo."
+            "{t('dna18gates.finalMessage')}"
           </p>
           <p className="text-[#ffd700] font-bold mt-4">
-            Dostrój się do 718 Hz. Bramy otworzą się same.
+            {t('dna18gates.finalFrequency')}
           </p>
         </div>
       </CardContent>
