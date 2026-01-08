@@ -200,10 +200,14 @@ const ResearchVault = () => {
   return (
     <div className="relative min-h-screen overflow-y-auto">
       {/* Navigation */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 flex gap-2">
+        <Button onClick={() => navigate("/")} variant="secondary" className="gap-2 shadow-lg">
+          <Home className="w-4 h-4" />
+          Start
+        </Button>
         <Button onClick={() => navigate(-1)} variant="secondary" className="gap-2 shadow-lg">
           <ArrowLeft className="w-4 h-4" />
-          <Home className="w-4 h-4" />
+          Wstecz
         </Button>
       </div>
 
