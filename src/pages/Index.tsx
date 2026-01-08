@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Heart } from "lucide-react";
+import { Shield, Sigma, Heart, Sparkles } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,14 @@ const Index = () => {
         >
           <Shield className="w-4 h-4" />
           {t("vault.button")}
+        </Button>
+        <Button
+          onClick={() => navigate("/unified")}
+          variant="secondary"
+          className="gap-2 shadow-lg bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border-primary/50"
+        >
+          <Sparkles className="w-4 h-4" />
+          UNIFIED
         </Button>
       </div>
 
