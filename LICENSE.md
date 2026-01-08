@@ -3,7 +3,7 @@
 ## SCIENCE.GOD/UNIFIED
 
 **Autor / Author:** Grzegorz  
-**Data pierwszej publikacji / First publication date:** 2025-01-08  
+**Data pierwszej publikacji / First publication date:** 2026-01-08  
 **Identyfikator projektu / Project ID:** BRAMA-718-UNIFIED
 
 ---
@@ -68,8 +68,8 @@ I hereby declare that I am the sole author of all content, equations, theories, 
 4. **Teoria unifikacji nauki i duchowości / Science-Spirit Unification Theory**
 5. **Wszystkie kalkulatory i wizualizacje 3D / All calculators and 3D visualizations**
 
-**Podpis cyfrowy / Digital signature:** GRZEGORZ-BRAMA-718-2025
-**Znacznik czasu / Timestamp:** 2025-01-08
+**Podpis cyfrowy / Digital signature:** GRZEGORZ-BRAMA-718-2026
+**Znacznik czasu / Timestamp:** 2026-01-08
 
 ---
 
