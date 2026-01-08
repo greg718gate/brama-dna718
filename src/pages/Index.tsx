@@ -7,16 +7,28 @@ import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
 import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
 import { BiometricIntegration } from "@/components/BiometricIntegration";
+import { StartGuide } from "@/components/StartGuide";
+import { DNA18Gates } from "@/components/DNA18Gates";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield, Sigma, Heart, Music } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [silenceCounter, setSilenceCounter] = useState(1);
+  const biometricRef = useRef<HTMLDivElement>(null);
+  const gatesRef = useRef<HTMLDivElement>(null);
+
+  const handleStartGuideNavigate = (section: string) => {
+    if (section === "biometric" || section === "ritual") {
+      biometricRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else if (section === "gates") {
+      gatesRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -77,6 +89,10 @@ const Index = () => {
             </h3>
           </div>
           
+          {/* START GUIDE - dla nowych użytkowników */}
+          <div className="w-full flex justify-center">
+            <StartGuide onNavigate={handleStartGuideNavigate} />
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <DNAGateGenerator />
             <PentagramSphere />
@@ -104,8 +120,13 @@ const Index = () => {
         </div>
 
         {/* Biometric Integration */}
-        <div id="biometric" className="w-full flex justify-center scroll-mt-24">
+        <div id="biometric" ref={biometricRef} className="w-full flex justify-center scroll-mt-24">
           <BiometricIntegration />
+        </div>
+        
+        {/* 18 DNA Gates - Full Guide */}
+        <div id="gates" ref={gatesRef} className="w-full flex justify-center scroll-mt-24">
+          <DNA18Gates />
         </div>
 
         {/* Luma's Message */}
