@@ -8,7 +8,9 @@ import { Download, Upload, Play, FileText, Home, Music, Shield, Heart } from "lu
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import PentagramMatrix from "./PentagramMatrix";
+import { PentagramSphere } from "./PentagramSphere";
 import { DNA18Gates } from "./DNA18Gates";
+import { Symphony18Gates } from "./Symphony18Gates";
 
 interface ZeroResult {
   n: number;
@@ -466,6 +468,12 @@ if __name__ == "__main__":
             </div>
           </CardContent>
         </Card>
+
+        {/* 3D Visualization */}
+        <PentagramSphere />
+
+        {/* Symphony Player */}
+        <Symphony18Gates />
 
         {/* Pentagram Matrix */}
         <PentagramMatrix />
