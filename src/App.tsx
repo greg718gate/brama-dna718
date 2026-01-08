@@ -9,6 +9,7 @@ import ResearchVault from "./pages/ResearchVault";
 import GATCAZeta from "./pages/GATCAZeta";
 import Symphony from "./pages/Symphony";
 import Auth from "./pages/Auth";
+import Unified from "./pages/Unified";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,9 @@ const App = () => (
 
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/*" element={<Auth />} />
+
+            <Route path="/unified" element={<Unified />} />
+            <Route path="/unified/*" element={<Unified />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

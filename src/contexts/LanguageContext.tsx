@@ -466,6 +466,7 @@ const translations = {
     'paper.errorAuthor': 'Proszę podać nazwisko autora',
     'paper.errorAbstract': 'Proszę dodać abstrakt',
     'paper.errorNoResearch': 'Brak badań do eksportu. Dodaj odkrycia w Skarbcu poniżej.',
+    'backToMain': 'Powrót',
   },
   en: {
     // Header
@@ -924,6 +925,7 @@ const translations = {
     'paper.errorAuthor': 'Please provide author name',
     'paper.errorAbstract': 'Please add abstract',
     'paper.errorNoResearch': 'No research to export. Add discoveries in the Vault below.',
+    'backToMain': 'Back',
   }
 };
 
