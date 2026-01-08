@@ -230,46 +230,83 @@ if __name__ == "__main__":
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4 md:p-8">
-      {/* Navigation Bar (mobile-safe) */}
-      <nav className="fixed top-3 left-3 right-3 z-50">
-        <div className="flex items-center justify-end gap-2 overflow-x-auto md:overflow-visible">
+      {/* Navigation Bar (desktop) */}
+      <nav className="fixed top-3 left-3 right-3 z-50 hidden md:block">
+        <div className="flex items-center justify-end gap-2">
           <Button
             onClick={() => navigate("/")}
             variant="secondary"
             size="sm"
-            className="gap-2 shadow-lg shrink-0"
+            className="gap-2 shadow-lg"
             aria-label="Strona Główna"
             title="Strona Główna"
           >
             <Home className="w-4 h-4" />
-            <span className="hidden md:inline">Strona Główna</span>
+            <span>Strona Główna</span>
           </Button>
           <Button
             onClick={() => navigate("/symphony")}
             variant="secondary"
             size="sm"
-            className="gap-2 shadow-lg shrink-0"
+            className="gap-2 shadow-lg"
             aria-label="Symfonia"
             title="Symfonia"
           >
             <Music className="w-4 h-4" />
-            <span className="hidden md:inline">Symfonia</span>
+            <span>Symfonia</span>
           </Button>
           <Button
             onClick={() => navigate("/vault")}
             variant="secondary"
             size="sm"
-            className="gap-2 shadow-lg shrink-0"
+            className="gap-2 shadow-lg"
             aria-label="Skarbiec"
             title="Skarbiec"
           >
             <Shield className="w-4 h-4" />
-            <span className="hidden md:inline">Skarbiec</span>
+            <span>Skarbiec</span>
           </Button>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto space-y-6 pt-16">
+      {/* Navigation Bar (mobile: fixed bottom, always visible) */}
+      <nav className="fixed bottom-3 left-3 right-3 z-50 md:hidden">
+        <div className="mx-auto flex max-w-sm items-center justify-between rounded-full border border-border bg-background/80 p-2 backdrop-blur">
+          <Button
+            onClick={() => navigate("/")}
+            variant="secondary"
+            size="icon"
+            className="shadow-lg"
+            aria-label="Strona Główna"
+            title="Strona Główna"
+          >
+            <Home />
+          </Button>
+          <Button
+            onClick={() => navigate("/symphony")}
+            variant="secondary"
+            size="icon"
+            className="shadow-lg"
+            aria-label="Symfonia"
+            title="Symfonia"
+          >
+            <Music />
+          </Button>
+          <Button
+            onClick={() => navigate("/vault")}
+            variant="secondary"
+            size="icon"
+            className="shadow-lg"
+            aria-label="Skarbiec"
+            title="Skarbiec"
+          >
+            <Shield />
+          </Button>
+        </div>
+      </nav>
+
+
+      <div className="max-w-6xl mx-auto space-y-6 pt-16 pb-24 md:pb-0">
         {/* Header */}
         <Card className="border-primary/20">
           <CardHeader>
