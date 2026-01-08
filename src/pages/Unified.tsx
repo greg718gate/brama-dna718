@@ -439,6 +439,24 @@ DNA = GATCA...`}</CodeBlock>
           <p className="text-primary font-semibold">A umysł można zmienić.</p>
         </section>
 
+        {/* Author signature */}
+        <div className="text-center py-8 border-t border-border/50 space-y-3">
+          <div className="flex justify-center gap-2 items-center">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold text-primary">Created by Grzegorz</p>
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            © 2025 Grzegorz — SCIENCE.GOD/UNIFIED
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            Wolno dzielić się z innymi. Nie wolno przypisywać sobie autorstwa ani komercjalizować.
+          </p>
+          <p className="text-xs text-muted-foreground/50">
+            Free to share. Attribution required. Non-commercial use only.
+          </p>
+        </div>
+
         {/* Back Link */}
         <div className="text-center pb-8">
           <Link 

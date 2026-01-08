@@ -239,6 +239,19 @@ const Index = () => {
           <section>
             <Comments />
           </section>
+
+          {/* Author signature */}
+          <div className="text-center py-8 border-t border-border/50 space-y-2">
+            <p className="text-sm text-muted-foreground">
+              © 2025 <span className="font-semibold text-primary">Grzegorz</span> — SCIENCE.GOD/UNIFIED
+            </p>
+            <p className="text-xs text-muted-foreground/70">
+              Wolno dzielić się z innymi. Nie wolno przypisywać sobie autorstwa ani komercjalizować.
+            </p>
+            <p className="text-xs text-muted-foreground/50">
+              Free to share. Attribution required. Non-commercial use only.
+            </p>
+          </div>
         </div>
       </div>
     </div>
