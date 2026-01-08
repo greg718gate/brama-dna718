@@ -243,7 +243,7 @@ const Index = () => {
           {/* Author signature */}
           <div className="text-center py-8 border-t border-border/50 space-y-2">
             <p className="text-sm text-muted-foreground">
-              © 2025 <span className="font-semibold text-primary">Grzegorz</span> — SCIENCE.GOD/UNIFIED
+              © 2026 <span className="font-semibold text-primary">Grzegorz</span> — SCIENCE.GOD/UNIFIED
             </p>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
               <span>Licencja:</span>

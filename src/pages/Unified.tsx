@@ -447,7 +447,7 @@ DNA = GATCA...`}</CodeBlock>
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <p className="text-xs text-muted-foreground">
-            © 2025 Grzegorz — SCIENCE.GOD/UNIFIED
+            © 2026 Grzegorz — SCIENCE.GOD/UNIFIED
           </p>
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
             <span>Licencja:</span>
