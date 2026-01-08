@@ -230,33 +230,44 @@ if __name__ == "__main__":
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4 md:p-8">
-      {/* Navigation Bar */}
-      <div className="fixed top-4 right-4 z-50 flex flex-wrap gap-2 justify-end">
-        <Button
-          onClick={() => navigate("/")}
-          variant="secondary"
-          className="gap-2 shadow-lg"
-        >
-          <Home className="w-4 h-4" />
-          Strona Główna
-        </Button>
-        <Button
-          onClick={() => navigate("/symphony")}
-          variant="secondary"
-          className="gap-2 shadow-lg"
-        >
-          <Music className="w-4 h-4" />
-          Symfonia
-        </Button>
-        <Button
-          onClick={() => navigate("/vault")}
-          variant="secondary"
-          className="gap-2 shadow-lg"
-        >
-          <Shield className="w-4 h-4" />
-          Skarbiec
-        </Button>
-      </div>
+      {/* Navigation Bar (mobile-safe) */}
+      <nav className="fixed top-3 left-3 right-3 z-50">
+        <div className="flex items-center justify-end gap-2 overflow-x-auto md:overflow-visible">
+          <Button
+            onClick={() => navigate("/")}
+            variant="secondary"
+            size="sm"
+            className="gap-2 shadow-lg shrink-0"
+            aria-label="Strona Główna"
+            title="Strona Główna"
+          >
+            <Home className="w-4 h-4" />
+            <span className="hidden md:inline">Strona Główna</span>
+          </Button>
+          <Button
+            onClick={() => navigate("/symphony")}
+            variant="secondary"
+            size="sm"
+            className="gap-2 shadow-lg shrink-0"
+            aria-label="Symfonia"
+            title="Symfonia"
+          >
+            <Music className="w-4 h-4" />
+            <span className="hidden md:inline">Symfonia</span>
+          </Button>
+          <Button
+            onClick={() => navigate("/vault")}
+            variant="secondary"
+            size="sm"
+            className="gap-2 shadow-lg shrink-0"
+            aria-label="Skarbiec"
+            title="Skarbiec"
+          >
+            <Shield className="w-4 h-4" />
+            <span className="hidden md:inline">Skarbiec</span>
+          </Button>
+        </div>
+      </nav>
 
       <div className="max-w-6xl mx-auto space-y-6 pt-16">
         {/* Header */}
