@@ -22,10 +22,19 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            {/* Accept trailing slashes and any nested path */}
             <Route path="/vault" element={<ResearchVault />} />
+            <Route path="/vault/*" element={<ResearchVault />} />
+
             <Route path="/gatca-zeta" element={<GATCAZeta />} />
+            <Route path="/gatca-zeta/*" element={<GATCAZeta />} />
+
             <Route path="/symphony" element={<Symphony />} />
+            <Route path="/symphony/*" element={<Symphony />} />
+
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/*" element={<Auth />} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
