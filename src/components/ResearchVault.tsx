@@ -9,6 +9,7 @@ import { ResearchEntry, ResearchList } from "@/components/research/ResearchList"
 import { exportToPDF } from "@/lib/pdfExport";
 import { Download, Plus, Shield, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export interface Research {
   id: string;
@@ -27,6 +28,7 @@ interface ResearchVaultProps {
 }
 
 export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProps = {}) => {
+  const { t } = useLanguage();
   const [researches, setResearches] = useState<Research[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [author, setAuthor] = useState("");
@@ -67,11 +69,11 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
 
   const handleAddResearch = () => {
     if (!author.trim()) {
-      toast.error("Wprowadź swoje imię/pseudonim");
+      toast.error(t('vault.enterName'));
       return;
     }
     if (!newResearch.title.trim() || !newResearch.description.trim()) {
-      toast.error("Wypełnij tytuł i opis");
+      toast.error(t('vault.fillRequired'));
       return;
     }
 
@@ -95,21 +97,21 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
       verification: "",
     });
     setShowForm(false);
-    toast.success("Odkrycie zabezpieczone i zapisane!");
+    toast.success(t('vault.saved'));
   };
 
   const handleExportAll = () => {
     if (researches.length === 0) {
-      toast.error("Brak odkryć do eksportu");
+      toast.error(t('vault.noResearches'));
       return;
     }
     exportToPDF(researches, author);
-    toast.success("PDF wygenerowany z zabezpieczeniami");
+    toast.success(t('vault.pdfGenerated'));
   };
 
   const handleDelete = (id: string) => {
     setResearches(researches.filter(r => r.id !== id));
-    toast.success("Usunięto");
+    toast.success(t('vault.deleted'));
   };
 
   return (
@@ -122,9 +124,9 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
               <Shield className="w-8 h-8 text-primary" />
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  SKARBIEC ODKRYĆ
+                  {t('vault.title')}
                 </h1>
-                <p className="text-sm text-muted-foreground">Zabezpieczone dokumentowanie przełomowych odkryć naukowych</p>
+                <p className="text-sm text-muted-foreground">{t('vault.subtitle')}</p>
               </div>
             </div>
             <Lock className="w-6 h-6 text-primary/50" />
@@ -132,7 +134,7 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
 
           {/* Author Input */}
           <div className="space-y-2 bg-secondary/10 p-4 rounded-lg border border-secondary/30">
-            <Label htmlFor="author" className="text-sm font-semibold">Twoje imię/pseudonim (wymagane do watermarku)</Label>
+            <Label htmlFor="author" className="text-sm font-semibold">{t('vault.authorLabel')}</Label>
             <Input
               id="author"
               value={author}
@@ -140,7 +142,7 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
                 setAuthor(e.target.value);
                 localStorage.setItem("research_author", e.target.value);
               }}
-              placeholder="np. Jan Kowalski"
+              placeholder={t('vault.authorPlaceholder')}
               className="font-medium"
               maxLength={100}
             />
@@ -155,7 +157,7 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
             disabled={!author}
           >
             <Plus className="w-4 h-4" />
-            {showForm ? "Anuluj" : "Dodaj nowe odkrycie"}
+            {showForm ? t('vault.cancel') : t('vault.addNew')}
           </Button>
           <Button
             onClick={handleExportAll}
@@ -164,27 +166,27 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
             disabled={researches.length === 0}
           >
             <Download className="w-4 h-4" />
-            Eksport PDF ({researches.length})
+            {t('vault.exportPdf')} ({researches.length})
           </Button>
         </div>
 
         {/* Add Form */}
         {showForm && (
           <Card className="p-6 border-2 border-primary/30 shadow-lg">
-            <h2 className="text-xl font-bold mb-4 text-primary">Nowe odkrycie</h2>
+            <h2 className="text-xl font-bold mb-4 text-primary">{t('vault.newDiscovery')}</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title">Tytuł odkrycia *</Label>
+                <Label htmlFor="title">{t('vault.titleLabel')}</Label>
                 <Input
                   id="title"
                   value={newResearch.title}
                   onChange={(e) => setNewResearch({ ...newResearch, title: e.target.value })}
-                  placeholder="np. Rozwiązanie równania Schrödingera dla γ = 1/φ"
+                  placeholder={t('vault.titlePlaceholder')}
                 />
               </div>
 
               <div>
-                <Label htmlFor="category">Kategoria</Label>
+                <Label htmlFor="category">{t('vault.categoryLabel')}</Label>
                 <Select
                   value={newResearch.category}
                   onValueChange={(value) => setNewResearch({ ...newResearch, category: value })}
@@ -193,54 +195,56 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="quantum">Fizyka kwantowa</SelectItem>
-                    <SelectItem value="chemistry">Chemia</SelectItem>
-                    <SelectItem value="dna">DNA / Genetyka</SelectItem>
-                    <SelectItem value="time">Podróże w czasie</SelectItem>
-                    <SelectItem value="math">Matematyka</SelectItem>
-                    <SelectItem value="physics">Fizyka klasyczna</SelectItem>
-                    <SelectItem value="other">Inne</SelectItem>
+                    <SelectItem value="quantum">{t('vault.category.quantum')}</SelectItem>
+                    <SelectItem value="chemistry">{t('vault.category.chemistry')}</SelectItem>
+                    <SelectItem value="dna">{t('vault.category.dna')}</SelectItem>
+                    <SelectItem value="time">{t('vault.category.time')}</SelectItem>
+                    <SelectItem value="math">{t('vault.category.math')}</SelectItem>
+                    <SelectItem value="physics">{t('vault.category.physics')}</SelectItem>
+                    <SelectItem value="frequency">{t('vault.category.frequency')}</SelectItem>
+                    <SelectItem value="geometry">{t('vault.category.geometry')}</SelectItem>
+                    <SelectItem value="other">{t('vault.category.other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="description">Opis odkrycia *</Label>
+                <Label htmlFor="description">{t('vault.descriptionLabel')}</Label>
                 <Textarea
                   id="description"
                   value={newResearch.description}
                   onChange={(e) => setNewResearch({ ...newResearch, description: e.target.value })}
-                  placeholder="Opisz swoje odkrycie w sposób zrozumiały dla innych..."
+                  placeholder={t('vault.descriptionPlaceholder')}
                   rows={4}
                 />
               </div>
 
               <div>
-                <Label htmlFor="equations">Równania / Wzory</Label>
+                <Label htmlFor="equations">{t('vault.equationsLabel')}</Label>
                 <Textarea
                   id="equations"
                   value={newResearch.equations}
                   onChange={(e) => setNewResearch({ ...newResearch, equations: e.target.value })}
-                  placeholder="Wklej równania, wzory matematyczne..."
+                  placeholder={t('vault.equationsPlaceholder')}
                   rows={4}
                   className="font-mono text-sm"
                 />
               </div>
 
               <div>
-                <Label htmlFor="verification">Weryfikacja (Python, obliczenia)</Label>
+                <Label htmlFor="verification">{t('vault.verificationLabel')}</Label>
                 <Textarea
                   id="verification"
                   value={newResearch.verification}
                   onChange={(e) => setNewResearch({ ...newResearch, verification: e.target.value })}
-                  placeholder="Kod Python, wyniki obliczeń, potwierdzenia..."
+                  placeholder={t('vault.verificationPlaceholder')}
                   rows={4}
                   className="font-mono text-sm"
                 />
               </div>
 
               <Button onClick={handleAddResearch} className="w-full">
-                Zabezpiecz i zapisz odkrycie
+                {t('vault.saveButton')}
               </Button>
             </div>
           </Card>
@@ -252,7 +256,7 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
         {researches.length === 0 && !showForm && (
           <Card className="p-12 text-center border-2 border-dashed border-primary/20">
             <Shield className="w-16 h-16 mx-auto mb-4 text-primary/30" />
-            <p className="text-muted-foreground">Dodaj swoje pierwsze odkrycie</p>
+            <p className="text-muted-foreground">{t('vault.empty')}</p>
           </Card>
         )}
       </div>
