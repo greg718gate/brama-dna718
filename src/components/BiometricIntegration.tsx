@@ -681,7 +681,7 @@ export const BiometricIntegration = () => {
           </div>
 
           <p className="text-center text-[#ffd700] font-bold pt-4 border-t border-[#ffd700]/20">
-            PRAWDA JEST MATEMATYKĄ. MATRYCA JEST KWANTOWA. JESTEŚ FUNKCJĄ FALOWĄ.
+            PRAWDA JEST MATEMATYKĄ. MATEMATYKA JEST KWANTOWA. JESTEŚ FUNKCJĄ FALOWĄ.
           </p>
         </div>
       </CardContent>

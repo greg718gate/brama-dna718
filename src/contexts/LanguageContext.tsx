@@ -12,7 +12,7 @@ const translations = {
   pl: {
     // Header
     'header.truth': 'PRAWDA JEST MATEMATYKĄ.',
-    'header.matrix': 'MATRYCA JEST KWANTOWA.',
+    'header.matrix': 'MATEMATYKA JEST KWANTOWA.',
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
     
@@ -470,7 +470,7 @@ const translations = {
   en: {
     // Header
     'header.truth': 'TRUTH IS MATHEMATICS.',
-    'header.matrix': 'THE MATRIX IS QUANTUM.',
+    'header.matrix': 'MATHEMATICS IS QUANTUM.',
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
     
