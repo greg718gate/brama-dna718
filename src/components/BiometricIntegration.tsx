@@ -312,15 +312,39 @@ export const BiometricIntegration = () => {
           </div>
         )}
 
-        {/* Ritual Section */}
+        {/* Source Protocol Section */}
         {syncPercentage !== null && (
-          <div className="p-5 bg-gradient-to-b from-[#1a1a3e] to-black/60 rounded-lg border border-[#ffd700]/30">
-            <h3 className="text-[#ffd700] font-bold text-center mb-4 uppercase tracking-wider">
-              🕯️ Rytuał 108 Sekund
+          <div className="p-5 bg-gradient-to-b from-[#1a1a3e] to-black/60 rounded-lg border border-[#ffd700]/30 space-y-6">
+            <h3 className="text-[#ffd700] font-bold text-center text-lg uppercase tracking-wider">
+              ✦ PROTOKÓŁ ŹRÓDŁA ✦
+              <span className="block text-sm font-normal text-gray-400 mt-1">Powrót do Boskiego Potencjału (Ψ)</span>
             </h3>
             
+            {/* Ritual Phases */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/30 text-center">
+                <div className="text-2xl mb-2">🔍</div>
+                <div className="text-[#00f2ff] font-bold text-sm">DIAGNOZA</div>
+                <div className="text-xl font-mono text-white">60s</div>
+                <div className="text-xs text-gray-400 mt-1">Ustalasz punkt wyjścia. Gdzie jesteś teraz?</div>
+              </div>
+              <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/30 text-center">
+                <div className="text-2xl mb-2">🕯️</div>
+                <div className="text-[#ffd700] font-bold text-sm">SESJA</div>
+                <div className="text-xl font-mono text-white">108s</div>
+                <div className="text-xs text-gray-400 mt-1">Czas świętej geometrii. Łączysz puls z Matrycą.</div>
+              </div>
+              <div className="p-3 bg-black/40 rounded-lg border border-purple-500/30 text-center">
+                <div className="text-2xl mb-2">💎</div>
+                <div className="text-purple-400 font-bold text-sm">STABILIZACJA</div>
+                <div className="text-xl font-mono text-white">3 min</div>
+                <div className="text-xs text-gray-400 mt-1">Zapisujesz informację w wodzie i komórkach.</div>
+              </div>
+            </div>
+
             {/* Timer Display */}
-            <div className="text-center mb-4">
+            <div className="text-center py-4 bg-black/50 rounded-lg border border-[#ffd700]/20">
+              <div className="text-xs text-gray-400 mb-2">🕯️ RYTUAŁ 108 SEKUND</div>
               <div className={`text-5xl font-mono font-bold ${
                 ritualComplete ? 'text-[#ffd700]' : isRitualActive ? 'text-[#00f2ff] animate-pulse' : 'text-white'
               }`}>
@@ -375,8 +399,75 @@ export const BiometricIntegration = () => {
               )}
             </div>
 
+            {/* Benefits Section */}
+            <div className="mt-4 p-4 bg-gradient-to-r from-[#ffd700]/10 to-purple-500/10 rounded-lg border border-[#ffd700]/20">
+              <h4 className="text-[#ffd700] font-bold text-center mb-3 text-sm uppercase tracking-wider">
+                ✦ Co to daje? Wyjście poza biologię ✦
+              </h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex gap-3">
+                  <span className="text-[#00f2ff] font-bold shrink-0">⚡</span>
+                  <div>
+                    <span className="text-[#00f2ff] font-semibold">DOSTROJENIE DO ŹRÓDŁA:</span>
+                    <span className="text-gray-300"> Przestajesz walczyć z życiem. Zaczynasz płynąć w nurcie kreacji. Rozwiązania przychodzą same (synchroniczność).</span>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="text-[#ffd700] font-bold shrink-0">✨</span>
+                  <div>
+                    <span className="text-[#ffd700] font-semibold">MOC KREACJI:</span>
+                    <span className="text-gray-300"> Jezus powiedział: „Będziecie czynić rzeczy większe". Osiągnięcie stanu 718 Hz to zdjęcie blokady z Twojej woli. Twoje słowa i myśli zaczynają mieć realną moc sprawczą.</span>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="text-purple-400 font-bold shrink-0">💜</span>
+                  <div>
+                    <span className="text-purple-400 font-semibold">KONIEC ILUZJI ODDZIELENIA:</span>
+                    <span className="text-gray-300"> Czujesz, że nie jesteś sam. Jesteś częścią inteligentnego Pola, które Cię wspiera i chroni.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 18 DNA Gates */}
+            <div className="mt-4 space-y-4">
+              <h4 className="text-[#ffd700] font-bold text-center text-sm uppercase tracking-wider">
+                🧬 18 BRAM DNA – Klucze do Cudów 🧬
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Gates 1-6 */}
+                <div className="p-3 bg-black/40 rounded-lg border border-green-500/30">
+                  <div className="text-green-400 font-bold text-sm mb-2 text-center">BRAMY 1-6</div>
+                  <div className="text-xs text-green-400/80 text-center mb-2">REGENERACJA ŚWIĄTYNI</div>
+                  <p className="text-xs text-gray-400 text-center italic">
+                    „Twoje ciało to Świątynia. Bramy te usuwają skazę chaosu, przywracając pierwotną czystość biologii."
+                  </p>
+                </div>
+
+                {/* Gates 7-12 */}
+                <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/30">
+                  <div className="text-[#00f2ff] font-bold text-sm mb-2 text-center">BRAMY 7-12</div>
+                  <div className="text-xs text-[#00f2ff]/80 text-center mb-2">OTWARCIE WZROKU</div>
+                  <p className="text-xs text-gray-400 text-center italic">
+                    „Brama 9: Widzenie poza materią. Zaczynasz dostrzegać okazje i powiązania, których inni nie widzą."
+                  </p>
+                </div>
+
+                {/* Gates 13-18 */}
+                <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/30">
+                  <div className="text-[#ffd700] font-bold text-sm mb-2 text-center">BRAMY 13-18</div>
+                  <div className="text-xs text-[#ffd700]/80 text-center mb-2">JEDNOŚĆ ZE ŹRÓDŁEM</div>
+                  <p className="text-xs text-gray-400 text-center italic">
+                    „Brama 17: Stan Cudotwórczy. Moment, w którym Twoje pole Ψ jest tak silne, że wpływasz na materię i ludzi wokół Ciebie."
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Ritual Instructions */}
-            <div className="mt-5 space-y-3 text-sm">
+            <div className="mt-4 space-y-3 text-sm">
+              <h4 className="text-gray-400 text-center text-xs uppercase tracking-wider mb-3">Instrukcja Rytuału</h4>
               <div className={`flex gap-3 p-2 rounded ${syncPercentage !== null ? 'bg-green-500/10 border-l-2 border-green-500' : 'opacity-50'}`}>
                 <span className="text-[#ffd700] font-bold">KROK 1:</span>
                 <span className="text-gray-300">Wpisz tętno i datę, by zobaczyć swoją energię. ✓</span>
@@ -389,6 +480,18 @@ export const BiometricIntegration = () => {
                 <span className="text-[#ffd700] font-bold">KROK 3:</span>
                 <span className="text-gray-300">Przez 108 sekund słuchaj częstotliwości, programując wodę i komórki na powrót do Matrycy Źródłowej.</span>
               </div>
+            </div>
+
+            {/* Seeker's Suggestion */}
+            <div className="mt-4 p-4 bg-gradient-to-b from-purple-900/30 to-black/40 rounded-lg border border-purple-500/30">
+              <p className="text-sm text-gray-300 italic text-center leading-relaxed">
+                Nie szukaj cudów na zewnątrz. One są wynikiem Twojego porządku wewnętrznego. 
+                Kiedy Twój wykres staje się stabilny i złoty, oznacza to, że Twoja „antena" jest ustawiona na Głos Źródła. 
+                Wtedy to, co inni nazywają cudem, dla Ciebie staje się codziennością.
+              </p>
+              <p className="text-[#ffd700] font-bold text-center mt-3 text-sm">
+                „Uwierz, a ujrzysz. Dostrój się, a poczujesz."
+              </p>
             </div>
           </div>
         )}
