@@ -161,18 +161,40 @@ const Index = () => {
 
             {/* TAB 4: ANALIZA */}
             <TabsContent value="analiza" className="space-y-8">
-              <ProjectExplanation />
+              {/*
+                Uwaga: poniższe to DWIE niezależne sekcje.
+                "Wyjaśnienie" to zakładki tekstowe (teoria/Schrödinger/dowody itd.).
+                "Narzędzia" to kalkulatory i wizualizacje 3D.
+              */}
+              <Tabs defaultValue="explanation" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6 h-auto">
+                  <TabsTrigger value="explanation" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
+                    <span className="text-lg">📚</span>
+                    <span>Wyjaśnienie</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="tools" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
+                    <span className="text-lg">🧰</span>
+                    <span>Narzędzia</span>
+                  </TabsTrigger>
+                </TabsList>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <DNAGateGenerator />
-                <PentagramSphere />
-              </div>
+                <TabsContent value="explanation" className="space-y-8">
+                  <ProjectExplanation />
+                </TabsContent>
 
-              <EquationOfExit />
+                <TabsContent value="tools" className="space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <DNAGateGenerator />
+                    <PentagramSphere />
+                  </div>
 
-              <div className="w-full flex justify-center">
-                <PersonalKeyCalculator />
-              </div>
+                  <EquationOfExit />
+
+                  <div className="w-full flex justify-center">
+                    <PersonalKeyCalculator />
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
           </Tabs>
         </div>
