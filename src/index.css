@@ -61,10 +61,18 @@ All colors MUST be HSL.
     height: 100%;
   }
 
+  html {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
   body {
     @apply bg-background text-foreground;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 }
