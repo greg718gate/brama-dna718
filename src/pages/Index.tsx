@@ -245,11 +245,22 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">
               © 2025 <span className="font-semibold text-primary">Grzegorz</span> — SCIENCE.GOD/UNIFIED
             </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
+              <span>Licencja:</span>
+              <a 
+                href="https://creativecommons.org/licenses/by-nc/4.0/deed.pl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline hover:text-primary transition-colors"
+              >
+                CC BY-NC 4.0
+              </a>
+            </div>
             <p className="text-xs text-muted-foreground/70">
-              Wolno dzielić się z innymi. Nie wolno przypisywać sobie autorstwa ani komercjalizować.
+              Wolno dzielić się z innymi. <strong>Wymagane uznanie autorstwa.</strong> Zakaz komercjalizacji.
             </p>
             <p className="text-xs text-muted-foreground/50">
-              Free to share. Attribution required. Non-commercial use only.
+              Free to share. <strong>Attribution required.</strong> Non-commercial use only.
             </p>
           </div>
         </div>
