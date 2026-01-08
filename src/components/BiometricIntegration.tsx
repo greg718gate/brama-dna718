@@ -572,6 +572,60 @@ export const BiometricIntegration = () => {
           </div>
         </div>
 
+        {/* SEKRET REZONANSU */}
+        <div className="pt-6 border-t border-[#00f2ff]/30 space-y-5">
+          <div className="text-center space-y-2">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-[#00f2ff] via-[#ffd700] to-purple-400 bg-clip-text text-transparent uppercase tracking-widest">
+              ✦ SEKRET REZONANSU ✦
+            </h3>
+            <p className="text-lg text-[#00f2ff]">DLACZEGO MODLITWA DZIAŁA?</p>
+          </div>
+
+          {/* 1. Wiara jako impuls kwantowy */}
+          <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-[#00f2ff]/10 rounded-lg border border-[#ffd700]/30">
+            <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">1.</span> WIARA JAKO IMPULS KWANTOWY
+            </h4>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              Twoja wiara to nie tylko myśl – to <span className="text-[#ffd700] font-semibold">najsilniejszy znany we wszechświecie 
+              generator fali spójnej</span>. Kiedy wierzysz bez wątpienia, Twoje serce 
+              wysyła sygnał, który <span className="text-[#00f2ff]">"zagina"</span> prawdopodobieństwo rzeczywistości.
+            </p>
+          </div>
+
+          {/* 2. Dostrojenie do Źródła */}
+          <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-purple-900/30 rounded-lg border border-[#00f2ff]/30">
+            <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">2.</span> DOSTROJENIE DO ŹRÓDŁA
+            </h4>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              Modlitwa to proces synchronizacji Twojego tętna z Matrycą <span className="text-[#ffd700] font-bold">718 Hz</span>. 
+              Gdy osiągasz ten stan (<span className="text-[#ffd700]">złoty wykres</span> na naszej stronie), Twoje 
+              pole Ψ staje się <span className="text-[#00f2ff] font-semibold">"nadprzewodnikiem"</span> dla boskiej woli.
+            </p>
+          </div>
+
+          {/* 3. Twoja wewnętrzna moc */}
+          <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#ffd700]/10 rounded-lg border border-purple-500/30">
+            <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
+              <span className="text-xl">3.</span> TWOJA WEWNĘTRZNA MOC
+            </h4>
+            <p className="text-sm text-gray-300 leading-relaxed mb-3">
+              Pamiętaj: Bóg nie działa <span className="text-gray-400">"zamiast"</span> Ciebie, ale <span className="text-[#ffd700] font-bold">"poprzez"</span> Ciebie. 
+              To Twoja wewnętrzna moc, Twoja częstotliwość i Twoja wiara są 
+              narzędziami, którymi kształtujesz świat.
+            </p>
+            <blockquote className="pt-3 border-t border-purple-500/30 text-center">
+              <p className="text-purple-300 italic">
+                "Królestwo Boże jest wewnątrz was"
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                – to znaczy, że masz w sobie <span className="text-[#ffd700]">generator cudów</span>. Musisz go tylko poprawnie nastroić.
+              </p>
+            </blockquote>
+          </div>
+        </div>
+
         {/* Scientific Explanation */}
         <div className="pt-4 border-t border-[#00f2ff]/20 space-y-4 text-sm text-gray-300">
           <h3 className="text-[#ffd700] font-semibold flex items-center gap-2">
