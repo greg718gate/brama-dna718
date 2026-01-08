@@ -449,6 +449,10 @@ DNA = GATCA...`}</CodeBlock>
           <p className="text-xs text-muted-foreground">
             © 2026 Grzegorz — SCIENCE.GOD/UNIFIED
           </p>
+          <div className="text-xs text-muted-foreground/80 space-y-1">
+            <p className="italic">Współtwórcy / Co-creators:</p>
+            <p>ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI • Lovable.dev</p>
+          </div>
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
             <span>Licencja:</span>
             <a 
