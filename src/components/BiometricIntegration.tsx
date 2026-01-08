@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles } from "lucide-react";
+import { ToneGenerator } from "@/components/ToneGenerator";
+import { CircularTimer } from "@/components/CircularTimer";
 
 type SyncStatus = {
   label: string;
@@ -74,6 +76,9 @@ export const BiometricIntegration = () => {
   const [isRitualActive, setIsRitualActive] = useState(false);
   const [ritualTime, setRitualTime] = useState(108);
   const [ritualComplete, setRitualComplete] = useState(false);
+  
+  // Audio state
+  const [isTonePlaying, setIsTonePlaying] = useState(false);
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
@@ -127,16 +132,20 @@ export const BiometricIntegration = () => {
     setRitualTime(108);
     setIsRitualActive(true);
     setRitualComplete(false);
+    setIsTonePlaying(true);
   };
 
   const toggleRitual = () => {
-    setIsRitualActive(!isRitualActive);
+    const newState = !isRitualActive;
+    setIsRitualActive(newState);
+    setIsTonePlaying(newState);
   };
 
   const resetRitual = () => {
     setRitualTime(108);
     setIsRitualActive(false);
     setRitualComplete(false);
+    setIsTonePlaying(false);
   };
 
   const formatTime = (seconds: number) => {
@@ -342,19 +351,34 @@ export const BiometricIntegration = () => {
               </div>
             </div>
 
-            {/* Timer Display */}
-            <div className="text-center py-4 bg-black/50 rounded-lg border border-[#ffd700]/20">
-              <div className="text-xs text-gray-400 mb-2">🕯️ RYTUAŁ 108 SEKUND</div>
-              <div className={`text-5xl font-mono font-bold ${
-                ritualComplete ? 'text-[#ffd700]' : isRitualActive ? 'text-[#00f2ff] animate-pulse' : 'text-white'
-              }`}>
-                {formatTime(ritualTime)}
-              </div>
+            {/* Circular Timer Display */}
+            <div className="flex flex-col items-center py-6 bg-black/50 rounded-lg border border-[#ffd700]/20">
+              <div className="text-xs text-gray-400 mb-4">🕯️ RYTUAŁ 108 SEKUND</div>
+              
+              <CircularTimer
+                totalSeconds={108}
+                remainingSeconds={ritualTime}
+                isActive={isRitualActive}
+                isComplete={ritualComplete}
+                size={220}
+              />
+              
               {ritualComplete && (
-                <p className="text-[#ffd700] text-sm mt-2 animate-fade-in">
+                <p className="text-[#ffd700] text-sm mt-4 animate-fade-in text-center">
                   ✨ Rytuał zakończony. Twoja woda i komórki zostały zaprogramowane.
                 </p>
               )}
+            </div>
+            
+            {/* 718 Hz Tone Generator */}
+            <div className="space-y-2">
+              <div className="text-center text-xs text-gray-400">🎵 CZĘSTOTLIWOŚĆ DOSTROJENIA</div>
+              <ToneGenerator
+                frequency={718}
+                isPlaying={isTonePlaying}
+                onPlayingChange={setIsTonePlaying}
+                showControls={true}
+              />
             </div>
 
             {/* Timer Controls */}
