@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Play, FileText, Home, Music, Shield, Heart } from "lucide-react";
+import { Download, Upload, Play, FileText, Home, Music, Shield, Heart, ArrowLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import PentagramMatrix from "./PentagramMatrix";
@@ -321,6 +321,30 @@ if __name__ == "__main__":
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+              <Button
+                onClick={() => navigate(-1)}
+                variant="secondary"
+                size="sm"
+                className="gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Wróć
+              </Button>
+              <Button onClick={() => navigate("/")} variant="secondary" size="sm" className="gap-2">
+                <Home className="w-4 h-4" />
+                Start
+              </Button>
+              <Button onClick={() => navigate("/symphony")} variant="secondary" size="sm" className="gap-2">
+                <Music className="w-4 h-4" />
+                Symfonia
+              </Button>
+              <Button onClick={() => navigate("/vault")} variant="secondary" size="sm" className="gap-2">
+                <Shield className="w-4 h-4" />
+                Skarbiec
+              </Button>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
                 <div className="text-sm text-muted-foreground">DNA Sequences</div>
