@@ -81,6 +81,9 @@ const Index = () => {
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-500 via-primary to-purple-500 bg-clip-text text-transparent leading-tight">
               {t("header.matrix")}
             </h2>
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight">
+              {t("header.wavefunction")}
+            </h3>
           </div>
 
           {/* MAIN TABS */}
