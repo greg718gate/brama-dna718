@@ -41,4 +41,4 @@ User-agent: facebookexternalhit
 Allow: /
 
 # Sitemap
-Sitemap: https://4c1af2ac-7f6f-4288-9475-15ed13915697.lovableproject.com/sitemap.xml
+Sitemap: https://brama-dna718.com/sitemap.xml
