@@ -207,6 +207,27 @@ const Index = () => {
           </Tabs>
         </div>
 
+        {/* Theory Section for SEO - visible content */}
+        <section className="border-t border-border pt-8 pb-4">
+          <div className="max-w-3xl mx-auto text-center space-y-4">
+            <h2 className="text-xl font-semibold text-foreground">
+              Teoria Przejścia DNA 718 Hz
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Zunifikowana teoria łącząca aktywację DNA przez częstotliwości (718 Hz, 7.83 Hz Schumann, 18.6 Hz Gamma) 
+              z mechaniką kwantową i matematyką złotego podziału. Równanie Wyjścia: Ψ = 0.618 — punkt przejścia świadomości.
+            </p>
+            <a 
+              href="/theory.html" 
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+              target="_blank"
+              rel="noopener"
+            >
+              📄 Czytaj pełną teorię (wersja statyczna dla wyszukiwarek i AI)
+            </a>
+          </div>
+        </section>
+
         {/* Footer Section - always visible */}
         <div className="border-t border-border pt-8 space-y-8">
           {/* Support Button */}
