@@ -1,48 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Waves, Music, BookOpen } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StartGuideProps {
   onNavigate?: (section: string) => void;
 }
 
 export const StartGuide = ({ onNavigate }: StartGuideProps) => {
+  const { t } = useLanguage();
+  
   const steps = [
     {
       number: 1,
-      title: "Sprawdź swój stan",
-      description: "Wpisz datę urodzenia i aktualne tętno. System obliczy Twoją synchronizację z Matrycą 718.",
+      titleKey: 'startGuide.step1.title',
+      descriptionKey: 'startGuide.step1.description',
       icon: Heart,
       color: "cyan",
       action: "biometric",
-      actionLabel: "Idź do kalkulatora"
+      actionLabelKey: 'startGuide.step1.action'
     },
     {
       number: 2,
-      title: "Posłuchaj częstotliwości",
-      description: "Włącz dźwięk 718 Hz i przez 108 sekund pozwól mu dostroić Twoje komórki.",
+      titleKey: 'startGuide.step2.title',
+      descriptionKey: 'startGuide.step2.description',
       icon: Music,
       color: "gold",
       action: "ritual",
-      actionLabel: "Rozpocznij rytuał"
+      actionLabelKey: 'startGuide.step2.action'
     },
     {
       number: 3,
-      title: "Zrozum 18 Bram",
-      description: "Poznaj mapę transformacji – od oczyszczenia ciała, przez otwarcie wzroku, do jedności ze Źródłem.",
+      titleKey: 'startGuide.step3.title',
+      descriptionKey: 'startGuide.step3.description',
       icon: BookOpen,
       color: "purple",
       action: "gates",
-      actionLabel: "Poznaj bramy"
+      actionLabelKey: 'startGuide.step3.action'
     },
     {
       number: 4,
-      title: "Praktykuj codziennie",
-      description: "7 minut ciszy dziennie. To wszystko, czego potrzebujesz, by zacząć widzieć zmiany.",
+      titleKey: 'startGuide.step4.title',
+      descriptionKey: 'startGuide.step4.description',
       icon: Waves,
       color: "green",
       action: "practice",
-      actionLabel: "Rozpocznij praktykę"
+      actionLabelKey: 'startGuide.step4.action'
     }
   ];
 
@@ -95,14 +98,13 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
         <div className="relative">
           <div className="text-4xl mb-4">✨</div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#00f2ff] via-[#ffd700] to-purple-400 bg-clip-text text-transparent">
-            START TUTAJ
+            {t('startGuide.title')}
           </CardTitle>
           <p className="text-lg text-[#ffd700] mt-3">
-            Twoja droga do przebudzenia w 4 krokach
+            {t('startGuide.subtitle')}
           </p>
           <p className="text-sm text-gray-400 mt-2 max-w-xl mx-auto">
-            Nie musisz wierzyć. Nie musisz rozumieć wszystkiego od razu. 
-            Wystarczy, że zaczniesz od pierwszego kroku.
+            {t('startGuide.intro')}
           </p>
         </div>
       </CardHeader>
@@ -129,11 +131,11 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
                     <div className="flex items-center gap-3 mb-2">
                       <Icon className={`w-5 h-5 ${colors.text}`} />
                       <h3 className={`font-bold text-lg ${colors.text}`}>
-                        {step.title}
+                        {t(step.titleKey)}
                       </h3>
                     </div>
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      {step.description}
+                      {t(step.descriptionKey)}
                     </p>
                   </div>
                   
@@ -143,7 +145,7 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
                     className={`${colors.button} shrink-0 gap-2`}
                     onClick={() => onNavigate?.(step.action)}
                   >
-                    {step.actionLabel}
+                    {t(step.actionLabelKey)}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -160,7 +162,7 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
         {/* Quote */}
         <div className="mt-8 p-6 bg-black/40 rounded-lg border border-[#ffd700]/30 text-center">
           <blockquote className="text-[#ffd700] italic text-lg">
-            „Nie musisz wierzyć. Musisz tylko zrobić 7 minut ciszy. Reszta przyjdzie sama."
+            {t('startGuide.quote')}
           </blockquote>
           <p className="text-gray-500 text-sm mt-3">— Luma</p>
         </div>
@@ -169,15 +171,15 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
         <div className="grid grid-cols-3 gap-4 pt-4">
           <div className="text-center p-4 bg-black/30 rounded-lg border border-[#00f2ff]/20">
             <div className="text-2xl font-bold text-[#00f2ff]">718</div>
-            <div className="text-xs text-gray-400">Hz częstotliwość</div>
+            <div className="text-xs text-gray-400">{t('startGuide.frequency')}</div>
           </div>
           <div className="text-center p-4 bg-black/30 rounded-lg border border-[#ffd700]/20">
             <div className="text-2xl font-bold text-[#ffd700]">108</div>
-            <div className="text-xs text-gray-400">sekund rytuału</div>
+            <div className="text-xs text-gray-400">{t('startGuide.ritual')}</div>
           </div>
           <div className="text-center p-4 bg-black/30 rounded-lg border border-purple-500/20">
             <div className="text-2xl font-bold text-purple-400">18</div>
-            <div className="text-xs text-gray-400">bram DNA</div>
+            <div className="text-xs text-gray-400">{t('startGuide.gates')}</div>
           </div>
         </div>
       </CardContent>
