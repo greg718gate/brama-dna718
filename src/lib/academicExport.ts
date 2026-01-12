@@ -647,12 +647,15 @@ const getUnifiedBridges = (lang: 'pl' | 'en') => [
 
 // ============= KOMPLETNY KOD PYTHON =============
 const generatePythonCode = (contactEmail?: string) => {
-  const safeContactEmail = contactEmail
-    ? contactEmail.replace(/\\/g, "\\\\").replace(/\"/g, "\\\"")
-    : undefined;
+  const safeEmail = contactEmail
+    ? contactEmail.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+    : null;
 
-  return `
-# ===============================================
+  const contactLine = safeEmail 
+    ? `print("\\nContact: ${safeEmail}")\n` 
+    : '';
+
+  return `# ===============================================
 # DNA GATE 718 Hz - COMPLETE VERIFICATION CODE
 # Python 3.8+ | NumPy, SciPy, Matplotlib
 # ===============================================
@@ -713,69 +716,61 @@ print(f"    718 / φ = {718 / PHI:.2f} Hz")
 # ============= WAVE FUNCTION (EQUATION OF EXIT) =============
 print("\\n[4] WAVE FUNCTION Ψ (EQUATION OF EXIT)")
 def wave_function(t, x, omega=718, k=2*np.pi/718):
-    """
-    Ψ = A·e^(i·ω·t) · e^(-i·k·x) · γ
-    """
-    A = 1.0
-    psi = A * np.exp(1j * omega * t) * np.exp(-1j * k * x) * GAMMA
+    """Ψ(t,x) = e^(i·ω·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ"""
+    psi = np.exp(1j * omega * t) * np.exp(-1j * k * x) * GAMMA
     return psi
 
-t_test = np.linspace(0, 0.01, 100)  # 10 ms
-x_test = 0
-
-psi_values = [wave_function(t, x_test) for t in t_test]
-print(f"    Ψ(0, 0) = {wave_function(0, 0):.6f}")
-print(f"    |Ψ|² at t=0 = {np.abs(wave_function(0, 0))**2:.6f}")
+# Calculate at t=0, x=0
+psi_0 = wave_function(0, 0)
+print(f"    Ψ(0,0) = {psi_0:.6f}")
+print(f"    |Ψ(0,0)|² = {np.abs(psi_0)**2:.6f}")
 print(f"    Expected: γ² = {GAMMA**2:.6f}")
 
 # ============= GATCA ZETA FUNCTION =============
 print("\\n[5] GATCA ZETA FUNCTION")
 def gatca_zeta(s, repeats=None):
-    """
-    ζ_GATCA(s) = Σ (1/repeat_n^s)
-    Biological interpretation of Riemann hypothesis
-    """
+    """ζ_GATCA(s) = Σ (1/pos^s) for all 18 GATCA positions"""
     if repeats is None:
-        # Default: STR repeat counts from typical mtDNA
-        repeats = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 
-                   37, 41, 43, 47, 53, 59, 61, 67]
-    
-    result = sum(1 / (r ** s) for r in repeats)
-    return result
+        repeats = GATCA_POSITIONS
+    return sum(1 / (pos ** s) for pos in repeats)
 
-# Test on critical line Re(s) = 1/2
-s_critical = 0.5 + 14.134725j  # Near first Riemann zero
-zeta_value = gatca_zeta(s_critical)
-print(f"    ζ_GATCA(1/2 + 14.134i) = {zeta_value:.6f}")
+# Calculate at s = 1/2
+s = 0.5
+zeta_value = gatca_zeta(s)
+print(f"    ζ_GATCA(1/2) = {zeta_value:.6f}")
+
+# At critical line s = 1/2 + it
+t_values = [0, 14.13, 21.02, 25.01]  # First Riemann zeros
+for t in t_values:
+    s_complex = 0.5 + 1j * t
+    z = gatca_zeta(s_complex)
+    print(f"    ζ_GATCA(1/2 + {t:.2f}i) = {z:.4f}")
 print(f"    |ζ_GATCA| = {np.abs(zeta_value):.6f}")
 
 # ============= 18 GATES FREQUENCIES =============
 print("\\n[6] 18 DNA GATES - FREQUENCIES")
 print("    Gate | mtDNA pos | Frequency (Hz) | Weight")
 print("    " + "-"*50)
-
 for i, pos in enumerate(GATCA_POSITIONS, 1):
     freq = 144 * (1 + ((i * GAMMA) % 1)) + DNA_FREQ
     weight = (PHI ** (i % 7)) % 1
-    group = "Regeneration" if i <= 6 else ("Sight" if i <= 12 else "Source")
+    group = "Regen" if i <= 6 else ("Sight" if i <= 12 else "Source")
     print(f"    {i:2d}   |   {pos:5d}   |   {freq:7.2f}     |  {weight:.4f}  [{group}]")
 
 # ============= SYMPHONY GENERATION ALGORITHM =============
 print("\\n[7] SYMPHONY ALGORITHM (Conceptual)")
 print("""
-    for gate_index in range(18):
-        pos = GATCA_POSITIONS[gate_index]
-        start_time = (pos / MTDNA_LENGTH) * DURATION
-        gate_freq = 144 * (1 + ((gate_index * GAMMA) % 1)) + 718
-        weight = (PHI ** (gate_index % 7)) % 1
+    FOR gate = 1 TO 18:
+        pos = GATCA_POSITIONS[gate]
+        start_time = (pos / MTDNA_LENGTH) × DURATION
+        freq = 144 × (1 + ((gate × γ) mod 1)) + 718
+        weight = (φ^(gate mod 7)) mod 1
         
-        for sample in range(num_samples):
-            t = sample / SAMPLE_RATE
-            envelope = exp(-(t - start_time)² / (2 × 1.618²))
-            gate_sound = sin(2π × gate_freq × t) × envelope
-            final_wave += gate_sound × weight × GAMMA
+        FOR t = 0 TO DURATION:
+            envelope = e^(-(t - start_time)² / (2 × φ²))
+            sound = sin(2π × freq × t) × envelope × weight × γ
+            final_wave += sound
     
-    # Add Schumann base
     earth_base = sin(2π × 7.83 × t) × 0.05
     final_wave += earth_base
 """)
@@ -783,20 +778,17 @@ print("""
 # ============= SCHRÖDINGER EQUATION =============
 print("\\n[8] SCHRÖDINGER EQUATION APPLICATION")
 print("    iℏ ∂Ψ/∂t = ĤΨ")
-print("    ")
-print("    For hydrogen atom (1s orbital):")
-print("    Ψ_1s(r) = (1/√π)(1/a₀)^(3/2) × e^(-r/a₀)")
-print("    ")
-print(f"    In DNA Gate context:")
+print(f"    For ω = 718 Hz:")
 print(f"    E = ℏω = {HBAR * 718:.6e} J")
+print(f"    E = ℏω = {HBAR * 718 / 1.602e-19:.6e} eV")
 print(f"    λ = c/f = {3e8 / 718:.2f} m")
 
 # ============= 21-DAY PROTOCOL TIMING =============
 print("\\n[9] 21-DAY SYNCHRONIZATION PROTOCOL")
 protocol = [
-    ("Day 1-7", "Regeneration Gates 1-6", "Cell detox, repair"),
-    ("Day 8-14", "Sight Gates 7-12", "Perception expansion"),
-    ("Day 15-21", "Source Gates 13-18", "Consciousness integration")
+    ("Days 1-7", "Gates 1-6 (Regeneration)", "Cellular repair"),
+    ("Days 8-14", "Gates 7-12 (Sight)", "Perception expansion"),
+    ("Days 15-21", "Gates 13-18 (Source)", "Source connection"),
 ]
 for phase, gates, focus in protocol:
     print(f"    {phase:12s} | {gates:22s} | {focus}")
@@ -863,9 +855,9 @@ print(f"✓ Vector M magnitude: |M| = {magnitude:.10f}")
 print(f"✓ 18 Gates mapped to mtDNA positions")
 print(f"✓ GATCA Zeta function defined")
 print(f"✓ Wave function Ψ = γ at (0,0)")
-${safeContactEmail ? `print("\\nContact: ${safeContactEmail}")` : ''}
-print("License: CC BY-NC 4.0")
-`;
+${contactLine}print("License: CC BY-NC 4.0")
+`; 
+};
 
 // ============= KOMPLETNY KOD JAVASCRIPT SYMFONII =============
 const generateJavaScriptCode = () => `
