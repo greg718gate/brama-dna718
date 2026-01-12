@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Heart, Sparkles } from "lucide-react";
+import { Shield, Sigma, Sparkles } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { ProjectExplanation } from "@/components/ProjectExplanation";
 // Footer components
 import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
+import { DonationButton } from "@/components/DonationButton";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -230,26 +231,9 @@ const Index = () => {
         {/* Footer Section - always visible */}
         <div className="border-t border-border pt-8 space-y-8">
           {/* Support Button */}
-          <div className="w-full max-w-4xl mx-auto flex justify-center">
-            <form
-              action="https://www.paypal.com/cgi-bin/webscr"
-              method="post"
-              target="_top"
-            >
-              <input type="hidden" name="cmd" value="_donations" />
-              <input type="hidden" name="business" value="brama718@proton.me" />
-              <input type="hidden" name="currency_code" value="GBP" />
-              <input type="hidden" name="amount" value="1" />
-
-              <Button
-                type="submit"
-                variant="outline"
-                className="gap-2 opacity-75 hover:opacity-100 transition-all border-primary/30 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"
-              >
-                <Heart className="w-4 h-4 animate-pulse" />
-                {t('index.supportProject')}
-              </Button>
-            </form>
+          <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-2">
+            <span className="text-sm text-muted-foreground">{t('index.supportProject')}</span>
+            <DonationButton variant="compact" />
           </div>
 
           <section>

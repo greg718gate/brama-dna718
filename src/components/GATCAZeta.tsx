@@ -27,6 +27,7 @@ import { PentagramSphere } from "./PentagramSphere";
 import { DNA18Gates } from "./DNA18Gates";
 import { Symphony18Gates } from "./Symphony18Gates";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DonationButton } from "@/components/DonationButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ZeroResult {
@@ -580,36 +581,7 @@ if __name__ == "__main__":
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form
-              action="https://www.paypal.com/cgi-bin/webscr"
-              method="post"
-              target="_top"
-              className="flex flex-col items-center gap-4"
-            >
-              <input type="hidden" name="cmd" value="_donations" />
-              <input type="hidden" name="business" value="brama718@proton.me" />
-              <input type="hidden" name="currency_code" value="GBP" />
-
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  name="amount"
-                  placeholder={tr("Wpisz kwotę (np. 1)", "Enter amount (e.g. 1)")}
-                  className="w-32 px-4 py-2 text-center border border-primary/30 rounded-md bg-background/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  {tr("WYŚLIJ", "SEND")}
-                </button>
-              </div>
-
-              <small className="text-xs text-muted-foreground">
-                {tr("PayPal – bezpieczne, bez konta", "PayPal — secure, no account needed")}
-              </small>
-            </form>
+            <DonationButton variant="full" />
           </CardContent>
         </Card>
 
