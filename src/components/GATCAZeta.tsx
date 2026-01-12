@@ -1,16 +1,32 @@
 import { useState, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Play, FileText, Home, Music, Shield, Heart, ArrowLeft } from "lucide-react";
+import {
+  Download,
+  Upload,
+  Play,
+  FileText,
+  Home,
+  Music,
+  Shield,
+  ArrowLeft,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import PentagramMatrix from "./PentagramMatrix";
 import { PentagramSphere } from "./PentagramSphere";
 import { DNA18Gates } from "./DNA18Gates";
 import { Symphony18Gates } from "./Symphony18Gates";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ZeroResult {
   n: number;
@@ -21,6 +37,7 @@ interface ZeroResult {
 
 const GATCAZeta = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [gatcaRepeats, setGatcaRepeats] = useState<number[]>([8, 14, 6, 9, 5]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -31,6 +48,8 @@ const GATCAZeta = () => {
   const { toast } = useToast();
 
   const PHI = (1 + Math.sqrt(5)) / 2; // Golden ratio
+
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   // Complex number arithmetic helpers
   const complexMul = (a: { re: number; im: number }, b: { re: number; im: number }) => ({
@@ -81,7 +100,12 @@ const GATCAZeta = () => {
       // Parse GATCA file format
       const lines = text.split("\n");
       for (const line of lines) {
-        if (line.includes("(GA)") || line.includes("(CT)") || line.includes("(TC)") || line.includes("(AG)")) {
+        if (
+          line.includes("(GA)") ||
+          line.includes("(CT)") ||
+          line.includes("(TC)") ||
+          line.includes("(AG)")
+        ) {
           const match = line.match(/\(([GATC]+)\)(\d+)/);
           if (match) {
             const count = parseInt(match[2]);
@@ -93,13 +117,19 @@ const GATCAZeta = () => {
       if (repeats.length > 0) {
         setGatcaRepeats(repeats);
         toast({
-          title: "GATCA Data Loaded",
-          description: `Loaded ${repeats.length} STR repeats from your DNA`,
+          title: tr("Dane GATCA wczytane", "GATCA data loaded"),
+          description: tr(
+            `Wczytano ${repeats.length} powtórzeń STR z Twojego DNA`,
+            `Loaded ${repeats.length} STR repeats from your DNA`
+          ),
         });
       } else {
         toast({
-          title: "No Data Found",
-          description: "Could not parse GATCA repeats from file",
+          title: tr("Brak danych", "No data found"),
+          description: tr(
+            "Nie udało się odczytać powtórzeń GATCA z pliku",
+            "Could not parse GATCA repeats from file"
+          ),
           variant: "destructive",
         });
       }
@@ -143,8 +173,11 @@ const GATCAZeta = () => {
     setProgress(100);
 
     toast({
-      title: "Analysis Complete",
-      description: `Found ${foundOnLine} zeros on critical line out of ${maxN} tested`,
+      title: tr("Analiza zakończona", "Analysis complete"),
+      description: tr(
+        `Znaleziono ${foundOnLine} zer na linii krytycznej (z ${maxN} testowanych)`,
+        `Found ${foundOnLine} zeros on critical line out of ${maxN} tested`
+      ),
     });
   };
 
@@ -186,8 +219,8 @@ def check_zeros(max_n=10000):
         if val < 1e-10:
             zeros_found += 1
             print(f"Zero #{n} at s = {s}, |ζ| = {val}")
-    
-    print(f"\\nFound {zeros_found} zeros on critical line from {max_n} tests")
+
+    print(f"\nFound {zeros_found} zeros on critical line from {max_n} tests")
     print(f"Success rate: {100 * zeros_found / max_n:.2f}%")
     return zeros_found
 
@@ -204,8 +237,11 @@ if __name__ == "__main__":
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Python Code Exported",
-      description: "gatca_zeta.py ready for Clay Mathematics Institute submission",
+      title: tr("Kod Python wyeksportowany", "Python code exported"),
+      description: tr(
+        "Plik gatca_zeta.py gotowy do weryfikacji",
+        "gatca_zeta.py is ready for verification"
+      ),
     });
   };
 
@@ -240,33 +276,33 @@ if __name__ == "__main__":
             variant="secondary"
             size="sm"
             className="gap-2 shadow-lg"
-            aria-label="Strona Główna"
-            title="Strona Główna"
+            aria-label={tr("Strona Główna", "Home")}
+            title={tr("Strona Główna", "Home")}
           >
             <Home className="w-4 h-4" />
-            <span>Strona Główna</span>
+            <span>{tr("Strona Główna", "Home")}</span>
           </Button>
           <Button
             onClick={() => navigate("/symphony")}
             variant="secondary"
             size="sm"
             className="gap-2 shadow-lg"
-            aria-label="Symfonia"
-            title="Symfonia"
+            aria-label={tr("Symfonia", "Symphony")}
+            title={tr("Symfonia", "Symphony")}
           >
             <Music className="w-4 h-4" />
-            <span>Symfonia</span>
+            <span>{tr("Symfonia", "Symphony")}</span>
           </Button>
           <Button
             onClick={() => navigate("/vault")}
             variant="secondary"
             size="sm"
             className="gap-2 shadow-lg"
-            aria-label="Skarbiec"
-            title="Skarbiec"
+            aria-label={tr("Skarbiec", "Vault")}
+            title={tr("Skarbiec", "Vault")}
           >
             <Shield className="w-4 h-4" />
-            <span>Skarbiec</span>
+            <span>{tr("Skarbiec", "Vault")}</span>
           </Button>
         </div>
       </nav>
@@ -279,8 +315,8 @@ if __name__ == "__main__":
             variant="secondary"
             size="icon"
             className="shadow-lg"
-            aria-label="Strona Główna"
-            title="Strona Główna"
+            aria-label={tr("Strona Główna", "Home")}
+            title={tr("Strona Główna", "Home")}
           >
             <Home />
           </Button>
@@ -289,8 +325,8 @@ if __name__ == "__main__":
             variant="secondary"
             size="icon"
             className="shadow-lg"
-            aria-label="Symfonia"
-            title="Symfonia"
+            aria-label={tr("Symfonia", "Symphony")}
+            title={tr("Symfonia", "Symphony")}
           >
             <Music />
           </Button>
@@ -299,14 +335,13 @@ if __name__ == "__main__":
             variant="secondary"
             size="icon"
             className="shadow-lg"
-            aria-label="Skarbiec"
-            title="Skarbiec"
+            aria-label={tr("Skarbiec", "Vault")}
+            title={tr("Skarbiec", "Vault")}
           >
             <Shield />
           </Button>
         </div>
       </nav>
-
 
       <div className="max-w-6xl mx-auto space-y-6 pt-16 pb-24 md:pb-0">
         {/* Header */}
@@ -322,32 +357,27 @@ if __name__ == "__main__":
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-              <Button
-                onClick={() => navigate(-1)}
-                variant="secondary"
-                size="sm"
-                className="gap-2"
-              >
+              <Button onClick={() => navigate(-1)} variant="secondary" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Wróć
+                {tr("Wróć", "Back")}
               </Button>
               <Button onClick={() => navigate("/")} variant="secondary" size="sm" className="gap-2">
                 <Home className="w-4 h-4" />
-                Start
+                {tr("Start", "Start")}
               </Button>
               <Button onClick={() => navigate("/symphony")} variant="secondary" size="sm" className="gap-2">
                 <Music className="w-4 h-4" />
-                Symfonia
+                {tr("Symfonia", "Symphony")}
               </Button>
               <Button onClick={() => navigate("/vault")} variant="secondary" size="sm" className="gap-2">
                 <Shield className="w-4 h-4" />
-                Skarbiec
+                {tr("Skarbiec", "Vault")}
               </Button>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                <div className="text-sm text-muted-foreground">DNA Sequences</div>
+                <div className="text-sm text-muted-foreground">{tr("Sekwencje DNA", "DNA sequences")}</div>
                 <div className="text-2xl font-bold text-primary">{gatcaRepeats.length}</div>
               </div>
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
@@ -365,8 +395,10 @@ if __name__ == "__main__":
         {/* Upload GATCA Data */}
         <Card>
           <CardHeader>
-            <CardTitle>Load GATCA Data</CardTitle>
-            <CardDescription>Upload your GATCA_full.txt file with STR repeats</CardDescription>
+            <CardTitle>{tr("Wczytaj dane GATCA", "Load GATCA data")}</CardTitle>
+            <CardDescription>
+              {tr("Wgraj plik GATCA_full.txt z powtórzeniami STR", "Upload your GATCA_full.txt file with STR repeats")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <input
@@ -378,10 +410,10 @@ if __name__ == "__main__":
             />
             <Button onClick={() => fileInputRef.current?.click()} className="w-full" variant="outline">
               <Upload className="mr-2 h-4 w-4" />
-              Upload GATCA_full.txt
+              {tr("Wgraj GATCA_full.txt", "Upload GATCA_full.txt")}
             </Button>
             <div className="text-sm text-muted-foreground">
-              Current data: {gatcaRepeats.length} STR sequences from DNA
+              {tr("Aktualne dane", "Current data")}: {gatcaRepeats.length} {tr("sekwencji STR z DNA", "STR sequences from DNA")}
             </div>
           </CardContent>
         </Card>
@@ -389,18 +421,16 @@ if __name__ == "__main__":
         {/* Run Analysis */}
         <Card>
           <CardHeader>
-            <CardTitle>Test Riemann Hypothesis</CardTitle>
-            <CardDescription>Check if zeros align on critical line Re(s) = 1/2</CardDescription>
+            <CardTitle>{tr("Testuj Hipotezę Riemanna", "Test Riemann Hypothesis")}</CardTitle>
+            <CardDescription>
+              {tr("Sprawdź czy zera leżą na linii krytycznej Re(s) = 1/2", "Check if zeros align on critical line Re(s) = 1/2")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4">
-              <Button
-                onClick={() => checkZeros(1000)}
-                disabled={isProcessing}
-                className="flex-1"
-              >
+              <Button onClick={() => checkZeros(1000)} disabled={isProcessing} className="flex-1">
                 <Play className="mr-2 h-4 w-4" />
-                Test 1,000 Zeros
+                {tr("Test 1 000 zer", "Test 1,000 zeros")}
               </Button>
               <Button
                 onClick={() => checkZeros(10000)}
@@ -409,7 +439,7 @@ if __name__ == "__main__":
                 variant="secondary"
               >
                 <Play className="mr-2 h-4 w-4" />
-                Test 10,000 Zeros
+                {tr("Test 10 000 zer", "Test 10,000 zeros")}
               </Button>
             </div>
 
@@ -417,22 +447,26 @@ if __name__ == "__main__":
               <div className="space-y-2">
                 <Progress value={progress} />
                 <div className="text-sm text-center text-muted-foreground">
-                  Testing zeros... {progress.toFixed(0)}%
+                  {tr("Testuję zera...", "Testing zeros...")} {progress.toFixed(0)}%
                 </div>
                 <div className="text-sm text-center text-primary font-semibold">
-                  Robię to dla mojego syna.
+                  {tr("Robię to dla mojego syna.", "I do this for my son.")}
                 </div>
               </div>
             )}
 
             {totalZeros > 0 && (
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                <div className="text-lg font-semibold mb-2">Results</div>
+                <div className="text-lg font-semibold mb-2">{tr("Wyniki", "Results")}</div>
                 <div className="space-y-1">
-                  <div>Tested: {totalZeros} zeros</div>
-                  <div>On critical line: {zerosOnLine}</div>
+                  <div>
+                    {tr("Przetestowano", "Tested")}: {totalZeros} {tr("zer", "zeros")}
+                  </div>
+                  <div>
+                    {tr("Na linii krytycznej", "On critical line")}: {zerosOnLine}
+                  </div>
                   <div className="text-xl font-bold text-primary">
-                    Success rate: {((zerosOnLine / totalZeros) * 100).toFixed(2)}%
+                    {tr("Skuteczność", "Success rate")}: {((zerosOnLine / totalZeros) * 100).toFixed(2)}%
                   </div>
                 </div>
               </div>
@@ -444,8 +478,8 @@ if __name__ == "__main__":
         {results.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Zero Analysis (First 100)</CardTitle>
-              <CardDescription>Zeros found on critical line Re(s) = 1/2</CardDescription>
+              <CardTitle>{tr("Analiza zer (pierwsze 100)", "Zero analysis (first 100)")}</CardTitle>
+              <CardDescription>{tr("Zera na linii krytycznej Re(s) = 1/2", "Zeros found on critical line Re(s) = 1/2")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -466,28 +500,30 @@ if __name__ == "__main__":
         {/* Export */}
         <Card>
           <CardHeader>
-            <CardTitle>Export & Publish</CardTitle>
-            <CardDescription>Generate files for Clay Mathematics Institute submission</CardDescription>
+            <CardTitle>{tr("Eksport i publikacja", "Export & publish")}</CardTitle>
+            <CardDescription>
+              {tr("Wygeneruj pliki do weryfikacji i publikacji", "Generate files for verification and publication")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <Button onClick={exportPythonCode} variant="outline">
                 <FileText className="mr-2 h-4 w-4" />
-                Export Python Code
+                {tr("Eksportuj kod Python", "Export Python code")}
               </Button>
               <Button onClick={exportResults} variant="outline" disabled={results.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
-                Export Results (JSON)
+                {tr("Eksportuj wyniki (JSON)", "Export results (JSON)")}
               </Button>
             </div>
             <div className="p-4 bg-secondary/20 rounded-lg text-sm space-y-2">
-              <div className="font-semibold">Next Steps:</div>
+              <div className="font-semibold">{tr("Następne kroki:", "Next steps:")}</div>
               <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                <li>Run exported Python code locally with full precision</li>
-                <li>Write paper: "DNA as Riemann-like Zeta Function"</li>
-                <li>Submit to arXiv.org</li>
-                <li>Submit to Clay Mathematics Institute (claymath.org)</li>
-                <li>Claim $1,000,000 Millennium Prize</li>
+                <li>{tr("Uruchom wyeksportowany kod Python lokalnie z pełną precyzją", "Run exported Python code locally with full precision")}</li>
+                <li>{tr("Napisz artykuł: \"DNA as Riemann-like Zeta Function\"", "Write paper: \"DNA as Riemann-like Zeta Function\"")}</li>
+                <li>{tr("Wyślij na arXiv.org", "Submit to arXiv.org")}</li>
+                <li>{tr("Wyślij do Clay Mathematics Institute", "Submit to Clay Mathematics Institute")}</li>
+                <li>{tr("Odbierz nagrodę Millennium: 1 000 000 $", "Claim $1,000,000 Millennium Prize")}</li>
               </ol>
             </div>
           </CardContent>
@@ -507,21 +543,21 @@ if __name__ == "__main__":
           <CardHeader>
             <CardTitle>The Living Proof</CardTitle>
             <CardDescription className="text-primary font-semibold italic mt-2">
-              Dedykowane dla mojego syna
+              {tr("Dedykowane dla mojego syna", "Dedicated to my son")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p>
-              The Riemann Hypothesis is not an abstract game.
-              It is the question of whether <strong>order emerges naturally from chaos</strong>.
+              The Riemann Hypothesis is not an abstract game. It is the question of whether{" "}
+              <strong>order emerges naturally from chaos</strong>.
             </p>
             <p>
-              If the non-trivial zeros of the Riemann zeta function all lie on the critical line Re(s) = 1/2...
-              then the distribution of prime numbers follows a hidden harmonic structure.
+              If the non-trivial zeros of the Riemann zeta function all lie on the critical line Re(s) = 1/2... then the
+              distribution of prime numbers follows a hidden harmonic structure.
             </p>
             <p className="text-primary font-semibold">
-              If the zeros align on the critical line... you do not just win a million dollars.
-              You prove that the human body is living proof of the universe&apos;s deepest mathematical truth.
+              If the zeros align on the critical line... you do not just win a million dollars. You prove that the human
+              body is living proof of the universe&apos;s deepest mathematical truth.
             </p>
           </CardContent>
         </Card>
@@ -529,179 +565,49 @@ if __name__ == "__main__":
         {/* Support Section */}
         <Card className="border-primary/20 bg-background/80 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <CardTitle className="text-primary">Wesprzyj Prawdę – Dowolna Kwota</CardTitle>
+            <CardTitle className="text-primary">
+              {tr("Wesprzyj Prawdę – Dowolna Kwota", "Support the Truth – Any amount")}
+            </CardTitle>
             <CardDescription>
-              <p className="text-xs text-muted-foreground">Wpisz kwotę (nawet 1 £)</p>
+              <p className="text-xs text-muted-foreground">{tr("Wpisz kwotę (nawet 1 £)", "Enter an amount (even £1)")}</p>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form 
-              action="https://www.paypal.com/cgi-bin/webscr" 
-              method="post" 
+            <form
+              action="https://www.paypal.com/cgi-bin/webscr"
+              method="post"
               target="_top"
               className="flex flex-col items-center gap-4"
             >
               <input type="hidden" name="cmd" value="_donations" />
               <input type="hidden" name="business" value="brama718@proton.me" />
               <input type="hidden" name="currency_code" value="GBP" />
-              
+
               <div className="flex items-center gap-3">
-                <input 
-                  type="text" 
-                  name="amount" 
-                  placeholder="Wpisz kwotę (np. 1)" 
+                <input
+                  type="text"
+                  name="amount"
+                  placeholder={tr("Wpisz kwotę (np. 1)", "Enter amount (e.g. 1)")}
                   className="w-32 px-4 py-2 text-center border border-primary/30 rounded-md bg-background/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
-                
-                <button 
+
+                <button
                   type="submit"
                   className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"
                 >
-                  WYŚLIJ
+                  {tr("WYŚLIJ", "SEND")}
                 </button>
               </div>
-              
-              <small className="text-xs text-muted-foreground">PayPal – bezpieczne, bez konta</small>
+
+              <small className="text-xs text-muted-foreground">
+                {tr("PayPal – bezpieczne, bez konta", "PayPal — secure, no account needed")}
+              </small>
             </form>
           </CardContent>
         </Card>
 
         {/* 18 DNA Gates */}
         <DNA18Gates />
-
-        {/* MANIFEST JEDNOŚCI */}
-        <Card className="bg-[rgba(10,11,30,0.95)] border-[#ffd700]/50">
-          <CardContent className="pt-6 space-y-6">
-            <div className="text-center space-y-2">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-[#ffd700] via-purple-400 to-[#00f2ff] bg-clip-text text-transparent uppercase tracking-widest">
-                ✦ MANIFEST JEDNOŚCI ✦
-              </h3>
-              <p className="text-lg text-[#ffd700]">NAUKA + BÓG = RZECZYWISTOŚĆ</p>
-              <p className="text-xs text-gray-500 italic">By: Grzegorz</p>
-            </div>
-
-            {/* 1. Jeden język, dwie dialekty */}
-            <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#00f2ff]/10 rounded-lg border border-purple-500/30">
-              <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">1.</span> JEDEN JĘZYK, DWIE DIALEKTY
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-300"><span className="text-[#00f2ff] font-semibold">Matematyka</span> to słownictwo Boga.</p>
-                <p className="text-gray-300"><span className="text-[#ffd700] font-semibold">Fizyka</span> to Jego gramatyka.</p>
-                <p className="text-gray-300"><span className="text-green-400 font-semibold">Biologia</span> to Jego poezja.</p>
-                <p className="text-gray-300"><span className="text-purple-400 font-semibold">Świadomość</span> to Jego głos.</p>
-              </div>
-            </div>
-
-            {/* 2. Mostek Kwantowy */}
-            <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-[#ffd700]/10 rounded-lg border border-[#00f2ff]/30">
-              <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">2.</span> MOSTEK KWANTOWY
-              </h4>
-              <div className="space-y-3 text-sm">
-                <div className="flex gap-2">
-                  <span className="text-[#ffd700] font-bold shrink-0">💡</span>
-                  <p className="text-gray-300"><span className="text-[#ffd700]">"Niech stanie się światłość"</span> = Wielki Wybuch i inicjacja fotonów.</p>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-[#00f2ff] font-bold shrink-0">🧬</span>
-                  <p className="text-gray-300"><span className="text-[#00f2ff]">"Obraz i podobieństwo"</span> = Złoty Podział (φ) w Twoim DNA.</p>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-purple-400 font-bold shrink-0">✨</span>
-                  <p className="text-gray-300"><span className="text-purple-400">"Cuda"</span> = Dostęp do głębszych praw fizyki, których jeszcze nie nazwaliśmy.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. Twoja rola w systemie */}
-            <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-purple-900/30 rounded-lg border border-[#ffd700]/30">
-              <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">3.</span> TWOJA ROLA W SYSTEMIE
-              </h4>
-              <p className="text-sm text-gray-300 leading-relaxed">
-                Nie jesteś tylko biologiczną maszyną. Jesteś <span className="text-[#00f2ff] font-semibold">obserwatorem</span>, 
-                który poprzez swoją wiarę i częstotliwość (<span className="text-[#ffd700] font-bold">718 Hz</span>) 
-                wybiera rzeczywistość z nieskończonego pola potencjału.
-              </p>
-            </div>
-
-            {/* 4. Wniosek końcowy */}
-            <div className="p-5 bg-gradient-to-b from-black/60 to-purple-900/40 rounded-lg border border-[#ffd700]/50">
-              <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">4.</span> WNIOSEK KOŃCOWY
-              </h4>
-              <div className="space-y-3 text-sm text-gray-300 leading-relaxed">
-                <p>
-                  <span className="text-purple-400 font-semibold">Laboratorium</span> to Twoja katedra. 
-                  <span className="text-[#00f2ff] font-semibold"> Modlitwa</span> to Twój eksperyment. 
-                  Gdy Twoje tętno synchronizuje się z Matrycą, przestajesz tylko wierzyć – zaczynasz <span className="text-[#ffd700] font-bold">WIEDZIEĆ</span>.
-                </p>
-              </div>
-              <blockquote className="mt-4 pt-4 border-t border-[#ffd700]/30 text-center">
-                <p className="text-[#ffd700] italic text-lg font-semibold">
-                  "Tam, gdzie kończy się lęk przed nieznanym, zaczyna się matematyka cudów."
-                </p>
-              </blockquote>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* SEKRET REZONANSU */}
-        <Card className="bg-[rgba(10,11,30,0.95)] border-[#00f2ff]/50">
-          <CardContent className="pt-6 space-y-5">
-            <div className="text-center space-y-2">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-[#00f2ff] via-[#ffd700] to-purple-400 bg-clip-text text-transparent uppercase tracking-widest">
-                ✦ SEKRET REZONANSU ✦
-              </h3>
-              <p className="text-lg text-[#00f2ff]">DLACZEGO MODLITWA DZIAŁA?</p>
-            </div>
-
-            {/* 1. Wiara jako impuls kwantowy */}
-            <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-[#00f2ff]/10 rounded-lg border border-[#ffd700]/30">
-              <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">1.</span> WIARA JAKO IMPULS KWANTOWY
-              </h4>
-              <p className="text-sm text-gray-300 leading-relaxed">
-                Twoja wiara to nie tylko myśl – to <span className="text-[#ffd700] font-semibold">najsilniejszy znany we wszechświecie 
-                generator fali spójnej</span>. Kiedy wierzysz bez wątpienia, Twoje serce 
-                wysyła sygnał, który <span className="text-[#00f2ff]">"zagina"</span> prawdopodobieństwo rzeczywistości.
-              </p>
-            </div>
-
-            {/* 2. Dostrojenie do Źródła */}
-            <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-purple-900/30 rounded-lg border border-[#00f2ff]/30">
-              <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">2.</span> DOSTROJENIE DO ŹRÓDŁA
-              </h4>
-              <p className="text-sm text-gray-300 leading-relaxed">
-                Modlitwa to proces synchronizacji Twojego tętna z Matrycą <span className="text-[#ffd700] font-bold">718 Hz</span>. 
-                Gdy osiągasz ten stan (<span className="text-[#ffd700]">złoty wykres</span> na naszej stronie), Twoje 
-                pole Ψ staje się <span className="text-[#00f2ff] font-semibold">"nadprzewodnikiem"</span> dla boskiej woli.
-              </p>
-            </div>
-
-            {/* 3. Twoja wewnętrzna moc */}
-            <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#ffd700]/10 rounded-lg border border-purple-500/30">
-              <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
-                <span className="text-xl">3.</span> TWOJA WEWNĘTRZNA MOC
-              </h4>
-              <p className="text-sm text-gray-300 leading-relaxed mb-3">
-                Pamiętaj: Bóg nie działa <span className="text-gray-400">"zamiast"</span> Ciebie, ale <span className="text-[#ffd700] font-bold">"poprzez"</span> Ciebie. 
-                To Twoja wewnętrzna moc, Twoja częstotliwość i Twoja wiara są 
-                narzędziami, którymi kształtujesz świat.
-              </p>
-              <blockquote className="pt-3 border-t border-purple-500/30 text-center">
-                <p className="text-purple-300 italic">
-                  "Królestwo Boże jest wewnątrz was"
-                </p>
-                <p className="text-xs text-gray-400 mt-2">
-                  – to znaczy, że masz w sobie <span className="text-[#ffd700]">generator cudów</span>. Musisz go tylko poprawnie nastroić.
-                </p>
-              </blockquote>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
