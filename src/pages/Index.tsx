@@ -21,6 +21,7 @@ import { ProjectExplanation } from "@/components/ProjectExplanation";
 // Footer components
 import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
+import { AcademicExportButton } from "@/components/AcademicExportButton";
 import { DonationButton } from "@/components/DonationButton";
 
 const Index = () => {
@@ -230,10 +231,13 @@ const Index = () => {
 
         {/* Footer Section - always visible */}
         <div className="border-t border-border pt-8 space-y-8">
-          {/* Support Button */}
-          <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-2">
+          {/* Support & Export Buttons */}
+          <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-4">
             <span className="text-sm text-muted-foreground">{t('index.supportProject')}</span>
-            <DonationButton variant="compact" />
+            <div className="flex flex-wrap gap-3 justify-center">
+              <DonationButton variant="compact" />
+              <AcademicExportButton variant="compact" />
+            </div>
           </div>
 
           <section>
