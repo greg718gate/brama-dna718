@@ -26,6 +26,7 @@ import PentagramMatrix from "./PentagramMatrix";
 import { PentagramSphere } from "./PentagramSphere";
 import { DNA18Gates } from "./DNA18Gates";
 import { Symphony18Gates } from "./Symphony18Gates";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ZeroResult {
@@ -268,6 +269,9 @@ if __name__ == "__main__":
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4 md:p-8">
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
       {/* Navigation Bar (desktop) */}
       <nav className="fixed top-3 left-3 right-3 z-50 hidden md:block">
         <div className="flex items-center justify-end gap-2">
@@ -349,10 +353,13 @@ if __name__ == "__main__":
           <CardHeader>
             <CardTitle className="text-3xl flex items-center gap-3">
               <span className="text-4xl">𝜁</span>
-              GATCA Zeta Function
+              {tr("Funkcja Zeta GATCA", "GATCA Zeta Function")}
             </CardTitle>
             <CardDescription className="text-base">
-              Biological implementation of Riemann Hypothesis through DNA sequences
+              {tr(
+                "Biologiczna implementacja Hipotezy Riemanna poprzez sekwencje DNA",
+                "Biological implementation of Riemann Hypothesis through DNA sequences"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -381,11 +388,11 @@ if __name__ == "__main__":
                 <div className="text-2xl font-bold text-primary">{gatcaRepeats.length}</div>
               </div>
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                <div className="text-sm text-muted-foreground">Golden Ratio φ</div>
+                <div className="text-sm text-muted-foreground">{tr("Złoty podział", "Golden Ratio")} φ</div>
                 <div className="text-2xl font-bold text-primary">{PHI.toFixed(6)}</div>
               </div>
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                <div className="text-sm text-muted-foreground">Critical Line</div>
+                <div className="text-sm text-muted-foreground">{tr("Linia krytyczna", "Critical Line")}</div>
                 <div className="text-2xl font-bold text-primary">Re(s) = 1/2</div>
               </div>
             </div>
