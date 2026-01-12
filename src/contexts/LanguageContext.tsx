@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Language = 'pl' | 'en';
 
@@ -1237,11 +1237,25 @@ const translations = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const STORAGE_KEY = "dna718_language";
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('pl');
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "pl" || saved === "en") return saved;
+
+    const nav = (navigator.language || "").toLowerCase();
+    return nav.startsWith("pl") ? "pl" : "en";
+  });
+
+  useEffect(() => {
+    // Helps browsers (Brave/Chrome/etc.) offer proper auto-translation.
+    document.documentElement.lang = language;
+    localStorage.setItem(STORAGE_KEY, language);
+  }, [language]);
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    return translations[language]?.[key] ?? translations.pl[key] ?? key;
   };
 
   return (
@@ -1250,6 +1264,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     </LanguageContext.Provider>
   );
 };
+
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
