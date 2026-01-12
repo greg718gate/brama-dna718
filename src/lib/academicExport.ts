@@ -561,34 +561,6 @@ const generate3DSphereSVG = (lang: 'pl' | 'en') => {
 `;
 };
 
-  </defs>
-  
-  <!-- Main sphere -->
-  <circle cx="150" cy="150" r="120" fill="url(#sphereGrad)" opacity="0.3"/>
-  <ellipse cx="150" cy="150" rx="120" ry="40" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="5,3"/>
-  <ellipse cx="150" cy="150" rx="40" ry="120" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="5,3"/>
-  
-  <!-- Axes -->
-  <line x1="150" y1="150" x2="280" y2="150" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="150" y1="150" x2="150" y2="20" stroke="#27ae60" stroke-width="2"/>
-  <line x1="150" y1="150" x2="80" y2="220" stroke="#3498db" stroke-width="2"/>
-  
-  <!-- Vector M -->
-  <line x1="150" y1="150" x2="${150 + vectorM.Mx * 50}" y2="${150 - vectorM.Mz * 80}" stroke="#c4a000" stroke-width="3"/>
-  <circle cx="${150 + vectorM.Mx * 50}" cy="${150 - vectorM.Mz * 80}" r="8" fill="#c4a000"/>
-  
-  <!-- Labels -->
-  <text x="285" y="155" font-size="12" fill="#e74c3c">X (Słońce)</text>
-  <text x="155" y="15" font-size="12" fill="#27ae60">Y (Ziemia)</text>
-  <text x="50" y="235" font-size="12" fill="#3498db">Z (Człowiek)</text>
-  <text x="${155 + vectorM.Mx * 50}" y="${145 - vectorM.Mz * 80}" font-size="11" font-weight="bold" fill="#c4a000">M</text>
-  
-  <!-- Magnitude -->
-  <text x="150" y="290" text-anchor="middle" font-size="10" fill="#666">|M| = ${vectorM.magnitude.toFixed(6)}</text>
-</svg>
-`;
-
-// ============= 18 BRAM DNA - PEŁNE DANE =============
 const get18GatesData = (lang: 'pl' | 'en') => {
   const gates = [
     // Regeneracja (1-6)
@@ -891,7 +863,7 @@ print(f"✓ Vector M magnitude: |M| = {magnitude:.10f}")
 print(f"✓ 18 Gates mapped to mtDNA positions")
 print(f"✓ GATCA Zeta function defined")
 print(f"✓ Wave function Ψ = γ at (0,0)")
-print("\\nContact: dnagate718@proton.me")
+${safeContactEmail ? `print("\\nContact: ${safeContactEmail}")` : ''}
 print("License: CC BY-NC 4.0")
 `;
 
