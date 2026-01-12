@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const ProjectExplanation = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <div className="w-full">
       <Tabs defaultValue="about" className="w-full">
@@ -170,13 +170,13 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 </div>
                 
                 <div className="space-y-2 text-sm text-foreground/80">
-                  <p><strong>{t('language') === 'pl' ? 'Gdzie:' : 'Where:' }</strong></p>
+                  <p><strong>{language === 'pl' ? 'Gdzie:' : 'Where:' }</strong></p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Ψ (psi) – {t('language') === 'pl' ? 'funkcja falowa – prawdopodobieństwo znalezienia cząstki' : 'wave function – probability of finding a particle'}</li>
-                    <li>i – {t('language') === 'pl' ? 'jednostka urojona' : 'imaginary unit'}</li>
-                    <li>ℏ – {t('language') === 'pl' ? 'stała Plancka podzielona przez 2π' : 'Planck constant divided by 2π'}</li>
-                    <li>Ĥ – {t('language') === 'pl' ? 'operator Hamiltona = całkowita energia układu' : 'Hamiltonian operator = total energy of system'}</li>
-                    <li>t – {t('language') === 'pl' ? 'czas, r – pozycja' : 'time, r – position'}</li>
+                    <li>Ψ (psi) – {language === 'pl' ? 'funkcja falowa – prawdopodobieństwo znalezienia cząstki' : 'wave function – probability of finding a particle'}</li>
+                    <li>i – {language === 'pl' ? 'jednostka urojona' : 'imaginary unit'}</li>
+                    <li>ℏ – {language === 'pl' ? 'stała Plancka podzielona przez 2π' : 'Planck constant divided by 2π'}</li>
+                    <li>Ĥ – {language === 'pl' ? 'operator Hamiltona = całkowita energia układu' : 'Hamiltonian operator = total energy of system'}</li>
+                    <li>t – {language === 'pl' ? 'czas, r – pozycja' : 'time, r – position'}</li>
                   </ul>
                 </div>
 
