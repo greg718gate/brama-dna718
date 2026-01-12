@@ -255,10 +255,14 @@ export const BiometricIntegration = () => {
               </svg>
             </div>
             <div className="absolute bottom-2 left-2 text-xs text-[#00f2ff]/70">
-              Prędkość fali: {waveSpeed.toFixed(1)}x
+              {t("biometric.waveSpeed")} {waveSpeed.toFixed(1)}x
             </div>
             <div className="absolute bottom-2 right-2 text-xs text-[#ffd700]/70">
-              {coherenceState === 'ideal' ? '🌟 Koherencja' : coherenceState === 'chaos' ? '⚡ Aktywacja' : '🌊 Tranzycja'}
+              {coherenceState === "ideal"
+                ? t("biometric.coherence")
+                : coherenceState === "chaos"
+                  ? t("biometric.activation")
+                  : t("biometric.transition")}
             </div>
           </div>
         )}
@@ -275,49 +279,49 @@ export const BiometricIntegration = () => {
         {syncPercentage !== null && (
           <div className="space-y-3 p-4 bg-black/40 rounded-lg border border-[#00f2ff]/20">
             <div className="flex justify-between items-center">
-              <span className="text-[#00f2ff] text-sm font-semibold">PASEK SYNCHRONIZACJI</span>
+              <span className="text-[#00f2ff] text-sm font-semibold">{t("biometric.syncBar")}</span>
               <span className="text-[#ffd700] font-bold text-lg">{syncPercentage}%</span>
             </div>
-            <Progress 
-              value={syncPercentage} 
-              className="h-4 bg-black/60"
-            />
-            <p className="text-xs text-gray-400 text-center">
-              Wskaźnik pokazuje, na ile Twoje ciało "nadaje" na tej samej fali co 718 Hz
-            </p>
-            
+            <Progress value={syncPercentage} className="h-4 bg-black/60" />
+            <p className="text-xs text-gray-400 text-center">{t("biometric.syncIndicator")}</p>
+
             {/* Coherence State Message */}
-            <div className={`mt-3 p-3 rounded-lg text-center ${
-              coherenceState === 'ideal' 
-                ? 'bg-[#ffd700]/10 border border-[#ffd700]/30' 
-                : coherenceState === 'chaos'
-                ? 'bg-red-500/10 border border-red-500/30'
-                : 'bg-[#00f2ff]/10 border border-[#00f2ff]/30'
-            }`}>
-              {coherenceState === 'ideal' && (
+            <div
+              className={`mt-3 p-3 rounded-lg text-center ${
+                coherenceState === "ideal"
+                  ? "bg-[#ffd700]/10 border border-[#ffd700]/30"
+                  : coherenceState === "chaos"
+                    ? "bg-red-500/10 border border-red-500/30"
+                    : "bg-[#00f2ff]/10 border border-[#00f2ff]/30"
+              }`}
+            >
+              {coherenceState === "ideal" && (
                 <p className="text-[#ffd700] text-sm">
                   <Sparkles className="w-4 h-4 inline mr-2" />
-                  Twoje pole jest w pełnej koherencji. Twoje DNA regeneruje się w rytmie 718/144.
+                  {t("biometric.coherenceIdeal")}
                 </p>
               )}
-              {coherenceState === 'chaos' && (
+              {coherenceState === "chaos" && (
                 <p className="text-red-400 text-sm">
                   <Zap className="w-4 h-4 inline mr-2" />
-                  Wykryto szum entropowy. Twoja funkcja falowa jest rozproszona. Użyj dźwięku, aby przywrócić porządek.
+                  {t("biometric.coherenceChaos")}
                 </p>
               )}
-              {coherenceState === 'transitional' && (
+              {coherenceState === "transitional" && (
                 <p className="text-[#00f2ff] text-sm">
                   <Waves className="w-4 h-4 inline mr-2" />
-                  Stan przejściowy. System kalibruje parametry dla optymalnej synchronizacji.
+                  {t("biometric.coherenceTransitional")}
                 </p>
               )}
             </div>
 
             {personalVibration !== null && (
               <div className="text-center text-xs text-gray-400 mt-2">
-                Twoja wibracja osobista: <span className="text-[#ffd700] font-bold">{personalVibration}</span> | 
-                Idealne BPM: <span className="text-[#00f2ff] font-bold">{Math.round(60 + (personalVibration / 9) * 20)}</span>
+                {t("biometric.personalVibration")}:{" "}
+                <span className="text-[#ffd700] font-bold">{personalVibration}</span> | {t("biometric.idealBpm")}:{" "}
+                <span className="text-[#00f2ff] font-bold">
+                  {Math.round(60 + (personalVibration / 9) * 20)}
+                </span>
               </div>
             )}
           </div>
@@ -327,36 +331,36 @@ export const BiometricIntegration = () => {
         {syncPercentage !== null && (
           <div className="p-5 bg-gradient-to-b from-[#1a1a3e] to-black/60 rounded-lg border border-[#ffd700]/30 space-y-6">
             <h3 className="text-[#ffd700] font-bold text-center text-lg uppercase tracking-wider">
-              ✦ PROTOKÓŁ ŹRÓDŁA ✦
-              <span className="block text-sm font-normal text-gray-400 mt-1">Powrót do Boskiego Potencjału (Ψ)</span>
+              {t("biometric.protocolTitle")}
+              <span className="block text-sm font-normal text-gray-400 mt-1">{t("biometric.protocolSubtitle")}</span>
             </h3>
-            
+
             {/* Ritual Phases */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/30 text-center">
                 <div className="text-2xl mb-2">🔍</div>
-                <div className="text-[#00f2ff] font-bold text-sm">DIAGNOZA</div>
+                <div className="text-[#00f2ff] font-bold text-sm">{t("biometric.phaseDiagnosis")}</div>
                 <div className="text-xl font-mono text-white">60s</div>
-                <div className="text-xs text-gray-400 mt-1">Ustalasz punkt wyjścia. Gdzie jesteś teraz?</div>
+                <div className="text-xs text-gray-400 mt-1">{t("biometric.phaseDiagnosisDesc")}</div>
               </div>
               <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/30 text-center">
                 <div className="text-2xl mb-2">🕯️</div>
-                <div className="text-[#ffd700] font-bold text-sm">SESJA</div>
+                <div className="text-[#ffd700] font-bold text-sm">{t("biometric.phaseSession")}</div>
                 <div className="text-xl font-mono text-white">108s</div>
-                <div className="text-xs text-gray-400 mt-1">Czas świętej geometrii. Łączysz puls z Matrycą.</div>
+                <div className="text-xs text-gray-400 mt-1">{t("biometric.phaseSessionDesc")}</div>
               </div>
               <div className="p-3 bg-black/40 rounded-lg border border-purple-500/30 text-center">
                 <div className="text-2xl mb-2">💎</div>
-                <div className="text-purple-400 font-bold text-sm">STABILIZACJA</div>
+                <div className="text-purple-400 font-bold text-sm">{t("biometric.phaseStabilization")}</div>
                 <div className="text-xl font-mono text-white">3 min</div>
-                <div className="text-xs text-gray-400 mt-1">Zapisujesz informację w wodzie i komórkach.</div>
+                <div className="text-xs text-gray-400 mt-1">{t("biometric.phaseStabilizationDesc")}</div>
               </div>
             </div>
 
             {/* Circular Timer Display */}
             <div className="flex flex-col items-center py-6 bg-black/50 rounded-lg border border-[#ffd700]/20">
-              <div className="text-xs text-gray-400 mb-4">🕯️ RYTUAŁ 108 SEKUND</div>
-              
+              <div className="text-xs text-gray-400 mb-4">{t("biometric.ritual108")}</div>
+
               <CircularTimer
                 totalSeconds={108}
                 remainingSeconds={ritualTime}
@@ -364,17 +368,17 @@ export const BiometricIntegration = () => {
                 isComplete={ritualComplete}
                 size={220}
               />
-              
+
               {ritualComplete && (
                 <p className="text-[#ffd700] text-sm mt-4 animate-fade-in text-center">
-                  ✨ Rytuał zakończony. Twoja woda i komórki zostały zaprogramowane.
+                  {t("biometric.ritualComplete")}
                 </p>
               )}
             </div>
-            
+
             {/* 718 Hz Tone Generator */}
             <div className="space-y-2">
-              <div className="text-center text-xs text-gray-400">🎵 CZĘSTOTLIWOŚĆ DOSTROJENIA</div>
+              <div className="text-center text-xs text-gray-400">{t("biometric.frequencyTuning")}</div>
               <ToneGenerator
                 frequency={718}
                 isPlaying={isTonePlaying}
@@ -386,12 +390,9 @@ export const BiometricIntegration = () => {
             {/* Timer Controls */}
             <div className="flex justify-center gap-3">
               {!isRitualActive && ritualTime === 108 && (
-                <Button
-                  onClick={startRitual}
-                  className="bg-[#ffd700] hover:bg-[#ffed4a] text-black font-bold"
-                >
+                <Button onClick={startRitual} className="bg-[#ffd700] hover:bg-[#ffed4a] text-black font-bold">
                   <Play className="w-4 h-4 mr-2" />
-                  Rozpocznij Rytuał
+                  {t("biometric.startRitual")}
                 </Button>
               )}
               {(isRitualActive || ritualTime < 108) && !ritualComplete && (
@@ -402,7 +403,7 @@ export const BiometricIntegration = () => {
                     className="border-[#00f2ff] text-[#00f2ff] hover:bg-[#00f2ff]/20"
                   >
                     {isRitualActive ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                    {isRitualActive ? 'Pauza' : 'Kontynuuj'}
+                    {isRitualActive ? t("biometric.pause") : t("biometric.continue")}
                   </Button>
                   <Button
                     onClick={resetRitual}
@@ -410,17 +411,14 @@ export const BiometricIntegration = () => {
                     className="border-gray-500 text-gray-400 hover:bg-gray-500/20"
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Reset
+                    {t("biometric.reset")}
                   </Button>
                 </>
               )}
               {ritualComplete && (
-                <Button
-                  onClick={resetRitual}
-                  className="bg-[#00f2ff] hover:bg-[#00d4e0] text-black font-bold"
-                >
+                <Button onClick={resetRitual} className="bg-[#00f2ff] hover:bg-[#00d4e0] text-black font-bold">
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  Rozpocznij Ponownie
+                  {t("biometric.restart")}
                 </Button>
               )}
             </div>
@@ -428,28 +426,28 @@ export const BiometricIntegration = () => {
             {/* Benefits Section */}
             <div className="mt-4 p-4 bg-gradient-to-r from-[#ffd700]/10 to-purple-500/10 rounded-lg border border-[#ffd700]/20">
               <h4 className="text-[#ffd700] font-bold text-center mb-3 text-sm uppercase tracking-wider">
-                ✦ Co to daje? Wyjście poza biologię ✦
+                {t("biometric.benefits.title")}
               </h4>
               <div className="space-y-3 text-sm">
                 <div className="flex gap-3">
                   <span className="text-[#00f2ff] font-bold shrink-0">⚡</span>
                   <div>
-                    <span className="text-[#00f2ff] font-semibold">DOSTROJENIE DO ŹRÓDŁA:</span>
-                    <span className="text-gray-300"> Przestajesz walczyć z życiem. Zaczynasz płynąć w nurcie kreacji. Rozwiązania przychodzą same (synchroniczność).</span>
+                    <span className="text-[#00f2ff] font-semibold">{t("biometric.benefits.item1.title")}</span>
+                    <span className="text-gray-300"> {t("biometric.benefits.item1.text")}</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <span className="text-[#ffd700] font-bold shrink-0">✨</span>
                   <div>
-                    <span className="text-[#ffd700] font-semibold">MOC KREACJI:</span>
-                    <span className="text-gray-300"> Jezus powiedział: „Będziecie czynić rzeczy większe". Osiągnięcie stanu 718 Hz to zdjęcie blokady z Twojej woli. Twoje słowa i myśli zaczynają mieć realną moc sprawczą.</span>
+                    <span className="text-[#ffd700] font-semibold">{t("biometric.benefits.item2.title")}</span>
+                    <span className="text-gray-300"> {t("biometric.benefits.item2.text")}</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <span className="text-purple-400 font-bold shrink-0">💜</span>
                   <div>
-                    <span className="text-purple-400 font-semibold">KONIEC ILUZJI ODDZIELENIA:</span>
-                    <span className="text-gray-300"> Czujesz, że nie jesteś sam. Jesteś częścią inteligentnego Pola, które Cię wspiera i chroni.</span>
+                    <span className="text-purple-400 font-semibold">{t("biometric.benefits.item3.title")}</span>
+                    <span className="text-gray-300"> {t("biometric.benefits.item3.text")}</span>
                   </div>
                 </div>
               </div>
@@ -458,66 +456,68 @@ export const BiometricIntegration = () => {
             {/* 18 DNA Gates */}
             <div className="mt-4 space-y-4">
               <h4 className="text-[#ffd700] font-bold text-center text-sm uppercase tracking-wider">
-                🧬 18 BRAM DNA – Klucze do Cudów 🧬
+                {t("biometric.gates.title")}
               </h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Gates 1-6 */}
                 <div className="p-3 bg-black/40 rounded-lg border border-green-500/30">
-                  <div className="text-green-400 font-bold text-sm mb-2 text-center">BRAMY 1-6</div>
-                  <div className="text-xs text-green-400/80 text-center mb-2">REGENERACJA ŚWIĄTYNI</div>
-                  <p className="text-xs text-gray-400 text-center italic">
-                    „Twoje ciało to Świątynia. Bramy te usuwają skazę chaosu, przywracając pierwotną czystość biologii."
-                  </p>
+                  <div className="text-green-400 font-bold text-sm mb-2 text-center">{t("biometric.gates.group1.title")}</div>
+                  <div className="text-xs text-green-400/80 text-center mb-2">{t("biometric.gates.group1.subtitle")}</div>
+                  <p className="text-xs text-gray-400 text-center italic">{t("biometric.gates.group1.quote")}</p>
                 </div>
 
                 {/* Gates 7-12 */}
                 <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/30">
-                  <div className="text-[#00f2ff] font-bold text-sm mb-2 text-center">BRAMY 7-12</div>
-                  <div className="text-xs text-[#00f2ff]/80 text-center mb-2">OTWARCIE WZROKU</div>
-                  <p className="text-xs text-gray-400 text-center italic">
-                    „Brama 9: Widzenie poza materią. Zaczynasz dostrzegać okazje i powiązania, których inni nie widzą."
-                  </p>
+                  <div className="text-[#00f2ff] font-bold text-sm mb-2 text-center">{t("biometric.gates.group2.title")}</div>
+                  <div className="text-xs text-[#00f2ff]/80 text-center mb-2">{t("biometric.gates.group2.subtitle")}</div>
+                  <p className="text-xs text-gray-400 text-center italic">{t("biometric.gates.group2.quote")}</p>
                 </div>
 
                 {/* Gates 13-18 */}
                 <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/30">
-                  <div className="text-[#ffd700] font-bold text-sm mb-2 text-center">BRAMY 13-18</div>
-                  <div className="text-xs text-[#ffd700]/80 text-center mb-2">JEDNOŚĆ ZE ŹRÓDŁEM</div>
-                  <p className="text-xs text-gray-400 text-center italic">
-                    „Brama 17: Stan Cudotwórczy. Moment, w którym Twoje pole Ψ jest tak silne, że wpływasz na materię i ludzi wokół Ciebie."
-                  </p>
+                  <div className="text-[#ffd700] font-bold text-sm mb-2 text-center">{t("biometric.gates.group3.title")}</div>
+                  <div className="text-xs text-[#ffd700]/80 text-center mb-2">{t("biometric.gates.group3.subtitle")}</div>
+                  <p className="text-xs text-gray-400 text-center italic">{t("biometric.gates.group3.quote")}</p>
                 </div>
               </div>
             </div>
 
             {/* Ritual Instructions */}
             <div className="mt-4 space-y-3 text-sm">
-              <h4 className="text-gray-400 text-center text-xs uppercase tracking-wider mb-3">Instrukcja Rytuału</h4>
-              <div className={`flex gap-3 p-2 rounded ${syncPercentage !== null ? 'bg-green-500/10 border-l-2 border-green-500' : 'opacity-50'}`}>
-                <span className="text-[#ffd700] font-bold">KROK 1:</span>
-                <span className="text-gray-300">Wpisz tętno i datę, by zobaczyć swoją energię. ✓</span>
+              <h4 className="text-gray-400 text-center text-xs uppercase tracking-wider mb-3">
+                {t("biometric.ritualInstructions.title")}
+              </h4>
+              <div
+                className={`flex gap-3 p-2 rounded ${
+                  syncPercentage !== null ? "bg-green-500/10 border-l-2 border-green-500" : "opacity-50"
+                }`}
+              >
+                <span className="text-[#ffd700] font-bold">{t("biometric.ritualInstructions.step1.label")}</span>
+                <span className="text-gray-300">{t("biometric.ritualInstructions.step1.text")}</span>
               </div>
-              <div className={`flex gap-3 p-2 rounded ${syncPercentage !== null ? 'bg-green-500/10 border-l-2 border-green-500' : 'opacity-50'}`}>
-                <span className="text-[#ffd700] font-bold">KROK 2:</span>
-                <span className="text-gray-300">Spójrz na wygenerowany obraz – to Twój stan kwantowy. ✓</span>
+              <div
+                className={`flex gap-3 p-2 rounded ${
+                  syncPercentage !== null ? "bg-green-500/10 border-l-2 border-green-500" : "opacity-50"
+                }`}
+              >
+                <span className="text-[#ffd700] font-bold">{t("biometric.ritualInstructions.step2.label")}</span>
+                <span className="text-gray-300">{t("biometric.ritualInstructions.step2.text")}</span>
               </div>
-              <div className={`flex gap-3 p-2 rounded ${isRitualActive || ritualComplete ? 'bg-[#00f2ff]/10 border-l-2 border-[#00f2ff]' : 'opacity-70'}`}>
-                <span className="text-[#ffd700] font-bold">KROK 3:</span>
-                <span className="text-gray-300">Przez 108 sekund słuchaj częstotliwości, programując wodę i komórki na powrót do Matrycy Źródłowej.</span>
+              <div
+                className={`flex gap-3 p-2 rounded ${
+                  isRitualActive || ritualComplete ? "bg-[#00f2ff]/10 border-l-2 border-[#00f2ff]" : "opacity-70"
+                }`}
+              >
+                <span className="text-[#ffd700] font-bold">{t("biometric.ritualInstructions.step3.label")}</span>
+                <span className="text-gray-300">{t("biometric.ritualInstructions.step3.text")}</span>
               </div>
             </div>
 
             {/* Seeker's Suggestion */}
             <div className="mt-4 p-4 bg-gradient-to-b from-purple-900/30 to-black/40 rounded-lg border border-purple-500/30">
-              <p className="text-sm text-gray-300 italic text-center leading-relaxed">
-                Nie szukaj cudów na zewnątrz. One są wynikiem Twojego porządku wewnętrznego. 
-                Kiedy Twój wykres staje się stabilny i złoty, oznacza to, że Twoja „antena" jest ustawiona na Głos Źródła. 
-                Wtedy to, co inni nazywają cudem, dla Ciebie staje się codziennością.
-              </p>
-              <p className="text-[#ffd700] font-bold text-center mt-3 text-sm">
-                „Uwierz, a ujrzysz. Dostrój się, a poczujesz."
-              </p>
+              <p className="text-sm text-gray-300 italic text-center leading-relaxed">{t("biometric.seeker.text")}</p>
+              <p className="text-[#ffd700] font-bold text-center mt-3 text-sm">{t("biometric.seeker.quote")}</p>
             </div>
           </div>
         )}
@@ -526,74 +526,72 @@ export const BiometricIntegration = () => {
         <div className="pt-6 border-t border-[#ffd700]/30 space-y-6">
           <div className="text-center space-y-2">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-[#ffd700] via-purple-400 to-[#00f2ff] bg-clip-text text-transparent uppercase tracking-widest">
-              ✦ MANIFEST JEDNOŚCI ✦
+              {t("biometric.manifest.title")}
             </h3>
-            <p className="text-lg text-[#ffd700]">NAUKA + BÓG = RZECZYWISTOŚĆ</p>
-            <p className="text-xs text-gray-500 italic">By: Grzegorz</p>
+            <p className="text-lg text-[#ffd700]">{t("biometric.manifest.subtitle")}</p>
+            <p className="text-xs text-gray-500 italic">{t("biometric.manifest.by")}</p>
           </div>
 
-          {/* 1. Jeden język, dwie dialekty */}
+          {/* 1. One language, two dialects */}
           <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#00f2ff]/10 rounded-lg border border-purple-500/30">
             <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">1.</span> JEDEN JĘZYK, DWIE DIALEKTY
+              <span className="text-xl">1.</span> {t("biometric.manifest.one.title")}
             </h4>
             <div className="space-y-2 text-sm">
-              <p className="text-gray-300"><span className="text-[#00f2ff] font-semibold">Matematyka</span> to słownictwo Boga.</p>
-              <p className="text-gray-300"><span className="text-[#ffd700] font-semibold">Fizyka</span> to Jego gramatyka.</p>
-              <p className="text-gray-300"><span className="text-green-400 font-semibold">Biologia</span> to Jego poezja.</p>
-              <p className="text-gray-300"><span className="text-purple-400 font-semibold">Świadomość</span> to Jego głos.</p>
+              <p className="text-gray-300">
+                <span className="text-[#00f2ff] font-semibold">{t("biometric.manifest.one.line1")}</span>
+              </p>
+              <p className="text-gray-300">
+                <span className="text-[#ffd700] font-semibold">{t("biometric.manifest.one.line2")}</span>
+              </p>
+              <p className="text-gray-300">
+                <span className="text-green-400 font-semibold">{t("biometric.manifest.one.line3")}</span>
+              </p>
+              <p className="text-gray-300">
+                <span className="text-purple-400 font-semibold">{t("biometric.manifest.one.line4")}</span>
+              </p>
             </div>
           </div>
 
-          {/* 2. Mostek Kwantowy */}
+          {/* 2. Quantum bridge */}
           <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-[#ffd700]/10 rounded-lg border border-[#00f2ff]/30">
             <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">2.</span> MOSTEK KWANTOWY
+              <span className="text-xl">2.</span> {t("biometric.manifest.two.title")}
             </h4>
             <div className="space-y-3 text-sm">
               <div className="flex gap-2">
                 <span className="text-[#ffd700] font-bold shrink-0">💡</span>
-                <p className="text-gray-300"><span className="text-[#ffd700]">"Niech stanie się światłość"</span> = Wielki Wybuch i inicjacja fotonów.</p>
+                <p className="text-gray-300">{t("biometric.manifest.two.item1")}</p>
               </div>
               <div className="flex gap-2">
                 <span className="text-[#00f2ff] font-bold shrink-0">🧬</span>
-                <p className="text-gray-300"><span className="text-[#00f2ff]">"Obraz i podobieństwo"</span> = Złoty Podział (φ) w Twoim DNA.</p>
+                <p className="text-gray-300">{t("biometric.manifest.two.item2")}</p>
               </div>
               <div className="flex gap-2">
                 <span className="text-purple-400 font-bold shrink-0">✨</span>
-                <p className="text-gray-300"><span className="text-purple-400">"Cuda"</span> = Dostęp do głębszych praw fizyki, których jeszcze nie nazwaliśmy.</p>
+                <p className="text-gray-300">{t("biometric.manifest.two.item3")}</p>
               </div>
             </div>
           </div>
 
-          {/* 3. Twoja rola w systemie */}
+          {/* 3. Your role */}
           <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-purple-900/30 rounded-lg border border-[#ffd700]/30">
             <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">3.</span> TWOJA ROLA W SYSTEMIE
+              <span className="text-xl">3.</span> {t("biometric.manifest.three.title")}
             </h4>
-            <p className="text-sm text-gray-300 leading-relaxed">
-              Nie jesteś tylko biologiczną maszyną. Jesteś <span className="text-[#00f2ff] font-semibold">obserwatorem</span>, 
-              który poprzez swoją wiarę i częstotliwość (<span className="text-[#ffd700] font-bold">718 Hz</span>) 
-              wybiera rzeczywistość z nieskończonego pola potencjału.
-            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">{t("biometric.manifest.three.text")}</p>
           </div>
 
-          {/* 4. Wniosek końcowy */}
+          {/* 4. Final conclusion */}
           <div className="p-5 bg-gradient-to-b from-black/60 to-purple-900/40 rounded-lg border border-[#ffd700]/50">
             <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">4.</span> WNIOSEK KOŃCOWY
+              <span className="text-xl">4.</span> {t("biometric.manifest.four.title")}
             </h4>
             <div className="space-y-3 text-sm text-gray-300 leading-relaxed">
-              <p>
-                <span className="text-purple-400 font-semibold">Laboratorium</span> to Twoja katedra. 
-                <span className="text-[#00f2ff] font-semibold"> Modlitwa</span> to Twój eksperyment. 
-                Gdy Twoje tętno synchronizuje się z Matrycą, przestajesz tylko wierzyć – zaczynasz <span className="text-[#ffd700] font-bold">WIEDZIEĆ</span>.
-              </p>
+              <p>{t("biometric.manifest.four.text")}</p>
             </div>
             <blockquote className="mt-4 pt-4 border-t border-[#ffd700]/30 text-center">
-              <p className="text-[#ffd700] italic text-lg font-semibold">
-                "Tam, gdzie kończy się lęk przed nieznanym, zaczyna się matematyka cudów."
-              </p>
+              <p className="text-[#ffd700] italic text-lg font-semibold">{t("biometric.manifest.four.quote")}</p>
             </blockquote>
           </div>
         </div>
@@ -602,52 +600,33 @@ export const BiometricIntegration = () => {
         <div className="pt-6 border-t border-[#00f2ff]/30 space-y-5">
           <div className="text-center space-y-2">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-[#00f2ff] via-[#ffd700] to-purple-400 bg-clip-text text-transparent uppercase tracking-widest">
-              ✦ SEKRET REZONANSU ✦
+              {t("biometric.resonance.title")}
             </h3>
-            <p className="text-lg text-[#00f2ff]">DLACZEGO MODLITWA DZIAŁA?</p>
+            <p className="text-lg text-[#00f2ff]">{t("biometric.resonance.subtitle")}</p>
           </div>
 
-          {/* 1. Wiara jako impuls kwantowy */}
           <div className="p-4 bg-gradient-to-r from-[#ffd700]/10 to-[#00f2ff]/10 rounded-lg border border-[#ffd700]/30">
             <h4 className="text-[#ffd700] font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">1.</span> WIARA JAKO IMPULS KWANTOWY
+              <span className="text-xl">1.</span> {t("biometric.resonance.one.title")}
             </h4>
-            <p className="text-sm text-gray-300 leading-relaxed">
-              Twoja wiara to nie tylko myśl – to <span className="text-[#ffd700] font-semibold">najsilniejszy znany we wszechświecie 
-              generator fali spójnej</span>. Kiedy wierzysz bez wątpienia, Twoje serce 
-              wysyła sygnał, który <span className="text-[#00f2ff]">"zagina"</span> prawdopodobieństwo rzeczywistości.
-            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">{t("biometric.resonance.one.text")}</p>
           </div>
 
-          {/* 2. Dostrojenie do Źródła */}
           <div className="p-4 bg-gradient-to-r from-[#00f2ff]/10 to-purple-900/30 rounded-lg border border-[#00f2ff]/30">
             <h4 className="text-[#00f2ff] font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">2.</span> DOSTROJENIE DO ŹRÓDŁA
+              <span className="text-xl">2.</span> {t("biometric.resonance.two.title")}
             </h4>
-            <p className="text-sm text-gray-300 leading-relaxed">
-              Modlitwa to proces synchronizacji Twojego tętna z Matrycą <span className="text-[#ffd700] font-bold">718 Hz</span>. 
-              Gdy osiągasz ten stan (<span className="text-[#ffd700]">złoty wykres</span> na naszej stronie), Twoje 
-              pole Ψ staje się <span className="text-[#00f2ff] font-semibold">"nadprzewodnikiem"</span> dla boskiej woli.
-            </p>
+            <p className="text-sm text-gray-300 leading-relaxed">{t("biometric.resonance.two.text")}</p>
           </div>
 
-          {/* 3. Twoja wewnętrzna moc */}
           <div className="p-4 bg-gradient-to-r from-purple-900/30 to-[#ffd700]/10 rounded-lg border border-purple-500/30">
             <h4 className="text-purple-400 font-bold mb-3 flex items-center gap-2">
-              <span className="text-xl">3.</span> TWOJA WEWNĘTRZNA MOC
+              <span className="text-xl">3.</span> {t("biometric.resonance.three.title")}
             </h4>
-            <p className="text-sm text-gray-300 leading-relaxed mb-3">
-              Pamiętaj: Bóg nie działa <span className="text-gray-400">"zamiast"</span> Ciebie, ale <span className="text-[#ffd700] font-bold">"poprzez"</span> Ciebie. 
-              To Twoja wewnętrzna moc, Twoja częstotliwość i Twoja wiara są 
-              narzędziami, którymi kształtujesz świat.
-            </p>
+            <p className="text-sm text-gray-300 leading-relaxed mb-3">{t("biometric.resonance.three.text")}</p>
             <blockquote className="pt-3 border-t border-purple-500/30 text-center">
-              <p className="text-purple-300 italic">
-                "Królestwo Boże jest wewnątrz was"
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                – to znaczy, że masz w sobie <span className="text-[#ffd700]">generator cudów</span>. Musisz go tylko poprawnie nastroić.
-              </p>
+              <p className="text-purple-300 italic">{t("biometric.resonance.three.quote")}</p>
+              <p className="text-xs text-gray-400 mt-2">{t("biometric.resonance.three.note")}</p>
             </blockquote>
           </div>
         </div>
@@ -656,34 +635,30 @@ export const BiometricIntegration = () => {
         <div className="pt-4 border-t border-[#00f2ff]/20 space-y-4 text-sm text-gray-300">
           <h3 className="text-[#ffd700] font-semibold flex items-center gap-2">
             <Heart className="w-4 h-4" />
-            Twoje serce to oscylator kwantowy
+            {t("biometric.science.title")}
           </h3>
-          <p className="leading-relaxed">
-            Używając tętna, znajdujemy Twoje osobiste <strong className="text-[#00f2ff]">'zero'</strong> w funkcji Zeta Riemanna. 
-            To punkt, w którym znika stres, a zaczyna się życie. System porównuje Twoją stałą (datę urodzenia) 
-            ze zmienną (tętno), aby sprawdzić, jak bardzo Twój obecny stres oddala Cię od Twojej idealnej matrycy energetycznej.
-          </p>
+          <p className="leading-relaxed">{t("biometric.science.text")}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
             <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/20 text-center">
               <div className="text-2xl mb-1">🧬</div>
-              <div className="text-xs text-[#00f2ff]">Personalizacja DNA</div>
-              <div className="text-xs text-gray-400 mt-1">Unikalny odcisk w Matrycy 718</div>
+              <div className="text-xs text-[#00f2ff]">{t("biometric.science.card1.title")}</div>
+              <div className="text-xs text-gray-400 mt-1">{t("biometric.science.card1.subtitle")}</div>
             </div>
             <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/20 text-center">
               <div className="text-2xl mb-1">💧</div>
-              <div className="text-xs text-[#ffd700]">Programowanie Wody</div>
-              <div className="text-xs text-gray-400 mt-1">Geometria φ i rytm 7.83 Hz</div>
+              <div className="text-xs text-[#ffd700]">{t("biometric.science.card2.title")}</div>
+              <div className="text-xs text-gray-400 mt-1">{t("biometric.science.card2.subtitle")}</div>
             </div>
             <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/20 text-center">
               <div className="text-2xl mb-1">⚡</div>
-              <div className="text-xs text-[#00f2ff]">Koherencja Serca</div>
-              <div className="text-xs text-gray-400 mt-1">Częstotliwość 718 Hz</div>
+              <div className="text-xs text-[#00f2ff]">{t("biometric.science.card3.title")}</div>
+              <div className="text-xs text-gray-400 mt-1">{t("biometric.science.card3.subtitle")}</div>
             </div>
           </div>
 
           <p className="text-center text-[#ffd700] font-bold pt-4 border-t border-[#ffd700]/20">
-            PRAWDA JEST MATEMATYKĄ. MATEMATYKA JEST KWANTOWA. JESTEŚ FUNKCJĄ FALOWĄ.
+            {t("header.truth")} {t("header.matrix")} {t("header.wavefunction")}
           </p>
         </div>
       </CardContent>

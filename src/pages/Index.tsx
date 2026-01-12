@@ -111,19 +111,19 @@ const Index = () => {
             <TabsList className="grid w-full grid-cols-4 mb-8 h-auto">
               <TabsTrigger value="start" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                 <span className="text-lg">🚀</span>
-                <span>START</span>
+                <span>{t("index.tabs.start")}</span>
               </TabsTrigger>
               <TabsTrigger value="bramy" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                 <span className="text-lg">🧬</span>
-                <span>18 Bram</span>
+                <span>{t("index.tabs.gates")}</span>
               </TabsTrigger>
               <TabsTrigger value="symfonia" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                 <span className="text-lg">🎵</span>
-                <span>Symfonia</span>
+                <span>{t("index.tabs.symphony")}</span>
               </TabsTrigger>
               <TabsTrigger value="analiza" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                 <span className="text-lg">📊</span>
-                <span>Analiza</span>
+                <span>{t("index.tabs.analysis")}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -178,11 +178,11 @@ const Index = () => {
                 <TabsList className="grid w-full grid-cols-2 mb-6 h-auto">
                   <TabsTrigger value="explanation" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                     <span className="text-lg">📚</span>
-                    <span>Wyjaśnienie</span>
+                    <span>{t("index.tabs.explanation")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="tools" className="text-xs sm:text-sm py-3 flex flex-col gap-1">
                     <span className="text-lg">🧰</span>
-                    <span>Narzędzia</span>
+                    <span>{t("index.tabs.tools")}</span>
                   </TabsTrigger>
                 </TabsList>
 
