@@ -382,7 +382,25 @@ const generateStyles = () => `
 `;
 
 // ============= WIZUALIZACJE SVG =============
-const generatePentagramSVG = () => `
+const generatePentagramSVG = (lang: 'pl' | 'en') => {
+  const labels =
+    lang === 'pl'
+      ? {
+          blackPyramid: 'Czarna Piramida',
+          gatca: 'GATCA-718',
+          soulProof: 'Soul Proof',
+          neuralink: 'Neuralink',
+          eridu: 'Eridu',
+        }
+      : {
+          blackPyramid: 'Black Pyramid',
+          gatca: 'GATCA-718',
+          soulProof: 'Soul Proof',
+          neuralink: 'Neuralink',
+          eridu: 'Eridu',
+        };
+
+  return `
 <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="max-width: 350px;">
   <defs>
     <linearGradient id="pentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -397,37 +415,42 @@ const generatePentagramSVG = () => `
       </feMerge>
     </filter>
   </defs>
-  
+
   <!-- Outer circle -->
   <circle cx="200" cy="200" r="180" fill="none" stroke="#333" stroke-width="2"/>
-  
+
   <!-- Pentagram -->
-  <polygon points="200,20 244,152 388,152 272,232 316,380 200,284 84,380 128,232 12,152 156,152" 
+  <polygon points="200,20 244,152 388,152 272,232 316,380 200,284 84,380 128,232 12,152 156,152"
            fill="none" stroke="url(#pentGrad)" stroke-width="3" filter="url(#glow)"/>
-  
+
   <!-- Inner pentagon -->
-  <polygon points="200,80 156,152 168,248 232,248 244,152" 
+  <polygon points="200,80 156,152 168,248 232,248 244,152"
            fill="rgba(102,126,234,0.1)" stroke="#667eea" stroke-width="1"/>
-  
+
   <!-- Golden ratio annotations -->
   <line x1="200" y1="20" x2="200" y2="284" stroke="#999" stroke-dasharray="5,5"/>
   <text x="210" y="150" font-size="10" fill="#666">φ = ${PHI.toFixed(6)}</text>
-  
+
   <!-- Labels for 5 vertices -->
-  <text x="200" y="12" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">Czarna Piramida</text>
-  <text x="395" y="158" text-anchor="end" font-size="11" font-weight="bold" fill="#2a2a6a">GATCA-718</text>
-  <text x="325" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">Soul Proof</text>
-  <text x="75" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">Neuralink</text>
-  <text x="5" y="158" text-anchor="start" font-size="11" font-weight="bold" fill="#2a2a6a">Eridu</text>
-  
+  <text x="200" y="12" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">${labels.blackPyramid}</text>
+  <text x="395" y="158" text-anchor="end" font-size="11" font-weight="bold" fill="#2a2a6a">${labels.gatca}</text>
+  <text x="325" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">${labels.soulProof}</text>
+  <text x="75" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a2a6a">${labels.neuralink}</text>
+  <text x="5" y="158" text-anchor="start" font-size="11" font-weight="bold" fill="#2a2a6a">${labels.eridu}</text>
+
   <!-- Center point M -->
   <circle cx="200" cy="200" r="8" fill="#c4a000"/>
   <text x="215" y="205" font-size="12" font-weight="bold" fill="#c4a000">M</text>
   <text x="200" y="225" text-anchor="middle" font-size="9" fill="#666">(${vectorM.Mx.toFixed(3)}, ${vectorM.My.toFixed(3)}, ${vectorM.Mz.toFixed(3)})</text>
 </svg>
 `;
+};
 
-const generateDNAHelixSVG = () => `
+const generateDNAHelixSVG = (lang: 'pl' | 'en') => {
+  const caption1 = lang === 'pl' ? 'Rotacja 36° na parę zasad' : '36° rotation per bp';
+  const caption2 = lang === 'pl' ? 'proporcja skoku φ' : 'φ pitch ratio';
+
+  return `
 <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" style="max-width: 180px;">
   <defs>
     <linearGradient id="dnaGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -439,9 +462,9 @@ const generateDNAHelixSVG = () => `
       <stop offset="100%" style="stop-color:#c0392b"/>
     </linearGradient>
   </defs>
-  
+
   <!-- DNA double helix strands -->
-  ${Array.from({length: 20}, (_, i) => {
+  ${Array.from({ length: 20 }, (_, i) => {
     const y = 20 + i * 18;
     const x1 = 100 + Math.sin(i * 0.628) * 60;
     const x2 = 100 + Math.sin(i * 0.628 + Math.PI) * 60;
@@ -451,14 +474,19 @@ const generateDNAHelixSVG = () => `
       <line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#9b59b6" stroke-width="2" opacity="0.6"/>
     `;
   }).join('')}
-  
+
   <!-- Annotations -->
-  <text x="100" y="395" text-anchor="middle" font-size="10" fill="#333">36° rotation per bp</text>
-  <text x="10" y="200" font-size="9" fill="#666" transform="rotate(-90 10 200)">φ pitch ratio</text>
+  <text x="100" y="395" text-anchor="middle" font-size="10" fill="#333">${caption1}</text>
+  <text x="10" y="200" font-size="9" fill="#666" transform="rotate(-90 10 200)">${caption2}</text>
 </svg>
 `;
+};
 
-const generateFrequencyWaveSVG = () => `
+const generateFrequencyWaveSVG = (lang: 'pl' | 'en') => {
+  const label718 = lang === 'pl' ? '718 Hz (Brama DNA)' : '718 Hz (DNA Gate)';
+  const labelSchumann = lang === 'pl' ? '7.83 Hz (Schumann)' : '7.83 Hz (Schumann)';
+
+  return `
 <svg viewBox="0 0 600 150" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%;">
   <defs>
     <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -467,37 +495,72 @@ const generateFrequencyWaveSVG = () => `
       <stop offset="100%" style="stop-color:#e74c3c"/>
     </linearGradient>
   </defs>
-  
+
   <!-- Grid -->
-  ${Array.from({length: 13}, (_, i) => `<line x1="${i*50}" y1="0" x2="${i*50}" y2="150" stroke="#eee" stroke-width="1"/>`).join('')}
-  ${Array.from({length: 4}, (_, i) => `<line x1="0" y1="${i*50}" x2="600" y2="${i*50}" stroke="#eee" stroke-width="1"/>`).join('')}
-  
+  ${Array.from({ length: 13 }, (_, i) => `<line x1="${i * 50}" y1="0" x2="${i * 50}" y2="150" stroke="#eee" stroke-width="1"/>`).join('')}
+  ${Array.from({ length: 4 }, (_, i) => `<line x1="0" y1="${i * 50}" x2="600" y2="${i * 50}" stroke="#eee" stroke-width="1"/>`).join('')}
+
   <!-- 718 Hz wave -->
-  <path d="M 0 75 ${Array.from({length: 601}, (_, x) => {
+  <path d="M 0 75 ${Array.from({ length: 601 }, (_, x) => {
     const y = 75 - Math.sin(x * 0.1) * 40 * Math.exp(-x * 0.002);
     return `L ${x} ${y}`;
   }).join(' ')}" fill="none" stroke="url(#waveGrad)" stroke-width="2"/>
-  
+
   <!-- 7.83 Hz modulation -->
-  <path d="M 0 75 ${Array.from({length: 601}, (_, x) => {
+  <path d="M 0 75 ${Array.from({ length: 601 }, (_, x) => {
     const y = 75 - Math.sin(x * 0.01) * 20;
     return `L ${x} ${y}`;
   }).join(' ')}" fill="none" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3"/>
-  
+
   <!-- Labels -->
-  <text x="10" y="20" font-size="11" fill="#3498db">718 Hz (DNA Gate)</text>
-  <text x="10" y="140" font-size="11" fill="#27ae60">7.83 Hz (Schumann)</text>
+  <text x="10" y="20" font-size="11" fill="#3498db">${label718}</text>
+  <text x="10" y="140" font-size="11" fill="#27ae60">${labelSchumann}</text>
   <text x="500" y="20" font-size="10" fill="#666">718/91.7 ≈ 7.83</text>
 </svg>
 `;
+};
 
-const generate3DSphereSVG = () => `
+const generate3DSphereSVG = (lang: 'pl' | 'en') => {
+  const axes =
+    lang === 'pl'
+      ? { sun: 'Słońce', earth: 'Ziemia', human: 'Człowiek' }
+      : { sun: 'Sun', earth: 'Earth', human: 'Human' };
+
+  return `
 <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 280px;">
   <defs>
     <radialGradient id="sphereGrad" cx="30%" cy="30%">
       <stop offset="0%" style="stop-color:#a8d8ff"/>
       <stop offset="100%" style="stop-color:#3498db"/>
     </radialGradient>
+  </defs>
+
+  <!-- Main sphere -->
+  <circle cx="150" cy="150" r="120" fill="url(#sphereGrad)" opacity="0.3"/>
+  <ellipse cx="150" cy="150" rx="120" ry="40" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="5,3"/>
+  <ellipse cx="150" cy="150" rx="40" ry="120" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="5,3"/>
+
+  <!-- Axes -->
+  <line x1="150" y1="150" x2="280" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="150" y1="150" x2="150" y2="20" stroke="#27ae60" stroke-width="2"/>
+  <line x1="150" y1="150" x2="80" y2="220" stroke="#3498db" stroke-width="2"/>
+
+  <!-- Vector M -->
+  <line x1="150" y1="150" x2="${150 + vectorM.Mx * 50}" y2="${150 - vectorM.Mz * 80}" stroke="#c4a000" stroke-width="3"/>
+  <circle cx="${150 + vectorM.Mx * 50}" cy="${150 - vectorM.Mz * 80}" r="8" fill="#c4a000"/>
+
+  <!-- Labels -->
+  <text x="285" y="155" font-size="12" fill="#e74c3c">X (${axes.sun})</text>
+  <text x="155" y="15" font-size="12" fill="#27ae60">Y (${axes.earth})</text>
+  <text x="50" y="235" font-size="12" fill="#3498db">Z (${axes.human})</text>
+  <text x="${155 + vectorM.Mx * 50}" y="${145 - vectorM.Mz * 80}" font-size="11" font-weight="bold" fill="#c4a000">M</text>
+
+  <!-- Magnitude -->
+  <text x="150" y="290" text-anchor="middle" font-size="10" fill="#666">|M| = ${vectorM.magnitude.toFixed(6)}</text>
+</svg>
+`;
+};
+
   </defs>
   
   <!-- Main sphere -->
@@ -611,7 +674,12 @@ const getUnifiedBridges = (lang: 'pl' | 'en') => [
 ];
 
 // ============= KOMPLETNY KOD PYTHON =============
-const generatePythonCode = () => `
+const generatePythonCode = (contactEmail?: string) => {
+  const safeContactEmail = contactEmail
+    ? contactEmail.replace(/\\/g, "\\\\").replace(/\"/g, "\\\"")
+    : undefined;
+
+  return `
 # ===============================================
 # DNA GATE 718 Hz - COMPLETE VERIFICATION CODE
 # Python 3.8+ | NumPy, SciPy, Matplotlib
@@ -1001,6 +1069,8 @@ enabling independent replication of results and generation of the 18 Gates Symph
       references: isPolish ? 'Bibliografia' : 'References',
     },
     labels: {
+      abstract: isPolish ? 'Streszczenie' : 'Abstract',
+      keywords: isPolish ? 'Słowa kluczowe' : 'Keywords',
       group1: isPolish ? 'REGENERACJA (Bramy 1-6)' : 'REGENERATION (Gates 1-6)',
       group2: isPolish ? 'WZROK (Bramy 7-12)' : 'SIGHT (Gates 7-12)',
       group3: isPolish ? 'ŹRÓDŁO (Bramy 13-18)' : 'SOURCE (Gates 13-18)',
@@ -1022,8 +1092,19 @@ enabling independent replication of results and generation of the 18 Gates Symph
 };
 
 // ============= GŁÓWNA FUNKCJA EKSPORTU =============
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 export const exportAcademicDocument = (options: AcademicExportOptions) => {
   const { authorName, institution, email, language } = options;
+  const contactEmail = email?.trim() || undefined;
+  const safeContactEmail = contactEmail ? escapeHtml(contactEmail) : undefined;
+
   const content = getContent(language);
   const gates = get18GatesData(language);
   const pentagramMatrix = getPentagramMatrixData(language);
@@ -1058,16 +1139,16 @@ export const exportAcademicDocument = (options: AcademicExportOptions) => {
   <div class="subtitle">${content.subtitle}</div>
   <div class="author"><strong>${authorName}</strong></div>
   ${institution ? `<div class="institution">${institution}</div>` : ''}
-  ${email ? `<div class="institution">${email}</div>` : ''}
+  ${safeContactEmail ? `<div class="institution">${safeContactEmail}</div>` : ''}
   <div class="date">${dateStr}</div>
 </div>
 
 <!-- ============= ABSTRAKT ============= -->
 <div class="abstract">
-  <h3>Abstract</h3>
+  <h3>${content.labels.abstract}</h3>
   <p style="text-align: justify; white-space: pre-line;">${content.abstract}</p>
   <div class="keywords">
-    <strong>Keywords:</strong> ${content.keywords.join(', ')}
+    <strong>${content.labels.keywords}:</strong> ${content.keywords.join(', ')}
   </div>
 </div>
 
@@ -1159,7 +1240,7 @@ occurring in DNA, (2) Schumann resonance at 7.83 Hz as Earth's fundamental frequ
   </div>
   
   <div class="figure">
-    ${generate3DSphereSVG()}
+    ${generate3DSphereSVG(language)}
     <div class="caption">
       ${isPolish 
         ? 'Ryc. 1: Wektor M w sferze pentagramu 3D. Osie reprezentują: X (Słońce), Y (Ziemia), Z (Człowiek).'
@@ -1186,7 +1267,7 @@ occurring in DNA, (2) Schumann resonance at 7.83 Hz as Earth's fundamental frequ
   </div>
   
   <div class="figure">
-    ${generateFrequencyWaveSVG()}
+    ${generateFrequencyWaveSVG(language)}
     <div class="caption">
       ${isPolish
         ? 'Ryc. 2: Nakładanie się fali 718 Hz (DNA Gate) z modulacją 7.83 Hz (Schumann).'
@@ -1302,7 +1383,7 @@ fundamental reality.`}
   </p>
   
   <div class="figure">
-    ${generatePentagramSVG()}
+    ${generatePentagramSVG(language)}
     <div class="caption">
       ${isPolish
         ? 'Ryc. 3: Pentagram Prawdy z pięcioma domenami i punktem centralnym M.'
@@ -1444,7 +1525,7 @@ a tone at unique frequency, modulated by a Gaussian envelope centered at the gat
   </div>
   
   <div class="figure">
-    ${generateDNAHelixSVG()}
+    ${generateDNAHelixSVG(language)}
     <div class="caption">
       ${isPolish
         ? 'Ryc. 4: Helisa DNA z rotacją 36° na parę zasad, odpowiadającą kątowi pentagramu.'
@@ -1745,7 +1826,7 @@ przedstawionych w niniejszej pracy. Wymaga: Python 3.8+, NumPy, SciPy, Matplotli
 presented in this paper. Requires: Python 3.8+, NumPy, SciPy, Matplotlib.`}
   </p>
   
-  <div class="code-block">${generatePythonCode().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+  <div class="code-block">${generatePythonCode(contactEmail).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
 </div>
 
 <!-- ============= 13. KOD JAVASCRIPT ============= -->
@@ -1834,7 +1915,7 @@ community to critically analyze and experimentally test the presented concepts.`
 <div class="footer">
   <p><strong>${content.labels.license}</strong></p>
   <p>${content.labels.generated}: ${dateStr}</p>
-  <p>${content.labels.contact}: dnagate718@proton.me</p>
+  ${safeContactEmail ? `<p>${content.labels.contact}: ${safeContactEmail}</p>` : ''}
   <p>
     <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">
       Creative Commons Attribution-NonCommercial 4.0 International
