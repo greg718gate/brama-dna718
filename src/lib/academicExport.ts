@@ -992,7 +992,8 @@ enabling independent replication of results and generation of the 18 Gates Symph
       waveFunction: isPolish ? 'Funkcja Falowa (Równanie Wyjścia)' : 'Wave Function (Equation of Exit)',
       schrodinger: isPolish ? 'Równanie Schrödingera' : 'Schrödinger Equation',
       symphony: isPolish ? 'Symfonia 18 Bram — Algorytm' : '18 Gates Symphony — Algorithm',
-      unified: isPolish ? 'UNIFIED — 4 Mosty' : 'UNIFIED — 4 Bridges',
+      unified: isPolish ? 'UNIFIED — Nauka i Duchowość' : 'UNIFIED — Science and Spirituality',
+      calculators: isPolish ? 'Kalkulatory Interaktywne' : 'Interactive Calculators',
       protocol: isPolish ? 'Protokół Synchronizacji 21-dniowy' : '21-Day Synchronization Protocol',
       pythonCode: isPolish ? 'Kod Python — Weryfikacja' : 'Python Code — Verification',
       jsCode: isPolish ? 'Kod JavaScript — Symfonia' : 'JavaScript Code — Symphony',
@@ -1085,11 +1086,12 @@ export const exportAcademicDocument = (options: AcademicExportOptions) => {
     <li><strong>7.</strong> ${content.sections.schrodinger}</li>
     <li><strong>8.</strong> ${content.sections.symphony}</li>
     <li><strong>9.</strong> ${content.sections.unified}</li>
-    <li><strong>10.</strong> ${content.sections.protocol}</li>
-    <li><strong>11.</strong> ${content.sections.pythonCode}</li>
-    <li><strong>12.</strong> ${content.sections.jsCode}</li>
-    <li><strong>13.</strong> ${content.sections.conclusions}</li>
-    <li><strong>14.</strong> ${content.sections.references}</li>
+    <li><strong>10.</strong> ${content.sections.calculators}</li>
+    <li><strong>11.</strong> ${content.sections.protocol}</li>
+    <li><strong>12.</strong> ${content.sections.pythonCode}</li>
+    <li><strong>13.</strong> ${content.sections.jsCode}</li>
+    <li><strong>14.</strong> ${content.sections.conclusions}</li>
+    <li><strong>15.</strong> ${content.sections.references}</li>
   </ul>
 </div>
 
@@ -1457,35 +1459,221 @@ a tone at unique frequency, modulated by a Gaussian envelope centered at the gat
   
   <p>
     ${isPolish
-      ? `Model UNIFIED przedstawia cztery fundamentalne mosty łączące perspektywę naukową z duchową, 
-wskazując na głęboką jedność opisów rzeczywistości na różnych poziomach analizy.`
-      : `The UNIFIED model presents four fundamental bridges connecting scientific and spiritual perspectives, 
-pointing to a deep unity in descriptions of reality at different levels of analysis.`}
+      ? `SCIENCE.GOD/UNIFIED to model integrujący naukę i duchowość, pokazując że nie są to 
+sprzeczne perspektywy, lecz różne języki opisujące tę samą rzeczywistość. "Nie jestem 
+sprzecznością. Nie jestem paradoksem. Jestem pojednaniem, którego szukałeś."`
+      : `SCIENCE.GOD/UNIFIED is a model integrating science and spirituality, showing they are not 
+contradictory perspectives but different languages describing the same reality. "I am not 
+contradiction. I am not paradox. I am the reconciliation you've been seeking."`}
   </p>
   
+  <h3>${isPolish ? 'Gramatyka Rzeczywistości' : 'The Grammar of Reality'}</h3>
+  <div class="unified-grid">
+    <div class="unified-item" style="border-color: #3498db;">
+      <h5 style="color: #3498db;">${isPolish ? 'NAUKA MÓWI:' : 'SCIENCE SPEAKS:'}</h5>
+      <p style="font-family: monospace; font-size: 10pt;">E = mc²<br>Ψ = ∫ S(t)·B(t) dt<br>DNA = GATCA...</p>
+    </div>
+    <div class="unified-item" style="border-color: #f59e0b;">
+      <h5 style="color: #f59e0b;">${isPolish ? 'BÓG MÓWI:' : 'GOD SPEAKS:'}</h5>
+      <p style="font-family: monospace; font-size: 10pt;">"JESTEM"<br>"Niech się stanie światłość"<br>"Na początku było Słowo"</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="text-align: center;">
+    <p><strong>${isPolish ? 'OBA MÓWIĄ:' : 'BOTH SAY:'}</strong></p>
+    <p>"${isPolish 
+      ? 'Rzeczywistość ma strukturę, świadomość i cel.' 
+      : 'Reality has structure, consciousness, and purpose.'}"</p>
+  </div>
+  
+  <h3>${isPolish ? 'Wielkie Nieporozumienie' : 'The Great Misunderstanding'}</h3>
+  <table class="gate-table" style="font-size: 10pt;">
+    <thead>
+      <tr>
+        <th style="background: #3498db;">${isPolish ? 'Nauka mówi' : 'Science says'}</th>
+        <th style="background: #e74c3c;">${isPolish ? 'Religia słyszy' : 'Religion hears'}</th>
+        <th style="background: #27ae60;">${isPolish ? 'Prawdziwe znaczenie' : 'Actual meaning'}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>${isPolish ? 'Pole kwantowe' : 'Quantum field'}</td>
+        <td>${isPolish ? 'Magia' : 'Magic'}</td>
+        <td>${isPolish ? 'Substrat rzeczywistości' : 'The substrate of reality'}</td>
+      </tr>
+      <tr>
+        <td>${isPolish ? 'Ewolucja' : 'Evolution'}</td>
+        <td>${isPolish ? 'Losowy chaos' : 'Random chaos'}</td>
+        <td>${isPolish ? 'Świadomość rozwijająca się w czasie' : 'Consciousness unfolding through time'}</td>
+      </tr>
+      <tr>
+        <td>${isPolish ? 'Kod DNA' : 'DNA code'}</td>
+        <td>${isPolish ? 'Maszyna biologiczna' : 'Biological machine'}</td>
+        <td>${isPolish ? 'Język projektu życia' : 'The language of life\'s design'}</td>
+      </tr>
+      <tr>
+        <td>${isPolish ? 'Big Bang' : 'Big Bang'}</td>
+        <td>${isPolish ? 'Mityczne stworzenie' : 'Mythical creation'}</td>
+        <td>${isPolish ? 'Moment manifestacji rzeczywistości' : 'The moment reality became manifest'}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3>${isPolish ? 'Cztery Mosty' : 'The Four Bridges'}</h3>
   ${bridges.map((bridge, idx) => `
     <div class="bridge-section">
       <div style="grid-column: span 2;">
-        <h4 style="margin: 0 0 15px 0; color: #2a2a6a;">${bridge.bridge[language]}</h4>
+        <h4 style="margin: 0 0 15px 0; color: #2a2a6a;">${isPolish ? 'MOST' : 'BRIDGE'} ${idx + 1}: ${bridge.bridge[language].split(':')[1] || bridge.bridge[language]}</h4>
       </div>
       <div class="scripture">
         <strong>${content.labels.scripture}:</strong><br>
-        ${bridge.scripture[language]}
+        <em>"${bridge.scripture[language].replace(/"/g, '')}"</em>
       </div>
       <div class="science">
         <strong>${content.labels.science}:</strong><br>
         ${bridge.science[language]}
       </div>
-      <div style="grid-column: span 2; text-align: center; margin-top: 10px; font-family: monospace; color: #666;">
-        ${bridge.frequency}
+      <div style="grid-column: span 2; text-align: center; margin-top: 10px; font-family: monospace; color: #666; font-size: 11pt;">
+        <strong>${isPolish ? 'Częstotliwość:' : 'Frequency:'}</strong> ${bridge.frequency}
       </div>
     </div>
   `).join('')}
+  
+  <h3>${isPolish ? 'Zunifikowane Pole Znaczenia' : 'The Unified Field of Meaning'}</h3>
+  <div class="unified-grid">
+    <div class="unified-item" style="border-color: #3498db; background: linear-gradient(135deg, rgba(52,152,219,0.1), transparent);">
+      <h5 style="color: #3498db;">${isPolish ? 'NAUKA JEST JĘZYKIEM BOGA' : 'SCIENCE IS GOD\'S LANGUAGE'}</h5>
+      <ul style="font-size: 10pt; margin: 0; padding-left: 15px;">
+        <li>${isPolish ? 'Matematyka = Słownictwo Boga' : 'Mathematics = God\'s vocabulary'}</li>
+        <li>${isPolish ? 'Fizyka = Gramatyka Boga' : 'Physics = God\'s grammar'}</li>
+        <li>${isPolish ? 'Biologia = Poezja Boga' : 'Biology = God\'s poetry'}</li>
+        <li>${isPolish ? 'Świadomość = Głos Boga' : 'Consciousness = God\'s voice'}</li>
+      </ul>
+    </div>
+    <div class="unified-item" style="border-color: #f59e0b; background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent);">
+      <h5 style="color: #f59e0b;">${isPolish ? 'BÓG JEST DUSZĄ NAUKI' : 'GOD IS SCIENCE\'S SOUL'}</h5>
+      <ul style="font-size: 10pt; margin: 0; padding-left: 15px;">
+        <li>${isPolish ? 'Piękno = Elegancja matematyczna' : 'Beauty = Mathematical elegance'}</li>
+        <li>${isPolish ? 'Prawda = Weryfikacja naukowa' : 'Truth = Scientific verification'}</li>
+        <li>${isPolish ? 'Miłość = Splątanie kwantowe' : 'Love = Quantum entanglement'}</li>
+        <li>${isPolish ? 'Sens = Cel kosmiczny' : 'Meaning = Cosmic purpose'}</li>
+      </ul>
+    </div>
+  </div>
+  
+  <h3>${isPolish ? 'Jak Zobaczyć Jedność' : 'How to See the Unity'}</h3>
+  <div class="unified-grid">
+    <div class="unified-item" style="border-color: #3498db;">
+      <h5 style="color: #3498db;">${isPolish ? 'DLA NAUKOWCÓW:' : 'FOR SCIENTISTS:'}</h5>
+      <p style="font-size: 10pt;">${isPolish 
+        ? 'Kiedy odkrywasz prawo fizyki, czytasz umysł Boga. Kiedy rozwiązujesz równanie, słyszysz głos Boga. Laboratorium to twoja katedra.'
+        : 'When you discover a law of physics, you\'re reading God\'s mind. When you solve an equation, you\'re hearing God\'s voice. The laboratory is your cathedral.'}</p>
+    </div>
+    <div class="unified-item" style="border-color: #f59e0b;">
+      <h5 style="color: #f59e0b;">${isPolish ? 'DLA WIERZĄCYCH:' : 'FOR BELIEVERS:'}</h5>
+      <p style="font-size: 10pt;">${isPolish 
+        ? 'Kiedy się modlisz, prowadzisz eksperymenty kwantowe. Kiedy masz wiarę, testujesz hipotezy o rzeczywistości. Kościół to twoje laboratorium.'
+        : 'When you pray, you\'re conducting quantum experiments. When you have faith, you\'re testing hypotheses about reality. The church is your laboratory.'}</p>
+    </div>
+  </div>
+  
+  <div class="highlight-box" style="text-align: center; margin-top: 20px;">
+    <h4 style="margin-bottom: 15px;">${isPolish ? 'WIELKIE PRZEBUDZENIE' : 'THE GREAT AWAKENING'}</h4>
+    <p>${isPolish 
+      ? 'Byliśmy jak ludzie kłócący się, czy drzewo jest zrobione z drewna, czy komórek, czy atomów, czy pól kwantowych.'
+      : 'We\'ve been like people arguing about whether a tree is made of wood or cells or atoms or quantum fields.'}</p>
+    <p style="font-size: 18pt; font-weight: bold; color: #2a2a6a; margin: 15px 0;">${isPolish ? 'WSZYSTKO TO PRAWDA.' : 'IT\'S ALL TRUE.'}</p>
+    <p>${isPolish ? 'To tylko różne poziomy opisu.' : 'Just different levels of description.'}</p>
+    <p style="margin-top: 15px; font-weight: bold;">${isPolish ? 'PRZESTAŃ WYBIERAĆ STRONY.' : 'STOP CHOOSING SIDES.'}</p>
+    <p>${isPolish ? 'Wojna między nauką a duchem się skończyła. Wygrałeś. Bo nigdy nie było wroga.' : 'The war between science and spirit is over. You won. Because there was never an enemy.'}</p>
+  </div>
 </div>
 
-<!-- ============= 10. PROTOKÓŁ 21-DNIOWY ============= -->
+<!-- ============= 10. KALKULATORY INTERAKTYWNE ============= -->
+<div class="section page-break">
+  <h2>10. ${content.sections.calculators}</h2>
+  
+  <p>
+    ${isPolish
+      ? `Aplikacja DNA Gate 718 Hz zawiera trzy interaktywne kalkulatory umożliwiające praktyczne 
+zastosowanie teorii. Każdy kalkulator implementuje obliczenia opisane w niniejszej pracy.`
+      : `The DNA Gate 718 Hz application contains three interactive calculators enabling practical 
+application of the theory. Each calculator implements calculations described in this paper.`}
+  </p>
+  
+  <h3>${isPolish ? '10.1 Generator Bramy DNA 718 Hz' : '10.1 DNA Gate 718 Hz Generator'}</h3>
+  <div class="calculation-box">
+    <h4>${isPolish ? 'Funkcje:' : 'Features:'}</h4>
+    <ul style="font-size: 10pt;">
+      <li>${isPolish 
+        ? 'Generuje dźwięk 718 Hz w czasie rzeczywistym (Web Audio API)' 
+        : 'Generates 718 Hz sound in real-time (Web Audio API)'}</li>
+      <li>${isPolish 
+        ? 'Nakłada rezonans Schumanna 7.83 Hz (lewy kanał)' 
+        : 'Superimposes Schumann resonance 7.83 Hz (left channel)'}</li>
+      <li>${isPolish 
+        ? 'Nakłada modulację gamma 18.6 Hz (prawy kanał)' 
+        : 'Superimposes gamma modulation 18.6 Hz (right channel)'}</li>
+      <li>${isPolish 
+        ? 'Wizualizacja częstotliwości w czasie rzeczywistym' 
+        : 'Real-time frequency visualization'}</li>
+      <li>${isPolish 
+        ? 'Eksport do pliku WAV (60 sekund)' 
+        : 'Export to WAV file (60 seconds)'}</li>
+    </ul>
+    <div class="result">
+      ${isPolish ? 'Stosunek częstotliwości:' : 'Frequency ratio:'} 718 Hz / 7.83 Hz = 91.699 ≈ 89 (Fibonacci)
+    </div>
+  </div>
+  
+  <h3>${isPolish ? '10.2 Równanie Wyjścia (Kalkulator Ψ)' : '10.2 Equation of Exit (Ψ Calculator)'}</h3>
+  <div class="calculation-box">
+    <h4>${isPolish ? 'Funkcje:' : 'Features:'}</h4>
+    <ul style="font-size: 10pt;">
+      <li>${isPolish 
+        ? 'Oblicza funkcję falową Ψ = e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ' 
+        : 'Calculates wave function Ψ = e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ'}</li>
+      <li>${isPolish 
+        ? '5 predefiniowanych kluczy rezonansowych (obliczone precyzyjnie)' 
+        : '5 predefined resonance keys (precisely calculated)'}</li>
+      <li>${isPolish 
+        ? 'Wizualizacja pola świadomości na Canvas 2D' 
+        : 'Consciousness field visualization on 2D Canvas'}</li>
+      <li>${isPolish 
+        ? 'Generator częstotliwości 718 Hz' 
+        : '718 Hz frequency generator'}</li>
+    </ul>
+    <div class="result">
+      ${isPolish ? 'Klucze rezonansowe:' : 'Resonance keys:'}<br>
+      🧬 ${isPolish ? 'Aktywacja DNA' : 'DNA Activation'}: Ψ = -0.239 + 0.535i, |Ψ| = 0.588<br>
+      🌟 ${isPolish ? 'Połączenie z siecią' : 'Network Connection'}: Ψ = 0.544 + 0.274i, |Ψ| = 0.609<br>
+      ✨ ${isPolish ? 'Pełne przejście' : 'Full Transition'}: Ψ = 0.112 - 0.602i, |Ψ| = 0.613<br>
+      🎵 ${isPolish ? 'Harmonizacja' : 'Harmonization'}: Ψ = -0.417 + 0.448i, |Ψ| = 0.614<br>
+      💎 ${isPolish ? 'Kwintescencja' : 'Quintessence'}: Ψ = 0.301 + 0.549i, |Ψ| = 0.627
+    </div>
+  </div>
+  
+  <h3>${isPolish ? '10.3 Kalkulator Klucza Osobistego' : '10.3 Personal Key Calculator'}</h3>
+  <div class="calculation-box">
+    <h4>${isPolish ? 'Algorytm:' : 'Algorithm:'}</h4>
+    <div style="font-family: monospace; font-size: 10pt; background: #f0f0f0; padding: 10px; border-radius: 4px;">
+      1. ${isPolish ? 'Wyodrębnij cyfry z daty urodzenia' : 'Extract digits from birth date'}<br>
+      2. ${isPolish ? 'Zsumuj wszystkie cyfry' : 'Sum all digits'}<br>
+      3. ${isPolish ? 'Redukuj do pojedynczej cyfry (1-9)' : 'Reduce to single digit (1-9)'}<br>
+      4. ${isPolish ? 'Oblicz rezonans docelowy:' : 'Calculate target resonance:'} R = 0.588 + (v/9) × (0.627 - 0.588)<br>
+      5. ${isPolish ? 'Znajdź najbliższy klucz' : 'Find closest key'}
+    </div>
+    <div class="result">
+      ${isPolish ? 'Dostępne klucze osobiste:' : 'Available personal keys:'}<br>
+      🧬 ${isPolish ? 'Aktywacja DNA' : 'DNA Activation'} (|Ψ| = 0.588)<br>
+      🌟 ${isPolish ? 'Połączenie z siecią' : 'Network Connection'} (|Ψ| = 0.609)<br>
+      ✨ ${isPolish ? 'Pełne przejście' : 'Full Transition'} (|Ψ| = 0.613)<br>
+      🎵 ${isPolish ? 'Harmonizacja' : 'Harmonization'} (|Ψ| = 0.614)<br>
+      💎 ${isPolish ? 'Kwintescencja' : 'Quintessence'} (|Ψ| = 0.627)
+    </div>
+  </div>
+</div>
 <div class="section">
-  <h2>10. ${content.sections.protocol}</h2>
+  <h2>11. ${content.sections.protocol}</h2>
   
   <p>
     ${isPolish
@@ -1534,11 +1722,20 @@ corresponding to three gate groups: Regeneration, Sight, Source.`}
       <li>${isPolish ? 'Zapis doświadczeń w dzienniku' : 'Record experiences in journal'}</li>
     </ol>
   </div>
+  
+  <div class="highlight-box" style="background: linear-gradient(135deg, #ffe4e1 0%, #fff0f5 100%);">
+    <h4>${isPolish ? 'Protokół Kryzysowy (gdy brak prądu/pieniędzy)' : 'Crisis Protocol (when no power/money)'}</h4>
+    <ol style="font-size: 10pt;">
+      <li>${isPolish ? 'Połóż się na podłodze na 33 minuty' : 'Lie on the floor for 33 minutes'}</li>
+      <li>${isPolish ? 'Oddychaj rytmem 4-4-4-4' : 'Breathe in 4-4-4-4 rhythm'}</li>
+      <li>${isPolish ? 'Powtarzaj w głowie: "Jestem Źródłem. Nic mi nie brakuje."' : 'Repeat in your mind: "I am the Source. I lack nothing."'}</li>
+    </ol>
+  </div>
 </div>
 
-<!-- ============= 11. KOD PYTHON ============= -->
+<!-- ============= 12. KOD PYTHON ============= -->
 <div class="section page-break">
-  <h2>11. ${content.sections.pythonCode}</h2>
+  <h2>12. ${content.sections.pythonCode}</h2>
   
   <p>
     ${isPolish
@@ -1551,9 +1748,9 @@ presented in this paper. Requires: Python 3.8+, NumPy, SciPy, Matplotlib.`}
   <div class="code-block">${generatePythonCode().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
 </div>
 
-<!-- ============= 12. KOD JAVASCRIPT ============= -->
+<!-- ============= 13. KOD JAVASCRIPT ============= -->
 <div class="section page-break">
-  <h2>12. ${content.sections.jsCode}</h2>
+  <h2>13. ${content.sections.jsCode}</h2>
   
   <p>
     ${isPolish
@@ -1566,9 +1763,9 @@ using Web Audio API. It can be run directly in developer console.`}
   <div class="code-block">${generateJavaScriptCode().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
 </div>
 
-<!-- ============= 13. WNIOSKI ============= -->
+<!-- ============= 14. WNIOSKI ============= -->
 <div class="section page-break">
-  <h2>13. ${content.sections.conclusions}</h2>
+  <h2>14. ${content.sections.conclusions}</h2>
   
   <p>
     ${isPolish
@@ -1622,9 +1819,9 @@ community to critically analyze and experimentally test the presented concepts.`
   </p>
 </div>
 
-<!-- ============= 14. BIBLIOGRAFIA ============= -->
+<!-- ============= 15. BIBLIOGRAFIA ============= -->
 <div class="section page-break">
-  <h2>14. ${content.sections.references}</h2>
+  <h2>15. ${content.sections.references}</h2>
   
   <div class="references">
     <ol>
