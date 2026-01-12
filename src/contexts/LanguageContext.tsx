@@ -8,7 +8,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const translations = {
+export const translations = {
   pl: {
     // Header
     'header.truth': 'PRAWDA JEST MATEMATYKĄ.',
