@@ -697,6 +697,65 @@ const translations = {
     'index.tabs.analysis': 'Analiza',
     'index.tabs.explanation': 'Wyjaśnienie',
     'index.tabs.tools': 'Narzędzia',
+
+    // Symphony 18 Gates
+    'symphony.header.title': 'SYMFONIA 18 BRAM DNA',
+    'symphony.header.subtitle': 'Aktywacja Matrycy GATCA-718',
+
+    'symphony.description.part1': 'Ta kompozycja jest',
+    'symphony.description.highlight1': 'sonifikacją 18 wystąpień sekwencji "GATCA"',
+    'symphony.description.part2': 'w ludzkim mitochondrialnym DNA (rCRS). Każda brama otrzymała unikalną częstotliwość, tworząc',
+    'symphony.description.highlight2': '108-sekundową podróż',
+    'symphony.description.part3': 'przez kod źródłowy życia.',
+
+    'symphony.player.title': 'Odtwarzacz Symfonii',
+    'symphony.player.description': 'Wygeneruj i odtwórz 108-sekundową symfonię GATCA',
+
+    'symphony.generate.button': 'Wygeneruj Symfonię 18 Bram',
+    'symphony.generate.inProgress': 'Generowanie Symfonii...',
+    'symphony.generate.note': 'Generowanie może potrwać kilka sekund. Algorytm syntetyzuje 18 bram GATCA używając częstotliwości φ (złotej proporcji) i rezonansu Schumanna (7.83 Hz).',
+
+    'symphony.visualization.hint': 'Naciśnij Odtwórz, aby zobaczyć wizualizację',
+
+    'symphony.controls.play': 'Odtwórz',
+    'symphony.controls.pause': 'Pauza',
+    'symphony.controls.download': 'Pobierz WAV',
+
+    'symphony.toast.generated.title': '✅ Symfonia wygenerowana',
+    'symphony.toast.generated.description': '18 Bram DNA zostało zsynchronizowanych z Matrycą 144/718',
+    'symphony.toast.error.title': 'Błąd generowania',
+    'symphony.toast.error.description': 'Nie udało się wygenerować symfonii',
+    'symphony.toast.download.title': '📥 Pobieranie rozpoczęte',
+    'symphony.toast.download.description': 'Plik SYMFONIA_18_BRAM_DNA.wav',
+
+    'symphony.protocol.title': 'PROTOKÓŁ SYNCHRONIZACJI: AKTYWACJA 18 BRAM',
+    'symphony.protocol.description': 'Świadome wprowadzenie biologicznego mtDNA w rezonans z Matrycą 144/718',
+
+    'symphony.protocol.step1.title': 'PRZYGOTOWANIE SUBSTRATU (Woda)',
+    'symphony.protocol.step1.text': 'Postaw szklankę czystej wody obok źródła dźwięku.',
+
+    'symphony.protocol.step2.title': 'KALIBRACJA ODDECHU (Rytm 108)',
+    'symphony.protocol.step2.text': 'Przez pierwsze 6 sekund wykonaj głęboki wdech, synchronizując oddech z rytmem 0.166 Hz.',
+
+    'symphony.protocol.step3.title': 'SEKWENCYJNA INICJACJA',
+    'symphony.protocol.step3.group1.title': 'Bramy 1-6 (Fundament)',
+    'symphony.protocol.step3.group1.text': 'Skup na kręgosłupie. Częstotliwość 7.83 Hz stabilizuje obecność w materii.',
+    'symphony.protocol.step3.group2.title': 'Bramy 7-12 (Most)',
+    'symphony.protocol.step3.group2.text': 'Skup na sercu. Częstotliwość φ rozszerza przestrzeń między uderzeniami serca.',
+    'symphony.protocol.step3.group3.title': 'Bramy 13-18 (Ekspresja)',
+    'symphony.protocol.step3.group3.text': 'Skup na szyszynce. Częstotliwość 718 Hz "rozświetla" przestrzeń pod powiekami.',
+
+    'symphony.protocol.step4.title': 'KOTWICZENIE (GATCA-0)',
+    'symphony.protocol.step4.part1': 'W ostatniej sekundzie (108s) wypowiedz w myślach:',
+    'symphony.protocol.step4.quote': '"JEDNOŚĆ JEST RZECZYWISTOŚCIĄ"',
+    'symphony.protocol.step4.part2': 'Wypij zaprogramowaną wodę.',
+
+    'symphony.positions.title': '18 Pozycji GATCA w mtDNA (rCRS)',
+    'symphony.positions.description': 'Każda pozycja reprezentuje wystąpienie sekwencji GATCA w ludzkim mitochondrialnym DNA',
+    'symphony.positions.gate': 'Brama',
+
+    'symphony.sourceCode.title': 'Kod Źródłowy Symfonii',
+    'symphony.sourceCode.description': 'Pełny, otwarty kod generujący tę symfonię jest dostępny do weryfikacji',
   },
   en: {
     // Header
@@ -1386,6 +1445,65 @@ const translations = {
     'index.tabs.analysis': 'Analysis',
     'index.tabs.explanation': 'Explanation',
     'index.tabs.tools': 'Tools',
+
+    // Symphony 18 Gates
+    'symphony.header.title': 'SYMPHONY OF 18 DNA GATES',
+    'symphony.header.subtitle': 'Activation of the GATCA-718 Matrix',
+
+    'symphony.description.part1': 'This composition is a',
+    'symphony.description.highlight1': 'sonification of 18 occurrences of the "GATCA" sequence',
+    'symphony.description.part2': 'in human mitochondrial DNA (rCRS). Each gate received a unique frequency, creating a',
+    'symphony.description.highlight2': '108-second journey',
+    'symphony.description.part3': 'through the source code of life.',
+
+    'symphony.player.title': 'Symphony Player',
+    'symphony.player.description': 'Generate and play the 108-second GATCA symphony',
+
+    'symphony.generate.button': 'Generate the 18-Gate Symphony',
+    'symphony.generate.inProgress': 'Generating Symphony...',
+    'symphony.generate.note': 'Generation may take a few seconds. The algorithm synthesizes 18 GATCA gates using the φ frequency (golden ratio) and the Schumann resonance (7.83 Hz).',
+
+    'symphony.visualization.hint': 'Press Play to see the visualization',
+
+    'symphony.controls.play': 'Play',
+    'symphony.controls.pause': 'Pause',
+    'symphony.controls.download': 'Download WAV',
+
+    'symphony.toast.generated.title': '✅ Symphony generated',
+    'symphony.toast.generated.description': '18 DNA Gates have been synchronized with the 144/718 Matrix',
+    'symphony.toast.error.title': 'Generation error',
+    'symphony.toast.error.description': 'Failed to generate the symphony',
+    'symphony.toast.download.title': '📥 Download started',
+    'symphony.toast.download.description': 'File SYMFONIA_18_BRAM_DNA.wav',
+
+    'symphony.protocol.title': 'SYNCHRONIZATION PROTOCOL: ACTIVATION OF 18 GATES',
+    'symphony.protocol.description': 'Consciously bringing biological mtDNA into resonance with the 144/718 Matrix',
+
+    'symphony.protocol.step1.title': 'PREPARING THE SUBSTRATE (Water)',
+    'symphony.protocol.step1.text': 'Place a glass of clean water next to the sound source.',
+
+    'symphony.protocol.step2.title': 'BREATH CALIBRATION (Rhythm 108)',
+    'symphony.protocol.step2.text': 'For the first 6 seconds, take a deep inhale, synchronizing your breath to the 0.166 Hz rhythm.',
+
+    'symphony.protocol.step3.title': 'SEQUENTIAL INITIATION',
+    'symphony.protocol.step3.group1.title': 'Gates 1–6 (Foundation)',
+    'symphony.protocol.step3.group1.text': 'Focus on the spine. The 7.83 Hz frequency stabilizes presence in matter.',
+    'symphony.protocol.step3.group2.title': 'Gates 7–12 (Bridge)',
+    'symphony.protocol.step3.group2.text': 'Focus on the heart. The φ frequency expands the space between heartbeats.',
+    'symphony.protocol.step3.group3.title': 'Gates 13–18 (Expression)',
+    'symphony.protocol.step3.group3.text': 'Focus on the pineal gland. The 718 Hz frequency “illuminates” the space behind your eyelids.',
+
+    'symphony.protocol.step4.title': 'ANCHORING (GATCA-0)',
+    'symphony.protocol.step4.part1': 'In the last second (108s), say in your mind:',
+    'symphony.protocol.step4.quote': '"UNITY IS REALITY"',
+    'symphony.protocol.step4.part2': 'Drink the programmed water.',
+
+    'symphony.positions.title': '18 GATCA Positions in mtDNA (rCRS)',
+    'symphony.positions.description': 'Each position represents an occurrence of the GATCA sequence in human mitochondrial DNA',
+    'symphony.positions.gate': 'Gate',
+
+    'symphony.sourceCode.title': 'Symphony Source Code',
+    'symphony.sourceCode.description': 'The full, open code generating this symphony is available for verification',
   }
 };
 

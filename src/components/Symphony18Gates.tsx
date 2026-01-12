@@ -3,9 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { Play, Pause, Download, Volume2, VolumeX, Loader2, Music, Dna, Heart, Brain, Sparkles } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Download,
+  Volume2,
+  VolumeX,
+  Loader2,
+  Music,
+  Dna,
+  Heart,
+  Brain,
+  Sparkles,
+} from "lucide-react";
 import { generateSymphony, SymphonyData, SYMPHONY_INFO } from "@/lib/symphonyGenerator";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Symphony18Gates() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -16,7 +29,7 @@ export function Symphony18Gates() {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
-  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -25,21 +38,22 @@ export function Symphony18Gates() {
   const startTimeRef = useRef<number>(0);
   const animationRef = useRef<number>(0);
   const visualAnimationRef = useRef<number>(0);
-  
+
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Initialize canvas when visible
   useEffect(() => {
     if (canvasRef.current && symphonyData) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         // Set proper canvas dimensions
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width * window.devicePixelRatio;
         canvas.height = rect.height * window.devicePixelRatio;
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, rect.width, rect.height);
       }
     }
@@ -48,46 +62,49 @@ export function Symphony18Gates() {
   // Visualization drawing
   const drawVisualization = useCallback(() => {
     if (!analyserRef.current || !canvasRef.current) {
-      console.log('No analyser or canvas:', { analyser: !!analyserRef.current, canvas: !!canvasRef.current });
+      console.log("No analyser or canvas:", {
+        analyser: !!analyserRef.current,
+        canvas: !!canvasRef.current,
+      });
       return;
     }
-    
+
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     const analyser = analyserRef.current;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    
+
     const displayWidth = canvas.width / window.devicePixelRatio;
     const displayHeight = canvas.height / window.devicePixelRatio;
-    
+
     const draw = () => {
       if (!isPlaying) {
         cancelAnimationFrame(visualAnimationRef.current);
         return;
       }
-      
+
       visualAnimationRef.current = requestAnimationFrame(draw);
-      
+
       // Clear with fade effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
       ctx.fillRect(0, 0, displayWidth, displayHeight);
-      
+
       // Draw waveform
       analyser.getByteTimeDomainData(dataArray);
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#a855f7';
+      ctx.strokeStyle = "#a855f7";
       ctx.beginPath();
-      
+
       const sliceWidth = displayWidth / bufferLength;
       let x = 0;
-      
+
       for (let i = 0; i < bufferLength; i++) {
         const v = dataArray[i] / 128.0;
         const y = (v * displayHeight) / 2;
-        
+
         if (i === 0) {
           ctx.moveTo(x, y);
         } else {
@@ -95,41 +112,41 @@ export function Symphony18Gates() {
         }
         x += sliceWidth;
       }
-      
+
       ctx.lineTo(displayWidth, displayHeight / 2);
       ctx.stroke();
-      
+
       // Draw frequency bars
       analyser.getByteFrequencyData(dataArray);
       const barWidth = (displayWidth / bufferLength) * 2.5;
       let barX = 0;
-      
+
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * displayHeight * 0.5;
-        
+
         const gradient = ctx.createLinearGradient(0, displayHeight, 0, displayHeight - barHeight);
-        gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
-        gradient.addColorStop(1, 'rgba(168, 85, 247, 0.8)');
-        
+        gradient.addColorStop(0, "rgba(139, 92, 246, 0.3)");
+        gradient.addColorStop(1, "rgba(168, 85, 247, 0.8)");
+
         ctx.fillStyle = gradient;
         ctx.fillRect(barX, displayHeight - barHeight, barWidth, barHeight);
-        
+
         barX += barWidth + 1;
         if (barX > displayWidth) break;
       }
     };
-    
+
     draw();
   }, [isPlaying]);
 
   const stopVisualization = useCallback(() => {
     cancelAnimationFrame(visualAnimationRef.current);
     if (canvasRef.current) {
-      const ctx = canvasRef.current.getContext('2d');
+      const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
         const displayWidth = canvasRef.current.width / window.devicePixelRatio;
         const displayHeight = canvasRef.current.height / window.devicePixelRatio;
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, displayWidth, displayHeight);
       }
     }
@@ -157,41 +174,41 @@ export function Symphony18Gates() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setGenerationProgress(0);
-    
+
     try {
       // Create audio context
       audioContextRef.current = new AudioContext({ sampleRate: 44100 });
-      
+
       // Create gain node for volume control
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.gain.value = volume;
       gainNodeRef.current.connect(audioContextRef.current.destination);
-      
+
       // Create analyser for visualization
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 2048;
       analyserRef.current.connect(gainNodeRef.current);
-      
+
       // Simulate progress updates
       const progressInterval = setInterval(() => {
-        setGenerationProgress(prev => Math.min(prev + 5, 95));
+        setGenerationProgress((prev) => Math.min(prev + 5, 95));
       }, 200);
-      
+
       const data = await generateSymphony(audioContextRef.current);
-      
+
       clearInterval(progressInterval);
       setGenerationProgress(100);
       setSymphonyData(data);
-      
+
       toast({
-        title: "✅ Symfonia wygenerowana",
-        description: "18 Bram DNA zostało zsynchronizowanych z Matrycą 144/718",
+        title: t("symphony.toast.generated.title"),
+        description: t("symphony.toast.generated.description"),
       });
     } catch (error) {
       console.error("Generation error:", error);
       toast({
-        title: "Błąd generowania",
-        description: "Nie udało się wygenerować symfonii",
+        title: t("symphony.toast.error.title"),
+        description: t("symphony.toast.error.description"),
         variant: "destructive",
       });
     } finally {
@@ -201,7 +218,7 @@ export function Symphony18Gates() {
 
   const handlePlay = () => {
     if (!symphonyData || !audioContextRef.current || !analyserRef.current) return;
-    
+
     if (isPlaying) {
       // Stop
       sourceRef.current?.stop();
@@ -213,29 +230,29 @@ export function Symphony18Gates() {
       const source = audioContextRef.current.createBufferSource();
       source.buffer = symphonyData.audioBuffer;
       source.connect(analyserRef.current);
-      
+
       source.onended = () => {
         setIsPlaying(false);
         setProgress(0);
         setCurrentTime(0);
         stopVisualization();
       };
-      
+
       source.start(0, currentTime);
       sourceRef.current = source;
       startTimeRef.current = audioContextRef.current.currentTime - currentTime;
       setIsPlaying(true);
-      
+
       // Start visualization
       drawVisualization();
-      
+
       // Update progress
       const updateProgress = () => {
         if (audioContextRef.current) {
           const elapsed = audioContextRef.current.currentTime - startTimeRef.current;
           setCurrentTime(elapsed);
           setProgress((elapsed / SYMPHONY_INFO.duration) * 100);
-          
+
           if (elapsed < SYMPHONY_INFO.duration) {
             animationRef.current = requestAnimationFrame(updateProgress);
           }
@@ -247,19 +264,19 @@ export function Symphony18Gates() {
 
   const handleDownload = () => {
     if (!symphonyData) return;
-    
+
     const url = URL.createObjectURL(symphonyData.wavBlob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'SYMFONIA_18_BRAM_DNA.wav';
+    a.download = "SYMFONIA_18_BRAM_DNA.wav";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     toast({
-      title: "📥 Pobieranie rozpoczęte",
-      description: "Plik SYMFONIA_18_BRAM_DNA.wav",
+      title: t("symphony.toast.download.title"),
+      description: t("symphony.toast.download.description"),
     });
   };
 
@@ -282,7 +299,7 @@ export function Symphony18Gates() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -292,22 +309,20 @@ export function Symphony18Gates() {
         <div className="flex items-center justify-center gap-3">
           <Dna className="w-10 h-10 text-primary animate-pulse" />
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
-            SYMFONIA 18 BRAM DNA
+            {t("symphony.header.title")}
           </h1>
           <Music className="w-10 h-10 text-primary animate-pulse" />
         </div>
-        <h2 className="text-xl md:text-2xl text-muted-foreground">
-          Aktywacja Matrycy GATCA-718
-        </h2>
+        <h2 className="text-xl md:text-2xl text-muted-foreground">{t("symphony.header.subtitle")}</h2>
       </div>
 
       {/* Description */}
       <Card className="bg-card/50 backdrop-blur border-primary/20">
         <CardContent className="pt-6">
           <p className="text-center text-lg leading-relaxed">
-            Ta kompozycja jest <span className="text-primary font-semibold">sonifikacją 18 wystąpień sekwencji 'GATCA'</span> w ludzkim 
-            mitochondrialnym DNA (rCRS). Każda brama otrzymała unikalną częstotliwość, tworząc{" "}
-            <span className="text-primary font-semibold">108-sekundową podróż</span> przez kod źródłowy życia.
+            {t("symphony.description.part1")} <span className="text-primary font-semibold">{t("symphony.description.highlight1")}</span>{" "}
+            {t("symphony.description.part2")} <span className="text-primary font-semibold">{t("symphony.description.highlight2")}</span>{" "}
+            {t("symphony.description.part3")}
           </p>
         </CardContent>
       </Card>
@@ -317,17 +332,15 @@ export function Symphony18Gates() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Volume2 className="w-5 h-5 text-primary" />
-            Odtwarzacz Symfonii
+            {t("symphony.player.title")}
           </CardTitle>
-          <CardDescription>
-            Wygeneruj i odtwórz 108-sekundową symfonię GATCA
-          </CardDescription>
+          <CardDescription>{t("symphony.player.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {!symphonyData ? (
             <div className="space-y-4">
-              <Button 
-                onClick={handleGenerate} 
+              <Button
+                onClick={handleGenerate}
                 disabled={isGenerating}
                 className="w-full h-14 text-lg gap-3"
                 variant="glow"
@@ -335,38 +348,26 @@ export function Symphony18Gates() {
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Generowanie Symfonii... {generationProgress}%
+                    {t("symphony.generate.inProgress")} {generationProgress}%
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    Wygeneruj Symfonię 18 Bram
+                    {t("symphony.generate.button")}
                   </>
                 )}
               </Button>
-              {isGenerating && (
-                <Progress value={generationProgress} className="h-2" />
-              )}
-              <p className="text-sm text-muted-foreground text-center">
-                Generowanie może potrwać kilka sekund. Algorytm syntetyzuje 18 bram GATCA 
-                używając częstotliwości φ (złotej proporcji) i rezonansu Schumanna (7.83 Hz).
-              </p>
+              {isGenerating && <Progress value={generationProgress} className="h-2" />}
+              <p className="text-sm text-muted-foreground text-center">{t("symphony.generate.note")}</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* Real-time Visualization */}
               <div className="relative rounded-lg overflow-hidden border border-primary/30 bg-black">
-                <canvas 
-                  ref={canvasRef}
-                  width={600}
-                  height={150}
-                  className="w-full h-32 md:h-40"
-                />
+                <canvas ref={canvasRef} width={600} height={150} className="w-full h-32 md:h-40" />
                 {!isPlaying && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                    <span className="text-muted-foreground text-sm">
-                      Naciśnij Odtwórz, aby zobaczyć wizualizację
-                    </span>
+                    <span className="text-muted-foreground text-sm">{t("symphony.visualization.hint")}</span>
                   </div>
                 )}
               </div>
@@ -382,59 +383,32 @@ export function Symphony18Gates() {
 
               {/* Volume Control */}
               <div className="flex items-center gap-4 px-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleMute}
-                  className="flex-shrink-0"
-                >
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="w-5 h-5" />
-                  ) : (
-                    <Volume2 className="w-5 h-5" />
-                  )}
+                <Button variant="ghost" size="icon" onClick={toggleMute} className="flex-shrink-0">
+                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </Button>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  onValueChange={handleVolumeChange}
-                  max={1}
-                  step={0.01}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground w-12 text-right">
-                  {Math.round((isMuted ? 0 : volume) * 100)}%
-                </span>
+                <Slider value={[isMuted ? 0 : volume]} onValueChange={handleVolumeChange} max={1} step={0.01} className="flex-1" />
+                <span className="text-sm text-muted-foreground w-12 text-right">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
               </div>
-              
+
               {/* Controls */}
               <div className="flex gap-4 justify-center">
-                <Button 
-                  onClick={handlePlay}
-                  size="lg"
-                  className="h-14 px-8 gap-2"
-                  variant={isPlaying ? "secondary" : "glow"}
-                >
+                <Button onClick={handlePlay} size="lg" className="h-14 px-8 gap-2" variant={isPlaying ? "secondary" : "glow"}>
                   {isPlaying ? (
                     <>
                       <Pause className="w-6 h-6" />
-                      Pauza
+                      {t("symphony.controls.pause")}
                     </>
                   ) : (
                     <>
                       <Play className="w-6 h-6" />
-                      Odtwórz
+                      {t("symphony.controls.play")}
                     </>
                   )}
                 </Button>
-                
-                <Button 
-                  onClick={handleDownload}
-                  size="lg"
-                  variant="outline"
-                  className="h-14 px-8 gap-2"
-                >
+
+                <Button onClick={handleDownload} size="lg" variant="outline" className="h-14 px-8 gap-2">
                   <Download className="w-5 h-5" />
-                  Pobierz WAV
+                  {t("symphony.controls.download")}
                 </Button>
               </div>
             </div>
@@ -447,62 +421,54 @@ export function Symphony18Gates() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary">
             <Sparkles className="w-5 h-5" />
-            PROTOKÓŁ SYNCHRONIZACJI: AKTYWACJA 18 BRAM
+            {t("symphony.protocol.title")}
           </CardTitle>
-          <CardDescription>
-            Świadome wprowadzenie biologicznego mtDNA w rezonans z Matrycą 144/718
-          </CardDescription>
+          <CardDescription>{t("symphony.protocol.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Step 1 */}
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              1
-            </div>
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">1</div>
             <div>
-              <h4 className="font-semibold text-foreground">PRZYGOTOWANIE SUBSTRATU (Woda)</h4>
-              <p className="text-muted-foreground">Postaw szklankę czystej wody obok źródła dźwięku.</p>
+              <h4 className="font-semibold text-foreground">{t("symphony.protocol.step1.title")}</h4>
+              <p className="text-muted-foreground">{t("symphony.protocol.step1.text")}</p>
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              2
-            </div>
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">2</div>
             <div>
-              <h4 className="font-semibold text-foreground">KALIBRACJA ODDECHU (Rytm 108)</h4>
-              <p className="text-muted-foreground">Przez pierwsze 6 sekund wykonaj głęboki wdech, synchronizując oddech z rytmem 0.166 Hz.</p>
+              <h4 className="font-semibold text-foreground">{t("symphony.protocol.step2.title")}</h4>
+              <p className="text-muted-foreground">{t("symphony.protocol.step2.text")}</p>
             </div>
           </div>
 
           {/* Step 3 */}
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              3
-            </div>
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">3</div>
             <div>
-              <h4 className="font-semibold text-foreground">SEKWENCYJNA INICJACJA</h4>
+              <h4 className="font-semibold text-foreground">{t("symphony.protocol.step3.title")}</h4>
               <div className="mt-3 space-y-4">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-primary/10">
                   <Heart className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium text-red-400">Bramy 1-6 (Fundament)</span>
-                    <p className="text-sm text-muted-foreground">Skup na kręgosłupie. Częstotliwość 7.83 Hz stabilizuje obecność w materii.</p>
+                    <span className="font-medium text-red-400">{t("symphony.protocol.step3.group1.title")}</span>
+                    <p className="text-sm text-muted-foreground">{t("symphony.protocol.step3.group1.text")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-primary/10">
                   <Heart className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium text-green-400">Bramy 7-12 (Most)</span>
-                    <p className="text-sm text-muted-foreground">Skup na sercu. Częstotliwość φ rozszerza przestrzeń między uderzeniami serca.</p>
+                    <span className="font-medium text-green-400">{t("symphony.protocol.step3.group2.title")}</span>
+                    <p className="text-sm text-muted-foreground">{t("symphony.protocol.step3.group2.text")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-primary/10">
                   <Brain className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium text-purple-400">Bramy 13-18 (Ekspresja)</span>
-                    <p className="text-sm text-muted-foreground">Skup na szyszynce. Częstotliwość 718 Hz "rozświetla" przestrzeń pod powiekami.</p>
+                    <span className="font-medium text-purple-400">{t("symphony.protocol.step3.group3.title")}</span>
+                    <p className="text-sm text-muted-foreground">{t("symphony.protocol.step3.group3.text")}</p>
                   </div>
                 </div>
               </div>
@@ -511,14 +477,11 @@ export function Symphony18Gates() {
 
           {/* Step 4 */}
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              4
-            </div>
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">4</div>
             <div>
-              <h4 className="font-semibold text-foreground">KOTWICZENIE (GATCA-0)</h4>
+              <h4 className="font-semibold text-foreground">{t("symphony.protocol.step4.title")}</h4>
               <p className="text-muted-foreground">
-                W ostatniej sekundzie (108s) wypowiedz w myślach: <span className="text-primary font-semibold">"JEDNOŚĆ JEST RZECZYWISTOŚCIĄ"</span>. 
-                Wypij zaprogramowaną wodę.
+                {t("symphony.protocol.step4.part1")} <span className="text-primary font-semibold">{t("symphony.protocol.step4.quote")}</span>. {t("symphony.protocol.step4.part2")}
               </p>
             </div>
           </div>
@@ -530,20 +493,17 @@ export function Symphony18Gates() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Dna className="w-5 h-5 text-primary" />
-            18 Pozycji GATCA w mtDNA (rCRS)
+            {t("symphony.positions.title")}
           </CardTitle>
-          <CardDescription>
-            Każda pozycja reprezentuje wystąpienie sekwencji GATCA w ludzkim mitochondrialnym DNA
-          </CardDescription>
+          <CardDescription>{t("symphony.positions.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {SYMPHONY_INFO.positions.map((pos, i) => (
-              <div 
-                key={pos}
-                className="p-2 text-center rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
-              >
-                <div className="text-xs text-muted-foreground">Brama {i + 1}</div>
+              <div key={pos} className="p-2 text-center rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors">
+                <div className="text-xs text-muted-foreground">
+                  {t("symphony.positions.gate")} {i + 1}
+                </div>
                 <div className="font-mono font-bold text-primary">{pos}</div>
               </div>
             ))}
@@ -554,10 +514,8 @@ export function Symphony18Gates() {
       {/* Source Code */}
       <Card className="bg-card/50 backdrop-blur border-primary/20">
         <CardHeader>
-          <CardTitle>Kod Źródłowy Symfonii</CardTitle>
-          <CardDescription>
-            Pełny, otwarty kod generujący tę symfonię jest dostępny do weryfikacji
-          </CardDescription>
+          <CardTitle>{t("symphony.sourceCode.title")}</CardTitle>
+          <CardDescription>{t("symphony.sourceCode.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <pre className="p-4 rounded-lg bg-background/80 border border-primary/10 overflow-x-auto text-xs md:text-sm">
