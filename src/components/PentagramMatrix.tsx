@@ -16,7 +16,7 @@ const BulletList = ({ items }: { items: string[] }) => (
 
 const PentagramMatrix = () => {
   const { t, language } = useLanguage();
-  const c = CONTENT[language];
+  const c = PENTAGRAM_MATRIX_CONTENT[language as PentagramMatrixLang];
 
   return (
     <div className="space-y-6">

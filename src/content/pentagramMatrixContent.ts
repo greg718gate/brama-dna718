@@ -46,6 +46,9 @@ export type PentagramMatrixTabContent = {
   originTitle?: string;
   originLines?: string[];
 
+  coordsTitle?: string;
+  coordsLines?: string[];
+
   unescoTitle?: string;
   unescoLines?: string[];
 
