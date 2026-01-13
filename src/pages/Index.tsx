@@ -23,6 +23,7 @@ import { Comments } from "@/components/Comments";
 import { ContactForm } from "@/components/ContactForm";
 import { AcademicExportButton } from "@/components/AcademicExportButton";
 import { DonationButton } from "@/components/DonationButton";
+import { UnifiedReportExportButton } from "@/components/UnifiedReportExportButton";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -237,6 +238,9 @@ const Index = () => {
             <div className="flex flex-wrap gap-3 justify-center">
               <DonationButton variant="compact" />
               <AcademicExportButton variant="compact" />
+            </div>
+            <div className="mt-4">
+              <UnifiedReportExportButton />
             </div>
           </div>
 
