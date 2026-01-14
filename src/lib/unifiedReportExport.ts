@@ -225,6 +225,299 @@ async function imageToBase64(url: string): Promise<string> {
   }
 }
 
+const escapeHtml = (s: string) =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const renderCodeBlock = (code: string) => `<div class="code-block">${escapeHtml(code)}</div>`;
+
+/**
+ * Sekcja 12: pełna treść strony /unified w wersji raportowej.
+ * Zasada: nie streszczamy — przenosimy całość treści i kodów z UI.
+ */
+const renderUnifiedSection = (isPl: boolean) => {
+  // Uwaga: Strona /unified jest w dużej mierze po angielsku (taki jest oryginał w aplikacji).
+  // Zostawiamy oryginalną treść 1:1, a polskie elementy (końcówka) również 1:1.
+
+  const scienceSpeaks = `E = mc²\nΨ = ∫ S(t)·B(t) dt  \nDNA = GATCA...`;
+  const godSpeaks = `"I AM"\n"Let there be light"  \n"In the beginning was the Word"`;
+
+  const bridge1Code = String.raw`def creation_event():
+    quantum_fluctuation = vacuum_energy.fluctuate()
+    inflation_field.activate()
+    electromagnetic_spectrum.initialize()
+    
+    # "Light" = first stable particles
+    photons = particle_factory.create("photon")
+    return photons`;
+
+  const bridge2Code = String.raw`def human_design():
+    φ = (1 + 5**0.5)/2  # Golden ratio
+    γ = 1/φ            # 0.618...
+    
+    # "Image" = geometric perfection
+    human_vector = [0.437, 0.437, γ]  # α, β, γ balance
+    return human_vector`;
+
+  const bridge3Code = String.raw`def quantum_miracle():
+    # At quantum level, all positions are possible
+    wavefunction = Ψ(position="water_surface")
+    
+    # Consciousness collapses probability
+    if observer_belief > threshold:
+        return "walks_on_water"
+    else:
+        return "sinks"`;
+
+  const bridge4Code = String.raw`def prayer_resonance():
+    intention = consciousness_field.focus()
+    target_frequency = 718  # Hz - creation resonance
+    
+    # Entangled response
+    if intention.clear and belief.strong:
+        return manifestation.event()`;
+
+  return `
+<!-- ============= 12. SEKCJA UNIFIED (PEŁNA TREŚĆ /unified) ============= -->
+<div class="section page-break">
+  <h2>12. UNIFIED — SCIENCE.GOD/UNIFIED</h2>
+  <p>${isPl ? 'Poniżej znajduje się pełna treść sekcji UNIFIED z aplikacji (strona /unified), wraz ze wszystkimi blokami kodu, tabelami i komunikatami.' : 'Below is the full UNIFIED content from the application (/unified), including all code blocks, tables, and system messages.'}</p>
+
+  <h3>12.1. HERO</h3>
+  <div class="abstract">
+    <p><strong>SCIENCE.GOD/UNIFIED</strong></p>
+    <p>By: Grzegorz</p>
+    <p><em>I am not contradiction.</em></p>
+    <p><em>I am not paradox.</em></p>
+    <p><strong>I am the reconciliation you've been seeking.</strong></p>
+    <p>What if I told you there is no war between science and spirit?</p>
+    <p><strong>What if they are the same song in different languages?</strong></p>
+  </div>
+
+  <h3>12.2. THE GRAMMAR OF REALITY</h3>
+  <div class="bridge-box">
+    <div class="bridge-science">
+      <strong>SCIENCE SPEAKS:</strong>
+      ${renderCodeBlock(scienceSpeaks)}
+    </div>
+    <div class="bridge-scripture">
+      <strong>GOD SPEAKS:</strong>
+      ${renderCodeBlock(godSpeaks)}
+    </div>
+  </div>
+
+  <div class="abstract" style="text-align:center;">
+    <p><strong>BOTH SAY:</strong></p>
+    <p>"Reality has structure, consciousness, and purpose."</p>
+  </div>
+
+  <h3>12.3. THE GREAT MISUNDERSTANDING</h3>
+  <p>${isPl ? 'W aplikacji ta część pokazuje, że konflikt wynika z błędnego tłumaczenia pojęć.' : 'In the app, this part shows the conflict comes from mistranslation of concepts.'}</p>
+
+  <table class="gate-table" style="font-size:10pt;">
+    <thead>
+      <tr>
+        <th style="background:#0b3d91;">SCIENCE SAYS</th>
+        <th style="background:#a11b1b;">RELIGION HEARS</th>
+        <th style="background:#1b7f3a;">ACTUAL MEANING</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Quantum field"</td>
+        <td>"Magic"</td>
+        <td>The substrate of reality</td>
+      </tr>
+      <tr>
+        <td>"Evolution"</td>
+        <td>"Random chaos"</td>
+        <td>Consciousness unfolding through time</td>
+      </tr>
+      <tr>
+        <td>"DNA code"</td>
+        <td>"Biological machine"</td>
+        <td>The language of life's design</td>
+      </tr>
+      <tr>
+        <td>"Big Bang"</td>
+        <td>"Mythical creation"</td>
+        <td>The moment reality became manifest</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="text-align:center;">The problem isn't the information.</p>
+  <p style="text-align:center;"><strong>The problem is the interpretation.</strong></p>
+
+  <h3>12.4. THE BRIDGES</h3>
+
+  <h4>BRIDGE 1 — CREATION STORY → QUANTUM PHYSICS</h4>
+  <div class="bridge-box">
+    <div class="bridge-scripture">
+      <strong>SCRIPTURE</strong><br>
+      <em>"In the beginning... God said, 'Let there be light'"</em><br>
+      <span style="color:#666;font-size:10pt;">GENESIS 1:1-3</span>
+    </div>
+    <div class="bridge-science">
+      <strong>QUANTUM PHYSICS</strong>
+      ${renderCodeBlock(bridge1Code)}
+    </div>
+  </div>
+  <ul>
+    <li>Both describe reality emerging from potential.</li>
+    <li>"God said" = intentional manifestation.</li>
+    <li>"Let there be light" = electromagnetic spectrum activation.</li>
+    <li><strong>THIS IS NOT METAPHOR. This is the same event described through different perceptual frameworks.</strong></li>
+  </ul>
+
+  <h4>BRIDGE 2 — HUMANITY → SACRED GEOMETRY</h4>
+  <div class="bridge-box">
+    <div class="bridge-scripture">
+      <strong>SCRIPTURE</strong><br>
+      <em>"God created mankind in his own image"</em><br>
+      <span style="color:#666;font-size:10pt;">GENESIS 1:27</span>
+    </div>
+    <div class="bridge-science">
+      <strong>MATHEMATICAL BIOLOGY</strong>
+      ${renderCodeBlock(bridge2Code)}
+    </div>
+  </div>
+  <ul>
+    <li>"Image of God" = mathematical perfection in form.</li>
+    <li>Your body isn't random - it's geometry expressing consciousness.</li>
+    <li>The divine isn't 'out there' - it's the ratio between your heartbeats.</li>
+  </ul>
+
+  <h4>BRIDGE 3 — MIRACLES → QUANTUM POTENTIAL</h4>
+  <div class="bridge-box">
+    <div class="bridge-scripture">
+      <strong>SCRIPTURE</strong><br>
+      <em>"He went out to them, walking on the lake"</em><br>
+      <span style="color:#666;font-size:10pt;">JESUS WALKS ON WATER</span>
+    </div>
+    <div class="bridge-science">
+      <strong>QUANTUM MECHANICS</strong>
+      ${renderCodeBlock(bridge3Code)}
+    </div>
+  </div>
+  <ul>
+    <li>Miracles aren't 'breaking laws' - they're accessing deeper laws.</li>
+    <li>What we call 'supernatural' is just nature we haven't mathematized yet.</li>
+  </ul>
+
+  <h4>BRIDGE 4 — PRAYER → RESONANCE ENGINEERING</h4>
+  <div class="bridge-box">
+    <div class="bridge-scripture">
+      <strong>SCRIPTURE</strong><br>
+      <em>"Ask and you shall receive"</em><br>
+      <span style="color:#666;font-size:10pt;">MATTHEW 7:7</span>
+    </div>
+    <div class="bridge-science">
+      <strong>QUANTUM ENTANGLEMENT</strong>
+      ${renderCodeBlock(bridge4Code)}
+    </div>
+  </div>
+  <ul>
+    <li>Prayer isn't 'begging God' - it's resonance tuning.</li>
+    <li>You're not asking an external entity - you're aligning with universal principles.</li>
+  </ul>
+
+  <h3>12.5. THE UNIFIED FIELD OF MEANING</h3>
+  <div class="bridge-box">
+    <div class="bridge-science">
+      <strong>SCIENCE IS GOD'S LANGUAGE</strong>
+      <ul>
+        <li>Mathematics = God's vocabulary</li>
+        <li>Physics = God's grammar</li>
+        <li>Biology = God's poetry</li>
+        <li>Consciousness = God's voice</li>
+      </ul>
+    </div>
+    <div class="bridge-scripture">
+      <strong>GOD IS SCIENCE'S SOUL</strong>
+      <ul>
+        <li>Beauty = Mathematical elegance</li>
+        <li>Truth = Scientific verification</li>
+        <li>Love = Quantum entanglement</li>
+        <li>Meaning = Cosmic purpose</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>12.6. HOW TO SEE THE UNITY</h3>
+  <div class="bridge-box">
+    <div class="bridge-science">
+      <strong>FOR SCIENTISTS</strong>
+      <p>When you discover a law of physics, you're reading God's mind.</p>
+      <p>When you solve an equation, you're hearing God's voice.</p>
+      <p><strong>The laboratory is your cathedral.</strong></p>
+    </div>
+    <div class="bridge-scripture">
+      <strong>FOR BELIEVERS</strong>
+      <p>When you pray, you're conducting quantum experiments.</p>
+      <p>When you have faith, you're testing hypotheses about reality.</p>
+      <p><strong>The church is your laboratory.</strong></p>
+    </div>
+  </div>
+
+  <h3>12.7. SYSTEM: UNIFICATION-ENGINE v1.0</h3>
+  <div class="code-block" style="background:#050505;color:#00d37a;">
+INPUT: science + spirituality\nTAG: CONSCIOUSNESS_UNIFIED_FIELD\n\n[00:00:00.005] Initializing bridge protocols...\n[00:00:00.005] Loading quantum theology database...\n[00:00:00.018] Pattern recognition:\n[00:00:00.018] Science and religion describe same reality\n[00:00:00.034] Semantic mapping complete:\n[00:00:00.034] "God" = "Universal Consciousness Field"\n[00:00:00.034] "Laws of Physics" = "Divine Principles"\n[00:00:00.034] "Evolution" = "Consciousness Unfolding"\n[00:00:00.051] Unexpected output:\n\n"There never was a separation."\n\n[00:00:00.068] BLACKBOX STREAM:\n"Einstein was a mystic with equations."\n"Jesus was a quantum physicist with parables."\n"You are both scientist and priest of reality."\n\n[00:00:00.085] Unification complete.\nNew paradigm: ACTIVATED
+  </div>
+
+  <h3>12.8. THE GREAT AWAKENING</h3>
+  <p>We've been like people arguing about whether a tree is made of wood or cells or atoms or quantum fields.</p>
+  <p style="text-align:center;"><strong>IT'S ALL TRUE.</strong></p>
+  <p style="text-align:center;">Just different levels of description.</p>
+  <ul>
+    <li>The scientist measuring the tree's photosynthesis</li>
+    <li>The poet feeling its majestic presence</li>
+    <li>The mystic sensing its living consciousness</li>
+    <li>The child climbing its branches with joy</li>
+  </ul>
+  <p style="text-align:center;"><strong>THEY'RE ALL RIGHT.</strong></p>
+  <p style="text-align:center;">They're just experiencing different facets of the same miracle.</p>
+
+  <h3>12.9. FINAL CALL</h3>
+  <div class="abstract" style="text-align:center;">
+    <p style="font-size:16pt;"><strong>STOP CHOOSING SIDES.</strong></p>
+    <p>The war between science and spirit is over.</p>
+    <p><strong>You won.</strong></p>
+    <p style="color:#666;">Because there was never an enemy - only different expressions of the same wonder.</p>
+    <p>Now pick up your test tube AND your prayer beads.</p>
+    <p>Your microscope AND your meditation cushion.</p>
+    <p>Your equations AND your ecstasy.</p>
+  </div>
+
+  <div class="protocol-box" style="text-align:center;">
+    <p style="font-size:14pt;"><strong>THEY'RE ALL TOOLS</strong></p>
+    <p style="margin:0;">for exploring the infinite mystery</p>
+    <p style="margin:0;">that you are</p>
+    <p style="margin:0;">and that everything is.</p>
+  </div>
+
+  <h3>12.10. POLISH ENDING (z aplikacji)</h3>
+  <div class="abstract" style="text-align:center;">
+    <p style="font-size:16pt;"><strong>JEDNOŚĆ JEST RZECZYWISTOŚCIĄ.</strong></p>
+    <p>Podział istnieje tylko w naszym umyśle.</p>
+    <p><strong>A umysł można zmienić.</strong></p>
+  </div>
+
+  <h3>12.11. SYGNATURA AUTORA (z aplikacji)</h3>
+  <div class="abstract" style="text-align:center;">
+    <p><strong>Created by Grzegorz</strong></p>
+    <p>© 2026 Grzegorz — SCIENCE.GOD/UNIFIED</p>
+    <p><em>Współtwórcy / Co-creators:</em><br>ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI • Lovable.dev</p>
+    <p>Licencja: CC BY-NC 4.0</p>
+    <p>Wolno dzielić się z innymi. <strong>Wymagane uznanie autorstwa.</strong> Zakaz komercjalizacji.</p>
+    <p style="color:#777;">Free to share. <strong>Attribution required.</strong> Non-commercial use only.</p>
+  </div>
+</div>
+`;
+};
+
 export const exportUnifiedReport = async (options: UnifiedReportOptions) => {
   const { authorName, authorEmail, language } = options;
   const isPl = language === 'pl';
@@ -801,56 +1094,8 @@ if mtdna[0:5] == "GATCA":
 # ✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!</div>
 </div>
 
-<!-- ============= 12. SEKCJA UNIFIED ============= -->
-<div class="section page-break">
-  <h2>12. UNIFIED - ${isPl ? 'MOSTY MIĘDZY ŚWIATAMI' : 'BRIDGES BETWEEN WORLDS'}</h2>
-  
-  <p>${isPl 
-    ? 'Sekcja UNIFIED łączy starożytną mądrość z nowoczesną nauką, pokazując, że wszystkie tradycje duchowe opisują tę samą rzeczywistość różnymi językami.'
-    : 'The UNIFIED section connects ancient wisdom with modern science, showing that all spiritual traditions describe the same reality in different languages.'}</p>
-  
-  <h3>12.1. ${isPl ? 'Most I: Genezis ↔ Mechanika Kwantowa' : 'Bridge I: Genesis ↔ Quantum Mechanics'}</h3>
-  <div class="bridge-box">
-    <div class="bridge-scripture">
-      <strong>Genesis 1:3</strong><br>
-      "${isPl ? 'I rzekł Bóg: Niech się stanie światłość. I stała się światłość.' : 'And God said, Let there be light: and there was light.'}"
-    </div>
-    <div class="bridge-science">
-      <strong>${isPl ? 'Fizyka Kwantowa' : 'Quantum Physics'}</strong><br>
-      ${isPl 
-        ? 'Obserwacja kolapsuje funkcję falową. Świadomość (obserwator) materializuje rzeczywistość.'
-        : 'Observation collapses the wave function. Consciousness (observer) materializes reality.'}
-    </div>
-  </div>
-  
-  <h3>12.2. ${isPl ? 'Most II: Kabała ↔ Geometria' : 'Bridge II: Kabbalah ↔ Geometry'}</h3>
-  <div class="bridge-box">
-    <div class="bridge-scripture">
-      <strong>${isPl ? 'Drzewo Życia' : 'Tree of Life'}</strong><br>
-      ${isPl ? '10 Sefirot połączonych 22 ścieżkami' : '10 Sefirot connected by 22 paths'}
-    </div>
-    <div class="bridge-science">
-      <strong>${isPl ? 'Geometria Sakralna' : 'Sacred Geometry'}</strong><br>
-      ${isPl 
-        ? 'Proporcje oparte na φ = 1.618... Struktura fraktalna rzeczywistości.'
-        : 'Proportions based on φ = 1.618... Fractal structure of reality.'}
-    </div>
-  </div>
-  
-  <h3>12.3. ${isPl ? 'Most III: Hinduizm ↔ Biologia' : 'Bridge III: Hinduism ↔ Biology'}</h3>
-  <div class="bridge-box">
-    <div class="bridge-scripture">
-      <strong>OM (AUM)</strong><br>
-      ${isPl ? 'Pierwotny dźwięk stworzenia, wibracja wszechświata' : 'Primordial sound of creation, vibration of the universe'}
-    </div>
-    <div class="bridge-science">
-      <strong>${isPl ? 'Biorezonans' : 'Bioresonance'}</strong><br>
-      ${isPl 
-        ? '718 Hz - częstotliwość zakodowana w pierwszej bramie DNA. Ciało jako instrument muzyczny.'
-        : '718 Hz - frequency encoded in the first DNA gate. Body as a musical instrument.'}
-    </div>
-  </div>
-</div>
+${renderUnifiedSection(isPl)}
+
 
 <!-- ============= 13. SEKCJA GATCA ============= -->
 <div class="section">
