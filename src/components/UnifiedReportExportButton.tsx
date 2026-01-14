@@ -31,7 +31,9 @@ export const UnifiedReportExportButton = () => {
   const [email, setEmail] = useState("");
   const [exportLanguage, setExportLanguage] = useState<"pl" | "en">(language as "pl" | "en");
 
-  const handleExport = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
     if (!authorName.trim()) {
       toast({
         title: language === "pl" ? "Wymagane pole" : "Required field",
@@ -43,22 +45,36 @@ export const UnifiedReportExportButton = () => {
       return;
     }
 
-    const options: UnifiedReportOptions = {
-      authorName: authorName.trim(),
-      authorEmail: email.trim() || undefined,
-      language: exportLanguage,
-    };
+    setIsExporting(true);
 
-    exportUnifiedReport(options);
+    try {
+      const options: UnifiedReportOptions = {
+        authorName: authorName.trim(),
+        authorEmail: email.trim() || undefined,
+        language: exportLanguage,
+      };
 
-    toast({
-      title: language === "pl" ? "Raport wygenerowany!" : "Report generated!",
-      description: language === "pl"
-        ? "UNIFIED MATRIX MODEL v.1.0 został pobrany jako HTML."
-        : "UNIFIED MATRIX MODEL v.1.0 has been downloaded as HTML.",
-    });
+      await exportUnifiedReport(options);
 
-    setOpen(false);
+      toast({
+        title: language === "pl" ? "Raport wygenerowany!" : "Report generated!",
+        description: language === "pl"
+          ? "UNIFIED MATRIX MODEL v.1.0 został pobrany jako HTML."
+          : "UNIFIED MATRIX MODEL v.1.0 has been downloaded as HTML.",
+      });
+
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: language === "pl" ? "Błąd" : "Error",
+        description: language === "pl"
+          ? "Nie udało się wygenerować raportu."
+          : "Failed to generate report.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -132,9 +148,11 @@ export const UnifiedReportExportButton = () => {
           <Button variant="outline" onClick={() => setOpen(false)}>
             {language === "pl" ? "Anuluj" : "Cancel"}
           </Button>
-          <Button onClick={handleExport} className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600">
+          <Button onClick={handleExport} disabled={isExporting} className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600">
             <Download className="w-4 h-4" />
-            {language === "pl" ? "Pobierz raport" : "Download report"}
+            {isExporting 
+              ? (language === "pl" ? "Generowanie..." : "Generating...")
+              : (language === "pl" ? "Pobierz raport" : "Download report")}
           </Button>
         </DialogFooter>
 
