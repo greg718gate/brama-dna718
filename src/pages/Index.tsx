@@ -17,6 +17,7 @@ import { PentagramSphere } from "@/components/PentagramSphere";
 import { EquationOfExit } from "@/components/EquationOfExit";
 import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
 import { ProjectExplanation } from "@/components/ProjectExplanation";
+import { EditorialNote } from "@/components/EditorialNote";
 
 // Footer components
 import { Comments } from "@/components/Comments";
@@ -133,6 +134,9 @@ const Index = () => {
             {/* TAB 1: START */}
             <TabsContent value="start" className="space-y-8">
               <StartGuide onNavigate={handleStartGuideNavigate} />
+              
+              {/* Editorial Note */}
+              <EditorialNote />
 
               {/* Silence Counter */}
               <div className="w-full text-center py-6 px-4 bg-black text-primary border-t border-b border-primary/20 rounded-lg">

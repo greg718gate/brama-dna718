@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Atom, Heart, Sparkles, Zap, Brain, Eye } from "lucide-react";
+import { ArrowLeft, Atom, Heart, Sparkles, Zap, Brain, Eye, Info } from "lucide-react";
 
 const CodeBlock = ({ children }: { children: string }) => (
   <pre className="bg-black/80 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto border border-green-500/30 my-4">
@@ -115,6 +115,55 @@ const Unified = () => {
             <p>What if I told you there is no war between science and spirit?</p>
             <p className="text-primary font-medium">What if they are the same song in different languages?</p>
           </div>
+        </section>
+
+        {/* Editorial Note */}
+        <section className="space-y-4">
+          <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/30">
+            <div className="flex items-start gap-3">
+              <Info className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-primary">
+                  NOTA REDAKCYJNA I TECHNICZNA — SCIENCE.GOD/UNIFIED
+                </h3>
+                
+                <p className="text-sm text-muted-foreground">
+                  Projekt SCIENCE.GOD/UNIFIED operuje na dwóch płaszczyznach przekazu:
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="p-4 bg-background/50 rounded-lg border border-cyan-500/30">
+                    <h4 className="font-bold text-cyan-400 mb-2">1. WARSTWA OBLICZENIOWA (FUNDAMENT)</h4>
+                    <p className="text-sm text-foreground/80">
+                      Wszystkie kody w języku Python, równania kwantowe (oparte na funkcji Zeta Riemanna) oraz algorytmy Złotej Proporcji są matematycznie precyzyjne i weryfikowalne. Stanowią one nienaruszalny trzon projektu. Każdy wynik generowany przez kalkulatory na stronie jest bezpośrednim rezultatem tych obliczeń.
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-background/50 rounded-lg border border-amber-500/30">
+                    <h4 className="font-bold text-amber-400 mb-2">2. WARSTWA EDUKACYJNA (INTERPRETACJA)</h4>
+                    <p className="text-sm text-foreground/80">
+                      Opisy działania „Bram", wpływ częstotliwości na organizm oraz terminologia dotycząca „Źródła" i „Świadomości" zostały sformułowane w języku przystępnym. Są to interpretacje semantyczne mające na celu ułatwienie zrozumienia abstrakcyjnych procesów fizycznych.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
+                  <p className="text-sm font-semibold text-yellow-400">
+                    UWAGA: Uproszczenia językowe w warstwie opisowej nie wpływają na integralność matematyczną kodów źródłowych. Prawda projektu zawarta jest w jego liczbach i kodzie – opisy są jedynie mapą, która ma Cię do nich doprowadzić.
+                  </p>
+                </div>
+                
+                <div className="text-center pt-2">
+                  <p className="text-xs text-muted-foreground">
+                    © 2026 Grzegorz — Wszystkie prawa zastrzeżone.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Weryfikacja kodu dostępna na platformie GitHub.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
         </section>
 
         {/* Grammar of Reality */}

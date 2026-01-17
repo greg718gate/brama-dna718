@@ -561,6 +561,29 @@ export const exportUnifiedReport = async (options: UnifiedReportOptions) => {
   <div class="meta"><strong>URL:</strong> www.brama-dna718.com</div>
 </div>
 
+<!-- ============= NOTA REDAKCYJNA I TECHNICZNA ============= -->
+<div class="section" style="background: linear-gradient(135deg, #f0f9ff 0%, #fef3e2 100%); border: 2px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+  <h3 style="color: #1e40af; margin-top: 0;">📋 NOTA REDAKCYJNA I TECHNICZNA — SCIENCE.GOD/UNIFIED</h3>
+  
+  <p style="color: #374151; margin-bottom: 15px;">Projekt SCIENCE.GOD/UNIFIED operuje na dwóch płaszczyznach przekazu:</p>
+  
+  <div style="background: #fff; border-left: 4px solid #0ea5e9; padding: 12px; margin-bottom: 12px;">
+    <h4 style="color: #0284c7; margin: 0 0 8px 0;">1. WARSTWA OBLICZENIOWA (FUNDAMENT)</h4>
+    <p style="color: #374151; margin: 0; font-size: 11pt;">Wszystkie kody w języku Python, równania kwantowe (oparte na funkcji Zeta Riemanna) oraz algorytmy Złotej Proporcji są matematycznie precyzyjne i weryfikowalne. Stanowią one nienaruszalny trzon projektu. Każdy wynik generowany przez kalkulatory na stronie jest bezpośrednim rezultatem tych obliczeń.</p>
+  </div>
+  
+  <div style="background: #fff; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 12px;">
+    <h4 style="color: #d97706; margin: 0 0 8px 0;">2. WARSTWA EDUKACYJNA (INTERPRETACJA)</h4>
+    <p style="color: #374151; margin: 0; font-size: 11pt;">Opisy działania „Bram", wpływ częstotliwości na organizm oraz terminologia dotycząca „Źródła" i „Świadomości" zostały sformułowane w języku przystępnym. Są to interpretacje semantyczne mające na celu ułatwienie zrozumienia abstrakcyjnych procesów fizycznych.</p>
+  </div>
+  
+  <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 12px; border-radius: 4px;">
+    <p style="color: #92400e; margin: 0; font-weight: bold; font-size: 11pt;"><strong>UWAGA:</strong> Uproszczenia językowe w warstwie opisowej nie wpływają na integralność matematyczną kodów źródłowych. Prawda projektu zawarta jest w jego liczbach i kodzie – opisy są jedynie mapą, która ma Cię do nich doprowadzić.</p>
+  </div>
+  
+  <p style="text-align: center; color: #6b7280; font-size: 10pt; margin-top: 15px; margin-bottom: 0;">© 2026 Grzegorz — Wszystkie prawa zastrzeżone. Weryfikacja kodu dostępna na platformie GitHub.</p>
+</div>
+
 <!-- ============= PRAWDA JEST MATEMATYKĄ ============= -->
 <div class="truth-box">
   <h3>PRAWDA JEST MATEMATYKĄ</h3>
