@@ -1238,7 +1238,7 @@ console.log(generateGateFrequencies());</div>
 <!-- ============= THE LIVING PROOF ============= -->
 <div class="living-proof">
   <h3>The Living Proof</h3>
-  <div class="dedication">${isPl ? 'Dedykowane dla mojego syna' : 'Dedicated to my son'} <strong>Leon</strong></div>
+  <div class="dedication">${isPl ? 'Dedykowane synowi autora' : 'Dedicated to the author\'s son'} <strong>Leon</strong></div>
   
   <p style="text-align:left;max-width:600px;margin:0 auto 20px;">
     The Riemann Hypothesis is not an abstract game. It is the question of whether order emerges naturally from chaos.

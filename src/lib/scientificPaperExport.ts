@@ -793,32 +793,25 @@ phi = np.linspace(0, 2*np.pi, 100)
   </div>
 
   <div class="no-print" style="margin-top: 3cm; padding: 1cm; background: #f0f0f0; border: 2px solid #333;">
-    <h3>Sharing Instructions for Scotland-based Researchers</h3>
-    <p><strong>Without arXiv access, consider these alternatives:</strong></p>
-    <ol>
-      <li><strong>Preprints.org:</strong> Free, open-access preprint server - <a href="https://www.preprints.org">www.preprints.org</a></li>
-      <li><strong>ResearchGate:</strong> Upload and share with academic community - <a href="https://www.researchgate.net">www.researchgate.net</a></li>
-      <li><strong>OSF Preprints:</strong> Open Science Framework - <a href="https://osf.io/preprints/">osf.io/preprints</a></li>
-      <li><strong>Zenodo:</strong> CERN-hosted open repository - <a href="https://zenodo.org">zenodo.org</a></li>
-      <li><strong>bioRxiv:</strong> Biology preprints (if applicable) - <a href="https://www.biorxiv.org">www.biorxiv.org</a></li>
-      <li><strong>UK Universities:</strong> Contact physics/biology departments at:
-        <ul>
-          <li>University of Edinburgh</li>
-          <li>University of Glasgow</li>
-          <li>University of St Andrews</li>
-        </ul>
-      </li>
-      <li><strong>Royal Society of Edinburgh:</strong> Scotland's National Academy</li>
-      <li><strong>FigShare:</strong> Store and share research outputs - <a href="https://figshare.com">figshare.com</a></li>
-    </ol>
-    <p><strong>Next Steps:</strong></p>
+    <h3>Rekomendacje dotyczące publikacji</h3>
+    <p><strong>Zalecane platformy preprint:</strong></p>
     <ul>
-      <li>Save this file as HTML</li>
-      <li>Convert to PDF using browser's "Print to PDF" function</li>
-      <li>Register with ORCID (<a href="https://orcid.org">orcid.org</a>) for researcher identity</li>
-      <li>Submit to preprint servers above (most are free and immediate)</li>
-      <li>Share on academic social networks (ResearchGate, Academia.edu)</li>
-      <li>Contact Scottish university departments for peer review opportunities</li>
+      <li><strong>Preprints.org</strong> — Otwarty serwer preprintów</li>
+      <li><strong>ResearchGate</strong> — Sieć akademicka do udostępniania badań</li>
+      <li><strong>OSF Preprints</strong> — Open Science Framework</li>
+      <li><strong>Zenodo</strong> — Repozytorium CERN</li>
+      <li><strong>bioRxiv</strong> — Preprinty biologiczne</li>
+      <li><strong>FigShare</strong> — Przechowywanie wyników badań</li>
+    </ul>
+    <p><strong>Uniwersytety w Szkocji:</strong> University of Edinburgh, University of Glasgow, University of St Andrews</p>
+    <p><strong>Royal Society of Edinburgh</strong> — Narodowa Akademia Szkocji</p>
+    <p style="margin-top: 15px;"><strong>Kolejne kroki:</strong></p>
+    <ul>
+      <li>Zapisanie dokumentu jako HTML</li>
+      <li>Konwersja do PDF przez funkcję „Drukuj do PDF"</li>
+      <li>Rejestracja w ORCID (identyfikator badacza)</li>
+      <li>Przesłanie do serwerów preprint</li>
+      <li>Kontakt z wydziałami fizyki/biologii uniwersytetów</li>
     </ul>
   </div>
 
