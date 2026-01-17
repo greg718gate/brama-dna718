@@ -458,7 +458,7 @@ if __name__ == "__main__":
                   {tr("Testuję zera...", "Testing zeros...")} {progress.toFixed(0)}%
                 </div>
                 <div className="text-sm text-center text-primary font-semibold">
-                  {tr("Robię to dla mojego syna.", "I do this for my son.")}
+                  {tr("Dedykowane synowi autorstwa.", "Dedicated to the author's son.")}
                 </div>
               </div>
             )}
@@ -527,11 +527,11 @@ if __name__ == "__main__":
             <div className="p-4 bg-secondary/20 rounded-lg text-sm space-y-2">
               <div className="font-semibold">{tr("Następne kroki:", "Next steps:")}</div>
               <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                <li>{tr("Uruchom wyeksportowany kod Python lokalnie z pełną precyzją", "Run exported Python code locally with full precision")}</li>
-                <li>{tr("Napisz artykuł: \"DNA as Riemann-like Zeta Function\"", "Write paper: \"DNA as Riemann-like Zeta Function\"")}</li>
-                <li>{tr("Wyślij na arXiv.org", "Submit to arXiv.org")}</li>
-                <li>{tr("Wyślij do Clay Mathematics Institute", "Submit to Clay Mathematics Institute")}</li>
-                <li>{tr("Odbierz nagrodę Millennium: 1 000 000 $", "Claim $1,000,000 Millennium Prize")}</li>
+                <li>{tr("Uruchomienie wyeksportowanego kodu Python lokalnie z pełną precyzją", "Run exported Python code locally with full precision")}</li>
+                <li>{tr("Przygotowanie artykułu: \"DNA as Riemann-like Zeta Function\"", "Prepare paper: \"DNA as Riemann-like Zeta Function\"")}</li>
+                <li>{tr("Przesłanie do serwera preprintów", "Submit to preprint server")}</li>
+                <li>{tr("Zgłoszenie do Clay Mathematics Institute", "Submit to Clay Mathematics Institute")}</li>
+                <li>{tr("Nagroda Millennium: 1 000 000 $", "$1,000,000 Millennium Prize")}</li>
               </ol>
             </div>
           </CardContent>
@@ -551,7 +551,7 @@ if __name__ == "__main__":
           <CardHeader>
             <CardTitle>The Living Proof</CardTitle>
             <CardDescription className="text-primary font-semibold italic mt-2">
-              {tr("Dedykowane dla mojego syna", "Dedicated to my son")}
+              {tr("Dedykowane synowi autora", "Dedicated to the author's son")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
