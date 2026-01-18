@@ -691,26 +691,22 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">1. 718 Hz + DNA</h4>
                   <p className="text-sm">{t('scientificEvidence.study1')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">DOI: 10.1016/j.jcmg.2024.118.005</p>
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">2. {t('scientificEvidence.study2').split(':')[0]}</h4>
                   <p className="text-sm">{t('scientificEvidence.study2')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">NASA Technical Reports: 20230007777</p>
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">3. STR DNA + φ = 1.618</h4>
                   <p className="text-sm mb-2">{t('scientificEvidence.study3')}</p>
                   <p className="text-sm font-semibold text-primary">{t('scientificEvidence.study3note')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Kod Python: gatca_phi.py</p>
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-semibold mb-2">4. Grounding 15 min/dzień</h4>
                   <p className="text-sm">{t('scientificEvidence.study4')}</p>
-                  <p className="text-xs text-muted-foreground mt-1">PubMed: 38724893</p>
                 </div>
               </div>
             </CardContent>
