@@ -1269,7 +1269,7 @@ console.log(generateGateFrequencies());</div>
   <h3>${isPl ? 'Repozytoria i zasoby online' : 'Repositories and online resources'}</h3>
   <ul>
     <li><strong>${isPl ? 'Strona główna projektu' : 'Main project website'}:</strong> www.brama-dna718.com</li>
-    <li><strong>${isPl ? 'Aplikacja interaktywna' : 'Interactive application'}:</strong> https://freq-gate-magic.lovable.app</li>
+    <li><strong>${isPl ? 'Aplikacja interaktywna' : 'Interactive application'}:</strong> https://brama-dna718.com</li>
   </ul>
 </div>
 
