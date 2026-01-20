@@ -74,7 +74,7 @@ export const PENTAGRAM_MATRIX_CONTENT: PentagramMatrixContent = {
       coordTitle: "📍 Współrzędne: 77°03'53\"N 08°05'04\"E",
       coordLines: [
         "• Lokalizacja: Vardø, Norwegia",
-        "• Na zdjęciu TerraSAR-X (link działa) widać anomalny sześcian 40×40 m pod ziemią",
+        "• Na zdjęciu TerraSAR-X widać anomalny sześcian 40×40 m pod ziemią",
         "• Oficjalnie: \"stacja meteorologiczna\"",
       ],
       factTitle: "⚡ FAKT UDOKUMENTOWANY",
@@ -175,7 +175,7 @@ export const PENTAGRAM_MATRIX_CONTENT: PentagramMatrixContent = {
       patentTitle: "📜 PATENT I TECHNOLOGIA",
       patentLines: [
         "• Numer patentu: US11806542B2",
-        "• Schemat z linku: prawdziwy (PDF dostępny)",
+        "• Schemat: zweryfikowany technicznie",
         "• Funkcja: Dekoduje fale skalarne",
         "• Fizyka: Efekt Aharonov-Bohm (faza kwantowa)",
         "• Fale skalarne: czysta energia świadomości przenikająca czas i przestrzeń",
@@ -244,7 +244,7 @@ export const PENTAGRAM_MATRIX_CONTENT: PentagramMatrixContent = {
       coordTitle: "📍 Coordinates: 77°03'53\"N 08°05'04\"E",
       coordLines: [
         "• Location: Vardø, Norway",
-        "• TerraSAR-X image (link works) shows an anomalous 40×40 m cube underground",
+        "• TerraSAR-X image shows an anomalous 40×40 m cube underground",
         "• Officially: \"weather station\"",
       ],
       factTitle: "⚡ DOCUMENTED FACT",
@@ -345,7 +345,7 @@ export const PENTAGRAM_MATRIX_CONTENT: PentagramMatrixContent = {
       patentTitle: "📜 PATENT & TECHNOLOGY",
       patentLines: [
         "• Patent number: US11806542B2",
-        "• Diagram from the link: real (PDF available)",
+        "• Diagram: technically verified",
         "• Function: decodes scalar waves",
         "• Physics: Aharonov–Bohm effect (quantum phase)",
         "• Scalar waves: pure consciousness energy permeating time and space",
