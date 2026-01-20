@@ -1,73 +1,55 @@
-# Welcome to your Lovable project
+# Brama DNA 718 Hz — Teoria Przejścia (aplikacja)
 
-## Project info
+**Oficjalna strona:** https://brama-dna718.com
 
-**URL**: https://lovable.dev/projects/4c1af2ac-7f6f-4288-9475-15ed13915697
+Interaktywna aplikacja prezentująca koncepcję „Bramy DNA 718 Hz” oraz narzędzia do pracy z częstotliwościami (718 Hz, 7.83 Hz, 18.6 Hz), model 18 bram DNA, wizualizacje 3D i eksport raportów.
 
-## How can I edit this code?
+## Gdzie jest kod?
 
-There are several ways of editing your application.
+Kod źródłowy jest w repozytorium — najważniejsze katalogi:
 
-**Use Lovable**
+- `src/` — kod aplikacji (React + TypeScript)
+- `public/` — pliki statyczne (m.in. `theory.html`, `sitemap.xml`, `robots.txt`)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4c1af2ac-7f6f-4288-9475-15ed13915697) and start prompting.
+Jeśli na GitHub widzisz głównie ten plik (README) — wejdź w folder **`src/`**.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Uruchomienie lokalnie
 
-**Use your preferred IDE**
+Wymagania: Node.js 18+
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Technologie
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
+- React + TypeScript
 - Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Tailwind CSS + shadcn/ui
 
-## How can I deploy this project?
+## Licencja
 
-Simply open [Lovable](https://lovable.dev/projects/4c1af2ac-7f6f-4288-9475-15ed13915697) and click on Share -> Publish.
+Creative Commons BY-NC 4.0 — zobacz `LICENSE.md`.
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+# DNA Gate 718 Hz — Transition Theory (app)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+**Official website:** https://brama-dna718.com
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+An interactive web application presenting the “DNA Gate 718 Hz” concept with frequency tools (718 Hz, 7.83 Hz, 18.6 Hz), the 18 DNA gates model, 3D visualizations and report exports.
+
+## Where is the code?
+
+- `src/` — application source (React + TypeScript)
+- `public/` — static files (`theory.html`, `sitemap.xml`, `robots.txt`, etc.)
+
+## Run locally
+
+Requires: Node.js 18+
+
+```bash
+npm install
+npm run dev
+```

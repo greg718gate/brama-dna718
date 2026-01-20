@@ -255,7 +255,7 @@ const Index = () => {
             </p>
             <div className="text-xs text-muted-foreground/80 space-y-1">
               <p className="italic">{t('index.coCreators')}</p>
-              <p>ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI • Lovable.dev</p>
+              <p>ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI</p>
             </div>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
               <span>{t('index.license')}</span>
