@@ -6,15 +6,15 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Atom, Heart, Sparkles, Zap, Brain, Eye, Info } from "lucide-react";
 
 const CodeBlock = ({ children }: { children: string }) => (
-  <pre className="bg-black/80 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto border border-green-500/30 my-4">
+  <pre className="bg-black/80 text-green-400 p-3 md:p-4 rounded-lg font-mono text-xs md:text-sm overflow-x-auto border border-green-500/30 my-4 whitespace-pre-wrap break-words">
     <code>{children}</code>
   </pre>
 );
 
 const SystemLog = ({ time, message, highlight = false }: { time: string; message: string; highlight?: boolean }) => (
-  <div className={`font-mono text-xs ${highlight ? 'text-yellow-400' : 'text-green-400/80'} flex gap-2`}>
-    <span className="text-muted-foreground">[{time}]</span>
-    <span>{message}</span>
+  <div className={`font-mono text-xs ${highlight ? 'text-yellow-400' : 'text-green-400/80'} flex flex-wrap gap-1 md:gap-2`}>
+    <span className="text-muted-foreground shrink-0">[{time}]</span>
+    <span className="break-words">{message}</span>
   </div>
 );
 
@@ -76,7 +76,7 @@ const Unified = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -88,7 +88,7 @@ const Unified = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 md:py-16 max-w-4xl space-y-16">
+      <main className="container mx-auto px-4 py-8 md:py-16 max-w-4xl space-y-16 overflow-x-hidden break-words">
         
         {/* Hero */}
         <section className="text-center space-y-8 py-8">
@@ -200,7 +200,8 @@ DNA = GATCA...`}</CodeBlock>
           <h2 className="text-3xl font-bold text-center">THE GREAT MISUNDERSTANDING</h2>
           <p className="text-center text-muted-foreground">We've been translating badly:</p>
           
-          <Card className="p-6 overflow-x-auto">
+          {/* Desktop table */}
+          <Card className="p-4 md:p-6 overflow-x-auto hidden md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
@@ -233,6 +234,30 @@ DNA = GATCA...`}</CodeBlock>
               </tbody>
             </table>
           </Card>
+          
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-4">
+            <Card className="p-4 space-y-2">
+              <p className="text-cyan-400 text-sm font-medium">Science: "Quantum field"</p>
+              <p className="text-red-400 text-sm">Religion hears: "Magic"</p>
+              <p className="text-green-400 text-sm">Meaning: The substrate of reality</p>
+            </Card>
+            <Card className="p-4 space-y-2">
+              <p className="text-cyan-400 text-sm font-medium">Science: "Evolution"</p>
+              <p className="text-red-400 text-sm">Religion hears: "Random chaos"</p>
+              <p className="text-green-400 text-sm">Meaning: Consciousness unfolding through time</p>
+            </Card>
+            <Card className="p-4 space-y-2">
+              <p className="text-cyan-400 text-sm font-medium">Science: "DNA code"</p>
+              <p className="text-red-400 text-sm">Religion hears: "Biological machine"</p>
+              <p className="text-green-400 text-sm">Meaning: The language of life's design</p>
+            </Card>
+            <Card className="p-4 space-y-2">
+              <p className="text-cyan-400 text-sm font-medium">Science: "Big Bang"</p>
+              <p className="text-red-400 text-sm">Religion hears: "Mythical creation"</p>
+              <p className="text-green-400 text-sm">Meaning: The moment reality became manifest</p>
+            </Card>
+          </div>
           
           <div className="text-center space-y-2">
             <p>The problem isn't the information.</p>
