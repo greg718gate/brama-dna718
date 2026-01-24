@@ -192,7 +192,7 @@ const Legend = ({ language }: { language: string }) => {
   ];
 
   return (
-    <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3 text-xs space-y-1.5">
+    <div className="absolute bottom-4 left-4 md:top-4 md:bottom-auto bg-card/90 backdrop-blur-sm border border-border rounded-lg p-2 md:p-3 text-[10px] md:text-xs space-y-1 md:space-y-1.5 z-10 max-w-[180px] md:max-w-none">
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-2">
           <div 
