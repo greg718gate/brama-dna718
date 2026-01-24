@@ -62,9 +62,9 @@ const Axes = ({ language }: { language: string }) => {
         {t.sun}
       </Text>
 
-      {/* β - Ziemia (zielona) */}
-      <arrowHelper args={[new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 1.5, 0x44ff44, 0.12, 0.08]} />
-      <Text position={[0, 1.7, 0]} fontSize={0.12} color="#44ff44" anchorX="center">
+      {/* β - Ziemia (cyjan - odróżnienie od rezonansu) */}
+      <arrowHelper args={[new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 1.5, 0x00CED1, 0.12, 0.08]} />
+      <Text position={[0, 1.7, 0]} fontSize={0.12} color="#00CED1" anchorX="center">
         {t.earth}
       </Text>
 
@@ -181,27 +181,43 @@ const VectorM = () => {
 };
 
 const Legend = ({ language }: { language: string }) => {
-  const items = [
+  const axisItems = [
     { color: "#ff4444", label: language === "pl" ? "α (Słońce)" : "α (Sun)" },
-    { color: "#44ff44", label: language === "pl" ? "β (Ziemia)" : "β (Earth)" },
+    { color: "#00CED1", label: language === "pl" ? "β (Ziemia)" : "β (Earth)" },
     { color: "#4488ff", label: language === "pl" ? "γ (Człowiek)" : "γ (Human)" },
-    { color: "#ffd700", label: `M (φ⁻¹ = ${gamma.toFixed(4)})` },
-    { color: "#32CD32", label: language === "pl" ? "Ziemia 7.83 Hz" : "Earth 7.83 Hz" },
-    { color: "#9932CC", label: language === "pl" ? "Modulacja 18.6 Hz" : "Modulation 18.6 Hz" },
-    { color: "#FFA500", label: language === "pl" ? "Brama DNA 718 Hz" : "DNA Gate 718 Hz" },
+    { color: "#ffd700", label: `M (φ⁻¹)` },
+  ];
+
+  const resonanceItems = [
+    { color: "#32CD32", label: "7.83 Hz" },
+    { color: "#9932CC", label: "18.6 Hz" },
+    { color: "#FFA500", label: "718 Hz" },
   ];
 
   return (
-    <div className="absolute bottom-4 left-4 md:top-4 md:bottom-auto bg-card/90 backdrop-blur-sm border border-border rounded-lg p-2 md:p-3 text-[10px] md:text-xs space-y-1 md:space-y-1.5 z-10 max-w-[180px] md:max-w-none">
-      {items.map((item, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded-full border border-border" 
-            style={{ backgroundColor: item.color }}
-          />
-          <span className="text-foreground">{item.label}</span>
-        </div>
-      ))}
+    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[10px] md:text-xs">
+      <div className="flex flex-wrap gap-x-3 gap-y-1">
+        {axisItems.map((item, i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <div 
+              className="w-2.5 h-2.5 rounded-full" 
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-muted-foreground">{item.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-1">
+        {resonanceItems.map((item, i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <div 
+              className="w-2.5 h-2.5 rounded-full" 
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-muted-foreground">{item.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -210,24 +226,22 @@ export const PentagramSphere = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="w-full h-[650px] bg-gradient-to-b from-background to-card rounded-lg border border-border overflow-hidden relative">
-      <div className="p-6 border-b border-border bg-card/50">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+    <div className="w-full h-[600px] md:h-[650px] bg-gradient-to-b from-background to-card rounded-lg border border-border overflow-hidden">
+      <div className="p-4 md:p-6 border-b border-border bg-card/50">
+        <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
           {t('pentagramSphere.title')}
         </h2>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-sm text-muted-foreground mt-1">
           {t('pentagramSphere.description')}
         </p>
-        <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-          <span>φ = {phi.toFixed(6)}</span>
-          <span>γ = φ⁻¹ = {gamma.toFixed(6)}</span>
-          <span>α = β = {alpha.toFixed(6)}</span>
+        <div className="flex flex-wrap gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
+          <span>φ = {phi.toFixed(4)}</span>
+          <span>γ = {gamma.toFixed(4)}</span>
         </div>
+        <Legend language={language} />
       </div>
       
-      <Legend language={language} />
-      
-      <div className="h-[calc(100%-130px)]">
+      <div className="h-[calc(100%-160px)] md:h-[calc(100%-150px)]">
         <Canvas camera={{ position: [3.5, 2, 2], fov: 45 }}>
           <color attach="background" args={['#0a0a0a']} />
           <ambientLight intensity={0.4} />
