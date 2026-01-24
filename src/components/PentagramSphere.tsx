@@ -78,11 +78,23 @@ const Axes = ({ language }: { language: string }) => {
 };
 
 const ResonanceVectors = ({ language }: { language: string }) => {
+  // Offsety dla etykiet, żeby nie nakładały się na osie
+  const labelOffsets = [
+    { x: 0.25, y: 0, z: 0.1 },   // Ziemia 7.83 Hz - przesunięta w prawo
+    { x: 0.15, y: 0.1, z: 0 },   // Modulacja 18.6 Hz - przesunięta w górę
+    { x: 0, y: 0.15, z: 0 },     // Brama DNA - lekko w górę
+  ];
+
   return (
     <>
       {resonances.map((res, index) => {
         const normalizedVec = res.vec.clone().normalize().multiplyScalar(1.4);
-        const labelPos = res.vec.clone().normalize().multiplyScalar(1.6);
+        const offset = labelOffsets[index];
+        const labelPos = new THREE.Vector3(
+          normalizedVec.x * 1.15 + offset.x,
+          normalizedVec.y * 1.15 + offset.y,
+          normalizedVec.z * 1.15 + offset.z
+        );
         const name = language === "pl" ? res.name : res.nameEn;
         
         return (
@@ -97,10 +109,10 @@ const ResonanceVectors = ({ language }: { language: string }) => {
               <meshStandardMaterial color={res.color} emissive={res.color} emissiveIntensity={0.3} />
             </mesh>
             <Text 
-              position={[labelPos.x, labelPos.y + 0.1, labelPos.z]} 
+              position={[labelPos.x, labelPos.y, labelPos.z]} 
               fontSize={0.09} 
               color={res.color}
-              anchorX="center"
+              anchorX="left"
             >
               {name}
             </Text>
