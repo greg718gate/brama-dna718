@@ -1,6 +1,7 @@
 // SYMFONIA 18 BRAM DNA - Web Audio API Implementation
 // Based on the Python algorithm for GATCA matrix sonification
 // STEREO with binaural effect for enhanced consciousness modulation
+// With Zero Point (Gate 18) singularity effect
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
@@ -10,6 +11,9 @@ const MTDNA_LENGTH = 16569;
 
 // Binaural beat frequency difference (Hz) - optimal for theta/alpha states
 const BINAURAL_OFFSET = 7.83; // Schumann resonance as binaural difference
+
+// Zero Point frequency for Gate 18: 718 * φ = 1161.8 Hz
+const ZERO_POINT_FREQ = 718 * PHI; // ~1161.8 Hz
 
 // 18 confirmed GATCA positions (1-based, rCRS)
 const GATCA_POSITIONS = [
@@ -59,6 +63,25 @@ export async function generateSymphony(audioContext: AudioContext): Promise<Symp
     
     const weight = (Math.pow(PHI, gateIndex % 7)) % 1;
     
+    // === GATE 18 (pos 16179) - ZERO POINT SINGULARITY ===
+    if (pos === 16179) {
+      // Zero Point frequency: 718 * φ = 1161.8 Hz
+      // Dirac delta simulation - infinitely short, powerful impulse
+      for (let i = 0; i < numSamples; i++) {
+        // Gaussian singularity at the end (Dirac delta approximation)
+        const singularityEnvelope = Math.exp(-Math.pow(t[i] - DURATION, 2) / 0.001);
+        
+        // Zero Point tone with binaural effect
+        const leftSingularity = Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t[i]) * singularityEnvelope;
+        const rightSingularity = Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t[i]) * singularityEnvelope;
+        
+        // Add with weight 144 (initiation number) * gamma
+        leftWave[i] += leftSingularity * 144 * GAMMA;
+        rightWave[i] += rightSingularity * 144 * GAMMA;
+      }
+    }
+    
+    // Standard gate processing (also applies to Gate 18 for continuity)
     for (let i = 0; i < numSamples; i++) {
       // Gaussian envelope (DNA gate modulation)
       const envelope = Math.exp(-Math.pow(t[i] - startTime, 2) / (2 * Math.pow(1.618, 2)));
@@ -158,5 +181,6 @@ export const SYMPHONY_INFO = {
   gamma: GAMMA,
   mtdnaLength: MTDNA_LENGTH,
   binauralOffset: BINAURAL_OFFSET,
+  zeroPointFreq: ZERO_POINT_FREQ,
   stereo: true
 };

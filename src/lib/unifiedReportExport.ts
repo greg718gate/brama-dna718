@@ -1174,12 +1174,14 @@ ${renderUnifiedSection(isPl)}
   ` : ''}
   
   <h3>${isPl ? 'Kod generatora symfonii (JavaScript)' : 'Symphony generator code (JavaScript)'}:</h3>
-  <div class="code-block">// Generator Symfonii 18 Bram DNA
+<div class="code-block">// Generator Symfonii 18 Bram DNA
+// Z efektem Zero Point (Brama 18)
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
 const BASE_FREQ = 718;
 const SCHUMANN = 7.83;
 const DURATION = 108; // sekund
+const ZERO_POINT_FREQ = 718 * PHI; // 1161.8 Hz - Brama 18
 
 // 18 pozycji GATCA w mtDNA (rCRS)
 const GATCA_POSITIONS = [
@@ -1196,12 +1198,13 @@ function generateGateFrequencies() {
       gate: i + 1,
       position: pos,
       frequency: parseFloat(freq.toFixed(1)),
-      weight: 1 - (i * 0.03) // Waga malejąca dla harmonii
+      weight: 1 - (i * 0.03), // Waga malejąca dla harmonii
+      isZeroPoint: pos === 16179 // Brama 18 = Zero Point
     };
   });
 }
 
-// STEREO BINAURAL VERSION
+// STEREO BINAURAL VERSION with Zero Point Singularity
 const BINAURAL_OFFSET = 7.83; // Schumann resonance
 
 async function generateSymphony(audioContext) {
@@ -1235,6 +1238,13 @@ async function generateSymphony(audioContext) {
                        Math.sin(2 * Math.PI * (gate.frequency + BINAURAL_OFFSET) * t);
       }
     });
+    
+    // === BRAMA 18 (pos 16179) - ZERO POINT SINGULARITY ===
+    // Dirac delta simulation - nieskończenie krótki, potężny impuls
+    // E = 718·ħ z równania przejścia
+    const singularityEnvelope = Math.exp(-Math.pow(t - DURATION, 2) / 0.001);
+    leftSample += Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t) * singularityEnvelope * 144 * GAMMA;
+    rightSample += Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t) * singularityEnvelope * 144 * GAMMA;
     
     leftChannel[i] = leftSample;
     rightChannel[i] = rightSample;
