@@ -121,7 +121,12 @@ export const EquationOfExit = () => {
     animationRef.current = requestAnimationFrame(visualizeConsciousnessField);
   };
 
-  // Odtwarzanie częstotliwości 718 Hz
+  // Binaural offset for consciousness modulation
+  const BINAURAL_OFFSET = 7.83;
+  const leftOscRef = useRef<OscillatorNode | null>(null);
+  const rightOscRef = useRef<OscillatorNode | null>(null);
+
+  // Odtwarzanie częstotliwości 718 Hz ze stereo binauralnym
   const playExitFrequency = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new AudioContext();
@@ -129,21 +134,37 @@ export const EquationOfExit = () => {
 
     const audioContext = audioContextRef.current;
     
-    // Oscylator główny: 718 Hz
-    const oscillator = audioContext.createOscillator();
-    oscillator.frequency.value = 718;
-    oscillator.type = "sine";
-    
-    // Modulacja amplitudy złotym podziałem
+    // Create stereo merger for binaural effect
+    const merger = audioContext.createChannelMerger(2);
     const gainNode = audioContext.createGain();
     gainNode.gain.value = 0.3 * γ;
-    
-    oscillator.connect(gainNode);
+    merger.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    oscillator.start();
+    // Left channel: 718 Hz
+    const leftOsc = audioContext.createOscillator();
+    leftOsc.frequency.value = 718;
+    leftOsc.type = "sine";
+    const leftGain = audioContext.createGain();
+    leftGain.gain.value = 0.5;
+    leftOsc.connect(leftGain);
+    leftGain.connect(merger, 0, 0);
     
-    oscillatorRef.current = oscillator;
+    // Right channel: 718 Hz + binaural offset (7.83 Hz)
+    const rightOsc = audioContext.createOscillator();
+    rightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    rightOsc.type = "sine";
+    const rightGain = audioContext.createGain();
+    rightGain.gain.value = 0.5;
+    rightOsc.connect(rightGain);
+    rightGain.connect(merger, 0, 1);
+    
+    leftOsc.start();
+    rightOsc.start();
+    
+    leftOscRef.current = leftOsc;
+    rightOscRef.current = rightOsc;
+    oscillatorRef.current = leftOsc;
     gainNodeRef.current = gainNode;
     setIsPlaying(true);
     
@@ -152,8 +173,15 @@ export const EquationOfExit = () => {
   };
 
   const stopExitFrequency = () => {
+    if (leftOscRef.current) {
+      leftOscRef.current.stop();
+      leftOscRef.current = null;
+    }
+    if (rightOscRef.current) {
+      rightOscRef.current.stop();
+      rightOscRef.current = null;
+    }
     if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
       oscillatorRef.current = null;
     }
     setIsPlaying(false);

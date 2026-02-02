@@ -24,6 +24,11 @@ export const ToneGenerator = ({
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
 
+  // Binaural offset - Schumann resonance for theta/alpha states
+  const BINAURAL_OFFSET = 7.83;
+  const leftOscillatorRef = useRef<OscillatorNode | null>(null);
+  const rightOscillatorRef = useRef<OscillatorNode | null>(null);
+
   const startTone = useCallback(() => {
     if (audioContextRef.current) return;
 
@@ -31,20 +36,38 @@ export const ToneGenerator = ({
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
 
-      const oscillator = audioContext.createOscillator();
+      // Create stereo panner for binaural effect
+      const merger = audioContext.createChannelMerger(2);
       const gainNode = audioContext.createGain();
-
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
       
       gainNode.gain.setValueAtTime(isMuted ? 0 : volume, audioContext.currentTime);
-
-      oscillator.connect(gainNode);
+      merger.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.start();
+      // Left oscillator - base frequency
+      const leftOsc = audioContext.createOscillator();
+      leftOsc.type = "sine";
+      leftOsc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      const leftGain = audioContext.createGain();
+      leftGain.gain.value = 0.5;
+      leftOsc.connect(leftGain);
+      leftGain.connect(merger, 0, 0); // Left channel
+
+      // Right oscillator - base frequency + binaural offset
+      const rightOsc = audioContext.createOscillator();
+      rightOsc.type = "sine";
+      rightOsc.frequency.setValueAtTime(frequency + BINAURAL_OFFSET, audioContext.currentTime);
+      const rightGain = audioContext.createGain();
+      rightGain.gain.value = 0.5;
+      rightOsc.connect(rightGain);
+      rightGain.connect(merger, 0, 1); // Right channel
+
+      leftOsc.start();
+      rightOsc.start();
       
-      oscillatorRef.current = oscillator;
+      leftOscillatorRef.current = leftOsc;
+      rightOscillatorRef.current = rightOsc;
+      oscillatorRef.current = leftOsc; // Keep for compatibility
       gainNodeRef.current = gainNode;
     } catch (error) {
       console.error("Error starting tone:", error);
@@ -52,9 +75,17 @@ export const ToneGenerator = ({
   }, [frequency, volume, isMuted]);
 
   const stopTone = useCallback(() => {
+    if (leftOscillatorRef.current) {
+      leftOscillatorRef.current.stop();
+      leftOscillatorRef.current.disconnect();
+      leftOscillatorRef.current = null;
+    }
+    if (rightOscillatorRef.current) {
+      rightOscillatorRef.current.stop();
+      rightOscillatorRef.current.disconnect();
+      rightOscillatorRef.current = null;
+    }
     if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
-      oscillatorRef.current.disconnect();
       oscillatorRef.current = null;
     }
     if (gainNodeRef.current) {

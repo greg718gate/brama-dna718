@@ -1201,32 +1201,43 @@ function generateGateFrequencies() {
   });
 }
 
+// STEREO BINAURAL VERSION
+const BINAURAL_OFFSET = 7.83; // Schumann resonance
+
 async function generateSymphony(audioContext) {
   const sampleRate = audioContext.sampleRate;
   const samples = sampleRate * DURATION;
-  const buffer = audioContext.createBuffer(1, samples, sampleRate);
-  const data = buffer.getChannelData(0);
+  // STEREO: 2 channels
+  const buffer = audioContext.createBuffer(2, samples, sampleRate);
+  const leftChannel = buffer.getChannelData(0);
+  const rightChannel = buffer.getChannelData(1);
   
   const gates = generateGateFrequencies();
   
   for (let i = 0; i < samples; i++) {
     const t = i / sampleRate;
-    let sample = 0;
+    let leftSample = 0;
+    let rightSample = 0;
     
-    // Bazowa częstotliwość Ziemi (Schumann)
-    sample += 0.2 * Math.sin(2 * Math.PI * SCHUMANN * t);
+    // Bazowa częstotliwość Ziemi (Schumann) - stereo z przesunięciem fazy
+    leftSample += 0.2 * Math.sin(2 * Math.PI * SCHUMANN * t);
+    rightSample += 0.2 * Math.sin(2 * Math.PI * SCHUMANN * t + Math.PI / 4);
     
-    // Dodaj każdą bramę z jej częstotliwością
+    // Dodaj każdą bramę z efektem binauralnym
     gates.forEach((gate, idx) => {
       const startTime = (idx / 18) * DURATION * 0.5;
       if (t >= startTime) {
         const fadeIn = Math.min(1, (t - startTime) / 2);
-        sample += fadeIn * gate.weight * 0.1 * 
-                  Math.sin(2 * Math.PI * gate.frequency * t);
+        // Left: base frequency, Right: base + binaural offset
+        leftSample += fadeIn * gate.weight * 0.1 * 
+                      Math.sin(2 * Math.PI * gate.frequency * t);
+        rightSample += fadeIn * gate.weight * 0.1 * 
+                       Math.sin(2 * Math.PI * (gate.frequency + BINAURAL_OFFSET) * t);
       }
     });
     
-    data[i] = sample;
+    leftChannel[i] = leftSample;
+    rightChannel[i] = rightSample;
   }
   
   return buffer;
