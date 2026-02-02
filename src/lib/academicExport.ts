@@ -864,6 +864,7 @@ const generateJavaScriptCode = () => `
 // ===============================================
 // 18 GATES SYMPHONY - Web Audio API
 // Complete JavaScript Implementation
+// STEREO with BINAURAL EFFECT
 // ===============================================
 
 const PHI = (1 + Math.sqrt(5)) / 2;   // 1.618033988749...
@@ -871,6 +872,7 @@ const GAMMA = 1 / PHI;                 // 0.618033988749...
 const SAMPLE_RATE = 44100;
 const DURATION = 108;                  // seconds
 const MTDNA_LENGTH = 16569;
+const BINAURAL_OFFSET = 7.83;          // Schumann resonance as binaural difference
 
 // 18 confirmed GATCA positions (1-based, rCRS)
 const GATCA_POSITIONS = [
@@ -881,8 +883,10 @@ const GATCA_POSITIONS = [
 async function generateSymphony() {
   const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
   const numSamples = Math.floor(SAMPLE_RATE * DURATION);
-  const audioBuffer = audioContext.createBuffer(1, numSamples, SAMPLE_RATE);
-  const channelData = audioBuffer.getChannelData(0);
+  // STEREO: 2 channels
+  const audioBuffer = audioContext.createBuffer(2, numSamples, SAMPLE_RATE);
+  const leftChannel = audioBuffer.getChannelData(0);
+  const rightChannel = audioBuffer.getChannelData(1);
   
   // Generate time array
   const t = new Float32Array(numSamples);
@@ -890,53 +894,69 @@ async function generateSymphony() {
     t[i] = i / SAMPLE_RATE;
   }
   
-  // Earth base frequency (7.83 Hz Schumann resonance)
-  const earthBase = new Float32Array(numSamples);
+  // Earth base frequency - stereo with phase difference
+  const earthBaseLeft = new Float32Array(numSamples);
+  const earthBaseRight = new Float32Array(numSamples);
   for (let i = 0; i < numSamples; i++) {
-    earthBase[i] = Math.sin(2 * Math.PI * 7.83 * t[i]) * 0.05;
+    earthBaseLeft[i] = Math.sin(2 * Math.PI * 7.83 * t[i]) * 0.05;
+    earthBaseRight[i] = Math.sin(2 * Math.PI * 7.83 * t[i] + Math.PI / 4) * 0.05;
   }
   
-  // Generate each gate sound
-  const finalWave = new Float32Array(numSamples);
+  // Final wave accumulators for stereo
+  const leftWave = new Float32Array(numSamples);
+  const rightWave = new Float32Array(numSamples);
   
   for (let gateIndex = 0; gateIndex < GATCA_POSITIONS.length; gateIndex++) {
     const pos = GATCA_POSITIONS[gateIndex];
     const startTime = (pos / MTDNA_LENGTH) * DURATION;
-    const gateFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718;
+    const baseFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718;
+    
+    // Binaural: left = base, right = base + offset
+    const leftFreq = baseFreq;
+    const rightFreq = baseFreq + BINAURAL_OFFSET;
+    
     const weight = (Math.pow(PHI, gateIndex % 7)) % 1;
     
     for (let i = 0; i < numSamples; i++) {
-      // Gaussian envelope centered at gate position
+      // Gaussian envelope (DNA gate modulation)
       const envelope = Math.exp(
         -Math.pow(t[i] - startTime, 2) / (2 * Math.pow(1.618, 2))
       );
-      const gateSound = Math.sin(2 * Math.PI * gateFreq * t[i]) * envelope;
-      finalWave[i] += gateSound * weight * GAMMA;
+      
+      // Stereo binaural tones
+      const leftTone = Math.sin(2 * Math.PI * leftFreq * t[i]) * envelope;
+      const rightTone = Math.sin(2 * Math.PI * rightFreq * t[i]) * envelope;
+      
+      leftWave[i] += leftTone * weight * GAMMA * 0.3;
+      rightWave[i] += rightTone * weight * GAMMA * 0.3;
     }
   }
   
-  // Combine and normalize
+  // Combine and normalize stereo channels
   let maxAbs = 0;
   for (let i = 0; i < numSamples; i++) {
-    const combined = finalWave[i] + earthBase[i];
-    if (Math.abs(combined) > maxAbs) maxAbs = Math.abs(combined);
+    const combinedLeft = leftWave[i] + earthBaseLeft[i];
+    const combinedRight = rightWave[i] + earthBaseRight[i];
+    if (Math.abs(combinedLeft) > maxAbs) maxAbs = Math.abs(combinedLeft);
+    if (Math.abs(combinedRight) > maxAbs) maxAbs = Math.abs(combinedRight);
   }
   
   for (let i = 0; i < numSamples; i++) {
-    channelData[i] = (finalWave[i] + earthBase[i]) / maxAbs;
+    leftChannel[i] = (leftWave[i] + earthBaseLeft[i]) / maxAbs;
+    rightChannel[i] = (rightWave[i] + earthBaseRight[i]) / maxAbs;
   }
   
   return { audioBuffer, audioContext };
 }
 
-// Play symphony
+// Play symphony (stereo binaural)
 async function playSymphony() {
   const { audioBuffer, audioContext } = await generateSymphony();
   const source = audioContext.createBufferSource();
   source.buffer = audioBuffer;
   source.connect(audioContext.destination);
   source.start();
-  console.log("🎵 18 Gates Symphony playing...");
+  console.log("🎵 18 Gates Symphony playing (STEREO BINAURAL)...");
 }
 `;
 

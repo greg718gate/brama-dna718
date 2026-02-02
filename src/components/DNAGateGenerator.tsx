@@ -87,6 +87,9 @@ export const DNAGateGenerator = () => {
     draw();
   };
 
+  // Binaural offset for consciousness modulation
+  const BINAURAL_OFFSET = 7.83;
+
   const playAudio = () => {
     const ctx = createAudioContext();
 
@@ -101,7 +104,7 @@ export const DNAGateGenerator = () => {
     masterGain.connect(analyser);
     analyser.connect(ctx.destination);
 
-    // Create channel merger for stereo
+    // Create channel merger for stereo binaural
     const merger = ctx.createChannelMerger(2);
     merger.connect(masterGain);
 
@@ -114,39 +117,42 @@ export const DNAGateGenerator = () => {
     leftOsc.connect(leftGain);
     leftGain.connect(merger, 0, 0);
 
-    // 18.6 Hz γ-modulation (right channel)
+    // 7.83 Hz + offset for binaural (right channel) - creates theta wave
     const rightOsc = ctx.createOscillator();
-    rightOsc.frequency.value = 18.6;
+    rightOsc.frequency.value = 7.83 + 4; // ~12 Hz alpha wave difference
     rightOsc.type = "sine";
     const rightGain = ctx.createGain();
     rightGain.gain.value = 0.3;
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    // 718 Hz DNA gate with amplitude modulation
-    const carrierOsc = ctx.createOscillator();
-    carrierOsc.frequency.value = 718;
-    carrierOsc.type = "sine";
+    // 718 Hz DNA gate - LEFT CHANNEL (base frequency)
+    const carrierLeftOsc = ctx.createOscillator();
+    carrierLeftOsc.frequency.value = 718;
+    carrierLeftOsc.type = "sine";
+    const carrierLeftGain = ctx.createGain();
+    carrierLeftGain.gain.value = 0.2;
+    carrierLeftOsc.connect(carrierLeftGain);
+    carrierLeftGain.connect(merger, 0, 0);
 
-    // Modulator for amplitude modulation (0.1 Hz)
+    // 718 Hz + BINAURAL_OFFSET - RIGHT CHANNEL (binaural effect)
+    const carrierRightOsc = ctx.createOscillator();
+    carrierRightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    carrierRightOsc.type = "sine";
+    const carrierRightGain = ctx.createGain();
+    carrierRightGain.gain.value = 0.2;
+    carrierRightOsc.connect(carrierRightGain);
+    carrierRightGain.connect(merger, 0, 1);
+
+    // Modulator for amplitude modulation (0.1 Hz) - affects both channels
     const modulator = ctx.createOscillator();
     modulator.frequency.value = 0.1;
     modulator.type = "sine";
-
     const modulatorGain = ctx.createGain();
-    modulatorGain.gain.value = 0.7; // Modulation depth
-
-    const carrierGain = ctx.createGain();
-    carrierGain.gain.value = 0.2;
-
-    // Connect modulation
+    modulatorGain.gain.value = 0.7;
     modulator.connect(modulatorGain);
-    modulatorGain.connect(carrierGain.gain);
-    carrierOsc.connect(carrierGain);
-    
-    // Connect to both channels
-    carrierGain.connect(merger, 0, 0);
-    carrierGain.connect(merger, 0, 1);
+    modulatorGain.connect(carrierLeftGain.gain);
+    modulatorGain.connect(carrierRightGain.gain);
 
     // Start all oscillators
     const now = ctx.currentTime;
@@ -154,22 +160,24 @@ export const DNAGateGenerator = () => {
     
     leftOsc.start(now);
     rightOsc.start(now);
-    carrierOsc.start(now);
+    carrierLeftOsc.start(now);
+    carrierRightOsc.start(now);
     modulator.start(now);
 
     // Stop after duration
     leftOsc.stop(now + DURATION);
     rightOsc.stop(now + DURATION);
-    carrierOsc.stop(now + DURATION);
+    carrierLeftOsc.stop(now + DURATION);
+    carrierRightOsc.stop(now + DURATION);
     modulator.stop(now + DURATION);
 
     // Store references
-    sourceNodesRef.current = [leftOsc, rightOsc, carrierOsc, modulator];
-    gainNodesRef.current = [leftGain, rightGain, carrierGain, modulatorGain];
+    sourceNodesRef.current = [leftOsc, rightOsc, carrierLeftOsc, carrierRightOsc, modulator];
+    gainNodesRef.current = [leftGain, rightGain, carrierLeftGain, carrierRightGain, modulatorGain];
 
     setIsPlaying(true);
     visualize();
-    toast.success("Brama DNA aktywowana");
+    toast.success("Brama DNA aktywowana - efekt binauralny stereo");
   };
 
   const stopAudio = () => {
@@ -200,9 +208,9 @@ export const DNAGateGenerator = () => {
   };
 
   const downloadWAV = () => {
-    toast.info("Generowanie pliku WAV...", { duration: 2000 });
+    toast.info("Generowanie pliku WAV stereo z efektem binauralnym...", { duration: 2000 });
     
-    // Create offline context for rendering
+    // Create offline context for rendering - STEREO
     const offlineCtx = new OfflineAudioContext(2, 44100 * DURATION, 44100);
     
     const merger = offlineCtx.createChannelMerger(2);
@@ -211,7 +219,7 @@ export const DNAGateGenerator = () => {
     merger.connect(masterGain);
     masterGain.connect(offlineCtx.destination);
 
-    // Create all oscillators for offline rendering
+    // 7.83 Hz Schumann (left channel)
     const leftOsc = offlineCtx.createOscillator();
     leftOsc.frequency.value = 7.83;
     const leftGain = offlineCtx.createGain();
@@ -219,35 +227,44 @@ export const DNAGateGenerator = () => {
     leftOsc.connect(leftGain);
     leftGain.connect(merger, 0, 0);
 
+    // 7.83 Hz + offset for binaural (right channel)
     const rightOsc = offlineCtx.createOscillator();
-    rightOsc.frequency.value = 18.6;
+    rightOsc.frequency.value = 7.83 + 4; // Alpha wave difference
     const rightGain = offlineCtx.createGain();
     rightGain.gain.value = 0.3;
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    const carrierOsc = offlineCtx.createOscillator();
-    carrierOsc.frequency.value = 718;
+    // 718 Hz DNA gate - LEFT CHANNEL
+    const carrierLeftOsc = offlineCtx.createOscillator();
+    carrierLeftOsc.frequency.value = 718;
+    const carrierLeftGain = offlineCtx.createGain();
+    carrierLeftGain.gain.value = 0.2;
+    carrierLeftOsc.connect(carrierLeftGain);
+    carrierLeftGain.connect(merger, 0, 0);
+
+    // 718 Hz + 7.83 Hz - RIGHT CHANNEL (binaural)
+    const carrierRightOsc = offlineCtx.createOscillator();
+    carrierRightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    const carrierRightGain = offlineCtx.createGain();
+    carrierRightGain.gain.value = 0.2;
+    carrierRightOsc.connect(carrierRightGain);
+    carrierRightGain.connect(merger, 0, 1);
     
+    // Modulator for amplitude modulation
     const modulator = offlineCtx.createOscillator();
     modulator.frequency.value = 0.1;
-    
     const modulatorGain = offlineCtx.createGain();
     modulatorGain.gain.value = 0.7;
-    
-    const carrierGain = offlineCtx.createGain();
-    carrierGain.gain.value = 0.2;
-
     modulator.connect(modulatorGain);
-    modulatorGain.connect(carrierGain.gain);
-    carrierOsc.connect(carrierGain);
-    carrierGain.connect(merger, 0, 0);
-    carrierGain.connect(merger, 0, 1);
+    modulatorGain.connect(carrierLeftGain.gain);
+    modulatorGain.connect(carrierRightGain.gain);
 
     // Start all
     leftOsc.start(0);
     rightOsc.start(0);
-    carrierOsc.start(0);
+    carrierLeftOsc.start(0);
+    carrierRightOsc.start(0);
     modulator.start(0);
 
     offlineCtx.startRendering().then((renderedBuffer) => {
@@ -256,10 +273,10 @@ export const DNAGateGenerator = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "GATE_718.wav";
+      a.download = "GATE_718_BINAURAL_STEREO.wav";
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Plik GATE_718.wav pobrany!");
+      toast.success("Plik GATE_718_BINAURAL_STEREO.wav pobrany!");
     });
   };
 
