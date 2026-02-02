@@ -1,11 +1,15 @@
 // SYMFONIA 18 BRAM DNA - Web Audio API Implementation
 // Based on the Python algorithm for GATCA matrix sonification
+// STEREO with binaural effect for enhanced consciousness modulation
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
 const SAMPLE_RATE = 44100;
 const DURATION = 108; // seconds
 const MTDNA_LENGTH = 16569;
+
+// Binaural beat frequency difference (Hz) - optimal for theta/alpha states
+const BINAURAL_OFFSET = 7.83; // Schumann resonance as binaural difference
 
 // 18 confirmed GATCA positions (1-based, rCRS)
 const GATCA_POSITIONS = [
@@ -20,8 +24,10 @@ export interface SymphonyData {
 
 export async function generateSymphony(audioContext: AudioContext): Promise<SymphonyData> {
   const numSamples = Math.floor(SAMPLE_RATE * DURATION);
-  const audioBuffer = audioContext.createBuffer(1, numSamples, SAMPLE_RATE);
-  const channelData = audioBuffer.getChannelData(0);
+  // STEREO: 2 channels
+  const audioBuffer = audioContext.createBuffer(2, numSamples, SAMPLE_RATE);
+  const leftChannel = audioBuffer.getChannelData(0);
+  const rightChannel = audioBuffer.getChannelData(1);
   
   // Generate time array
   const t = new Float32Array(numSamples);
@@ -29,51 +35,66 @@ export async function generateSymphony(audioContext: AudioContext): Promise<Symp
     t[i] = (i / SAMPLE_RATE);
   }
   
-  // Earth base frequency (7.83 Hz Schumann resonance)
-  const earthBase = new Float32Array(numSamples);
+  // Earth base frequency (7.83 Hz Schumann resonance) - stereo with phase difference
+  const earthBaseLeft = new Float32Array(numSamples);
+  const earthBaseRight = new Float32Array(numSamples);
   for (let i = 0; i < numSamples; i++) {
-    earthBase[i] = Math.sin(2 * Math.PI * 7.83 * t[i]) * 0.05;
+    earthBaseLeft[i] = Math.sin(2 * Math.PI * 7.83 * t[i]) * 0.05;
+    earthBaseRight[i] = Math.sin(2 * Math.PI * 7.83 * t[i] + Math.PI / 4) * 0.05; // Phase shifted
   }
   
-  // Final wave accumulator
-  const finalWave = new Float32Array(numSamples);
+  // Final wave accumulators for stereo
+  const leftWave = new Float32Array(numSamples);
+  const rightWave = new Float32Array(numSamples);
   
-  // Generate each gate sound
+  // Generate each gate sound with binaural effect
   for (let gateIndex = 0; gateIndex < GATCA_POSITIONS.length; gateIndex++) {
     const pos = GATCA_POSITIONS[gateIndex];
     const startTime = (pos / MTDNA_LENGTH) * DURATION;
-    const gateFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718;
+    const baseFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718;
+    
+    // Binaural: left ear gets base frequency, right ear gets base + offset
+    const leftFreq = baseFreq;
+    const rightFreq = baseFreq + BINAURAL_OFFSET;
+    
     const weight = (Math.pow(PHI, gateIndex % 7)) % 1;
     
     for (let i = 0; i < numSamples; i++) {
-      // Gaussian envelope
+      // Gaussian envelope (DNA gate modulation)
       const envelope = Math.exp(-Math.pow(t[i] - startTime, 2) / (2 * Math.pow(1.618, 2)));
-      const gateSound = Math.sin(2 * Math.PI * gateFreq * t[i]) * envelope;
-      finalWave[i] += gateSound * weight * GAMMA;
+      
+      // Stereo binaural tones
+      const leftTone = Math.sin(2 * Math.PI * leftFreq * t[i]) * envelope;
+      const rightTone = Math.sin(2 * Math.PI * rightFreq * t[i]) * envelope;
+      
+      // Apply weight and gamma scaling (equivalent to * 0.3 * dna_gate)
+      leftWave[i] += leftTone * weight * GAMMA * 0.3;
+      rightWave[i] += rightTone * weight * GAMMA * 0.3;
     }
   }
   
-  // Combine and normalize
+  // Combine and normalize stereo channels
   let maxAbs = 0;
   for (let i = 0; i < numSamples; i++) {
-    const combined = finalWave[i] + earthBase[i];
-    if (Math.abs(combined) > maxAbs) {
-      maxAbs = Math.abs(combined);
-    }
+    const combinedLeft = leftWave[i] + earthBaseLeft[i];
+    const combinedRight = rightWave[i] + earthBaseRight[i];
+    if (Math.abs(combinedLeft) > maxAbs) maxAbs = Math.abs(combinedLeft);
+    if (Math.abs(combinedRight) > maxAbs) maxAbs = Math.abs(combinedRight);
   }
   
   for (let i = 0; i < numSamples; i++) {
-    channelData[i] = (finalWave[i] + earthBase[i]) / maxAbs;
+    leftChannel[i] = (leftWave[i] + earthBaseLeft[i]) / maxAbs;
+    rightChannel[i] = (rightWave[i] + earthBaseRight[i]) / maxAbs;
   }
   
-  // Create WAV blob for download
-  const wavBlob = audioBufferToWav(audioBuffer);
+  // Create WAV blob for download (stereo)
+  const wavBlob = audioBufferToWavStereo(audioBuffer);
   
   return { audioBuffer, wavBlob };
 }
 
-function audioBufferToWav(buffer: AudioBuffer): Blob {
-  const numChannels = buffer.numberOfChannels;
+function audioBufferToWavStereo(buffer: AudioBuffer): Blob {
+  const numChannels = 2; // STEREO
   const sampleRate = buffer.sampleRate;
   const format = 1; // PCM
   const bitDepth = 16;
@@ -81,8 +102,9 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   const bytesPerSample = bitDepth / 8;
   const blockAlign = numChannels * bytesPerSample;
   
-  const data = buffer.getChannelData(0);
-  const samples = data.length;
+  const leftData = buffer.getChannelData(0);
+  const rightData = buffer.getChannelData(1);
+  const samples = leftData.length;
   const dataLength = samples * blockAlign;
   const bufferLength = 44 + dataLength;
   
@@ -104,12 +126,19 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   writeString(view, 36, 'data');
   view.setUint32(40, dataLength, true);
   
-  // Write audio data
+  // Write interleaved stereo audio data (L, R, L, R, ...)
   let offset = 44;
   for (let i = 0; i < samples; i++) {
-    const sample = Math.max(-1, Math.min(1, data[i]));
-    const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-    view.setInt16(offset, intSample, true);
+    // Left channel
+    const leftSample = Math.max(-1, Math.min(1, leftData[i]));
+    const leftInt = leftSample < 0 ? leftSample * 0x8000 : leftSample * 0x7FFF;
+    view.setInt16(offset, leftInt, true);
+    offset += 2;
+    
+    // Right channel
+    const rightSample = Math.max(-1, Math.min(1, rightData[i]));
+    const rightInt = rightSample < 0 ? rightSample * 0x8000 : rightSample * 0x7FFF;
+    view.setInt16(offset, rightInt, true);
     offset += 2;
   }
   
@@ -127,5 +156,7 @@ export const SYMPHONY_INFO = {
   duration: DURATION,
   phi: PHI,
   gamma: GAMMA,
-  mtdnaLength: MTDNA_LENGTH
+  mtdnaLength: MTDNA_LENGTH,
+  binauralOffset: BINAURAL_OFFSET,
+  stereo: true
 };
