@@ -873,6 +873,7 @@ const SAMPLE_RATE = 44100;
 const DURATION = 108;                  // seconds
 const MTDNA_LENGTH = 16569;
 const BINAURAL_OFFSET = 7.83;          // Schumann resonance as binaural difference
+const ZERO_POINT_FREQ = 718 * PHI;     // 1161.8 Hz - Gate 18 Zero Point
 
 // 18 confirmed GATCA positions (1-based, rCRS)
 const GATCA_POSITIONS = [
@@ -916,6 +917,24 @@ async function generateSymphony() {
     const rightFreq = baseFreq + BINAURAL_OFFSET;
     
     const weight = (Math.pow(PHI, gateIndex % 7)) % 1;
+    
+    // === GATE 18 (pos 16179) - ZERO POINT SINGULARITY ===
+    if (pos === 16179) {
+      // Zero Point frequency: 718 * φ = 1161.8 Hz
+      // Dirac delta simulation - infinitely short, powerful impulse
+      for (let i = 0; i < numSamples; i++) {
+        // Gaussian singularity at the end (Dirac delta approximation)
+        const singularityEnvelope = Math.exp(-Math.pow(t[i] - DURATION, 2) / 0.001);
+        
+        // Zero Point tone with binaural effect
+        const leftSingularity = Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t[i]) * singularityEnvelope;
+        const rightSingularity = Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t[i]) * singularityEnvelope;
+        
+        // Add with weight 144 (initiation number) * gamma
+        leftWave[i] += leftSingularity * 144 * GAMMA;
+        rightWave[i] += rightSingularity * 144 * GAMMA;
+      }
+    }
     
     for (let i = 0; i < numSamples; i++) {
       // Gaussian envelope (DNA gate modulation)
