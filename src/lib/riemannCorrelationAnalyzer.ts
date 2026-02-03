@@ -22,8 +22,64 @@ export interface AnalysisResult {
   maxZetaMagnitude: number;
 }
 
+// Wynik analizy w czasie rzeczywistym
+export interface RealtimeAnalysisResult {
+  currentTime: number;
+  gateIndex: number;
+  energy: number;
+  zetaValue: number;
+  isNearZero: boolean;
+  coherence: number;
+}
+
 const FREQ_718 = 718;
 const ZERO_THRESHOLD = 0.1; // Próg bliskości zera Riemanna
+
+// Pozycje 18 Bram DNA w czasie (w sekundach) - obliczone na podstawie symfonii
+const GATE_TIMES = [
+  0, 7.2, 14.4, 21.6, 28.8, 36.0, 43.2, 50.4, 57.6,
+  64.8, 72.0, 79.2, 86.4, 93.6, 100.8, 108.0, 115.2, 122.4
+];
+
+/**
+ * Określa indeks aktualnej Bramy na podstawie czasu odtwarzania
+ */
+export const getGateIndexAtTime = (currentTime: number): number => {
+  for (let i = GATE_TIMES.length - 1; i >= 0; i--) {
+    if (currentTime >= GATE_TIMES[i]) {
+      return i + 1; // Bramy numerowane od 1
+    }
+  }
+  return 1;
+};
+
+/**
+ * Analizuje punkt w czasie rzeczywistym
+ */
+export const analyzeAtTime = (currentTime: number): RealtimeAnalysisResult => {
+  const gateIndex = getGateIndexAtTime(currentTime);
+  
+  // Mapowanie czasu na energię: E = t × 718 × ħ
+  const energy = currentTime * FREQ_718 * H_BAR;
+  
+  // Obliczenie wartości funkcji Zeta na linii krytycznej
+  // s = 1/2 + i(E/ħ)
+  const s = { re: 0.5, im: energy / H_BAR };
+  const zetaComplex = riemannZeta(s, 30); // Mniejsza precyzja dla wydajności
+  const zetaValue = complexAbs(zetaComplex);
+  
+  const isNearZero = zetaValue < ZERO_THRESHOLD;
+  const coherence = Math.max(0, Math.min(1, 1 - zetaValue)); // Normalizacja do 0-1
+  
+  return {
+    currentTime,
+    gateIndex,
+    energy,
+    zetaValue,
+    isNearZero,
+    coherence,
+  };
+};
 
 /**
  * Wykrywa szczyty energii w danych audio (gdzie amplituda > gamma = 0.618)

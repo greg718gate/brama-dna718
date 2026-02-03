@@ -1,8 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Text, Line } from "@react-three/drei";
-import { useRef, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useResonance } from "@/contexts/ResonanceContext";
 
 // Obliczenia matrycy
 const phi = (1 + Math.sqrt(5)) / 2;
@@ -11,6 +12,10 @@ const alpha = Math.sqrt((1 - gamma ** 2) / 2);
 const beta = Math.sqrt((1 - gamma ** 2) / 2);
 const M = new THREE.Vector3(alpha, beta, gamma);
 
+// Kolory efektów
+const GOLDEN_COLOR = "#FFD700";
+const ALIGNED_COLOR = "#00FF88";
+
 // Dane rezonansów
 const resonances = [
   { name: "Ziemia 7.83 Hz", nameEn: "Earth 7.83 Hz", vec: new THREE.Vector3(0, 1, 0), color: "#32CD32", freq: 7.83 },
@@ -18,9 +23,44 @@ const resonances = [
   { name: "Brama DNA 718 Hz", nameEn: "DNA Gate 718 Hz", vec: new THREE.Vector3(alpha * 1.05, beta * 1.05, gamma * 1.05), color: "#FFA500", freq: 718 },
 ];
 
-const Sphere = () => {
+interface ResonanceEffectState {
+  isAligned: boolean;
+  intensity: number;
+  isGoldenPulse: boolean;
+}
+
+const Sphere = ({ resonanceEffect }: { resonanceEffect: ResonanceEffectState }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame(({ clock }) => {
+    if (meshRef.current) {
+      const material = meshRef.current.material as THREE.MeshStandardMaterial;
+      
+      if (resonanceEffect.isGoldenPulse) {
+        // Złoty Błysk - pulsacja kolorem złotym
+        const pulseIntensity = Math.sin(clock.getElapsedTime() * 8) * 0.5 + 0.5;
+        material.color.setStyle(GOLDEN_COLOR);
+        material.opacity = 0.1 + pulseIntensity * resonanceEffect.intensity * 0.2;
+        material.emissive = new THREE.Color(GOLDEN_COLOR);
+        material.emissiveIntensity = pulseIntensity * resonanceEffect.intensity * 0.3;
+      } else if (resonanceEffect.isAligned) {
+        // Stabilizacja przy wysokiej koherencji
+        material.color.setStyle(ALIGNED_COLOR);
+        material.opacity = 0.12;
+        material.emissive = new THREE.Color(ALIGNED_COLOR);
+        material.emissiveIntensity = 0.1;
+      } else {
+        // Stan domyślny
+        material.color.setStyle("#00CED1");
+        material.opacity = 0.08;
+        material.emissive = new THREE.Color("#000000");
+        material.emissiveIntensity = 0;
+      }
+    }
+  });
+
   return (
-    <mesh>
+    <mesh ref={meshRef}>
       <sphereGeometry args={[1.3, 48, 48]} />
       <meshStandardMaterial 
         color="#00CED1" 
@@ -123,17 +163,48 @@ const ResonanceVectors = ({ language }: { language: string }) => {
   );
 };
 
-const VectorM = () => {
+const VectorM = ({ resonanceEffect }: { resonanceEffect: ResonanceEffectState }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const orbitControlsRef = useRef<any>(null);
 
   useFrame(({ clock }) => {
     if (meshRef.current && glowRef.current) {
       const t = clock.getElapsedTime();
       
       // Kombinacja pulsacji z różnymi częstotliwościami (skalowane dla wizualizacji)
-      const pulse18 = 1 + 0.15 * Math.sin(2 * Math.PI * 18.6 * t / 50);
-      const pulse718 = 1 + 0.08 * Math.sin(2 * Math.PI * 718 * t / 500);
+      let pulse18 = 1 + 0.15 * Math.sin(2 * Math.PI * 18.6 * t / 50);
+      let pulse718 = 1 + 0.08 * Math.sin(2 * Math.PI * 718 * t / 500);
+      
+      // Efekt Złotego Błysku - wzmocniona pulsacja
+      if (resonanceEffect.isGoldenPulse) {
+        const goldenPulse = 1 + 0.5 * Math.sin(t * 10) * resonanceEffect.intensity;
+        pulse18 *= goldenPulse;
+        pulse718 *= goldenPulse;
+        
+        // Zmiana koloru na złoty
+        const material = meshRef.current.material as THREE.MeshStandardMaterial;
+        material.color.setStyle(GOLDEN_COLOR);
+        material.emissive = new THREE.Color(GOLDEN_COLOR);
+        material.emissiveIntensity = 0.8 + 0.2 * Math.sin(t * 15);
+        
+        const glowMaterial = glowRef.current.material as THREE.MeshStandardMaterial;
+        glowMaterial.color.setStyle(GOLDEN_COLOR);
+        glowMaterial.emissive = new THREE.Color(GOLDEN_COLOR);
+        glowMaterial.emissiveIntensity = 0.5 * resonanceEffect.intensity;
+      } else {
+        // Przywróć domyślny kolor
+        const material = meshRef.current.material as THREE.MeshStandardMaterial;
+        material.color.setStyle("#ffd700");
+        material.emissive = new THREE.Color("#ffd700");
+        material.emissiveIntensity = 0.5;
+        
+        const glowMaterial = glowRef.current.material as THREE.MeshStandardMaterial;
+        glowMaterial.color.setStyle("#ffd700");
+        glowMaterial.emissive = new THREE.Color("#ffd700");
+        glowMaterial.emissiveIntensity = 0.3;
+      }
+      
       const combinedPulse = pulse18 * pulse718;
       
       meshRef.current.scale.set(combinedPulse, combinedPulse, combinedPulse);
@@ -141,7 +212,9 @@ const VectorM = () => {
       
       // Pulsacja jasności
       const material = glowRef.current.material as THREE.MeshStandardMaterial;
-      material.emissiveIntensity = 0.3 + 0.2 * Math.sin(t * 3);
+      if (!resonanceEffect.isGoldenPulse) {
+        material.emissiveIntensity = 0.3 + 0.2 * Math.sin(t * 3);
+      }
     }
   });
 
@@ -192,7 +265,39 @@ const VectorM = () => {
   );
 };
 
-const Legend = ({ language }: { language: string }) => {
+// Komponent efektu stabilizacji geometrii
+const StabilizationEffect = ({ isAligned, intensity }: { isAligned: boolean; intensity: number }) => {
+  const ringRef = useRef<THREE.Mesh>(null);
+  
+  useFrame(({ clock }) => {
+    if (ringRef.current && isAligned) {
+      const t = clock.getElapsedTime();
+      // Powolna rotacja przy stabilizacji
+      ringRef.current.rotation.z = t * 0.5;
+      ringRef.current.rotation.x = Math.sin(t * 0.3) * 0.1;
+      
+      const material = ringRef.current.material as THREE.MeshStandardMaterial;
+      material.opacity = 0.2 + intensity * 0.3;
+    }
+  });
+  
+  if (!isAligned) return null;
+  
+  return (
+    <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
+      <torusGeometry args={[1.5, 0.02, 16, 100]} />
+      <meshStandardMaterial 
+        color={ALIGNED_COLOR}
+        emissive={ALIGNED_COLOR}
+        emissiveIntensity={0.5}
+        transparent
+        opacity={0.3}
+      />
+    </mesh>
+  );
+};
+
+const Legend = ({ language, resonanceEffect }: { language: string; resonanceEffect: ResonanceEffectState }) => {
   const axisItems = [
     { color: "#ff4444", label: language === "pl" ? "α (Słońce)" : "α (Sun)" },
     { color: "#00CED1", label: language === "pl" ? "β (Ziemia)" : "β (Earth)" },
@@ -230,12 +335,98 @@ const Legend = ({ language }: { language: string }) => {
           </div>
         ))}
       </div>
+      
+      {/* Status rezonansu */}
+      {resonanceEffect.isGoldenPulse && (
+        <div className="w-full mt-2 flex items-center gap-2 text-[#FFD700] animate-pulse">
+          <div className="w-3 h-3 rounded-full bg-[#FFD700] animate-ping" />
+          <span className="font-semibold">
+            {language === "pl" ? "ZŁOTY REZONANS AKTYWNY" : "GOLDEN RESONANCE ACTIVE"}
+          </span>
+          <span className="text-xs">({(resonanceEffect.intensity * 100).toFixed(0)}%)</span>
+        </div>
+      )}
+      
+      {resonanceEffect.isAligned && !resonanceEffect.isGoldenPulse && (
+        <div className="w-full mt-2 flex items-center gap-2 text-[#00FF88]">
+          <div className="w-3 h-3 rounded-full bg-[#00FF88]" />
+          <span className="font-medium">
+            {language === "pl" ? "Geometria ustabilizowana" : "Geometry Stabilized"}
+          </span>
+        </div>
+      )}
     </div>
+  );
+};
+
+// Komponent sceny z efektami rezonansu
+const Scene = ({ language, resonanceEffect }: { language: string; resonanceEffect: ResonanceEffectState }) => {
+  const controlsRef = useRef<any>(null);
+  
+  // Stabilizacja geometrii - zatrzymanie rotacji przy wysokiej koherencji
+  useFrame(() => {
+    if (controlsRef.current) {
+      if (resonanceEffect.isAligned && resonanceEffect.intensity > 0.8) {
+        // Stopniowe zatrzymanie przy bardzo wysokiej koherencji
+        controlsRef.current.autoRotateSpeed = 0.3;
+      } else if (resonanceEffect.isGoldenPulse) {
+        // Przyspieszenie przy Złotym Błysku
+        controlsRef.current.autoRotateSpeed = 3 + resonanceEffect.intensity * 2;
+      } else {
+        // Normalna prędkość
+        controlsRef.current.autoRotateSpeed = 1.5;
+      }
+    }
+  });
+  
+  return (
+    <>
+      <color attach="background" args={['#0a0a0a']} />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4488ff" />
+      <pointLight position={[0, 5, 0]} intensity={0.5} color="#ffd700" />
+      
+      {/* Dodatkowe światło przy Złotym Błysku */}
+      {resonanceEffect.isGoldenPulse && (
+        <pointLight 
+          position={[M.x * 3, M.y * 3, M.z * 3]} 
+          intensity={resonanceEffect.intensity * 2} 
+          color={GOLDEN_COLOR} 
+        />
+      )}
+      
+      <Sphere resonanceEffect={resonanceEffect} />
+      <SphereWireframe />
+      <Axes language={language} />
+      <ResonanceVectors language={language} />
+      <VectorM resonanceEffect={resonanceEffect} />
+      <StabilizationEffect isAligned={resonanceEffect.isAligned} intensity={resonanceEffect.intensity} />
+      
+      <OrbitControls
+        ref={controlsRef}
+        enableZoom={true}
+        enablePan={true}
+        enableRotate={true}
+        autoRotate={true}
+        autoRotateSpeed={1.5}
+        minDistance={2}
+        maxDistance={8}
+      />
+    </>
   );
 };
 
 export const PentagramSphere = () => {
   const { t, language } = useLanguage();
+  const { activeEffect, state } = useResonance();
+  
+  // Stan efektów rezonansu oparty na kontekście
+  const resonanceEffect: ResonanceEffectState = {
+    isAligned: state.isAligned,
+    intensity: state.coherenceLevel,
+    isGoldenPulse: activeEffect?.type === "GOLDEN_RESONANCE",
+  };
   
   return (
     <div className="w-full h-[600px] md:h-[650px] bg-gradient-to-b from-background to-card rounded-lg border border-border overflow-hidden">
@@ -250,32 +441,12 @@ export const PentagramSphere = () => {
           <span>φ = {phi.toFixed(4)}</span>
           <span>γ = {gamma.toFixed(4)}</span>
         </div>
-        <Legend language={language} />
+        <Legend language={language} resonanceEffect={resonanceEffect} />
       </div>
       
       <div className="h-[calc(100%-160px)] md:h-[calc(100%-150px)]">
         <Canvas camera={{ position: [3.5, 2, 2], fov: 45 }}>
-          <color attach="background" args={['#0a0a0a']} />
-          <ambientLight intensity={0.4} />
-          <pointLight position={[10, 10, 10]} intensity={1} />
-          <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4488ff" />
-          <pointLight position={[0, 5, 0]} intensity={0.5} color="#ffd700" />
-          
-          <Sphere />
-          <SphereWireframe />
-          <Axes language={language} />
-          <ResonanceVectors language={language} />
-          <VectorM />
-          
-          <OrbitControls
-            enableZoom={true}
-            enablePan={true}
-            enableRotate={true}
-            autoRotate={true}
-            autoRotateSpeed={1.5}
-            minDistance={2}
-            maxDistance={8}
-          />
+          <Scene language={language} resonanceEffect={resonanceEffect} />
         </Canvas>
       </div>
     </div>
