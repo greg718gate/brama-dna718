@@ -28,6 +28,7 @@ import { DNA18Gates } from "./DNA18Gates";
 import { Symphony18Gates } from "./Symphony18Gates";
 import { BramaUnificationPanel } from "./BramaUnificationPanel";
 import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
+import { ResonanceTuner } from "./ResonanceTuner";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { DonationButton } from "@/components/DonationButton";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -592,6 +593,9 @@ if __name__ == "__main__":
             <DonationButton variant="full" />
           </CardContent>
         </Card>
+
+        {/* Resonance Tuner */}
+        <ResonanceTuner />
 
         {/* 18 DNA Gates */}
         <DNA18Gates />
