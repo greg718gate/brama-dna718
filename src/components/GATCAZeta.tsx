@@ -27,6 +27,7 @@ import { PentagramSphere } from "./PentagramSphere";
 import { DNA18Gates } from "./DNA18Gates";
 import { Symphony18Gates } from "./Symphony18Gates";
 import { BramaUnificationPanel } from "./BramaUnificationPanel";
+import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { DonationButton } from "@/components/DonationButton";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -540,6 +541,9 @@ if __name__ == "__main__":
 
         {/* BRAMA Unification Engine */}
         <BramaUnificationPanel />
+
+        {/* Riemann Correlation Analyzer */}
+        <RiemannCorrelationAnalyzer />
 
         {/* 3D Visualization */}
         <PentagramSphere />
