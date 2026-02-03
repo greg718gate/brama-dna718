@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from "react";
 import { useResonance } from "@/contexts/ResonanceContext";
-import { analyzeAtTime } from "@/lib/riemannCorrelationAnalyzer";
+import { analyzeAtTimeWithFreq } from "@/lib/resonanceTuner";
 
 interface UseResonancePlaybackOptions {
   updateInterval?: number; // ms between updates
@@ -12,28 +12,30 @@ interface UseResonancePlaybackOptions {
  */
 export function useResonancePlayback(options: UseResonancePlaybackOptions = {}) {
   const { updateInterval = 100 } = options;
-  const { updateResonance, triggerVisualEffect } = useResonance();
+  const { updateResonance, triggerVisualEffect, tunedFrequency } = useResonance();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastGateRef = useRef<number>(0);
 
   /**
    * Analizuje aktualny czas i aktualizuje stan rezonansu
+   * Używa dostrojonej częstotliwości z kontekstu
    */
   const handleAnalysisUpdate = useCallback((currentTime: number) => {
-    const result = analyzeAtTime(currentTime);
+    // Używamy dostrojonej częstotliwości zamiast sztywnego 718
+    const result = analyzeAtTimeWithFreq(currentTime, tunedFrequency);
     
     // Aktualizacja globalnego stanu
     updateResonance({
-      currentTime: result.currentTime,
+      currentTime: currentTime,
       activeGateIndex: result.gateIndex,
-      distanceToZero: result.zetaValue,
-      isAligned: result.isNearZero,
+      distanceToZero: result.distanceToZero,
+      isAligned: result.isAligned,
       coherenceLevel: result.coherence,
       isPlaying: true,
     });
     
     // Wyzwalacz wizualny dla "Złotego Błysku"
-    if (result.isNearZero) {
+    if (result.isAligned) {
       triggerVisualEffect("GOLDEN_RESONANCE", { 
         intensity: result.coherence,
         gateIndex: result.gateIndex,
@@ -50,7 +52,7 @@ export function useResonancePlayback(options: UseResonancePlaybackOptions = {}) 
     }
     
     return result;
-  }, [updateResonance, triggerVisualEffect]);
+  }, [updateResonance, triggerVisualEffect, tunedFrequency]);
 
   /**
    * Rozpoczyna ciągłą analizę podczas odtwarzania

@@ -16,11 +16,11 @@ const M = new THREE.Vector3(alpha, beta, gamma);
 const GOLDEN_COLOR = "#FFD700";
 const ALIGNED_COLOR = "#00FF88";
 
-// Dane rezonansów
-const resonances = [
+// Dane rezonansów - dynamiczna częstotliwość DNA Gate
+const getResonances = (tunedFreq: number) => [
   { name: "Ziemia 7.83 Hz", nameEn: "Earth 7.83 Hz", vec: new THREE.Vector3(0, 1, 0), color: "#32CD32", freq: 7.83 },
   { name: "Modulacja 18.6 Hz", nameEn: "Modulation 18.6 Hz", vec: new THREE.Vector3(0, 0, 1), color: "#9932CC", freq: 18.6 },
-  { name: "Brama DNA 718 Hz", nameEn: "DNA Gate 718 Hz", vec: new THREE.Vector3(alpha * 1.05, beta * 1.05, gamma * 1.05), color: "#FFA500", freq: 718 },
+  { name: `Brama DNA ${tunedFreq.toFixed(2)} Hz`, nameEn: `DNA Gate ${tunedFreq.toFixed(2)} Hz`, vec: new THREE.Vector3(alpha * 1.05, beta * 1.05, gamma * 1.05), color: "#FFA500", freq: tunedFreq },
 ];
 
 interface ResonanceEffectState {
@@ -117,13 +117,15 @@ const Axes = ({ language }: { language: string }) => {
   );
 };
 
-const ResonanceVectors = ({ language }: { language: string }) => {
+const ResonanceVectors = ({ language, tunedFrequency }: { language: string; tunedFrequency: number }) => {
   // Offsety dla etykiet, żeby nie nakładały się na osie
   const labelOffsets = [
     { x: 0.25, y: 0, z: 0.1 },   // Ziemia 7.83 Hz - przesunięta w prawo
     { x: 0.15, y: 0.1, z: 0 },   // Modulacja 18.6 Hz - przesunięta w górę
     { x: 0, y: 0.15, z: 0 },     // Brama DNA - lekko w górę
   ];
+
+  const resonances = getResonances(tunedFrequency);
 
   return (
     <>
@@ -297,7 +299,7 @@ const StabilizationEffect = ({ isAligned, intensity }: { isAligned: boolean; int
   );
 };
 
-const Legend = ({ language, resonanceEffect }: { language: string; resonanceEffect: ResonanceEffectState }) => {
+const Legend = ({ language, resonanceEffect, tunedFrequency }: { language: string; resonanceEffect: ResonanceEffectState; tunedFrequency: number }) => {
   const axisItems = [
     { color: "#ff4444", label: language === "pl" ? "α (Słońce)" : "α (Sun)" },
     { color: "#00CED1", label: language === "pl" ? "β (Ziemia)" : "β (Earth)" },
@@ -308,7 +310,7 @@ const Legend = ({ language, resonanceEffect }: { language: string; resonanceEffe
   const resonanceItems = [
     { color: "#32CD32", label: "7.83 Hz" },
     { color: "#9932CC", label: "18.6 Hz" },
-    { color: "#FFA500", label: "718 Hz" },
+    { color: "#FFA500", label: `${tunedFrequency.toFixed(2)} Hz` },
   ];
 
   return (
@@ -360,7 +362,7 @@ const Legend = ({ language, resonanceEffect }: { language: string; resonanceEffe
 };
 
 // Komponent sceny z efektami rezonansu
-const Scene = ({ language, resonanceEffect }: { language: string; resonanceEffect: ResonanceEffectState }) => {
+const Scene = ({ language, resonanceEffect, tunedFrequency }: { language: string; resonanceEffect: ResonanceEffectState; tunedFrequency: number }) => {
   const controlsRef = useRef<any>(null);
   
   // Stabilizacja geometrii - zatrzymanie rotacji przy wysokiej koherencji
@@ -399,7 +401,7 @@ const Scene = ({ language, resonanceEffect }: { language: string; resonanceEffec
       <Sphere resonanceEffect={resonanceEffect} />
       <SphereWireframe />
       <Axes language={language} />
-      <ResonanceVectors language={language} />
+      <ResonanceVectors language={language} tunedFrequency={tunedFrequency} />
       <VectorM resonanceEffect={resonanceEffect} />
       <StabilizationEffect isAligned={resonanceEffect.isAligned} intensity={resonanceEffect.intensity} />
       
@@ -419,13 +421,13 @@ const Scene = ({ language, resonanceEffect }: { language: string; resonanceEffec
 
 export const PentagramSphere = () => {
   const { t, language } = useLanguage();
-  const { activeEffect, state } = useResonance();
+  const { activeEffect, state, tunedFrequency } = useResonance();
   
   // Stan efektów rezonansu oparty na kontekście
   const resonanceEffect: ResonanceEffectState = {
     isAligned: state.isAligned,
     intensity: state.coherenceLevel,
-    isGoldenPulse: activeEffect?.type === "GOLDEN_RESONANCE",
+    isGoldenPulse: activeEffect?.type === "GOLDEN_RESONANCE" || activeEffect?.type === "TUNED",
   };
   
   return (
@@ -440,13 +442,14 @@ export const PentagramSphere = () => {
         <div className="flex flex-wrap gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
           <span>φ = {phi.toFixed(4)}</span>
           <span>γ = {gamma.toFixed(4)}</span>
+          <span className="text-amber-500 font-mono">f = {tunedFrequency.toFixed(4)} Hz</span>
         </div>
-        <Legend language={language} resonanceEffect={resonanceEffect} />
+        <Legend language={language} resonanceEffect={resonanceEffect} tunedFrequency={tunedFrequency} />
       </div>
       
       <div className="h-[calc(100%-160px)] md:h-[calc(100%-150px)]">
         <Canvas camera={{ position: [3.5, 2, 2], fov: 45 }}>
-          <Scene language={language} resonanceEffect={resonanceEffect} />
+          <Scene language={language} resonanceEffect={resonanceEffect} tunedFrequency={tunedFrequency} />
         </Canvas>
       </div>
     </div>
