@@ -20,16 +20,31 @@ interface VisualEffectPayload {
   freq?: number;
 }
 
+// DNA Gate positions from mtDNA rCRS
+export const DEFAULT_DNA_POSITIONS = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179];
+
 interface ResonanceContextType {
+  // Core state
   state: ResonanceState;
   updateResonance: (update: Partial<ResonanceState>) => void;
+  
+  // Visual effects
   triggerVisualEffect: (type: VisualEffectType, payload: { intensity: number; gateIndex?: number; freq?: number }) => void;
   activeEffect: VisualEffectPayload | null;
   clearEffect: () => void;
-  // Nowe pola dla tunera
+  
+  // Tuner state
   tunedFrequency: number;
   setTunedFrequency: (freq: number) => void;
   runAutoTune: (positions?: number[]) => ScanResult;
+  
+  // DNA data
+  dnaData: number[];
+  setDnaData: (positions: number[]) => void;
+  
+  // Convenient aliases for components
+  tunedFreq: number;
+  coherence: number;
 }
 
 const defaultState: ResonanceState = {
@@ -47,6 +62,7 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ResonanceState>(defaultState);
   const [activeEffect, setActiveEffect] = useState<VisualEffectPayload | null>(null);
   const [tunedFrequency, setTunedFrequency] = useState(718.0);
+  const [dnaData, setDnaData] = useState<number[]>(DEFAULT_DNA_POSITIONS);
 
   const updateResonance = useCallback((update: Partial<ResonanceState>) => {
     setState(prev => ({ ...prev, ...update }));
@@ -66,7 +82,7 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
     setActiveEffect(null);
   }, []);
 
-  const runAutoTune = useCallback((positions: number[] = DEFAULT_GATE_POSITIONS): ScanResult => {
+  const runAutoTune = useCallback((positions: number[] = dnaData): ScanResult => {
     const result = findOptimalResonancePrecise(positions);
     
     if (result.success || result.minZetaValue < 1.0) {
@@ -90,7 +106,7 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
     }
     
     return result;
-  }, [triggerVisualEffect]);
+  }, [dnaData, triggerVisualEffect]);
 
   return (
     <ResonanceContext.Provider value={{ 
@@ -102,6 +118,11 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
       tunedFrequency,
       setTunedFrequency,
       runAutoTune,
+      dnaData,
+      setDnaData,
+      // Convenient aliases
+      tunedFreq: tunedFrequency,
+      coherence: state.coherenceLevel,
     }}>
       {children}
     </ResonanceContext.Provider>
