@@ -95,14 +95,14 @@ export const ResonanceTuner: React.FC = () => {
         {/* Wyniki skanowania */}
         {lastResult && (
           <div className="space-y-3 pt-2">
-            {/* Status */}
+            {/* Status - based on coherence percentage */}
             <div className="flex items-center gap-2">
-              {lastResult.success ? (
+              {getCoherencePercent() >= 80 ? (
                 <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/50">
                   <CheckCircle2 className="h-3 w-3 mr-1" />
                   BRAMA OTWARTA
                 </Badge>
-              ) : lastResult.minZeta < 1.0 ? (
+              ) : getCoherencePercent() >= 30 ? (
                 <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   CZĘŚCIOWE WYRÓWNANIE
@@ -110,7 +110,7 @@ export const ResonanceTuner: React.FC = () => {
               ) : (
                 <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-red-500/50">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  BRAK REZONANSU
+                  NISKI REZONANS
                 </Badge>
               )}
             </div>
