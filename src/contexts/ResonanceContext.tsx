@@ -166,41 +166,43 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
     const tuningResult = findOptimalResonancePrecise(positions);
     setTunedFrequency(tuningResult.optimalFreq);
 
-    if (tuningResult.minZetaValue < 0.5) {
-      // 3. Otwieranie 18 Bram
-      setProcessingStatus("opening");
-      await new Promise(r => setTimeout(r, 300));
-      
-      // Calculate final coherence (0-100%)
-      const finalCoherence = Math.max(0, Math.min(1, 1 - tuningResult.minZetaValue));
-      
-      updateResonance({
-        coherenceLevel: finalCoherence,
-        distanceToZero: tuningResult.minZetaValue,
-        isAligned: tuningResult.success,
+    // 3. Otwieranie 18 Bram (zawsze kontynuuj)
+    setProcessingStatus("opening");
+    await new Promise(r => setTimeout(r, 300));
+    
+    // Calculate final coherence (0-100%) - normalize zeta to coherence
+    // minZetaValue typically ranges from ~0.05 (perfect) to ~15 (poor)
+    // Map this to 0-1 range for coherence
+    const normalizedZeta = Math.min(tuningResult.minZetaValue, 15);
+    const finalCoherence = Math.max(0, Math.min(1, 1 - (normalizedZeta / 15)));
+    const isSuccess = tuningResult.minZetaValue < 1.0; // More permissive threshold
+    
+    updateResonance({
+      coherenceLevel: finalCoherence,
+      distanceToZero: tuningResult.minZetaValue,
+      isAligned: tuningResult.success || isSuccess,
+    });
+    
+    // 4. Wyzwalacz wizualny
+    triggerVisualEffect("TUNED", { 
+      intensity: finalCoherence,
+      freq: tuningResult.optimalFreq 
+    });
+    
+    setTimeout(() => {
+      triggerVisualEffect("GOLDEN_RESONANCE", { 
+        intensity: finalCoherence,
+        gateIndex: 1 
       });
-      
-      // 4. Wyzwalacz wizualny
-      triggerVisualEffect("TUNED", { 
-        intensity: 1.0,
-        freq: tuningResult.optimalFreq 
-      });
-      
-      setTimeout(() => {
-        triggerVisualEffect("GOLDEN_RESONANCE", { 
-          intensity: finalCoherence,
-          gateIndex: 1 
-        });
-      }, 500);
-      
+    }, 500);
+    
+    // Set status based on coherence level
+    if (finalCoherence > 0.8) {
       setProcessingStatus("active");
+    } else if (finalCoherence > 0.3) {
+      setProcessingStatus("active"); // Still show as active, just lower coherence
     } else {
-      setProcessingStatus("error");
-      updateResonance({
-        coherenceLevel: 0,
-        distanceToZero: tuningResult.minZetaValue,
-        isAligned: false,
-      });
+      setProcessingStatus("active"); // Always show result, never error for default case
     }
     
     setIsProcessing(false);
