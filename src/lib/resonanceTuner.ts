@@ -31,8 +31,8 @@ export interface TunedAnalysisResult {
 }
 
 /**
- * Skanuje zakres częstotliwości szukając minimum |ζ(s)|
- * "Igła w stogu siana" - precyzyjne strojenie do zera Riemanna
+ * Skanuje zakres częstotliwości szukając minimum średniej |ζ(s)| dla WSZYSTKICH pozycji
+ * "Rezonans Hybrydowy" - agreguje wyniki z całego zestawu bram
  */
 export const findOptimalResonance = (
   gatcaPositions: number[] = DEFAULT_GATE_POSITIONS,
@@ -40,45 +40,45 @@ export const findOptimalResonance = (
     minFreq?: number;
     maxFreq?: number;
     step?: number;
-    testGateIndex?: number;
   } = {}
 ): ScanResult => {
   const {
     minFreq = 717.5,
     maxFreq = 718.5,
     step = 0.001,
-    testGateIndex = 0, // Pierwsza Brama (pozycja 1)
   } = options;
 
   let bestFreq = 718.0;
-  let minZeta = Infinity;
+  let minAvgZeta = Infinity;
   let iterations = 0;
 
-  // Pozycja testowa - pierwsza Brama jako fundament
-  const testPosition = gatcaPositions[testGateIndex] || 1;
+  // Używamy wszystkich pozycji, nie tylko pierwszej
+  const positions = gatcaPositions.length > 0 ? gatcaPositions : DEFAULT_GATE_POSITIONS;
 
   for (let f = minFreq; f <= maxFreq; f += step) {
     iterations++;
     
-    // Energia dla danej pozycji i częstotliwości
-    const energy = testPosition * f * H_BAR;
-    const t = energy / H_BAR; // t = position * freq
+    // Oblicz średnią |ζ(s)| dla WSZYSTKICH pozycji przy tej częstotliwości
+    let totalZeta = 0;
+    for (const position of positions) {
+      const t = position * f; // t = position * freq (uproszczone, H_BAR się skraca)
+      const s = { re: 0.5, im: t };
+      const zetaValue = riemannZeta(s, 15); // Niższa precyzja dla szybkości przy wielu pozycjach
+      totalZeta += complexAbs(zetaValue);
+    }
     
-    // Obliczenie ζ(1/2 + it)
-    const s = { re: 0.5, im: t };
-    const zetaValue = riemannZeta(s, 20); // Mniejsza precyzja dla szybkości
-    const magnitude = complexAbs(zetaValue);
+    const avgZeta = totalZeta / positions.length;
 
-    if (magnitude < minZeta) {
-      minZeta = magnitude;
+    if (avgZeta < minAvgZeta) {
+      minAvgZeta = avgZeta;
       bestFreq = f;
     }
   }
 
   return {
     optimalFreq: bestFreq,
-    minZetaValue: minZeta,
-    success: minZeta < 0.1, // Próg otwarcia bramy
+    minZetaValue: minAvgZeta,
+    success: minAvgZeta < 0.5, // Łagodniejszy próg dla średniej
     scanRange: { min: minFreq, max: maxFreq },
     iterations,
   };
@@ -92,12 +92,11 @@ export const findOptimalResonance = (
 export const findOptimalResonancePrecise = (
   gatcaPositions: number[] = DEFAULT_GATE_POSITIONS
 ): ScanResult => {
-  // Faza 1: Grube skanowanie
+  // Faza 1: Grube skanowanie (wszystkie pozycje)
   const coarseResult = findOptimalResonance(gatcaPositions, {
     minFreq: 717.0,
     maxFreq: 719.0,
     step: 0.01,
-    testGateIndex: 0,
   });
 
   // Faza 2: Precyzyjne skanowanie wokół najlepszego wyniku
@@ -105,7 +104,6 @@ export const findOptimalResonancePrecise = (
     minFreq: coarseResult.optimalFreq - 0.05,
     maxFreq: coarseResult.optimalFreq + 0.05,
     step: 0.0001,
-    testGateIndex: 0,
   });
 
   return {
