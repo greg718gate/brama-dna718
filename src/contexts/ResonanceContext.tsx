@@ -1,14 +1,14 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { findOptimalResonancePrecise, ScanResult, DEFAULT_GATE_POSITIONS } from "@/lib/resonanceTuner";
 
-// Struktura stanu rezonansu zgodnie z planem
+// Struktura stanu rezonansu
 export interface ResonanceState {
-  isAligned: boolean;       // Czy aktualna Brama trafia w zero Riemanna?
-  coherenceLevel: number;   // Skuteczność unifikacji (0.0 - 1.0)
-  activeGateIndex: number;  // Indeks aktualnie odtwarzanej Bramy (1-18)
-  distanceToZero: number;   // Jak blisko zera Riemanna jesteśmy (< 0.1 = trafienie)
-  isPlaying: boolean;       // Czy symfonia jest odtwarzana
-  currentTime: number;      // Aktualny czas odtwarzania
+  isAligned: boolean;
+  coherenceLevel: number;
+  activeGateIndex: number;
+  distanceToZero: number;
+  isPlaying: boolean;
+  currentTime: number;
 }
 
 export type VisualEffectType = "GOLDEN_RESONANCE" | "GATE_TRANSITION" | "ZERO_POINT" | "TUNED";
@@ -22,6 +22,24 @@ interface VisualEffectPayload {
 
 // DNA Gate positions from mtDNA rCRS
 export const DEFAULT_DNA_POSITIONS = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179];
+
+// Status types for UI
+export type ProcessingStatus = 
+  | "idle" 
+  | "analyzing" 
+  | "tuning" 
+  | "opening" 
+  | "active" 
+  | "error";
+
+const STATUS_MESSAGES: Record<ProcessingStatus, string> = {
+  idle: "Oczekiwanie na dane...",
+  analyzing: "Analizowanie sekwencji GATCA...",
+  tuning: "Strojenie do zer Riemanna...",
+  opening: "Otwieranie 18 Bram...",
+  active: "Brama Aktywna. Rezonans osiągnięty.",
+  error: "Błąd: Nie znaleziono punktu unifikacji.",
+};
 
 interface ResonanceContextType {
   // Core state
@@ -40,11 +58,18 @@ interface ResonanceContextType {
   
   // DNA data
   dnaData: number[];
+  rawDnaInput: string;
   setDnaData: (positions: number[]) => void;
   
-  // Convenient aliases for components
+  // Convenient aliases
   tunedFreq: number;
   coherence: number;
+  
+  // Master activation
+  activateBrama: (rawDna?: string) => Promise<void>;
+  isProcessing: boolean;
+  status: string;
+  processingStatus: ProcessingStatus;
 }
 
 const defaultState: ResonanceState = {
@@ -58,11 +83,25 @@ const defaultState: ResonanceState = {
 
 const ResonanceContext = createContext<ResonanceContextType | undefined>(undefined);
 
+// Helper: Parse raw DNA/rCRS input to positions
+const parseDnaInput = (input: string): number[] => {
+  // Try to extract numbers from input
+  const numbers = input.match(/\d+/g);
+  if (numbers && numbers.length >= 3) {
+    return numbers.map(n => parseInt(n, 10)).filter(n => n > 0 && n <= 16569);
+  }
+  // Fallback to default positions
+  return DEFAULT_DNA_POSITIONS;
+};
+
 export function ResonanceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ResonanceState>(defaultState);
   const [activeEffect, setActiveEffect] = useState<VisualEffectPayload | null>(null);
   const [tunedFrequency, setTunedFrequency] = useState(718.0);
   const [dnaData, setDnaData] = useState<number[]>(DEFAULT_DNA_POSITIONS);
+  const [rawDnaInput, setRawDnaInput] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
   const updateResonance = useCallback((update: Partial<ResonanceState>) => {
     setState(prev => ({ ...prev, ...update }));
@@ -71,7 +110,6 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
   const triggerVisualEffect = useCallback((type: VisualEffectType, payload: { intensity: number; gateIndex?: number; freq?: number }) => {
     setActiveEffect({ type, ...payload });
     
-    // Auto-clear effect after animation duration
     const duration = type === "GOLDEN_RESONANCE" ? 2000 : type === "TUNED" ? 3000 : 1000;
     setTimeout(() => {
       setActiveEffect(null);
@@ -88,13 +126,11 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
     if (result.success || result.minZetaValue < 1.0) {
       setTunedFrequency(result.optimalFreq);
       
-      // Wyzwól efekt wizualny TUNED
       triggerVisualEffect("TUNED", { 
         intensity: result.success ? 1.0 : 0.5,
         freq: result.optimalFreq 
       });
       
-      // Jeśli sukces (< 0.1), wyzwól też Złoty Błysk
       if (result.success) {
         setTimeout(() => {
           triggerVisualEffect("GOLDEN_RESONANCE", { 
@@ -108,6 +144,70 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
     return result;
   }, [dnaData, triggerVisualEffect]);
 
+  // GŁÓWNY PROCES AKTYWACJI - "Guzik Prawdy"
+  const activateBrama = useCallback(async (rawDna?: string) => {
+    setIsProcessing(true);
+    
+    // 1. Analizowanie sekwencji
+    setProcessingStatus("analyzing");
+    await new Promise(r => setTimeout(r, 300)); // Visual delay
+    
+    // Parse and store DNA data
+    const positions = rawDna ? parseDnaInput(rawDna) : dnaData;
+    if (rawDna) {
+      setRawDnaInput(rawDna);
+      setDnaData(positions);
+    }
+
+    // 2. Strojenie do zer Riemanna
+    setProcessingStatus("tuning");
+    await new Promise(r => setTimeout(r, 200));
+    
+    const tuningResult = findOptimalResonancePrecise(positions);
+    setTunedFrequency(tuningResult.optimalFreq);
+
+    if (tuningResult.minZetaValue < 0.5) {
+      // 3. Otwieranie 18 Bram
+      setProcessingStatus("opening");
+      await new Promise(r => setTimeout(r, 300));
+      
+      // Calculate final coherence (0-100%)
+      const finalCoherence = Math.max(0, Math.min(1, 1 - tuningResult.minZetaValue));
+      
+      updateResonance({
+        coherenceLevel: finalCoherence,
+        distanceToZero: tuningResult.minZetaValue,
+        isAligned: tuningResult.success,
+      });
+      
+      // 4. Wyzwalacz wizualny
+      triggerVisualEffect("TUNED", { 
+        intensity: 1.0,
+        freq: tuningResult.optimalFreq 
+      });
+      
+      setTimeout(() => {
+        triggerVisualEffect("GOLDEN_RESONANCE", { 
+          intensity: finalCoherence,
+          gateIndex: 1 
+        });
+      }, 500);
+      
+      setProcessingStatus("active");
+    } else {
+      setProcessingStatus("error");
+      updateResonance({
+        coherenceLevel: 0,
+        distanceToZero: tuningResult.minZetaValue,
+        isAligned: false,
+      });
+    }
+    
+    setIsProcessing(false);
+  }, [dnaData, updateResonance, triggerVisualEffect]);
+
+  const status = STATUS_MESSAGES[processingStatus];
+
   return (
     <ResonanceContext.Provider value={{ 
       state, 
@@ -119,10 +219,16 @@ export function ResonanceProvider({ children }: { children: ReactNode }) {
       setTunedFrequency,
       runAutoTune,
       dnaData,
+      rawDnaInput,
       setDnaData,
       // Convenient aliases
       tunedFreq: tunedFrequency,
       coherence: state.coherenceLevel,
+      // Master activation
+      activateBrama,
+      isProcessing,
+      status,
+      processingStatus,
     }}>
       {children}
     </ResonanceContext.Provider>
@@ -157,7 +263,6 @@ export function useResonanceAnalysis() {
       coherenceLevel: coherence,
     });
     
-    // Wyzwalacz wizualny dla "Złotego Błysku"
     if (isNearZero) {
       triggerVisualEffect("GOLDEN_RESONANCE", { 
         intensity: coherence,
