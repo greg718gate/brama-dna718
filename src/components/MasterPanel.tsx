@@ -13,6 +13,7 @@ import {
 // Lazy imports for debug components
 import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
 import { ResonanceTuner } from "./ResonanceTuner";
+import { EquationOfExit } from "./EquationOfExit";
 
 const MasterPanel = () => {
   const { 
@@ -118,7 +119,10 @@ const MasterPanel = () => {
         </div>
       </section>
 
-      {/* SEKCJA 3: BEBECHY - Panel Debug */}
+      {/* SEKCJA 3: RÓWNANIE WYJŚCIA */}
+      <EquationOfExit />
+
+      {/* SEKCJA 4: BEBECHY - Panel Debug */}
       <Collapsible open={isDebugOpen} onOpenChange={setIsDebugOpen}>
         <CollapsibleTrigger asChild>
           <Button 
