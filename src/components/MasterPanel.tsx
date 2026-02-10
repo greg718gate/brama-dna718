@@ -14,6 +14,7 @@ import {
 import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
 import { ResonanceTuner } from "./ResonanceTuner";
 import { EquationOfExit } from "./EquationOfExit";
+import { IntentionVectorCalculator } from "./IntentionVectorCalculator";
 
 const MasterPanel = () => {
   const { 
@@ -121,6 +122,9 @@ const MasterPanel = () => {
 
       {/* SEKCJA 3: RÓWNANIE WYJŚCIA */}
       <EquationOfExit />
+
+      {/* SEKCJA 3.5: WEKTOR INTENCJI */}
+      <IntentionVectorCalculator />
 
       {/* SEKCJA 4: BEBECHY - Panel Debug */}
       <Collapsible open={isDebugOpen} onOpenChange={setIsDebugOpen}>
