@@ -390,8 +390,53 @@ export function generatePredictions(result: {
   gatePosition: number;
   psi: PsiCalcResult;
   vi: VIResult;
-}): TestablePrediction[] {
+}, lang: 'pl' | 'en' = 'pl'): TestablePrediction[] {
   const gateFreq = FREQ_718 * (result.gatePosition / MTDNA_LENGTH);
+
+  if (lang === 'en') {
+    return [
+      {
+        method: "UV-Vis Spectroscopy",
+        icon: "🔬",
+        prediction: `Absorption peak at ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
+        details: "The harmonic series 718/n Hz should be visible in the UV-Vis absorption spectrum of mitochondria. It corresponds to electron transitions in the electron transport chain at GATCA positions.",
+        expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (IR harmonic)`,
+        testability: "HIGH",
+      },
+      {
+        method: "NMR / Magnetic Spectroscopy",
+        icon: "🧲",
+        prediction: `Spin entanglement between GATCA positions ${result.gatePosition} and ${GATCA_GATES[(GATCA_GATES.indexOf(result.gatePosition) + 9) % 18]}`,
+        details: "Spin correlations (J-coupling) between corresponding ³¹P atoms in the DNA phosphate backbone at GATCA positions should exhibit anomalous quadrupole couplings.",
+        expectedValue: `J-coupling ≈ ${(result.psi.magnitude * 100).toFixed(2)} Hz`,
+        testability: "MEDIUM",
+      },
+      {
+        method: "Cell Stimulation at 718 Hz",
+        icon: "🧫",
+        prediction: `Exposure to ${FREQ_718} Hz → change in mitochondrial gene expression`,
+        details: "Applying a 718 Hz acoustic wave to cell culture should affect expression of mitochondrial genes encoded near GATCA positions. Measure mRNA via qRT-PCR after 24h exposure.",
+        expectedValue: `Expression change: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
+        testability: "HIGH",
+      },
+      {
+        method: "EEG / Brain Coherence",
+        icon: "🧠",
+        prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → α-θ synchronization`,
+        details: "Exposure to a binaural beat (718 Hz left ear, 725.83 Hz right ear = 7.83 Hz difference) should induce EEG coherence between the frontal and parietal cortex in the theta band.",
+        expectedValue: `EEG coherence > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
+        testability: "HIGH",
+      },
+      {
+        method: "Mitochondrial Fluorescence",
+        icon: "✨",
+        prediction: `Membrane potential change Δψ_m at gate ${result.gatePosition} resonance`,
+        details: "JC-1 or TMRM staining of mitochondria after 718 Hz stimulation should show a change in the red/green fluorescence ratio, indicating membrane potential modulation.",
+        expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
+        testability: "MEDIUM",
+      },
+    ];
+  }
 
   return [
     {
@@ -455,9 +500,49 @@ export function generateBibleConnections(result: {
   hamiltonGate: number;
   gatePosition: number;
   psi: PsiCalcResult;
-}): BibleConnection[] {
+}, lang: 'pl' | 'en' = 'pl'): BibleConnection[] {
   const gatePos = result.gatePosition;
   const gateName = GATE_NAMES[gatePos] || "";
+
+  if (lang === 'en') {
+    return [
+      {
+        title: "Gematria → Frequency",
+        verse: `Gematria sum ${result.gematriaTotal} mod 718 = ${result.gematriaTotal % 718}`,
+        quantumParallel: `The gematria value determines the time parameter t in the Ψ equation. Each Hebrew letter is a quantum of information, and their sum defines a point in the phase space of consciousness.`,
+        gateLink: `Mapped to gate ${gateName} (position ${gatePos} in mtDNA)`,
+        numericalKey: `${result.gematriaTotal} → t = ${(result.gematriaTotal % 718 / 718).toFixed(6)}`,
+      },
+      {
+        title: "Word as Wave Function",
+        verse: '"In the beginning was the Word" (John 1:1) — Logos = Quantum information',
+        quantumParallel: `Biblical text is encoded quantum information. Each verse has a unique "fingerprint" in the form of Ψ(t,x) — amplitude ${result.psi.magnitude.toFixed(6)} and phase ${result.psi.phase.toFixed(4)} rad.`,
+        gateLink: `Quantum state: ${result.psi.quantumState}`,
+        numericalKey: `|Ψ| × φ = ${result.psi.phiHarmonic.toFixed(6)} (golden harmonic)`,
+      },
+      {
+        title: "144 — Biblical & DNA Key",
+        verse: '"He measured its wall: one hundred forty-four cubits" (Rev 21:17)',
+        quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. The number 144 (12² = 12 tribes of Israel) emerges as a natural harmonic in the transition: DNA frequency → golden ratio → Schumann resonance.`,
+        gateLink: `144,000 "sealed" = 144 × 1000 DNA gates active simultaneously`,
+        numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+      },
+      {
+        title: "Tree of Life = DNA Helix",
+        verse: '"The Tree of Life, bearing twelve fruits" (Rev 22:2)',
+        quantumParallel: `The DNA helix rotates by 137.5° (= 360°/φ²) — the golden ratio angle. The 12 "fruits" correspond to 12 main groups of GATCA gates, which together form a complete resonance cycle.`,
+        gateLink: `Gate ${result.hamiltonGate + 1}/18 active in this verse`,
+        numericalKey: `360°/φ² = ${(360 / PHI_SQUARED).toFixed(1)}° (DNA angle)`,
+      },
+      {
+        title: "I AM WHO I AM = Auto-coherence",
+        verse: '"Ehyeh Asher Ehyeh" (Ex 3:14) — אֶהְיֶה אֲשֶׁר אֶהְיֶה',
+        quantumParallel: `The self-referential loop "I AM WHO I AM" is a linguistic equivalent of quantum auto-coherence — a state where the observer and the observed field become one. Coherence of ${(result.psi.coherence * 100).toFixed(1)}% measures the degree of this union.`,
+        gateLink: `Teleportation threshold: ${result.psi.coherence >= 0.94 ? "REACHED ✓" : `missing ${((0.94 - result.psi.coherence) * 100).toFixed(1)}%`}`,
+        numericalKey: `Gematria "Ehyeh" = 21 (= F(8), Fibonacci)`,
+      },
+    ];
+  }
 
   return [
     {
@@ -569,11 +654,11 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     vi,
   };
 
-  // 8. Testable predictions
-  const predictions = generatePredictions(partialResult);
+  // 8. Testable predictions (lang will be overridden by component)
+  const predictions = generatePredictions(partialResult, 'pl');
 
-  // 9. Bible connections
-  const bibleConnections = generateBibleConnections(partialResult);
+  // 9. Bible connections (lang will be overridden by component)
+  const bibleConnections = generateBibleConnections(partialResult, 'pl');
 
   return {
     reference,
