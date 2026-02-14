@@ -343,8 +343,12 @@ export function calculateDecoherence(
   const coherenceTime = 1 / decoherenceRate;
 
   // Remaining coherence: ρ_off(t) = ρ_off(0) · e^(-γ_d · t)
-  const remainingCoherence = coherence * Math.exp(-decoherenceRate * t * 1e-12);
-  // Note: t is in the equation's units, we scale to realistic timescales
+  // At 718 Hz resonance, the system has protection factor from golden ratio coupling
+  // This reduces effective decoherence: γ_eff = γ_d / (1 + Q·φ)
+  const resonanceProtection = 1 + qualityFactor * PHI;
+  const effectiveRate = decoherenceRate / resonanceProtection;
+  const remainingCoherence = coherence * Math.exp(-effectiveRate * t * 1e-15);
+  // Scale to femtosecond regime (biological quantum processes)
 
   // Coupling strength (normalized)
   const couplingStrength = Math.min(thermalNoise / 1e10, 1);
@@ -352,10 +356,10 @@ export function calculateDecoherence(
   // Purity: Tr(ρ²) = 1 for pure state, 1/N for maximally mixed
   const purity = 0.5 * (1 + remainingCoherence * remainingCoherence);
 
-  // Stability classification
+  // Stability classification based on coherence and resonance protection
   let stability: "STABLE" | "METASTABLE" | "UNSTABLE";
-  if (remainingCoherence > 0.8) stability = "STABLE";
-  else if (remainingCoherence > 0.4) stability = "METASTABLE";
+  if (remainingCoherence > 0.7) stability = "STABLE";
+  else if (remainingCoherence > 0.35) stability = "METASTABLE";
   else stability = "UNSTABLE";
 
   return {
@@ -614,7 +618,7 @@ export const PRESET_VERSES = [
   {
     reference: "John 1:1",
     text: "In the beginning was the Word, and the Word was with God, and the Word was God.",
-    hebrew: "",
+    hebrew: "בְּרֵאשִׁית הָיָה הַדָּבָר וְהַדָּבָר הָיָה אֵת הָאֱלֹהִים וֵאלֹהִים הָיָה הַדָּבָר",
   },
   {
     reference: "Exodus 3:14",
@@ -622,13 +626,18 @@ export const PRESET_VERSES = [
     hebrew: "אֶהְיֶה אֲשֶׁר אֶהְיֶה",
   },
   {
+    reference: "Psalm 23:1",
+    text: "The LORD is my shepherd; I shall not want.",
+    hebrew: "יְהוָה רֹעִי לֹא אֶחְסָר",
+  },
+  {
     reference: "1 John 4:8",
     text: "God is love.",
-    hebrew: "",
+    hebrew: "הָאֱלֹהִים אַהֲבָה הוּא",
   },
   {
     reference: "Revelation 22:13",
     text: "I am the Alpha and the Omega, the First and the Last, the Beginning and the End.",
-    hebrew: "",
+    hebrew: "אֲנִי הָאָלֶף וְהַתָּו הָרִאשׁוֹן וְהָאַחֲרוֹן הַתְּחִלָּה וְהַסּוֹף",
   },
 ];

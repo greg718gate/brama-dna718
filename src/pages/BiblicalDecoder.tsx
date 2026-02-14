@@ -275,17 +275,17 @@ const BiblicalDecoder = () => {
                 {/* Interpretation */}
                 <div className="p-4 rounded-lg bg-muted/30 border border-border">
                   <h3 className="font-mono text-sm text-primary mb-2">{t('decoder.interpretation.title')}</h3>
-                  {result.vi.teleportReady ? (
+                {result.vi.teleportReady ? (
                     <ul className="text-sm space-y-1 text-green-400">
-                      <li>→ Coherence {">"} 94%: Phase teleportation possible</li>
-                      <li>→ DNA gate resonance: GATCA activated</li>
-                      <li>→ Intention vector locked: Reality modification enabled</li>
+                      <li>→ {t('decoder.interp.coherenceHigh')}</li>
+                      <li>→ {t('decoder.interp.gateActive')}</li>
+                      <li>→ {t('decoder.interp.viLocked')}</li>
                     </ul>
                   ) : (
                     <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>→ Coherence building: Continue harmonic alignment</li>
-                      <li>→ Adjust t or x to nearest resonance key</li>
-                      <li>→ Use audio activation: 7.83 + 18.6 + 718 Hz</li>
+                      <li>→ {t('decoder.interp.coherenceBuilding')}</li>
+                      <li>→ {t('decoder.interp.adjustParams')}</li>
+                      <li>→ {t('decoder.interp.useAudio')}</li>
                     </ul>
                   )}
                 </div>
