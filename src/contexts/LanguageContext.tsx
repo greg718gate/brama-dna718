@@ -806,6 +806,12 @@ export const translations = {
     'decoder.viz2.desc': '4 panele: (1) Hamiltonian H (|H_ij|) — macierz 18×18 z elementami diagonalnymi i sprzężeniami pozadiagonalnymi malejącymi wykładniczo. (2) Widmo energetyczne — 18 poziomów od ~500 Hz do ~11500 Hz. (3) Macierz gęstości ρ = |ψ₀⟩⟨ψ₀| — stan czysty skoncentrowany na bramach 0–2. (4) Operator ewolucji U(t=1s) — część rzeczywista, widoczna struktura unitarna.',
     'decoder.viz3.title': 'Kalkulator Wektora Intencji (Aplikacja)',
     'decoder.viz3.desc': 'Zrzut ekranu interaktywnego kalkulatora VI z aplikacji. Parametry: Amplituda A=6, Czas T=13s, Częstotliwość f=18 Hz. Wynik: VI zmaterializowany = 1.1628. Wykres Ψ_total(t) pokazuje przebieg funkcji falowej z modulacjami Schumanna i Lunar.',
+    'decoder.interp.coherenceHigh': 'Koherencja > 94%: Teleportacja fazowa możliwa',
+    'decoder.interp.gateActive': 'Rezonans bramy DNA: GATCA aktywowana',
+    'decoder.interp.viLocked': 'Wektor intencji zablokowany: Modyfikacja rzeczywistości włączona',
+    'decoder.interp.coherenceBuilding': 'Koherencja rośnie: Kontynuuj harmoniczne wyrównanie',
+    'decoder.interp.adjustParams': 'Dostosuj t lub x do najbliższego klucza rezonansu',
+    'decoder.interp.useAudio': 'Użyj aktywacji audio: 7.83 + 18.6 + 718 Hz',
     'decoder.license': '© 2026 Grzegorz | BRAMA-718-UNIFIED | Licencja: CC BY-NC 4.0',
   },
   en: {
@@ -1605,6 +1611,12 @@ export const translations = {
     'decoder.viz2.desc': '4 panels: (1) Hamiltonian H (|H_ij|) — 18×18 matrix with diagonal elements and exponentially decaying off-diagonal couplings. (2) Energy spectrum — 18 levels from ~500 Hz to ~11500 Hz. (3) Density matrix ρ = |ψ₀⟩⟨ψ₀| — pure state concentrated on gates 0–2. (4) Evolution operator U(t=1s) — real part, showing unitary structure.',
     'decoder.viz3.title': 'Intention Vector Calculator (App)',
     'decoder.viz3.desc': 'Screenshot of the interactive VI calculator from the app. Parameters: Amplitude A=6, Time T=13s, Frequency f=18 Hz. Result: VI materialized = 1.1628. The Ψ_total(t) plot shows the wave function with Schumann and Lunar modulations.',
+    'decoder.interp.coherenceHigh': 'Coherence > 94%: Phase teleportation possible',
+    'decoder.interp.gateActive': 'DNA gate resonance: GATCA activated',
+    'decoder.interp.viLocked': 'Intention vector locked: Reality modification enabled',
+    'decoder.interp.coherenceBuilding': 'Coherence building: Continue harmonic alignment',
+    'decoder.interp.adjustParams': 'Adjust t or x to nearest resonance key',
+    'decoder.interp.useAudio': 'Use audio activation: 7.83 + 18.6 + 718 Hz',
     'decoder.license': '© 2026 Grzegorz | BRAMA-718-UNIFIED | License: CC BY-NC 4.0',
   }
 };
