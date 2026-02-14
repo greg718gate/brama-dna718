@@ -742,5 +742,173 @@ def main():
     print("718 Hz | 18 Gates | Golden Ratio | Teleportation Ready")
     print("=" * 80)
 
+# ═══════════════════════════════════════════════════════════════════
+# TEMPORAL EVOLUTION VISUALIZATION
+# Hebrew Gematria + Hamilton Eigenvalue + Lindblad Decoherence
+# ═══════════════════════════════════════════════════════════════════
+
+HEBREW_GEMATRIA = {
+    'א':1, 'ב':2, 'ג':3, 'ד':4, 'ה':5, 'ו':6, 'ז':7, 'ח':8, 'ט':9,
+    'י':10,'כ':20,'ל':30,'מ':40,'נ':50,'ס':60,'ע':70,'פ':80,'צ':90,
+    'ק':100,'ר':200,'ש':300,'ת':400
+}
+
+def hebrew_gematria(text: str) -> float:
+    """Hebrew gematria -> parameter t (normalized to [0,1])"""
+    total = sum(HEBREW_GEMATRIA.get(c, 0) for c in text)
+    return (total % 718) / 718 if total > 0 else 0
+
+def fractal_analysis_718(text: str) -> float:
+    """First 718 chars -> parameter x (fractal complexity)"""
+    chars = text[:718]
+    if len(chars) < 10:
+        return 1.0
+    n = len(chars)
+    L = [len(set(chars[i:i+10])) for i in range(0, n-10, 10)]
+    H = np.mean(L) / 10.0
+    return 100 + H * 1000
+
+def hamilton_eigenvalue_correlation(gematria: float, fractal: float) -> int:
+    """Map gematria+fractal to DNA gate (Hamilton spectrum)"""
+    eigen_index = int((gematria + fractal/10000) * 18) % 18
+    return eigen_index
+
+def visualize_quantum_evolution():
+    """
+    Generate temporal evolution visualization of the 18-gate quantum system.
+    Outputs: quantum_evolution.png
+    """
+    print("\n[EVOLUTION] Generating temporal evolution visualization...")
+    
+    gate_names = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", 
+                  "Eta", "Theta", "Iota", "Kappa", "Lambda", "Mu", 
+                  "Nu", "Xi", "Omicron", "Pi", "Rho", "Sigma"]
+    
+    N = 18  # Number of gates
+    
+    # Build modified Hamiltonian H (18x18)
+    H_mod = np.zeros((N, N), dtype=complex)
+    for i in range(N):
+        # Diagonal: E_i = 443.75·(i+1)·[1 + γ·sin(2πi/φ)]
+        H_mod[i, i] = 443.75 * (i + 1) * (1 + GAMMA * np.sin(2 * np.pi * i / PHI))
+        for j in range(N):
+            if i != j:
+                # Off-diagonal coupling: V_ij = 20·exp(-|i-j|/3φ)·exp(i·2πij/18φ)
+                H_mod[i, j] = 20 * np.exp(-abs(i-j) / (3*PHI)) * cmath.exp(1j * 2*np.pi*i*j / (18*PHI))
+    
+    # Ensure Hermitian
+    H_mod = (H_mod + H_mod.conj().T) / 2
+    
+    # Eigenvalues
+    eigenvalues_m, eigenvectors_m = np.linalg.eigh(H_mod)
+    eigenvalues_m_real = eigenvalues_m.real
+    
+    # Initial state: (|Alpha⟩ + |Theta⟩ + |Sigma⟩)/√3
+    psi0 = np.zeros(N, dtype=complex)
+    psi0[0] = 1/np.sqrt(3)   # Alpha
+    psi0[7] = 1/np.sqrt(3)   # Theta
+    psi0[17] = 1/np.sqrt(3)  # Sigma
+    
+    # Time evolution
+    times = np.linspace(0, 5, 500)
+    probabilities = np.zeros((len(times), N))
+    coherence = np.zeros(len(times))
+    VI_trajectory = np.zeros((len(times), N))
+    
+    for ti, t in enumerate(times):
+        # U(t) = exp(-iHt)
+        U = eigenvectors_m @ np.diag(np.exp(-1j * eigenvalues_m * t)) @ eigenvectors_m.conj().T
+        psi_t = U @ psi0
+        probs = np.abs(psi_t)**2
+        probabilities[ti] = probs
+        coherence[ti] = np.max(probs)
+        
+        # Accumulate VI
+        if ti > 0:
+            dt = times[ti] - times[ti-1]
+            VI_trajectory[ti] = VI_trajectory[ti-1] + probs * dt
+    
+    # Final VI and top gates
+    VI_final = VI_trajectory[-1]
+    top_gates = np.argsort(VI_final)[::-1]
+    
+    # ═══════════════════════════════════════════════════════════════════
+    # PLOTTING
+    # ═══════════════════════════════════════════════════════════════════
+    
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    
+    # 1. Probability heatmap
+    im1 = axes[0, 0].imshow(probabilities.T, aspect='auto', cmap='hot',
+                            extent=[0, 5, 0, 18], origin='lower')
+    axes[0, 0].set_title('Ewolucja Prawdopodobieństwa |ψᵢ(t)|²', fontsize=12, fontweight='bold')
+    axes[0, 0].set_xlabel('Czas [s]')
+    axes[0, 0].set_ylabel('Brama (0=Alpha, 17=Sigma)')
+    axes[0, 0].set_yticks(range(0, 18, 2))
+    plt.colorbar(im1, ax=axes[0, 0], label='Prawdopodobieństwo')
+    axes[0, 0].axhline(y=0, color='cyan', linestyle='--', alpha=0.7, label='Alpha')
+    axes[0, 0].axhline(y=7, color='green', linestyle='--', alpha=0.7, label='Theta')
+    axes[0, 0].axhline(y=17, color='blue', linestyle='--', alpha=0.7, label='Sigma')
+    axes[0, 0].legend(loc='upper right')
+    
+    # 2. Coherence over time
+    axes[0, 1].plot(times, coherence, 'b-', linewidth=2)
+    axes[0, 1].axhline(y=0.94, color='r', linestyle='--', label='Próg teleportacji (94%)')
+    axes[0, 1].set_title('Koherencja w Czasie', fontsize=12, fontweight='bold')
+    axes[0, 1].set_xlabel('Czas [s]')
+    axes[0, 1].set_ylabel('Koherencja (max |ψᵢ|²)')
+    axes[0, 1].grid(True, alpha=0.3)
+    axes[0, 1].legend()
+    axes[0, 1].set_ylim(0, 1.05)
+    
+    # 3. VI trajectory (top 5 gates)
+    colors = plt.cm.tab10(np.linspace(0, 1, 5))
+    for i, gate_idx in enumerate(top_gates[:5]):
+        axes[1, 0].plot(times, VI_trajectory[:, gate_idx],
+                       color=colors[i], linewidth=2, label=f'{gate_names[gate_idx]}')
+    axes[1, 0].set_title('Akumulacja Wektora Intencji VI(t)', fontsize=12, fontweight='bold')
+    axes[1, 0].set_xlabel('Czas [s]')
+    axes[1, 0].set_ylabel('VI (skumulowane)')
+    axes[1, 0].grid(True, alpha=0.3)
+    axes[1, 0].legend()
+    
+    # 4. Final state spectrum
+    theta_angles = np.linspace(0, 2*np.pi, 18, endpoint=False)
+    final_probs = probabilities[-1]
+    bars = axes[1, 1].bar(theta_angles, final_probs, width=0.3, bottom=0.0)
+    for i, bar in enumerate(bars):
+        bar.set_facecolor(plt.cm.viridis(final_probs[i]))
+        bar.set_alpha(0.8)
+    axes[1, 1].set_title('Stan Końcowy |ψ(t=5s)|² (Widmo)', fontsize=12, fontweight='bold')
+    axes[1, 1].set_xticks(theta_angles[::2])
+    axes[1, 1].set_xticklabels([gate_names[i] for i in range(0, 18, 2)], fontsize=8)
+    axes[1, 1].set_ylim(0, 1)
+    
+    plt.tight_layout()
+    plt.savefig('quantum_evolution.png', dpi=150, bbox_inches='tight')
+    print("✓ Zapisano wizualizację: quantum_evolution.png")
+    plt.close()
+    
+    # Mathematical summary
+    print("\n" + "=" * 80)
+    print("PODSUMOWANIE MATEMATYCZNE SYSTEMU Ψ-718")
+    print("=" * 80)
+    print(f"\n1. HAMILTONIAN (18x18):")
+    print(f"   - Elementy diagonalne: E_i = 443.75·(i+1)·[1+γ·sin(2πi/φ)] Hz")
+    print(f"   - Sprzężenia: V_ij = 20·exp(-|i-j|/3φ)·exp(i·2πij/18φ)")
+    print(f"   - Hermitowski: {np.allclose(H_mod, H_mod.conj().T)}")
+    print(f"\n2. WARTOŚCI WŁASNE:")
+    print(f"   - Zakres: {eigenvalues_m_real[0]:.2f} - {eigenvalues_m_real[-1]:.2f} Hz")
+    print(f"   - Średni odstęp: {np.mean(np.diff(eigenvalues_m_real)):.2f} Hz")
+    print(f"\n3. EWOLUCJA CZASOWA:")
+    print(f"   - Stan początkowy: (|Alpha⟩ + |Theta⟩ + |Sigma⟩)/√3")
+    print(f"   - Stan końcowy zdominowany przez: {gate_names[top_gates[0]]} (VI={VI_final[top_gates[0]]:.4f})")
+    print(f"\n4. WEKTOR INTENCJI:")
+    print(f"   - VI_total = {np.sum(VI_final):.6f}")
+    print(f"   - Materiał. potencjał = VI × γ = {np.sum(VI_final) * GAMMA:.6f}")
+    print("=" * 80)
+
+
 if __name__ == "__main__":
     main()
+    visualize_quantum_evolution()
