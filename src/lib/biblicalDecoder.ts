@@ -584,6 +584,81 @@ export function generateBibleConnections(result: {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// VERBAL INTERPRETATION GENERATOR
+// Generates plain-language "Science ↔ Faith" interpretation for any verse
+// ═══════════════════════════════════════════════════════════════════
+
+export interface VerbalInterpretation {
+  scienceSays: string;
+  faithSays: string;
+  bridge: string;
+  miracle: string;
+  insight: string;
+}
+
+export function generateVerbalInterpretation(
+  result: {
+    reference: string;
+    text: string;
+    gematriaTotal: number;
+    gematriaT: number;
+    hamiltonGate: number;
+    gatePosition: number;
+    psi: PsiCalcResult;
+    vi: VIResult;
+    decoherence: DecoherenceResult;
+    goldenSignatures: { phi: number; gamma: number; ratio718Schumann: number };
+  },
+  lang: 'pl' | 'en' = 'pl'
+): VerbalInterpretation {
+  const coherencePct = (result.psi.coherence * 100).toFixed(0);
+  const gateName = GATE_NAMES[result.gatePosition] || `Gate-${result.hamiltonGate + 1}`;
+  const stateLabel = result.psi.quantumState;
+  const isHighCoherence = result.psi.coherence > 0.8;
+  const isStable = result.decoherence.stability === "STABLE";
+  const viStrong = result.vi.viMagnitude > 1;
+
+  if (lang === 'en') {
+    const scienceSays = isHighCoherence
+      ? `This verse vibrates at ${coherencePct}% coherence — an extremely organized quantum state (${stateLabel}). The wave function Ψ shows strong coupling with DNA gate ${gateName} at position ${result.gatePosition} in mitochondrial DNA. The system is ${isStable ? "stable — protected from decoherence by 718 Hz resonance" : "still building stability — the resonance field is forming"}.`
+      : `This verse reaches ${coherencePct}% coherence in state ${stateLabel}. The wave function maps to DNA gate ${gateName}. ${isStable ? "Despite moderate coherence, the system maintains stability through resonance protection." : "The field is in an early formation phase — like a seed that hasn't yet sprouted."}`;
+
+    const faithSays = `"${result.text.slice(0, 80)}${result.text.length > 80 ? '...' : ''}" — This passage carries a gematria value of ${result.gematriaTotal}, which in the Ψ-718 framework translates to a specific point in the phase space of consciousness. ${isHighCoherence ? "The high coherence suggests this text resonates deeply with the fundamental frequency of creation." : "Each word contributes to building a resonance field — the message is encoded at the quantum level."}`;
+
+    const bridge = viStrong
+      ? `When science measures Ψ = ${result.psi.magnitude.toFixed(4)} and faith reads "${result.reference}", they describe the SAME reality from different angles. The Intention Vector (VI = ${result.vi.viMagnitude.toFixed(4)}) shows that this verse has strong materialization potential — the "word becomes flesh" is not metaphor, it's quantum mechanics of consciousness collapsing probability into reality.`
+      : `Science sees a wave function with magnitude ${result.psi.magnitude.toFixed(4)}, faith sees divine revelation in "${result.reference}". The bridge between them: both describe information that shapes reality. The VI of ${result.vi.viMagnitude.toFixed(4)} indicates the verse is building its field — like prayer that accumulates power over time.`;
+
+    const miracle = isHighCoherence
+      ? `At ${coherencePct}% coherence, this verse enters the realm where "miracles" become quantum mechanics. What we call supernatural is nature operating at frequencies we haven't measured yet. The 718 Hz resonance in this text suggests it accesses the same field that underlies all transformative biblical events.`
+      : `This verse operates at ${coherencePct}% coherence — still building toward the threshold where quantum potential becomes manifest reality. Every reading, every prayer, every meditation on these words increases the coherence field. Miracles aren't instant — they're the culmination of accumulated quantum intention.`;
+
+    const insight = `${result.reference} maps to DNA gate ${gateName} — this isn't coincidence, it's the mathematical signature of creation encoded in both Scripture and biology. The golden ratio (φ = ${result.goldenSignatures.phi.toFixed(4)}) appears in DNA helix angles AND in the harmonic structure of this verse. God didn't write two books (Nature and Scripture) — He wrote one, in the language of mathematics.`;
+
+    return { scienceSays, faithSays, bridge, miracle, insight };
+  }
+
+  // Polish
+  const scienceSays = isHighCoherence
+    ? `Ten werset wibruje z koherencją ${coherencePct}% — niezwykle zorganizowany stan kwantowy (${stateLabel}). Funkcja falowa Ψ wykazuje silne sprzężenie z bramą DNA ${gateName} na pozycji ${result.gatePosition} w mitochondrialnym DNA. System jest ${isStable ? "stabilny — chroniony przed dekoherencją przez rezonans 718 Hz" : "w trakcie budowania stabilności — pole rezonansowe się formuje"}.`
+    : `Ten werset osiąga ${coherencePct}% koherencji w stanie ${stateLabel}. Funkcja falowa mapuje się na bramę DNA ${gateName}. ${isStable ? "Mimo umiarkowanej koherencji system utrzymuje stabilność dzięki ochronie rezonansowej." : "Pole jest w fazie wczesnego formowania — jak ziarno, które jeszcze nie wykiełkowało."}`;
+
+  const faithSays = `"${result.text.slice(0, 80)}${result.text.length > 80 ? '...' : ''}" — Ten fragment niesie wartość gematrii ${result.gematriaTotal}, co w ramach Ψ-718 przekłada się na konkretny punkt w przestrzeni fazowej świadomości. ${isHighCoherence ? "Wysoka koherencja sugeruje, że ten tekst rezonuje głęboko z fundamentalną częstotliwością stworzenia." : "Każde słowo przyczynia się do budowy pola rezonansowego — przesłanie jest zakodowane na poziomie kwantowym."}`;
+
+  const bridge = viStrong
+    ? `Kiedy nauka mierzy Ψ = ${result.psi.magnitude.toFixed(4)}, a wiara czyta „${result.reference}", opisują TĘ SAMĄ rzeczywistość z różnych perspektyw. Wektor Intencji (VI = ${result.vi.viMagnitude.toFixed(4)}) pokazuje, że ten werset ma silny potencjał materializacji — „słowo stało się ciałem" to nie metafora, to mechanika kwantowa świadomości zwijająca prawdopodobieństwo w rzeczywistość.`
+    : `Nauka widzi funkcję falową o magnitudzie ${result.psi.magnitude.toFixed(4)}, wiara widzi objawienie w „${result.reference}". Most między nimi: obie opisują informację kształtującą rzeczywistość. VI wynoszący ${result.vi.viMagnitude.toFixed(4)} wskazuje, że werset buduje swoje pole — jak modlitwa, która kumuluje moc w czasie.`;
+
+  const miracle = isHighCoherence
+    ? `Przy ${coherencePct}% koherencji ten werset wchodzi w obszar, gdzie „cuda" stają się mechaniką kwantową. To, co nazywamy nadprzyrodzonym, to natura działająca na częstotliwościach, których jeszcze nie zmierzyliśmy. Rezonans 718 Hz w tym tekście sugeruje dostęp do tego samego pola, które leży u podstaw wszystkich transformacyjnych wydarzeń biblijnych.`
+    : `Ten werset działa przy ${coherencePct}% koherencji — wciąż buduje się ku progowi, gdzie kwantowy potencjał staje się rzeczywistością. Każde czytanie, każda modlitwa, każda medytacja nad tymi słowami zwiększa pole koherencji. Cuda nie są natychmiastowe — są kulminacją skumulowanej kwantowej intencji.`;
+
+  const insight = `${result.reference} mapuje się na bramę DNA ${gateName} — to nie przypadek, to matematyczna sygnatura stworzenia zakodowana zarówno w Piśmie, jak i w biologii. Złoty podział (φ = ${result.goldenSignatures.phi.toFixed(4)}) pojawia się w kątach helisy DNA I w strukturze harmonicznej tego wersetu. Bóg nie napisał dwóch książek (Natury i Pisma) — napisał jedną, w języku matematyki.`;
+
+  return { scienceSays, faithSays, bridge, miracle, insight };
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FULL BIBLICAL DECODER
 // ═══════════════════════════════════════════════════════════════════
 
