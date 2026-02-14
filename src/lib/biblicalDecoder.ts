@@ -698,8 +698,10 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     gematriaResult = hebrewGematria(hebrewText);
     t = gematriaResult.normalized || 0.5;
   } else {
-    gematriaResult = { total: 0, normalized: 0, breakdown: [] };
+    // Latin gematria fallback — compute a stable sum for display
     t = gematriaLatin(text);
+    const latinSum = text.toUpperCase().split("").filter(c => /[A-Z]/.test(c)).reduce((s, c) => s + (c.charCodeAt(0) - 64), 0);
+    gematriaResult = { total: latinSum, normalized: t, breakdown: [] };
   }
 
   // 2. Fractal analysis → x
