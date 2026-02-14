@@ -80,10 +80,15 @@ const BiblicalDecoder = () => {
     if (!text.trim() && !hebrewText.trim()) return;
     setIsCalculating(true);
     setTimeout(() => {
-      const r = decodeVerse(reference || "Custom", text, hebrewText);
-      setResult(r);
-      setIsCalculating(false);
-    }, 150);
+      try {
+        const r = decodeVerse(reference || "Custom", text, hebrewText);
+        setResult(r);
+      } catch (e) {
+        console.error("Decode error:", e);
+      } finally {
+        setIsCalculating(false);
+      }
+    }, 50);
   };
 
   const handlePreset = (preset: typeof PRESET_VERSES[0]) => {
@@ -92,10 +97,15 @@ const BiblicalDecoder = () => {
     setHebrewText(preset.hebrew);
     setIsCalculating(true);
     setTimeout(() => {
-      const r = decodeVerse(preset.reference, preset.text, preset.hebrew);
-      setResult(r);
-      setIsCalculating(false);
-    }, 150);
+      try {
+        const r = decodeVerse(preset.reference, preset.text, preset.hebrew);
+        setResult(r);
+      } catch (e) {
+        console.error("Decode error:", e);
+      } finally {
+        setIsCalculating(false);
+      }
+    }, 50);
   };
 
   return (
@@ -141,6 +151,71 @@ const BiblicalDecoder = () => {
             <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
               <h4 className="font-semibold text-foreground text-xs mb-1">{t('decoder.purpose.title')}</h4>
               <p className="text-xs">{t('decoder.purpose.simple')}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* THE BRIDGE: Science speaks / God speaks */}
+        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Sparkles className="w-5 h-5 text-primary" />
+              {t('decoder.bridge.title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 text-sm leading-relaxed">
+            {/* Science speaks vs God speaks */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-background/60 border border-border space-y-3">
+                <h4 className="font-bold text-foreground flex items-center gap-2">
+                  <Atom className="w-4 h-4 text-primary" />
+                  {t('decoder.bridge.scienceSpeaks')}
+                </h4>
+                <div className="font-mono text-xs space-y-1 text-muted-foreground">
+                  <p>E = mc²</p>
+                  <p>Ψ = ∫ S(t)·B(t) dt</p>
+                  <p>DNA = GATCA...</p>
+                </div>
+              </div>
+              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-3">
+                <h4 className="font-bold text-foreground flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-primary" />
+                  {t('decoder.bridge.godSpeaks')}
+                </h4>
+                <div className="text-xs space-y-1 italic text-muted-foreground">
+                  <p>"{t('decoder.bridge.iAm')}"</p>
+                  <p>"{t('decoder.bridge.letThereBeLight')}"</p>
+                  <p>"{t('decoder.bridge.inTheBeginning')}"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Miracles → Quantum Potential */}
+            <div className="p-4 rounded-lg bg-background/60 border border-border space-y-3">
+              <h4 className="font-bold text-foreground text-center">{t('decoder.bridge.miraclesTitle')}</h4>
+              <p className="text-xs text-muted-foreground text-center">{t('decoder.bridge.miraclesDesc')}</p>
+            </div>
+
+            {/* Example: Jesus walks on water */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 rounded-lg bg-background/60 border border-border space-y-2">
+                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.scripture')}</h5>
+                <p className="text-xs italic text-muted-foreground">"{t('decoder.bridge.walksOnWater')}"</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background/60 border border-border space-y-2">
+                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.quantumMechanics')}</h5>
+                <p className="text-xs text-muted-foreground">{t('decoder.bridge.quantumExplanation')}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
+                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.theBridge')}</h5>
+                <p className="text-xs text-muted-foreground">{t('decoder.bridge.bridgeExplanation')}</p>
+              </div>
+            </div>
+
+            {/* Key insight */}
+            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
+              <p className="text-sm font-semibold text-foreground">{t('decoder.bridge.keyInsight')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('decoder.bridge.keyInsightDesc')}</p>
             </div>
           </CardContent>
         </Card>
