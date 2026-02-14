@@ -53,8 +53,25 @@ const BiblicalDecoder = () => {
   const [reference, setReference] = useState("");
   const [text, setText] = useState("");
   const [hebrewText, setHebrewText] = useState("");
+  const [hebrewFromPreset, setHebrewFromPreset] = useState(false);
   const [result, setResult] = useState<DecoderResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // When user manually edits reference or text, clear preset Hebrew to avoid stale data
+  const handleReferenceChange = (val: string) => {
+    setReference(val);
+    if (hebrewFromPreset) {
+      setHebrewText("");
+      setHebrewFromPreset(false);
+    }
+  };
+  const handleTextChange = (val: string) => {
+    setText(val);
+    if (hebrewFromPreset) {
+      setHebrewText("");
+      setHebrewFromPreset(false);
+    }
+  };
 
   // Re-generate language-dependent content when language changes
   const localizedPredictions = useMemo(() => {
@@ -115,6 +132,7 @@ const BiblicalDecoder = () => {
     setReference(preset.reference);
     setText(preset.text);
     setHebrewText(preset.hebrew);
+    setHebrewFromPreset(true);
     setIsCalculating(true);
     setTimeout(() => {
       try {
@@ -208,15 +226,15 @@ const BiblicalDecoder = () => {
           <CardContent className="space-y-4">
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">{t('decoder.input.ref')}</label>
-              <Input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Genesis 1:1" className="font-mono" />
+              <Input value={reference} onChange={(e) => handleReferenceChange(e.target.value)} placeholder="Genesis 1:1" className="font-mono" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">{t('decoder.input.text')}</label>
-              <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="In the beginning God created the heavens and the earth..." className="font-mono min-h-[80px]" />
+              <Textarea value={text} onChange={(e) => handleTextChange(e.target.value)} placeholder="In the beginning God created the heavens and the earth..." className="font-mono min-h-[80px]" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">{t('decoder.input.hebrew')}</label>
-              <Textarea value={hebrewText} onChange={(e) => setHebrewText(e.target.value)} placeholder="בְּרֵאשִׁית בָּרָא אֱלֹהִים" className="font-mono min-h-[60px]" dir="rtl" />
+              <Textarea value={hebrewText} onChange={(e) => { setHebrewText(e.target.value); setHebrewFromPreset(false); }} placeholder="בְּרֵאשִׁית בָּרָא אֱלֹהִים" className="font-mono min-h-[60px]" dir="rtl" />
             </div>
             <Button onClick={handleDecode} disabled={!canDecode} className="w-full h-12 font-bold text-lg">
               <Zap className="w-5 h-5 mr-2" />
