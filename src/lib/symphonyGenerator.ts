@@ -75,9 +75,9 @@ export async function generateSymphony(audioContext: AudioContext): Promise<Symp
         const leftSingularity = Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t[i]) * singularityEnvelope;
         const rightSingularity = Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t[i]) * singularityEnvelope;
         
-        // Add with weight 144 (initiation number) * gamma
-        leftWave[i] += leftSingularity * 144 * GAMMA;
-        rightWave[i] += rightSingularity * 144 * GAMMA;
+        // Add with weight scaled to match other gates (was 144*GAMMA≈89 which drowned everything after normalization)
+        leftWave[i] += leftSingularity * GAMMA * 0.5;
+        rightWave[i] += rightSingularity * GAMMA * 0.5;
       }
     }
     
