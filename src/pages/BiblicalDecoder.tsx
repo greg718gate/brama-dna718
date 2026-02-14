@@ -19,6 +19,7 @@ import {
   decodeVerse,
   generatePredictions,
   generateBibleConnections,
+  generateVerbalInterpretation,
   PRESET_VERSES,
   HEBREW_GEMATRIA,
   GATCA_GATES,
@@ -76,12 +77,31 @@ const BiblicalDecoder = () => {
     }, language);
   }, [result, language]);
 
+  const verbalInterpretation = useMemo(() => {
+    if (!result) return null;
+    return generateVerbalInterpretation({
+      reference: result.reference,
+      text: result.text,
+      gematriaTotal: result.gematriaTotal,
+      gematriaT: result.gematriaT,
+      hamiltonGate: result.hamiltonGate,
+      gatePosition: result.gatePosition,
+      psi: result.psi,
+      vi: result.vi,
+      decoherence: result.decoherence,
+      goldenSignatures: result.goldenSignatures,
+    }, language);
+  }, [result, language]);
+
   const handleDecode = () => {
-    if (!text.trim() && !hebrewText.trim()) return;
+    // Allow decoding if ANY field has content
+    const effectiveText = text.trim() || hebrewText.trim() || reference.trim();
+    if (!effectiveText) return;
     setIsCalculating(true);
     setTimeout(() => {
       try {
-        const r = decodeVerse(reference || "Custom", text, hebrewText);
+        const decodeText = text.trim() || reference.trim();
+        const r = decodeVerse(reference || "Custom", decodeText, hebrewText);
         setResult(r);
       } catch (e) {
         console.error("Decode error:", e);
@@ -107,6 +127,9 @@ const BiblicalDecoder = () => {
       }
     }, 50);
   };
+
+  const canDecode = !isCalculating && (text.trim() || hebrewText.trim() || reference.trim());
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -155,70 +178,6 @@ const BiblicalDecoder = () => {
           </CardContent>
         </Card>
 
-        {/* THE BRIDGE: Science speaks / God speaks */}
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="w-5 h-5 text-primary" />
-              {t('decoder.bridge.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6 text-sm leading-relaxed">
-            {/* Science speaks vs God speaks */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-background/60 border border-border space-y-3">
-                <h4 className="font-bold text-foreground flex items-center gap-2">
-                  <Atom className="w-4 h-4 text-primary" />
-                  {t('decoder.bridge.scienceSpeaks')}
-                </h4>
-                <div className="font-mono text-xs space-y-1 text-muted-foreground">
-                  <p>E = mc²</p>
-                  <p>Ψ = ∫ S(t)·B(t) dt</p>
-                  <p>DNA = GATCA...</p>
-                </div>
-              </div>
-              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-3">
-                <h4 className="font-bold text-foreground flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-primary" />
-                  {t('decoder.bridge.godSpeaks')}
-                </h4>
-                <div className="text-xs space-y-1 italic text-muted-foreground">
-                  <p>"{t('decoder.bridge.iAm')}"</p>
-                  <p>"{t('decoder.bridge.letThereBeLight')}"</p>
-                  <p>"{t('decoder.bridge.inTheBeginning')}"</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Miracles → Quantum Potential */}
-            <div className="p-4 rounded-lg bg-background/60 border border-border space-y-3">
-              <h4 className="font-bold text-foreground text-center">{t('decoder.bridge.miraclesTitle')}</h4>
-              <p className="text-xs text-muted-foreground text-center">{t('decoder.bridge.miraclesDesc')}</p>
-            </div>
-
-            {/* Example: Jesus walks on water */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="p-3 rounded-lg bg-background/60 border border-border space-y-2">
-                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.scripture')}</h5>
-                <p className="text-xs italic text-muted-foreground">"{t('decoder.bridge.walksOnWater')}"</p>
-              </div>
-              <div className="p-3 rounded-lg bg-background/60 border border-border space-y-2">
-                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.quantumMechanics')}</h5>
-                <p className="text-xs text-muted-foreground">{t('decoder.bridge.quantumExplanation')}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
-                <h5 className="font-semibold text-foreground text-xs">{t('decoder.bridge.theBridge')}</h5>
-                <p className="text-xs text-muted-foreground">{t('decoder.bridge.bridgeExplanation')}</p>
-              </div>
-            </div>
-
-            {/* Key insight */}
-            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
-              <p className="text-sm font-semibold text-foreground">{t('decoder.bridge.keyInsight')}</p>
-              <p className="text-xs text-muted-foreground mt-1">{t('decoder.bridge.keyInsightDesc')}</p>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Preset verses */}
         <Card className="border-primary/20">
@@ -259,7 +218,7 @@ const BiblicalDecoder = () => {
               <label className="text-xs text-muted-foreground mb-1 block">{t('decoder.input.hebrew')}</label>
               <Textarea value={hebrewText} onChange={(e) => setHebrewText(e.target.value)} placeholder="בְּרֵאשִׁית בָּרָא אֱלֹהִים" className="font-mono min-h-[60px]" dir="rtl" />
             </div>
-            <Button onClick={handleDecode} disabled={isCalculating || (!text.trim() && !hebrewText.trim())} className="w-full h-12 font-bold text-lg">
+            <Button onClick={handleDecode} disabled={!canDecode} className="w-full h-12 font-bold text-lg">
               <Zap className="w-5 h-5 mr-2" />
               {isCalculating ? t('decoder.button.loading') : t('decoder.button')}
             </Button>
@@ -377,23 +336,51 @@ const BiblicalDecoder = () => {
                 </div>
                 <Separator className="my-4" />
 
-                {/* Interpretation */}
-                <div className="p-4 rounded-lg bg-muted/30 border border-border">
-                  <h3 className="font-mono text-sm text-primary mb-2">{t('decoder.interpretation.title')}</h3>
-                {result.vi.teleportReady ? (
-                    <ul className="text-sm space-y-1 text-green-400">
-                      <li>→ {t('decoder.interp.coherenceHigh')}</li>
-                      <li>→ {t('decoder.interp.gateActive')}</li>
-                      <li>→ {t('decoder.interp.viLocked')}</li>
-                    </ul>
-                  ) : (
-                    <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>→ {t('decoder.interp.coherenceBuilding')}</li>
-                      <li>→ {t('decoder.interp.adjustParams')}</li>
-                      <li>→ {t('decoder.interp.useAudio')}</li>
-                    </ul>
-                  )}
-                </div>
+                {/* VERBAL INTERPRETATION - Science ↔ Faith */}
+                {verbalInterpretation && (
+                  <div className="space-y-4">
+                    <h3 className="font-mono text-sm text-primary mb-2">{t('decoder.interpretation.title')}</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="p-4 rounded-lg bg-background/60 border border-border space-y-2">
+                        <h4 className="font-bold text-foreground text-xs flex items-center gap-2">
+                          <Atom className="w-4 h-4 text-primary" />
+                          {language === 'pl' ? 'Nauka mówi:' : 'Science says:'}
+                        </h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{verbalInterpretation.scienceSays}</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
+                        <h4 className="font-bold text-foreground text-xs flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-primary" />
+                          {language === 'pl' ? 'Wiara mówi:' : 'Faith says:'}
+                        </h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{verbalInterpretation.faithSays}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 space-y-2">
+                      <h4 className="font-bold text-foreground text-xs flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        {language === 'pl' ? 'Most — Nauka i Wiara to jedno:' : 'The Bridge — Science and Faith are one:'}
+                      </h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{verbalInterpretation.bridge}</p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-background/60 border border-border space-y-2">
+                      <h4 className="font-bold text-foreground text-xs">
+                        {language === 'pl' ? '✨ Cuda jako mechanika kwantowa:' : '✨ Miracles as quantum mechanics:'}
+                      </h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{verbalInterpretation.miracle}</p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
+                      <h4 className="font-bold text-foreground text-xs">
+                        {language === 'pl' ? '💡 Kluczowy wniosek:' : '💡 Key insight:'}
+                      </h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{verbalInterpretation.insight}</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
