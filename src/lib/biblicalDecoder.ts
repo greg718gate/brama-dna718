@@ -223,7 +223,6 @@ export interface VIResult {
 }
 
 function calculateVI(tStart: number, tEnd: number, x: number, gateIdx: number, steps: number = 200): VIResult {
-  // Trapezoidal integration of |Ψ(t)| · cos(phase)
   const dt = (tEnd - tStart) / steps;
   let integral = 0;
 
@@ -250,6 +249,252 @@ function calculateVI(tStart: number, tEnd: number, x: number, gateIdx: number, s
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// INTENTION OPERATOR (18×18 Matrix instead of scalar VI)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface IntentionOperatorResult {
+  /** Diagonal values of the 18×18 operator matrix */
+  diagonal: number[];
+  /** Trace of the operator (sum of eigenvalues) */
+  trace: number;
+  /** Determinant approximation */
+  determinant: number;
+  /** Maximum eigenvalue (dominant gate) */
+  maxEigenvalue: number;
+  /** Index of the dominant gate */
+  dominantGateIdx: number;
+  /** Spectral gap (difference between top-2 eigenvalues) */
+  spectralGap: number;
+}
+
+export function calculateIntentionOperator(t: number, x: number): IntentionOperatorResult {
+  // Build VI vector for all 18 gates
+  const diagonal: number[] = [];
+  for (let g = 0; g < 18; g++) {
+    const vi = calculateVI(0, t || 0.5, x, g, 50);
+    diagonal.push(vi.viMagnitude);
+  }
+
+  const trace = diagonal.reduce((s, v) => s + v, 0);
+  const determinant = diagonal.reduce((p, v) => p * (v || 1e-12), 1);
+
+  // Find dominant gate
+  let maxVal = -Infinity;
+  let maxIdx = 0;
+  const sorted = [...diagonal].sort((a, b) => b - a);
+  for (let i = 0; i < 18; i++) {
+    if (diagonal[i] > maxVal) {
+      maxVal = diagonal[i];
+      maxIdx = i;
+    }
+  }
+
+  const spectralGap = sorted.length >= 2 ? sorted[0] - sorted[1] : 0;
+
+  return {
+    diagonal,
+    trace,
+    determinant,
+    maxEigenvalue: maxVal,
+    dominantGateIdx: maxIdx,
+    spectralGap,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LINDBLAD DECOHERENCE MODEL
+// ═══════════════════════════════════════════════════════════════════
+
+export interface DecoherenceResult {
+  /** Decoherence rate γ_d (s⁻¹) */
+  decoherenceRate: number;
+  /** Coherence time T₂ (seconds) */
+  coherenceTime: number;
+  /** Remaining coherence after time t */
+  remainingCoherence: number;
+  /** Thermal noise factor at 37°C */
+  thermalNoise: number;
+  /** Environmental coupling strength */
+  couplingStrength: number;
+  /** Stability assessment */
+  stability: "STABLE" | "METASTABLE" | "UNSTABLE";
+  /** Purity of quantum state (Tr(ρ²)) */
+  purity: number;
+}
+
+export function calculateDecoherence(
+  coherence: number,
+  t: number,
+  temperature: number = 310 // 37°C in Kelvin (body temperature)
+): DecoherenceResult {
+  const kB = 1.380649e-23; // Boltzmann constant
+  const hbar = 1.0545718e-34;
+
+  // Thermal noise at body temperature
+  const thermalEnergy = kB * temperature;
+  const thermalNoise = thermalEnergy / (hbar * FREQ_718 * 2 * Math.PI);
+
+  // Environmental coupling: Lindblad dissipator strength
+  // γ_d = (2π · kB · T) / (ħ · Q) where Q is quality factor
+  const qualityFactor = FREQ_718 / SCHUMANN; // ~91.7
+  const decoherenceRate = (2 * Math.PI * thermalEnergy) / (hbar * qualityFactor);
+
+  // Coherence time T₂ = 1/γ_d
+  const coherenceTime = 1 / decoherenceRate;
+
+  // Remaining coherence: ρ_off(t) = ρ_off(0) · e^(-γ_d · t)
+  const remainingCoherence = coherence * Math.exp(-decoherenceRate * t * 1e-12);
+  // Note: t is in the equation's units, we scale to realistic timescales
+
+  // Coupling strength (normalized)
+  const couplingStrength = Math.min(thermalNoise / 1e10, 1);
+
+  // Purity: Tr(ρ²) = 1 for pure state, 1/N for maximally mixed
+  const purity = 0.5 * (1 + remainingCoherence * remainingCoherence);
+
+  // Stability classification
+  let stability: "STABLE" | "METASTABLE" | "UNSTABLE";
+  if (remainingCoherence > 0.8) stability = "STABLE";
+  else if (remainingCoherence > 0.4) stability = "METASTABLE";
+  else stability = "UNSTABLE";
+
+  return {
+    decoherenceRate,
+    coherenceTime,
+    remainingCoherence,
+    thermalNoise,
+    couplingStrength,
+    stability,
+    purity,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TESTABLE PREDICTIONS
+// ═══════════════════════════════════════════════════════════════════
+
+export interface TestablePrediction {
+  method: string;
+  icon: string;
+  prediction: string;
+  details: string;
+  expectedValue: string;
+  testability: "HIGH" | "MEDIUM" | "LOW";
+}
+
+export function generatePredictions(result: {
+  gatePosition: number;
+  psi: PsiCalcResult;
+  vi: VIResult;
+}): TestablePrediction[] {
+  const gateFreq = FREQ_718 * (result.gatePosition / MTDNA_LENGTH);
+
+  return [
+    {
+      method: "Spektroskopia UV-Vis",
+      icon: "🔬",
+      prediction: `Pik absorpcji przy ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
+      details: "Seria harmoniczna 718/n Hz powinna być widoczna w widmie absorpcji UV-Vis mitochondriów. Odpowiada przejściom elektronowym w łańcuchu transportu elektronów na pozycjach GATCA.",
+      expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (harmoniczna IR)`,
+      testability: "HIGH",
+    },
+    {
+      method: "NMR / Spektroskopia magnetyczna",
+      icon: "🧲",
+      prediction: `Splątanie spinowe między pozycjami GATCA ${result.gatePosition} i ${GATCA_GATES[(GATCA_GATES.indexOf(result.gatePosition) + 9) % 18]}`,
+      details: "Korelacje spinowe (J-coupling) między odpowiednimi atomami ³¹P w szkielecie fosforanowym DNA na pozycjach GATCA powinny wykazywać anomalne sprzężenia kwadrupolowe.",
+      expectedValue: `J-coupling ≈ ${(result.psi.magnitude * 100).toFixed(2)} Hz`,
+      testability: "MEDIUM",
+    },
+    {
+      method: "Stymulacja komórkowa 718 Hz",
+      icon: "🧫",
+      prediction: `Ekspozycja na ${FREQ_718} Hz → zmiana ekspresji genów mitochondrialnych`,
+      details: "Nałożenie fali akustycznej 718 Hz na hodowlę komórkową powinno wpłynąć na ekspresję genów mitochondrialnych kodowanych w pobliżu pozycji GATCA. Mierz mRNA metodą qRT-PCR po 24h ekspozycji.",
+      expectedValue: `Zmiana ekspresji: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
+      testability: "HIGH",
+    },
+    {
+      method: "EEG / Koherencja mózgowa",
+      icon: "🧠",
+      prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → synchronizacja α-θ`,
+      details: "Ekspozycja na binauralny beat (718 Hz lewe ucho, 725.83 Hz prawe ucho = różnica 7.83 Hz) powinna indukować koherencję EEG między korą czołową a ciemieniową w paśmie theta.",
+      expectedValue: `Koherencja EEG > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
+      testability: "HIGH",
+    },
+    {
+      method: "Fluorescencja mitochondrialna",
+      icon: "✨",
+      prediction: `Zmiana potencjału błonowego Δψ_m przy rezonansie bramy ${result.gatePosition}`,
+      details: "Barwienie JC-1 lub TMRM mitochondriów po stymulacji 718 Hz powinno wykazać zmianę stosunku fluorescencji czerwonej/zielonej, wskazując na modulację potencjału błonowego.",
+      expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
+      testability: "MEDIUM",
+    },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BIBLE-QUANTUM CONNECTION ANALYSIS
+// ═══════════════════════════════════════════════════════════════════
+
+export interface BibleConnection {
+  title: string;
+  verse: string;
+  quantumParallel: string;
+  gateLink: string;
+  numericalKey: string;
+}
+
+export function generateBibleConnections(result: {
+  reference: string;
+  gematriaTotal: number;
+  hamiltonGate: number;
+  gatePosition: number;
+  psi: PsiCalcResult;
+}): BibleConnection[] {
+  const gatePos = result.gatePosition;
+  const gateName = GATE_NAMES[gatePos] || "";
+
+  return [
+    {
+      title: "Gematria → Częstotliwość",
+      verse: `Suma gematrii ${result.gematriaTotal} mod 718 = ${result.gematriaTotal % 718}`,
+      quantumParallel: `Wartość gematrii determinuje parametr czasowy t w równaniu Ψ. Każda litera hebrajska jest kwantem informacji, a ich suma definiuje punkt w przestrzeni fazowej świadomości.`,
+      gateLink: `Mapowanie na bramę ${gateName} (pozycja ${gatePos} w mtDNA)`,
+      numericalKey: `${result.gematriaTotal} → t = ${(result.gematriaTotal % 718 / 718).toFixed(6)}`,
+    },
+    {
+      title: "Słowo jako Funkcja Falowa",
+      verse: "\"Na początku było Słowo\" (J 1:1) — Logos = Informacja kwantowa",
+      quantumParallel: `Tekst biblijny jest zakodowaną informacją kwantową. Każdy werset ma unikalny „odcisk palca" w postaci Ψ(t,x) — wartości amplitudy ${result.psi.magnitude.toFixed(6)} i fazy ${result.psi.phase.toFixed(4)} rad.`,
+      gateLink: `Stan kwantowy: ${result.psi.quantumState}`,
+      numericalKey: `|Ψ| × φ = ${result.psi.phiHarmonic.toFixed(6)} (harmoniczna złota)`,
+    },
+    {
+      title: "144 — Klucz Biblijny i DNA",
+      verse: "\"Zmierzył jej mur: sto czterdzieści cztery łokcie\" (Ap 21:17)",
+      quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. Liczba 144 (12² = 12 pokoleń Izraela) pojawia się jako naturalna harmoniczna w przejściu: częstotliwość DNA → złoty podział → rezonans Schumanna.`,
+      gateLink: `144 000 „zapieczętowanych" = 144 × 1000 bram DNA aktywnych jednocześnie`,
+      numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+    },
+    {
+      title: "Drzewo Życia = Helisa DNA",
+      verse: "\"Drzewo Życia, rodzące dwanaście owoców\" (Ap 22:2)",
+      quantumParallel: `Helisa DNA obraca się o 137.5° (= 360°/φ²) — kąt złotego podziału. 12 „owoców" odpowiada 12 głównym grupom bram GATCA, które razem tworzą pełny cykl rezonansowy.`,
+      gateLink: `Brama ${result.hamiltonGate + 1}/18 aktywna w tym wersecie`,
+      numericalKey: `360°/φ² = ${(360 / PHI_SQUARED).toFixed(1)}° (kąt DNA)`,
+    },
+    {
+      title: "JESTEM KTÓRY JESTEM = Autokoherencja",
+      verse: "\"Ehyeh Asher Ehyeh\" (Wj 3:14) — אֶהְיֶה אֲשֶׁר אֶהְיֶה",
+      quantumParallel: `Samoreferencyjna pętla „JESTEM KTÓRY JESTEM" jest lingwistycznym odpowiednikiem autokoherencji kwantowej — stanu, w którym obserwator i obserwowane pole stają się jednym. Koherencja ${(result.psi.coherence * 100).toFixed(1)}% mierzy stopień tego zjednoczenia.`,
+      gateLink: `Próg teleportacji: ${result.psi.coherence >= 0.94 ? "OSIĄGNIĘTY ✓" : `brakuje ${((0.94 - result.psi.coherence) * 100).toFixed(1)}%`}`,
+      numericalKey: `Gematria „Ehyeh" = 21 (= F(8), Fibonacci)`,
+    },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FULL BIBLICAL DECODER
 // ═══════════════════════════════════════════════════════════════════
 
@@ -267,6 +512,10 @@ export interface DecoderResult {
   gatePosition: number;
   psi: PsiCalcResult;
   vi: VIResult;
+  intentionOperator: IntentionOperatorResult;
+  decoherence: DecoherenceResult;
+  predictions: TestablePrediction[];
+  bibleConnections: BibleConnection[];
   goldenSignatures: {
     phi: number;
     gamma: number;
@@ -299,7 +548,28 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   const psi = calculatePsi(t, fractal.x, gateIdx);
 
   // 5. Calculate VI
-  const vi = calculateVI(0, t, fractal.x, gateIdx);
+  const vi = calculateVI(0, t || 0.5, fractal.x, gateIdx);
+
+  // 6. Intention Operator (18×18 matrix)
+  const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x);
+
+  // 7. Decoherence (Lindblad model at body temperature)
+  const decoherence = calculateDecoherence(psi.coherence, t || 0.5);
+
+  const partialResult = {
+    reference,
+    gematriaTotal: gematriaResult.total,
+    hamiltonGate: gateIdx,
+    gatePosition: GATCA_GATES[gateIdx],
+    psi,
+    vi,
+  };
+
+  // 8. Testable predictions
+  const predictions = generatePredictions(partialResult);
+
+  // 9. Bible connections
+  const bibleConnections = generateBibleConnections(partialResult);
 
   return {
     reference,
@@ -315,6 +585,10 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     gatePosition: GATCA_GATES[gateIdx],
     psi,
     vi,
+    intentionOperator,
+    decoherence,
+    predictions,
+    bibleConnections,
     goldenSignatures: {
       phi: PHI,
       gamma: GAMMA,
