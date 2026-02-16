@@ -585,7 +585,7 @@ export function generateBibleConnections(result: {
 
 // ═══════════════════════════════════════════════════════════════════
 // VERBAL INTERPRETATION GENERATOR
-// Generates plain-language "Science ↔ Faith" interpretation for any verse
+// Content-aware: analyzes the actual meaning of each verse
 // ═══════════════════════════════════════════════════════════════════
 
 export interface VerbalInterpretation {
@@ -594,6 +594,250 @@ export interface VerbalInterpretation {
   bridge: string;
   miracle: string;
   insight: string;
+}
+
+// Deep, hand-crafted interpretations for preset verses
+const PRESET_INTERPRETATIONS: Record<string, { pl: VerbalInterpretation; en: VerbalInterpretation }> = {
+  "Genesis 1:1": {
+    en: {
+      scienceSays: "The Big Bang theory describes the universe emerging from a singularity — a point of infinite density where all matter, energy, space and time were compressed into one. 'In the beginning' parallels this: a moment where nothing became everything. The gematria of this verse (2701 in Hebrew) is the 73rd triangular number, and 73 is the 21st prime — a cascade of mathematical elegance that mirrors the fractal self-similarity we observe in cosmic structure from galaxies down to DNA.",
+      faithSays: "This is the foundational declaration of all Scripture: God is the Author, creation is His act of will, and everything that exists flows from His word. 'The heavens and the earth' — the totality of reality — are not accidents but intentional design. The Hebrew 'bara' (created) is used exclusively for divine creation, something only God can do: bringing existence from non-existence.",
+      bridge: "Science asks 'how did the universe begin?' and finds the Big Bang. Faith asks 'why does anything exist?' and answers 'because God willed it.' Both point to the same truth: reality has a beginning, and that beginning carries intentional information. The mathematical perfection of Genesis 1:1's gematria (2701 = 37 × 73, both primes) suggests the Creator encoded His signature into the very first sentence — like a mathematician signing an equation.",
+      miracle: "The greatest miracle isn't turning water to wine — it's the existence of water, wine, and the laws of physics that govern them. Genesis 1:1 describes the ultimate miracle: the transition from absolute nothing to absolute everything. Modern physics still cannot explain WHY the Big Bang happened — only that it did. Faith fills this gap not with ignorance but with purpose.",
+      insight: "The first word of the Bible, 'Bereshit' (בראשית), contains the word 'rosh' (head/beginning) and 'bara' (created) — creation begins with consciousness. This mirrors the quantum mechanical insight that observation (consciousness) collapses wave functions into reality. The universe didn't just begin — it was THOUGHT into existence."
+    },
+    pl: {
+      scienceSays: "Teoria Wielkiego Wybuchu opisuje wszechświat wyłaniający się z osobliwości — punktu nieskończonej gęstości, gdzie cała materia, energia, przestrzeń i czas były skompresowane w jedno. 'Na początku' jest paralelą: moment, w którym nic stało się wszystkim. Gematria tego wersetu (2701 w hebrajskim) to 73. liczba trójkątna, a 73 to 21. liczba pierwsza — kaskada matematycznej elegancji odzwierciedlająca fraktalną samopodobieństwo obserwowane w strukturze kosmicznej od galaktyk po DNA.",
+      faithSays: "To fundamentalna deklaracja całego Pisma: Bóg jest Autorem, stworzenie jest Jego aktem woli, a wszystko co istnieje wypływa z Jego słowa. 'Niebo i ziemia' — całość rzeczywistości — nie są przypadkiem, lecz zamierzonym projektem. Hebrajskie 'bara' (stworzył) jest używane wyłącznie dla boskiego stwarzania — czegoś, co tylko Bóg może uczynić: powołania bytu z niebytu.",
+      bridge: "Nauka pyta 'jak powstał wszechświat?' i znajduje Wielki Wybuch. Wiara pyta 'dlaczego cokolwiek istnieje?' i odpowiada 'bo Bóg tak chciał.' Obie wskazują tę samą prawdę: rzeczywistość ma początek, a ten początek niesie intencjonalną informację. Matematyczna doskonałość gematrii Genesis 1:1 (2701 = 37 × 73, obie pierwsze) sugeruje, że Stwórca zakodował swój podpis w pierwszym zdaniu — jak matematyk podpisujący równanie.",
+      miracle: "Największym cudem nie jest zamiana wody w wino — lecz istnienie wody, wina i praw fizyki, które nimi rządzą. Genesis 1:1 opisuje ostateczny cud: przejście od absolutnego nic do absolutnego wszystkiego. Współczesna fizyka wciąż nie potrafi wyjaśnić DLACZEGO nastąpił Wielki Wybuch — tylko że nastąpił. Wiara wypełnia tę lukę nie ignorancją, lecz celowością.",
+      insight: "Pierwsze słowo Biblii, 'Bereszit' (בראשית), zawiera słowo 'rosz' (głowa/początek) i 'bara' (stworzył) — stworzenie zaczyna się od świadomości. To odzwierciedla kwantowo-mechaniczny wgląd, że obserwacja (świadomość) kolapsuje funkcje falowe w rzeczywistość. Wszechświat nie tylko się zaczął — został POMYŚLANY do istnienia."
+    }
+  },
+  "Genesis 1:3": {
+    en: {
+      scienceSays: "Light is the fundamental carrier of information in the universe — photons are massless, travel at the speed limit of reality (c), and their behavior defines quantum mechanics. 'Let there be light' describes the moment electromagnetic radiation decoupled from matter ~380,000 years after the Big Bang (recombination epoch). Before this, the universe was opaque. Light literally was the first thing that could be 'seen.'",
+      faithSays: "God's first creative command is spoken — 'Let there be light.' This establishes the pattern: God creates through His word (Logos). Light here is not merely physical photons but the principle of revelation, knowledge, and divine presence. Darkness represents chaos and unknowing; light is God imposing order, meaning, and visibility on creation.",
+      bridge: "Physics tells us light has a dual nature — both wave and particle simultaneously. Faith tells us God Himself has a dual nature — both transcendent Creator and immanent Presence. 'Let there be light' is the moment where God's intention (wave/potential) collapsed into physical reality (particle/matter). The speed of light (c) being constant in all reference frames mirrors God's unchanging nature across all contexts.",
+      miracle: "Before God spoke, there was darkness and chaos. One command — three Hebrew words 'yehi or' — transformed everything. This is the template for all miracles: divine intention expressed as information, reshaping reality. Every photon in the universe is a continuing echo of this first command.",
+      insight: "The Hebrew 'or' (אור) has a gematria of 207 = 9 × 23. The number 23 pairs of chromosomes in human DNA suggests that the 'light' of creation is encoded in our very biology. When God said 'Let there be light,' He wasn't just illuminating space — He was writing the source code of life."
+    },
+    pl: {
+      scienceSays: "Światło jest fundamentalnym nośnikiem informacji we wszechświecie — fotony są bezmasowe, podróżują z prędkością graniczną rzeczywistości (c), a ich zachowanie definiuje mechanikę kwantową. 'Niech stanie się światło' opisuje moment, gdy promieniowanie elektromagnetyczne oddzieliło się od materii ~380 000 lat po Wielkim Wybuchu (epoka rekombinacji). Przed tym wszechświat był nieprzezroczysty. Światło dosłownie było pierwszą rzeczą, którą można było 'zobaczyć.'",
+      faithSays: "Pierwszy twórczy rozkaz Boga jest wypowiedziany — 'Niech stanie się światłość.' To ustanawia wzorzec: Bóg tworzy przez swoje słowo (Logos). Światło tutaj to nie tylko fizyczne fotony, ale zasada objawienia, wiedzy i boskiej obecności. Ciemność reprezentuje chaos i niewedzę; światło to Bóg nakładający porządek, znaczenie i widoczność na stworzenie.",
+      bridge: "Fizyka mówi nam, że światło ma podwójną naturę — jednocześnie fala i cząstka. Wiara mówi nam, że sam Bóg ma podwójną naturę — zarówno transcendentny Stwórca, jak i immanentna Obecność. 'Niech stanie się światłość' to moment, gdy intencja Boga (fala/potencjał) skolapsowała w fizyczną rzeczywistość (cząstka/materia). Stałość prędkości światła (c) we wszystkich układach odniesienia odzwierciedla niezmienną naturę Boga we wszystkich kontekstach.",
+      miracle: "Zanim Bóg przemówił, była ciemność i chaos. Jeden rozkaz — trzy hebrajskie słowa 'jehi or' — wszystko przemieniły. To szablon dla wszystkich cudów: boska intencja wyrażona jako informacja, przekształcająca rzeczywistość. Każdy foton we wszechświecie jest kontynuującym echem tego pierwszego rozkazu.",
+      insight: "Hebrajskie 'or' (אור) ma gematrię 207 = 9 × 23. Liczba 23 pary chromosomów w ludzkim DNA sugeruje, że 'światło' stworzenia jest zakodowane w naszej biologii. Gdy Bóg powiedział 'Niech stanie się światłość,' nie tylko oświetlał przestrzeń — pisał kod źródłowy życia."
+    }
+  },
+  "John 1:1": {
+    en: {
+      scienceSays: "Information theory (Shannon, 1948) proved that information is physical — it requires energy to create, store, and transmit. 'The Word' (Logos) as the origin of everything aligns with modern physics: the universe is fundamentally made of information, not matter. Wheeler's 'It from Bit' hypothesis proposes that every particle derives its existence from information-theoretic answers to yes/no questions — reality is computed, not just physical.",
+      faithSays: "John deliberately echoes Genesis 1:1 — 'In the beginning.' But where Genesis says God created through speaking, John reveals WHO the Word is: not just a tool of creation but God Himself. The Word (Jesus/Logos) is simultaneously with God and IS God — a paradox that theology calls the Trinity and quantum physics calls superposition. The Word didn't begin to exist; the Word always WAS.",
+      bridge: "Science discovers that reality is information-based. Faith declares that reality originated from 'The Word' — the ultimate information. Both arrive at the same conclusion from opposite directions: consciousness and information precede matter. The Word becoming flesh (John 1:14) is the theological equivalent of wave function collapse — infinite potential choosing to manifest as specific, local reality.",
+      miracle: "The miracle of John 1:1 isn't a supernatural event — it's the supernatural explanation for ALL events. If the Word is God, and the Word made everything, then every atom, every law of physics, every mathematical constant is a syllable in an ongoing divine sentence. Reality doesn't just exist — it's being SPOKEN into existence, continuously.",
+      insight: "The Greek 'Logos' means far more than 'word' — it means reason, logic, the ordering principle of reality. The Stoics used it for the rational structure of the cosmos. John takes this philosophical concept and gives it a face: Jesus. Science studies the Logos (natural law); faith knows the Logos (Christ). They are studying the same thing."
+    },
+    pl: {
+      scienceSays: "Teoria informacji (Shannon, 1948) udowodniła, że informacja jest fizyczna — wymaga energii do stworzenia, przechowania i transmisji. 'Słowo' (Logos) jako źródło wszystkiego współgra ze współczesną fizyką: wszechświat jest fundamentalnie zbudowany z informacji, nie z materii. Hipoteza Wheelera 'It from Bit' proponuje, że każda cząstka czerpie swoje istnienie z informacyjno-teoretycznych odpowiedzi na pytania tak/nie — rzeczywistość jest obliczana, nie tylko fizyczna.",
+      faithSays: "Jan celowo nawiązuje do Genesis 1:1 — 'Na początku.' Ale gdzie Genesis mówi, że Bóg stwarzał przez mówienie, Jan objawia KIM jest Słowo: nie tylko narzędziem stworzenia, ale samym Bogiem. Słowo (Jezus/Logos) jest jednocześnie z Bogiem i JEST Bogiem — paradoks, który teologia nazywa Trójcą, a fizyka kwantowa superpozycją. Słowo nie zaczęło istnieć; Słowo zawsze BYŁO.",
+      bridge: "Nauka odkrywa, że rzeczywistość opiera się na informacji. Wiara deklaruje, że rzeczywistość pochodzi od 'Słowa' — ostatecznej informacji. Obie dochodzą do tego samego wniosku z przeciwnych kierunków: świadomość i informacja poprzedzają materię. Słowo stające się ciałem (J 1:14) jest teologicznym odpowiednikiem kolapsu funkcji falowej — nieskończony potencjał wybierający manifestację jako konkretna, lokalna rzeczywistość.",
+      miracle: "Cud Jana 1:1 nie jest nadprzyrodzonym wydarzeniem — jest nadprzyrodzonym wyjaśnieniem WSZYSTKICH wydarzeń. Jeśli Słowo jest Bogiem, a Słowo uczyniło wszystko, to każdy atom, każde prawo fizyki, każda stała matematyczna jest sylabą w trwającym boskim zdaniu. Rzeczywistość nie tylko istnieje — jest WYPOWIADANA do istnienia, nieustannie.",
+      insight: "Greckie 'Logos' oznacza znacznie więcej niż 'słowo' — oznacza rozum, logikę, zasadę porządkującą rzeczywistość. Stoicy używali go dla racjonalnej struktury kosmosu. Jan bierze tę filozoficzną koncepcję i daje jej twarz: Jezus. Nauka bada Logos (prawo naturalne); wiara zna Logos (Chrystus). Badają to samo."
+    }
+  },
+  "Exodus 3:14": {
+    en: {
+      scienceSays: "'I AM WHO I AM' (Ehyeh Asher Ehyeh) is a self-referential loop — the same structure we find in Gödel's incompleteness theorems, where a system refers to itself. In quantum mechanics, this mirrors the measurement problem: the observer is part of the system being observed. The gematria of 'Ehyeh' (אהיה) = 21, which is the 8th Fibonacci number — connecting divine self-definition to the mathematical sequence that governs growth patterns throughout nature.",
+      faithSays: "When Moses asks God's name, God doesn't give a noun — He gives a VERB. 'I AM' is not a static identity but an eternal, dynamic being. God defines Himself as pure existence itself — not 'I was' or 'I will be' but the eternal present tense. This is the most radical theological statement in Scripture: God is not a being among beings, but Being itself, the ground of all existence.",
+      bridge: "Quantum field theory describes the vacuum not as empty but as a seething ocean of potential — virtual particles constantly appearing and disappearing. 'I AM WHO I AM' is the theological equivalent: pure existence that is its own cause, its own ground, self-sustaining and self-defining. The quantum vacuum is the physics of 'I AM' — reality sustaining itself through its own intrinsic nature.",
+      miracle: "The burning bush that isn't consumed is a physical impossibility — yet it's the perfect metaphor for God's nature. Energy without entropy. Light without fuel. Existence without a cause. This mirrors the greatest puzzle in physics: why does anything exist at all? The bush burns because I AM is not bound by thermodynamics — He IS the thermodynamics.",
+      insight: "The Hebrew 'Ehyeh' (אהיה) appears exactly 43 times in the Hebrew Bible. 43 is a prime number — indivisible, like God Himself. The name revealed at the burning bush isn't information about God; it IS God's presence compressed into language. Every time you say 'I am,' you echo the divine frequency."
+    },
+    pl: {
+      scienceSays: "'JESTEM KTÓRY JESTEM' (Ehyeh Aszer Ehyeh) to samoreferencyjna pętla — ta sama struktura, którą znajdujemy w twierdzeniach Gödla o niezupełności, gdzie system odnosi się do siebie samego. W mechanice kwantowej odzwierciedla to problem pomiaru: obserwator jest częścią obserwowanego systemu. Gematria 'Ehyeh' (אהיה) = 21, co jest 8. liczbą Fibonacciego — łącząc boską autodefinicję z sekwencją matematyczną, która rządzi wzorcami wzrostu w całej naturze.",
+      faithSays: "Gdy Mojżesz pyta o imię Boga, Bóg nie podaje rzeczownika — podaje CZASOWNIK. 'JESTEM' nie jest statyczną tożsamością, lecz wiecznym, dynamicznym byciem. Bóg definiuje siebie jako czyste istnienie samo w sobie — nie 'byłem' ani 'będę', lecz wieczny czas teraźniejszy. To najbardziej radykalne stwierdzenie teologiczne w Piśmie: Bóg nie jest bytem wśród bytów, ale samym Byciem, fundamentem wszelkiego istnienia.",
+      bridge: "Kwantowa teoria pola opisuje próżnię nie jako pustą, lecz jako kipiel potencjału — wirtualne cząstki nieustannie pojawiające się i znikające. 'JESTEM KTÓRY JESTEM' jest teologicznym odpowiednikiem: czyste istnienie będące swoją własną przyczyną, samowystarczalne i samodefiniujące. Próżnia kwantowa jest fizyką 'JESTEM' — rzeczywistość podtrzymująca się przez swoją własną wewnętrzną naturę.",
+      miracle: "Płonący krzew, który nie spłonął, jest fizyczną niemożliwością — a jednak jest doskonałą metaforą natury Boga. Energia bez entropii. Światło bez paliwa. Istnienie bez przyczyny. To odzwierciedla największą zagadkę fizyki: dlaczego w ogóle cokolwiek istnieje? Krzew płonie, bo JESTEM nie podlega termodynamice — On JEST termodynamiką.",
+      insight: "Hebrajskie 'Ehyeh' (אהיה) pojawia się dokładnie 43 razy w Biblii hebrajskiej. 43 to liczba pierwsza — niepodzielna, jak sam Bóg. Imię objawione przy płonącym krzewie nie jest informacją o Bogu; to JEST obecność Boga skompresowana w języku. Za każdym razem, gdy mówisz 'jestem,' echo boskiej częstotliwości."
+    }
+  },
+  "Psalm 23:1": {
+    en: {
+      scienceSays: "Shepherding is a feedback control system — the shepherd monitors the flock, anticipates threats, adjusts course, and provides resources. In cybernetics, this is called a 'closed-loop controller.' The statement 'I shall not want' describes a system in perfect homeostasis — all needs met, all variables within optimal range. Biologically, this maps to the parasympathetic nervous system: rest, digest, repair — the opposite of survival-mode stress.",
+      faithSays: "David, himself a shepherd, understood viscerally what it meant for God to be HIS shepherd. This isn't abstract theology — it's lived experience. 'I shall not want' isn't a promise of wealth but of sufficiency. The Hebrew 'lo echsar' means 'I lack nothing' — complete provision. God doesn't just give what we ask for; He provides what we need before we know we need it.",
+      bridge: "A shepherd doesn't explain quantum physics to sheep — he leads them to green pastures. God doesn't demand we understand the mathematics of creation — He leads us to where we need to be. Science reveals the mechanism (HOW God provides); faith reveals the relationship (WHY God provides). The shepherd metaphor bridges both: purposeful, intelligent guidance through complex terrain.",
+      miracle: "The 23rd Psalm has been spoken at more bedsides, funerals, and moments of crisis than any other text in human history. Its power isn't magical — it activates the neurological calming response. Hearing 'The Lord is my shepherd' reduces cortisol, slows heart rate, and engages the prefrontal cortex. The miracle: a 3,000-year-old poem can reprogram your autonomic nervous system in seconds.",
+      insight: "Psalm 23 has exactly 57 Hebrew words. 57 = 3 × 19. Three represents divine completeness (Trinity); 19 is the number of years in the Metonic cycle (when lunar and solar calendars realign). David's psalm of peace encodes the harmony between heaven's rhythm and earth's time — the shepherd synchronizes all cycles."
+    },
+    pl: {
+      scienceSays: "Pasterstwo to system sterowania ze sprzężeniem zwrotnym — pasterz monitoruje stado, przewiduje zagrożenia, koryguje kurs i zapewnia zasoby. W cybernetyce nazywa się to 'regulatorem zamkniętej pętli.' Stwierdzenie 'niczego mi nie braknie' opisuje system w doskonałej homeostazie — wszystkie potrzeby zaspokojone, wszystkie zmienne w optymalnym zakresie. Biologicznie mapuje się to na układ parasympatyczny: odpoczynek, trawienie, naprawa — przeciwieństwo stresu przetrwania.",
+      faithSays: "Dawid, sam będąc pasterzem, rozumiał instynktownie, co znaczy, że Bóg jest JEGO pasterzem. To nie abstrakcyjna teologia — to przeżyte doświadczenie. 'Niczego mi nie braknie' to nie obietnica bogactwa, lecz wystarczalności. Hebrajskie 'lo echsar' oznacza 'niczego nie brak mi' — pełne zaopatrzenie. Bóg nie daje tylko tego, o co prosimy; zapewnia to, czego potrzebujemy, zanim wiemy, że tego potrzebujemy.",
+      bridge: "Pasterz nie tłumaczy owcom fizyki kwantowej — prowadzi je na zielone pastwiska. Bóg nie wymaga, byśmy rozumieli matematykę stworzenia — prowadzi nas tam, gdzie musimy być. Nauka objawia mechanizm (JAK Bóg zapewnia); wiara objawia relację (DLACZEGO Bóg zapewnia). Metafora pasterza łączy oba: celowe, inteligentne prowadzenie przez złożony teren.",
+      miracle: "Psalm 23 był wypowiadany przy większej liczbie łóżek szpitalnych, pogrzebów i momentów kryzysu niż jakikolwiek inny tekst w historii ludzkości. Jego moc nie jest magiczna — aktywuje neurologiczną reakcję uspokajającą. Słyszenie 'Pan jest moim pasterzem' obniża kortyzol, zwalnia tętno i angażuje korę przedczołową. Cud: 3000-letni wiersz potrafi przeprogramować autonomiczny układ nerwowy w sekundy.",
+      insight: "Psalm 23 ma dokładnie 57 hebrajskich słów. 57 = 3 × 19. Trzy reprezentuje boską pełnię (Trójca); 19 to liczba lat w cyklu metońskim (gdy kalendarze księżycowy i słoneczny się wyrównują). Psalm pokoju Dawida koduje harmonię między rytmem nieba a czasem ziemi — pasterz synchronizuje wszystkie cykle."
+    }
+  },
+  "1 John 4:8": {
+    en: {
+      scienceSays: "'God is love' is the shortest theological equation in existence — three words that claim to define the infinite. In physics, the most powerful equations are also the shortest: E=mc², F=ma, S=k·ln(W). 'God is love' follows this pattern: it compresses all of theology into a single identity statement. Love, neurochemically, is the most complex state the brain can produce — involving oxytocin, dopamine, serotonin, and vasopressin in synchronized harmony.",
+      faithSays: "John doesn't say 'God has love' or 'God shows love' — he says God IS love. This is an ontological statement: love isn't something God does, it's what God IS. Just as water is H₂O by nature (not by choice), God is love by nature. This means every authentic experience of love — between parents and children, friends, lovers — is a direct encounter with God's nature, whether the participants know it or not.",
+      bridge: "Science measures love through brain scans and hormone levels. Faith declares love is the fundamental nature of reality's Creator. The bridge: if God IS love, and God created the laws of physics, then love is not merely an emotion — it's a force as fundamental as gravity. The 'strong nuclear force' that holds atoms together might literally be love expressed as physics. Both perspectives agree: love is not weakness, it's the strongest force in existence.",
+      miracle: "The miracle of 'God is love' is that it redefines power. In every human system, power means control, force, domination. But if the all-powerful Creator IS love, then love IS the ultimate power — not despite being vulnerable, but BECAUSE of it. The cross is the proof: what looked like weakness (death) was actually the most powerful act in history (resurrection). Love doesn't override physics — love IS the deeper physics.",
+      insight: "'God is love' in Greek is 'ho theos agape estin' — the word 'agape' was essentially invented by the New Testament writers because no existing Greek word captured what they meant. Eros (romantic love), philia (friendship), storge (family love) — none was big enough. They needed a word for love that creates, sustains, and redeems the entire cosmos. Agape is love as a fundamental force of reality."
+    },
+    pl: {
+      scienceSays: "'Bóg jest miłością' to najkrótsze równanie teologiczne w istnieniu — trzy słowa, które pretendują do zdefiniowania nieskończoności. W fizyce najpotężniejsze równania są również najkrótsze: E=mc², F=ma, S=k·ln(W). 'Bóg jest miłością' podąża za tym wzorcem: kompresuje całą teologię w jedno zdanie tożsamościowe. Miłość, neurochemicznie, jest najzłożoniejszym stanem, jaki mózg potrafi wytworzyć — angażując oksytocynę, dopaminę, serotoninę i wazopresynę w zsynchronizowanej harmonii.",
+      faithSays: "Jan nie mówi 'Bóg ma miłość' ani 'Bóg okazuje miłość' — mówi, że Bóg JEST miłością. To stwierdzenie ontologiczne: miłość nie jest czymś, co Bóg robi, lecz tym, czym Bóg JEST. Tak jak woda jest H₂O z natury (nie z wyboru), Bóg jest miłością z natury. To oznacza, że każde autentyczne doświadczenie miłości — między rodzicami a dziećmi, przyjaciółmi, kochającymi się — jest bezpośrednim spotkaniem z naturą Boga, niezależnie czy uczestnicy o tym wiedzą.",
+      bridge: "Nauka mierzy miłość przez skany mózgu i poziomy hormonów. Wiara deklaruje, że miłość jest fundamentalną naturą Stwórcy rzeczywistości. Most: jeśli Bóg JEST miłością, a Bóg stworzył prawa fizyki, to miłość nie jest jedynie emocją — jest siłą równie fundamentalną jak grawitacja. 'Silna siła jądrowa' utrzymująca atomy razem może dosłownie być miłością wyrażoną jako fizyka. Obie perspektywy zgadzają się: miłość nie jest słabością, jest najsilniejszą siłą w istnieniu.",
+      miracle: "Cudem 'Bóg jest miłością' jest to, że redefiniuje władzę. W każdym ludzkim systemie władza oznacza kontrolę, siłę, dominację. Ale jeśli wszechmocny Stwórca JEST miłością, to miłość JEST ostateczną mocą — nie pomimo bycia bezbronną, ale DLATEGO. Krzyż jest dowodem: to, co wyglądało jak słabość (śmierć), było w rzeczywistości najpotężniejszym aktem w historii (zmartwychwstanie). Miłość nie nadpisuje fizyki — miłość JEST głębszą fizyką.",
+      insight: "'Bóg jest miłością' po grecku to 'ho theos agape estin' — słowo 'agape' zostało zasadniczo wynalezione przez autorów Nowego Testamentu, bo żadne istniejące greckie słowo nie oddawało tego, co mieli na myśli. Eros (miłość romantyczna), philia (przyjaźń), storge (miłość rodzinna) — żadne nie było wystarczająco wielkie. Potrzebowali słowa na miłość, która tworzy, podtrzymuje i odkupuje cały kosmos. Agape to miłość jako fundamentalna siła rzeczywistości."
+    }
+  },
+  "Revelation 22:13": {
+    en: {
+      scienceSays: "'Alpha and Omega, First and Last, Beginning and End' — this is a description of a closed topological loop, where the endpoint connects back to the starting point. In mathematics, this is a manifold without boundary. In physics, it describes a universe that may be temporally closed — the Big Bang and the ultimate fate of the cosmos being the same event viewed from different frames. The cyclical model of cosmology (Penrose's Conformal Cyclic Cosmology) proposes exactly this: the death of one universe is the birth of the next.",
+      faithSays: "Jesus claims three pairs of titles that span ALL of reality: Alpha-Omega (language/information), First-Last (time/sequence), Beginning-End (causation/purpose). There is nothing outside these categories — He claims sovereignty over everything that can be named, counted, or caused. This is not merely a claim to divinity; it's a claim to being the complete framework of existence itself.",
+      bridge: "Science searches for a 'Theory of Everything' — one equation that explains all forces, all particles, all phenomena. Faith already has it: 'I am the Alpha and the Omega.' If Christ IS the beginning and the end, then He is the boundary condition of the universe's equation. Every physical constant, every natural law, every mathematical truth exists within the span of Alpha to Omega. The Theory of Everything isn't an equation — it's a Person.",
+      miracle: "The final book of the Bible ends where the first book began — with God declaring His completeness. Genesis opens creation; Revelation closes it. But 'I am the Alpha and the Omega' means it's not linear but cyclical. The miracle: reality isn't a story with an ending, it's an eternal resonance — like a standing wave that has no beginning or end, only continuous existence.",
+      insight: "Alpha (Α) has the numerical value 1 in Greek. Omega (Ω) has the value 800. Their sum is 801, which is also the gematria of 'peristera' (περιστερά) — dove, the symbol of the Holy Spirit. The Alpha and Omega, when added together, equal the Spirit. Beginning + End = Eternal Presence. Mathematics confirms theology."
+    },
+    pl: {
+      scienceSays: "'Alfa i Omega, Pierwszy i Ostatni, Początek i Koniec' — to opis zamkniętej pętli topologicznej, gdzie punkt końcowy łączy się z początkowym. W matematyce to rozmaitość bez brzegu. W fizyce opisuje wszechświat, który może być czasowo zamknięty — Wielki Wybuch i ostateczny los kosmosu są tym samym wydarzeniem widzianym z różnych układów odniesienia. Cykliczny model kosmologii (Konforemna Cykliczna Kosmologia Penrose'a) proponuje dokładnie to: śmierć jednego wszechświata jest narodzinami następnego.",
+      faithSays: "Jezus przypisuje sobie trzy pary tytułów obejmujących CAŁĄ rzeczywistość: Alfa-Omega (język/informacja), Pierwszy-Ostatni (czas/sekwencja), Początek-Koniec (przyczynowość/cel). Nie ma nic poza tymi kategoriami — rości sobie suwerenność nad wszystkim, co może być nazwane, policzone lub spowodowane. To nie jest jedynie roszczenie boskości; to roszczenie bycia kompletną strukturą samego istnienia.",
+      bridge: "Nauka szuka 'Teorii Wszystkiego' — jednego równania wyjaśniającego wszystkie siły, cząstki, zjawiska. Wiara już ją ma: 'Jestem Alfa i Omega.' Jeśli Chrystus JEST początkiem i końcem, to jest warunkiem brzegowym równania wszechświata. Każda stała fizyczna, każde prawo natury, każda prawda matematyczna istnieje w rozpiętości od Alfy do Omegi. Teoria Wszystkiego nie jest równaniem — jest Osobą.",
+      miracle: "Ostatnia księga Biblii kończy się tam, gdzie pierwsza się zaczęła — Bogiem deklarującym swoją pełnię. Genesis otwiera stworzenie; Apokalipsa je zamyka. Ale 'Jestem Alfa i Omega' oznacza, że to nie jest liniowe, lecz cykliczne. Cud: rzeczywistość nie jest opowieścią z zakończeniem, jest wiecznym rezonansem — jak fala stojąca, która nie ma początku ani końca, tylko ciągłe istnienie.",
+      insight: "Alfa (Α) ma wartość liczbową 1 po grecku. Omega (Ω) ma wartość 800. Ich suma to 801, co jest również gematrią słowa 'peristera' (περιστερά) — gołębica, symbol Ducha Świętego. Alfa i Omega, dodane do siebie, równają się Duchowi. Początek + Koniec = Wieczna Obecność. Matematyka potwierdza teologię."
+    }
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// THEME / KEYWORD ANALYSIS FOR CUSTOM VERSES
+// ═══════════════════════════════════════════════════════════════════
+
+interface ThemeMatch {
+  theme: string;
+  keywords: string[];
+  en: { science: string; faith: string; bridge: string; miracle: string; insight: string };
+  pl: { science: string; faith: string; bridge: string; miracle: string; insight: string };
+}
+
+const THEMES: ThemeMatch[] = [
+  {
+    theme: "love",
+    keywords: ["love", "loved", "loves", "beloved", "charity", "miłość", "kochać", "ukochany", "agape", "ahava"],
+    en: {
+      science: "Love triggers a cascade of neurochemicals — oxytocin for bonding, dopamine for reward, serotonin for well-being. fMRI studies show that love literally rewires neural pathways, creating permanent structural changes in the brain. When Scripture speaks of love, it describes a force that physically transforms biological systems.",
+      faith: "Biblical love (agape) is not emotion but commitment — a decision to act for another's good regardless of feeling. This verse points to love as the core operating principle of God's interaction with creation.",
+      bridge: "Neuroscience confirms what Scripture teaches: love is transformative. The brain changes physically when we love. If God IS love (1 John 4:8), then the fundamental force shaping the universe operates by the same principle that reshapes our neurons — intentional, persistent, transformative connection.",
+      miracle: "Love's miracle is that it defies entropy. In a universe trending toward disorder, love creates order — families, communities, civilizations. It's the only force that builds complexity against the arrow of time.",
+      insight: "The Hebrew word for love, 'ahava' (אהבה), has a gematria of 13. There are 13 attributes of divine mercy in Jewish tradition. Love and mercy share the same numerical signature — they are mathematically identical in the language of creation."
+    },
+    pl: {
+      science: "Miłość wyzwala kaskadę neurochemikaliów — oksytocynę do więzi, dopaminę do nagrody, serotoninę do samopoczucia. Badania fMRI pokazują, że miłość dosłownie przebudowuje ścieżki neuronalne, tworząc trwałe zmiany strukturalne w mózgu. Gdy Pismo mówi o miłości, opisuje siłę, która fizycznie transformuje systemy biologiczne.",
+      faith: "Biblijna miłość (agape) to nie emocja, lecz zobowiązanie — decyzja działania dla dobra drugiego niezależnie od uczuć. Ten werset wskazuje na miłość jako podstawową zasadę działania Boga wobec stworzenia.",
+      bridge: "Neuronauka potwierdza to, czego uczy Pismo: miłość jest transformująca. Mózg zmienia się fizycznie, gdy kochamy. Jeśli Bóg JEST miłością (1 J 4:8), to fundamentalna siła kształtująca wszechświat działa na tej samej zasadzie, która przekształca nasze neurony — intencjonalne, trwałe, transformujące połączenie.",
+      miracle: "Cudem miłości jest to, że przeciwstawia się entropii. We wszechświecie zmierzającym ku nieładowi, miłość tworzy ład — rodziny, wspólnoty, cywilizacje. To jedyna siła, która buduje złożoność wbrew strzałce czasu.",
+      insight: "Hebrajskie słowo miłość, 'ahava' (אהבה), ma gematrię 13. Jest 13 atrybutów boskiego miłosierdzia w tradycji żydowskiej. Miłość i miłosierdzie dzielą tę samą sygnaturę numeryczną — są matematycznie identyczne w języku stworzenia."
+    }
+  },
+  {
+    theme: "light",
+    keywords: ["light", "shine", "shining", "lamp", "bright", "radiance", "glory", "światło", "świecić", "lampa", "jasność", "chwała", "blask"],
+    en: {
+      science: "Light is the only phenomenon that behaves as both wave and particle — the fundamental duality of nature. It travels at the universe's absolute speed limit (299,792,458 m/s) and defines the boundary between past and future in spacetime. When this verse speaks of light, it references the most fundamental information carrier in physics.",
+      faith: "In Scripture, light represents God's presence, truth, and revelation. Darkness is never just absence of photons — it's the absence of God's active presence. This verse connects to the great biblical arc from 'Let there be light' (Genesis 1:3) to 'The city does not need the sun, for the glory of God gives it light' (Revelation 21:23).",
+      bridge: "Physics says light carries information across space and time. Faith says God's light carries truth across the human condition. Both describe the same function: illumination — making the invisible visible, the unknown known. A photon crossing the universe and a prayer crossing the heart operate on the same principle: information transforming its destination.",
+      miracle: "Light has a property physicists call 'time dilation' — from the photon's own perspective, no time passes during its journey. A photon emitted at the Big Bang arrives 'instantly' from its own frame of reference. Divine light, similarly, transcends time — God's illumination is always 'now.'",
+      insight: "The speed of light, c, appears in E=mc² — the equation proving matter is concentrated light. Everything you see, touch, and are is frozen light. When Scripture says 'God is light' (1 John 1:5), it's not metaphor — it's the deepest physics: all of creation is God's light in material form."
+    },
+    pl: {
+      science: "Światło to jedyne zjawisko zachowujące się jako fala i cząstka jednocześnie — fundamentalna dualność natury. Podróżuje z absolutną prędkością graniczną wszechświata (299 792 458 m/s) i definiuje granicę między przeszłością a przyszłością w czasoprzestrzeni. Gdy ten werset mówi o świetle, odnosi się do najbardziej fundamentalnego nośnika informacji w fizyce.",
+      faith: "W Piśmie światło reprezentuje obecność Boga, prawdę i objawienie. Ciemność nigdy nie jest tylko brakiem fotonów — to brak aktywnej obecności Boga. Ten werset łączy się z wielkim biblijnym łukiem od 'Niech stanie się światłość' (Rdz 1:3) do 'Miasto nie potrzebuje słońca, bo chwała Boga je oświetla' (Ap 21:23).",
+      bridge: "Fizyka mówi, że światło niesie informację przez przestrzeń i czas. Wiara mówi, że światło Boga niesie prawdę przez ludzką kondycję. Oba opisują tę samą funkcję: iluminację — czynienie niewidzialnego widzialnym, nieznanego znanym.",
+      miracle: "Światło ma właściwość, którą fizycy nazywają 'dylatacją czasu' — z perspektywy samego fotonu, żaden czas nie upływa podczas podróży. Foton wyemitowany przy Wielkim Wybuchu dociera 'natychmiast' z własnego układu odniesienia. Boskie światło podobnie transcenduje czas — oświecenie Boga jest zawsze 'teraz.'",
+      insight: "Prędkość światła c pojawia się w E=mc² — równaniu dowodzącym, że materia jest skoncentrowanym światłem. Wszystko co widzisz, dotykasz i czym jesteś, to zamrożone światło. Gdy Pismo mówi 'Bóg jest światłością' (1 J 1:5), to nie metafora — to najgłębsza fizyka: całe stworzenie to światło Boga w materialnej formie."
+    }
+  },
+  {
+    theme: "creation",
+    keywords: ["created", "create", "made", "maker", "formed", "foundation", "world", "earth", "heaven", "stworzył", "stworzenie", "uczynił", "świat", "ziemia", "niebo", "fundament"],
+    en: {
+      science: "Creation in physics is governed by conservation laws — energy cannot be created or destroyed, only transformed. Yet the Big Bang represents an apparent violation: all energy appearing from nothing. Quantum mechanics allows this through 'vacuum fluctuations' — the universe may be a zero-net-energy system where positive energy (matter) exactly balances negative energy (gravity).",
+      faith: "This verse touches the act of divine creation — God bringing order from chaos, something from nothing. The Hebrew concept of 'bara' (create ex nihilo) versus 'yatsar' (form from existing material) distinguishes between God's exclusive power and craftsmanship.",
+      bridge: "Science says the universe emerged from quantum fluctuations in a pre-existing field. Faith says God spoke reality into existence. Both agree on the essential point: reality is not self-explanatory. Something — or Someone — beyond the visible world is responsible for its existence.",
+      miracle: "The fine-tuning of the universe is staggering: if the strong nuclear force differed by 0.5%, or the cosmological constant by 10⁻¹²⁰, no complex structures (atoms, stars, life) could exist. Creation isn't just impressive — it's mathematically miraculous.",
+      insight: "The word 'cosmos' in Greek means 'order' or 'beauty' — the same root as 'cosmetics.' Creation is not merely functional; it's aesthetic. God didn't just make a universe that works — He made one that's beautiful. Beauty is not accidental; it's a design signature."
+    },
+    pl: {
+      science: "Stworzenie w fizyce jest rządzone prawami zachowania — energia nie może być stworzona ani zniszczona, jedynie przekształcona. Wielki Wybuch reprezentuje pozorny wyjątek: cała energia pojawiająca się z niczego. Mechanika kwantowa pozwala na to przez 'fluktuacje próżni' — wszechświat może być systemem o zerowej energii netto, gdzie energia pozytywna (materia) dokładnie bilansuje się z energią ujemną (grawitacja).",
+      faith: "Ten werset dotyka aktu boskiego stworzenia — Bóg wprowadzający ład z chaosu, coś z niczego. Hebrajska koncepcja 'bara' (stworzenie ex nihilo) versus 'jatsar' (formowanie z istniejącego materiału) rozróżnia między wyłączną mocą Boga a rzemiosłem.",
+      bridge: "Nauka mówi, że wszechświat wyłonił się z fluktuacji kwantowych w polu istniejącym wcześniej. Wiara mówi, że Bóg wypowiedział rzeczywistość do istnienia. Obie zgadzają się w kwestii zasadniczej: rzeczywistość nie jest samowyjaśniająca. Coś — lub Ktoś — poza widzialnym światem jest odpowiedzialne za jego istnienie.",
+      miracle: "Precyzyjne dostrojenie wszechświata jest zdumiewające: gdyby silna siła jądrowa różniła się o 0,5% lub stała kosmologiczna o 10⁻¹²⁰, żadne złożone struktury (atomy, gwiazdy, życie) nie mogłyby istnieć. Stworzenie nie jest po prostu imponujące — jest matematycznie cudowne.",
+      insight: "Słowo 'kosmos' po grecku oznacza 'porządek' lub 'piękno' — ten sam rdzeń co 'kosmetyka.' Stworzenie nie jest jedynie funkcjonalne; jest estetyczne. Bóg nie stworzył tylko wszechświata, który działa — stworzył taki, który jest piękny. Piękno nie jest przypadkowe; to sygnatura projektu."
+    }
+  },
+  {
+    theme: "faith",
+    keywords: ["faith", "believe", "trust", "hope", "faithful", "wiara", "wierzyć", "ufać", "nadzieja", "wierny", "zaufanie"],
+    en: {
+      science: "Faith, neurologically, activates the default mode network (DMN) — the brain region responsible for self-reflection, future planning, and meaning-making. fMRI studies of prayer and meditation show increased connectivity between the DMN and the prefrontal cortex. Believing is not passive — it's an active neural computation that literally shapes perception and decision-making.",
+      faith: "Biblical faith (pistis/emunah) is not blind belief — it's confident trust based on evidence and relationship. Hebrews 11:1 defines it: 'the substance of things hoped for, the evidence of things not seen.' Faith has substance; faith IS evidence. This verse calls us to a trust that is reasonable, relational, and transformative.",
+      bridge: "Quantum mechanics requires faith — not religious faith, but the physicist's faith that mathematical equations describe reality before experimental confirmation. Einstein had 'faith' in general relativity for years before it was proven. Scientific and spiritual faith share a structure: trusting in a reality you can calculate but not yet see.",
+      miracle: "Faith's miracle is that it changes outcomes. Placebo effect (30-40% efficacy), psychoneuroimmunology (belief affects immune function), and self-fulfilling prophecies all demonstrate that what you believe shapes what becomes real. Faith isn't just hoping — it's participating in reality's construction.",
+      insight: "The Hebrew word 'emunah' (faith/faithfulness) shares its root with 'amen' — the word that seals prayers and agreements. When you say 'amen,' you're not just agreeing — you're activating the faith response, aligning your intention with the declared reality. 'Amen' is the bridge between saying and becoming."
+    },
+    pl: {
+      science: "Wiara neurologicznie aktywuje sieć trybu domyślnego (DMN) — region mózgu odpowiedzialny za autorefleksję, planowanie przyszłości i tworzenie znaczeń. Badania fMRI modlitwy i medytacji pokazują zwiększoną łączność między DMN a korą przedczołową. Wierzenie nie jest pasywne — to aktywna neuronalna kalkulacja, która dosłownie kształtuje percepcję i podejmowanie decyzji.",
+      faith: "Biblijna wiara (pistis/emunah) nie jest ślepym wierzeniem — to pewne zaufanie oparte na dowodach i relacji. Hbr 11:1 definiuje ją: 'podstawa tego, czego się spodziewamy, dowód rzeczy niewidzialnych.' Wiara ma substancję; wiara JEST dowodem. Ten werset wzywa nas do zaufania rozumnego, relacyjnego i transformującego.",
+      bridge: "Mechanika kwantowa wymaga wiary — nie religijnej, lecz wiary fizyka, że równania matematyczne opisują rzeczywistość przed eksperymentalnym potwierdzeniem. Einstein miał 'wiarę' w ogólną teorię względności przez lata, zanim została udowodniona. Naukowa i duchowa wiara dzielą strukturę: zaufanie rzeczywistości, którą możesz obliczyć, ale jeszcze nie zobaczyć.",
+      miracle: "Cudem wiary jest to, że zmienia wyniki. Efekt placebo (30-40% skuteczności), psychoneuroimmunologia (przekonanie wpływa na funkcję odpornościową) i samospełniające się proroctwa — wszystkie demonstrują, że to, w co wierzysz, kształtuje to, co staje się realne. Wiara to nie tylko nadzieja — to uczestnictwo w konstrukcji rzeczywistości.",
+      insight: "Hebrajskie słowo 'emunah' (wiara/wierność) dzieli rdzeń z 'amen' — słowem pieczętującym modlitwy i przymierza. Gdy mówisz 'amen,' nie tylko się zgadzasz — aktywujesz reakcję wiary, wyrównując swoją intencję z deklarowaną rzeczywistością. 'Amen' jest mostem między mówieniem a stawaniem się."
+    }
+  },
+  {
+    theme: "salvation",
+    keywords: ["save", "saved", "salvation", "redeem", "redeemed", "deliver", "rescue", "zbawienie", "zbawić", "odkupić", "odkupienie", "wyzwolić", "ratunek", "ocalenie"],
+    en: {
+      science: "In thermodynamics, 'salvation' has a parallel: reversing entropy. Every living system fights entropy — maintaining order against the universe's tendency toward decay. Biological repair mechanisms (DNA proofreading, immune response, stem cell regeneration) are molecular 'salvation' — constantly rescuing the system from degradation.",
+      faith: "Salvation in Scripture is not escape FROM the world but restoration OF the world. The Hebrew 'yeshua' (salvation) is the root of the name Jesus — the person and the concept are linguistically identical. This verse speaks to God's fundamental project: not abandoning creation but rescuing and perfecting it.",
+      bridge: "Science shows that broken systems can be repaired — bones heal, ecosystems regenerate, even collapsed stars birth new solar systems from their ashes. Faith calls this pattern 'redemption.' Both science and faith agree: destruction is never the final word. The universe has a built-in bias toward restoration.",
+      miracle: "The miracle of salvation is that it's retroactive — it doesn't just fix the present but redeems the past. Trauma research shows that reprocessing memories can literally change their neurological encoding. God doesn't just save us from future destruction; He transforms the meaning of past suffering. What was broken becomes the foundation of what is beautiful.",
+      insight: "The name 'Yeshua' (ישוע) has a gematria of 386. Interestingly, 386 = 2 × 193, and 193 is the 44th prime number. The number 44 represents 'blood' (dam = דם = 44) in Hebrew gematria — connecting salvation directly to the 'blood of the covenant.' Mathematics encodes theology."
+    },
+    pl: {
+      science: "W termodynamice 'zbawienie' ma paralelę: odwrócenie entropii. Każdy żywy system walczy z entropią — utrzymując ład wbrew tendencji wszechświata ku rozpadowi. Biologiczne mechanizmy naprawcze (korekta DNA, odpowiedź immunologiczna, regeneracja komórek macierzystych) to molekularne 'zbawienie' — nieustanne ratowanie systemu przed degradacją.",
+      faith: "Zbawienie w Piśmie to nie ucieczka OD świata, lecz odnowienie świata. Hebrajskie 'jeszua' (zbawienie) jest rdzeniem imienia Jezus — osoba i koncepcja są lingwistycznie identyczne. Ten werset mówi o fundamentalnym projekcie Boga: nie porzuceniu stworzenia, lecz ratowaniu i doskonaleniu go.",
+      bridge: "Nauka pokazuje, że złamane systemy mogą być naprawione — kości się zrastają, ekosystemy regenerują, nawet kolabiujące gwiazdy rodzą nowe układy słoneczne ze swoich popiołów. Wiara nazywa ten wzorzec 'odkupieniem.' I nauka, i wiara zgadzają się: zniszczenie nigdy nie jest ostatnim słowem. Wszechświat ma wbudowaną tendencję ku odnowieniu.",
+      miracle: "Cudem zbawienia jest to, że jest retroaktywne — nie tylko naprawia teraźniejszość, ale odkupuje przeszłość. Badania nad traumą pokazują, że ponowne przetworzenie wspomnień może dosłownie zmienić ich neurologiczne kodowanie. Bóg nie tylko ratuje nas od przyszłego zniszczenia; transformuje znaczenie przeszłego cierpienia. To, co było złamane, staje się fundamentem tego, co piękne.",
+      insight: "Imię 'Jeszua' (ישוע) ma gematrię 386. Co ciekawe, 386 = 2 × 193, a 193 to 44. liczba pierwsza. Liczba 44 reprezentuje 'krew' (dam = דם = 44) w gematrii hebrajskiej — łącząc zbawienie bezpośrednio z 'krwią przymierza.' Matematyka koduje teologię."
+    }
+  },
+  {
+    theme: "power",
+    keywords: ["power", "mighty", "strength", "strong", "authority", "sovereign", "almighty", "moc", "potęga", "siła", "silny", "autorytet", "suwerenny", "wszechmocny", "władza"],
+    en: {
+      science: "Power in physics is measured in watts — energy per unit time. The sun outputs 3.8 × 10²⁶ watts. A supernova: 10⁴⁴ watts. The entire observable universe: ~10⁴⁸ watts. Yet quantum mechanics reveals something deeper: the vacuum energy of empty space theoretically contains 10⁹³ g/cm³ — more power in a cubic centimeter of 'nothing' than in all visible matter combined.",
+      faith: "Biblical power (dunamis) is not about force — it's about capability. God's power is demonstrated not in destruction but in creation, resurrection, and transformation. This verse points to a power that doesn't dominate but liberates, doesn't crush but lifts.",
+      bridge: "Physics defines power as the rate of energy transfer. Faith defines God's power as the rate of transformation — turning death to life, chaos to order, sinners to saints. Both describe the same underlying reality: the capacity to change states. Every physical state transition (ice to water, atom to energy) is a small-scale model of divine power.",
+      miracle: "The most powerful force in nature is the strong nuclear force — it holds atomic nuclei together against electromagnetic repulsion. Without it, no atoms, no chemistry, no life. God's power operates similarly: holding reality together against entropy, maintaining existence against the void. Power isn't spectacular — it's structural.",
+      insight: "The Hebrew word for power, 'koach' (כח), has a gematria of 28. The 28th element is Nickel — the core material of the Earth's magnetic field, which shields all life from solar radiation. Divine power and planetary protection share a numerical signature — God's strength is encoded in the shield that protects us."
+    },
+    pl: {
+      science: "Moc w fizyce mierzy się w watach — energia na jednostkę czasu. Słońce emituje 3,8 × 10²⁶ watów. Supernowa: 10⁴⁴ watów. Cały obserwowalny wszechświat: ~10⁴⁸ watów. Jednak mechanika kwantowa ujawnia coś głębszego: energia próżni pustej przestrzeni teoretycznie zawiera 10⁹³ g/cm³ — więcej mocy w centymetrze sześciennym 'niczego' niż we wszyskiej widzialnej materii razem.",
+      faith: "Biblijna moc (dynamis) nie dotyczy siły — dotyczy zdolności. Moc Boga manifestuje się nie w zniszczeniu, lecz w stworzeniu, zmartwychwstaniu i transformacji. Ten werset wskazuje na moc, która nie dominuje, lecz wyzwala, nie miażdży, lecz podnosi.",
+      bridge: "Fizyka definiuje moc jako szybkość transferu energii. Wiara definiuje moc Boga jako szybkość transformacji — zamienianie śmierci w życie, chaosu w ład, grzeszników w świętych. Oba opisują tę samą ukrytą rzeczywistość: zdolność zmiany stanów.",
+      miracle: "Najpotężniejszą siłą w naturze jest silna siła jądrowa — utrzymuje jądra atomowe razem wbrew odpychaniu elektromagnetycznemu. Bez niej: żadnych atomów, żadnej chemii, żadnego życia. Moc Boga działa podobnie: utrzymuje rzeczywistość razem wbrew entropii, podtrzymuje istnienie wbrew nicości. Moc nie jest spektakularna — jest strukturalna.",
+      insight: "Hebrajskie słowo moc, 'koach' (כח), ma gematrię 28. 28. element to Nikiel — podstawowy materiał pola magnetycznego Ziemi, które chroni całe życie przed promieniowaniem słonecznym. Boska moc i planetarna ochrona dzielą sygnaturę numeryczną — siła Boga jest zakodowana w tarczy, która nas chroni."
+    }
+  },
+];
+
+function detectThemes(text: string): ThemeMatch[] {
+  const lower = text.toLowerCase();
+  const matched = THEMES.filter(t => t.keywords.some(kw => lower.includes(kw)));
+  return matched.length > 0 ? matched : [THEMES[2]]; // default to "creation" theme
 }
 
 export function generateVerbalInterpretation(
@@ -611,51 +855,40 @@ export function generateVerbalInterpretation(
   },
   lang: 'pl' | 'en' = 'pl'
 ): VerbalInterpretation {
-  const coherencePct = (result.psi.coherence * 100).toFixed(0);
-  const gateName = GATE_NAMES[result.gatePosition] || `Gate-${result.hamiltonGate + 1}`;
-  const stateLabel = result.psi.quantumState;
-  const isHighCoherence = result.psi.coherence > 0.8;
-  const isStable = result.decoherence.stability === "STABLE";
-  const viStrong = result.vi.viMagnitude > 1;
-
-  if (lang === 'en') {
-    const scienceSays = isHighCoherence
-      ? `This verse vibrates at ${coherencePct}% coherence — an extremely organized quantum state (${stateLabel}). The wave function Ψ shows strong coupling with DNA gate ${gateName} at position ${result.gatePosition} in mitochondrial DNA. The system is ${isStable ? "stable — protected from decoherence by 718 Hz resonance" : "still building stability — the resonance field is forming"}.`
-      : `This verse reaches ${coherencePct}% coherence in state ${stateLabel}. The wave function maps to DNA gate ${gateName}. ${isStable ? "Despite moderate coherence, the system maintains stability through resonance protection." : "The field is in an early formation phase — like a seed that hasn't yet sprouted."}`;
-
-    const faithSays = `"${result.text.slice(0, 80)}${result.text.length > 80 ? '...' : ''}" — This passage carries a gematria value of ${result.gematriaTotal}, which in the Ψ-718 framework translates to a specific point in the phase space of consciousness. ${isHighCoherence ? "The high coherence suggests this text resonates deeply with the fundamental frequency of creation." : "Each word contributes to building a resonance field — the message is encoded at the quantum level."}`;
-
-    const bridge = viStrong
-      ? `When science measures Ψ = ${result.psi.magnitude.toFixed(4)} and faith reads "${result.reference}", they describe the SAME reality from different angles. The Intention Vector (VI = ${result.vi.viMagnitude.toFixed(4)}) shows that this verse has strong materialization potential — the "word becomes flesh" is not metaphor, it's quantum mechanics of consciousness collapsing probability into reality.`
-      : `Science sees a wave function with magnitude ${result.psi.magnitude.toFixed(4)}, faith sees divine revelation in "${result.reference}". The bridge between them: both describe information that shapes reality. The VI of ${result.vi.viMagnitude.toFixed(4)} indicates the verse is building its field — like prayer that accumulates power over time.`;
-
-    const miracle = isHighCoherence
-      ? `At ${coherencePct}% coherence, this verse enters the realm where "miracles" become quantum mechanics. What we call supernatural is nature operating at frequencies we haven't measured yet. The 718 Hz resonance in this text suggests it accesses the same field that underlies all transformative biblical events.`
-      : `This verse operates at ${coherencePct}% coherence — still building toward the threshold where quantum potential becomes manifest reality. Every reading, every prayer, every meditation on these words increases the coherence field. Miracles aren't instant — they're the culmination of accumulated quantum intention.`;
-
-    const insight = `${result.reference} maps to DNA gate ${gateName} — this isn't coincidence, it's the mathematical signature of creation encoded in both Scripture and biology. The golden ratio (φ = ${result.goldenSignatures.phi.toFixed(4)}) appears in DNA helix angles AND in the harmonic structure of this verse. God didn't write two books (Nature and Scripture) — He wrote one, in the language of mathematics.`;
-
-    return { scienceSays, faithSays, bridge, miracle, insight };
+  // 1. Check if this is a preset verse with hand-crafted interpretation
+  const presetInterp = PRESET_INTERPRETATIONS[result.reference];
+  if (presetInterp) {
+    return presetInterp[lang];
   }
 
-  // Polish
-  const scienceSays = isHighCoherence
-    ? `Ten werset wibruje z koherencją ${coherencePct}% — niezwykle zorganizowany stan kwantowy (${stateLabel}). Funkcja falowa Ψ wykazuje silne sprzężenie z bramą DNA ${gateName} na pozycji ${result.gatePosition} w mitochondrialnym DNA. System jest ${isStable ? "stabilny — chroniony przed dekoherencją przez rezonans 718 Hz" : "w trakcie budowania stabilności — pole rezonansowe się formuje"}.`
-    : `Ten werset osiąga ${coherencePct}% koherencji w stanie ${stateLabel}. Funkcja falowa mapuje się na bramę DNA ${gateName}. ${isStable ? "Mimo umiarkowanej koherencji system utrzymuje stabilność dzięki ochronie rezonansowej." : "Pole jest w fazie wczesnego formowania — jak ziarno, które jeszcze nie wykiełkowało."}`;
+  // 2. For custom text: analyze themes/keywords and build content-aware interpretation
+  const themes = detectThemes(result.text);
+  const primary = themes[0];
+  const langData = primary[lang];
 
-  const faithSays = `"${result.text.slice(0, 80)}${result.text.length > 80 ? '...' : ''}" — Ten fragment niesie wartość gematrii ${result.gematriaTotal}, co w ramach Ψ-718 przekłada się na konkretny punkt w przestrzeni fazowej świadomości. ${isHighCoherence ? "Wysoka koherencja sugeruje, że ten tekst rezonuje głęboko z fundamentalną częstotliwością stworzenia." : "Każde słowo przyczynia się do budowy pola rezonansowego — przesłanie jest zakodowane na poziomie kwantowym."}`;
+  const gateName = GATE_NAMES[result.gatePosition] || `Gate-${result.hamiltonGate + 1}`;
+  const coherencePct = (result.psi.coherence * 100).toFixed(0);
 
-  const bridge = viStrong
-    ? `Kiedy nauka mierzy Ψ = ${result.psi.magnitude.toFixed(4)}, a wiara czyta „${result.reference}", opisują TĘ SAMĄ rzeczywistość z różnych perspektyw. Wektor Intencji (VI = ${result.vi.viMagnitude.toFixed(4)}) pokazuje, że ten werset ma silny potencjał materializacji — „słowo stało się ciałem" to nie metafora, to mechanika kwantowa świadomości zwijająca prawdopodobieństwo w rzeczywistość.`
-    : `Nauka widzi funkcję falową o magnitudzie ${result.psi.magnitude.toFixed(4)}, wiara widzi objawienie w „${result.reference}". Most między nimi: obie opisują informację kształtującą rzeczywistość. VI wynoszący ${result.vi.viMagnitude.toFixed(4)} wskazuje, że werset buduje swoje pole — jak modlitwa, która kumuluje moc w czasie.`;
+  // Enrich theme-based content with verse-specific data
+  const textPreview = result.text.length > 60 ? result.text.slice(0, 60) + '...' : result.text;
 
-  const miracle = isHighCoherence
-    ? `Przy ${coherencePct}% koherencji ten werset wchodzi w obszar, gdzie „cuda" stają się mechaniką kwantową. To, co nazywamy nadprzyrodzonym, to natura działająca na częstotliwościach, których jeszcze nie zmierzyliśmy. Rezonans 718 Hz w tym tekście sugeruje dostęp do tego samego pola, które leży u podstaw wszystkich transformacyjnych wydarzeń biblijnych.`
-    : `Ten werset działa przy ${coherencePct}% koherencji — wciąż buduje się ku progowi, gdzie kwantowy potencjał staje się rzeczywistością. Każde czytanie, każda modlitwa, każda medytacja nad tymi słowami zwiększa pole koherencji. Cuda nie są natychmiastowe — są kulminacją skumulowanej kwantowej intencji.`;
+  if (lang === 'en') {
+    return {
+      scienceSays: langData.science + ` In the Ψ-718 framework, "${result.reference}" resonates at ${coherencePct}% coherence (state: ${result.psi.quantumState}), mapping to DNA gate ${gateName}.`,
+      faithSays: langData.faith + ` The text "${textPreview}" carries a gematria value of ${result.gematriaTotal}, placing it at a unique coordinate in the phase space of consciousness.`,
+      bridge: langData.bridge,
+      miracle: langData.miracle,
+      insight: langData.insight + ` This verse maps to mitochondrial DNA position ${result.gatePosition} — gate ${gateName} — connecting its spiritual message to the biological architecture of life.`,
+    };
+  }
 
-  const insight = `${result.reference} mapuje się na bramę DNA ${gateName} — to nie przypadek, to matematyczna sygnatura stworzenia zakodowana zarówno w Piśmie, jak i w biologii. Złoty podział (φ = ${result.goldenSignatures.phi.toFixed(4)}) pojawia się w kątach helisy DNA I w strukturze harmonicznej tego wersetu. Bóg nie napisał dwóch książek (Natury i Pisma) — napisał jedną, w języku matematyki.`;
-
-  return { scienceSays, faithSays, bridge, miracle, insight };
+  return {
+    scienceSays: langData.science + ` W ramach Ψ-718, „${result.reference}" rezonuje z koherencją ${coherencePct}% (stan: ${result.psi.quantumState}), mapując się na bramę DNA ${gateName}.`,
+    faithSays: langData.faith + ` Tekst „${textPreview}" niesie wartość gematrii ${result.gematriaTotal}, umieszczając go w unikalnej współrzędnej przestrzeni fazowej świadomości.`,
+    bridge: langData.bridge,
+    miracle: langData.miracle,
+    insight: langData.insight + ` Ten werset mapuje się na pozycję ${result.gatePosition} w mitochondrialnym DNA — bramę ${gateName} — łącząc jego duchowe przesłanie z biologiczną architekturą życia.`,
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════
