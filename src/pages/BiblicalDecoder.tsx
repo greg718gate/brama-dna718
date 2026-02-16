@@ -1,6 +1,7 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3 } from "lucide-react";
+import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -95,20 +96,80 @@ const BiblicalDecoder = () => {
     }, language);
   }, [result, language]);
 
-  const verbalInterpretation = useMemo(() => {
-    if (!result) return null;
-    return generateVerbalInterpretation({
-      reference: result.reference,
-      text: result.text,
-      gematriaTotal: result.gematriaTotal,
-      gematriaT: result.gematriaT,
-      hamiltonGate: result.hamiltonGate,
-      gatePosition: result.gatePosition,
-      psi: result.psi,
-      vi: result.vi,
-      decoherence: result.decoherence,
-      goldenSignatures: result.goldenSignatures,
-    }, language);
+  const PRESET_REFERENCES = ["Genesis 1:1", "Genesis 1:3", "John 1:1", "Exodus 3:14", "Psalm 23:1", "1 John 4:8", "Revelation 22:13"];
+
+  const [verbalInterpretation, setVerbalInterpretation] = useState<ReturnType<typeof generateVerbalInterpretation> | null>(null);
+  const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
+
+  useEffect(() => {
+    if (!result) {
+      setVerbalInterpretation(null);
+      return;
+    }
+
+    // For preset verses, use the static hand-crafted interpretations
+    if (PRESET_REFERENCES.includes(result.reference)) {
+      setVerbalInterpretation(generateVerbalInterpretation({
+        reference: result.reference,
+        text: result.text,
+        gematriaTotal: result.gematriaTotal,
+        gematriaT: result.gematriaT,
+        hamiltonGate: result.hamiltonGate,
+        gatePosition: result.gatePosition,
+        psi: result.psi,
+        vi: result.vi,
+        decoherence: result.decoherence,
+        goldenSignatures: result.goldenSignatures,
+      }, language));
+      return;
+    }
+
+    // For custom verses, call AI to generate unique interpretation
+    const fetchAIInterpretation = async () => {
+      setIsLoadingInterpretation(true);
+      try {
+        const gateName = result.gateName;
+        const coherence = (result.psi.coherence * 100).toFixed(0);
+        const { data, error } = await supabase.functions.invoke('generate-interpretation', {
+          body: {
+            reference: result.reference,
+            text: result.text,
+            lang: language,
+            gematriaTotal: result.gematriaTotal,
+            coherence,
+            quantumState: result.psi.quantumState,
+            gateName,
+            gatePosition: result.gatePosition,
+          },
+        });
+
+        if (error) throw error;
+
+        if (data && data.scienceSays) {
+          setVerbalInterpretation(data);
+        } else if (data && data.error) {
+          console.error("AI interpretation error:", data.error);
+          // Fallback to static
+          setVerbalInterpretation(generateVerbalInterpretation({
+            reference: result.reference, text: result.text, gematriaTotal: result.gematriaTotal,
+            gematriaT: result.gematriaT, hamiltonGate: result.hamiltonGate, gatePosition: result.gatePosition,
+            psi: result.psi, vi: result.vi, decoherence: result.decoherence, goldenSignatures: result.goldenSignatures,
+          }, language));
+        }
+      } catch (err) {
+        console.error("Failed to fetch AI interpretation:", err);
+        // Fallback to static theme-based
+        setVerbalInterpretation(generateVerbalInterpretation({
+          reference: result.reference, text: result.text, gematriaTotal: result.gematriaTotal,
+          gematriaT: result.gematriaT, hamiltonGate: result.hamiltonGate, gatePosition: result.gatePosition,
+          psi: result.psi, vi: result.vi, decoherence: result.decoherence, goldenSignatures: result.goldenSignatures,
+        }, language));
+      } finally {
+        setIsLoadingInterpretation(false);
+      }
+    };
+
+    fetchAIInterpretation();
   }, [result, language]);
 
   const handleDecode = () => {
@@ -267,7 +328,17 @@ const BiblicalDecoder = () => {
         {result && (
           <div ref={resultsRef} className="space-y-4 animate-fade-in">
             {/* VERBAL INTERPRETATION — FIRST, most important for user */}
-            {verbalInterpretation && (
+            {isLoadingInterpretation && (
+              <Card className="border-primary/30 bg-card/80">
+                <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'pl' ? 'Generuję unikalną interpretację tego wersetu...' : 'Generating unique interpretation for this verse...'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            {verbalInterpretation && !isLoadingInterpretation && (
               <Card className="border-primary/30 bg-card/80">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-mono flex items-center gap-2 text-primary">
