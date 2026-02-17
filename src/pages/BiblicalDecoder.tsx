@@ -173,23 +173,56 @@ const BiblicalDecoder = () => {
     fetchAIInterpretation();
   }, [result, language]);
 
-  const handleDecode = () => {
-    // Allow decoding if ANY field has content
-    const effectiveText = text.trim() || hebrewText.trim() || reference.trim();
-    if (!effectiveText) return;
+  const handleDecode = async () => {
+    const hasText = text.trim() || hebrewText.trim();
+    const hasRef = reference.trim();
+    if (!hasText && !hasRef) return;
+
     setIsCalculating(true);
-    setTimeout(() => {
-      try {
-        const decodeText = text.trim() || reference.trim();
-        const r = decodeVerse(reference || "Custom", decodeText, hebrewText);
-        setResult(r);
-        setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-      } catch (e) {
-        console.error("Decode error:", e);
-      } finally {
-        setIsCalculating(false);
+
+    try {
+      let decodeText = text.trim();
+      let decodeRef = reference.trim() || "Custom";
+
+      // If only reference is provided (no text), ask AI to look up the verse
+      if (!decodeText && hasRef) {
+        setIsLoadingInterpretation(true);
+        const { data, error } = await supabase.functions.invoke('generate-interpretation', {
+          body: { reference: decodeRef, lang: language, mode: 'lookup' },
+        });
+
+        if (!error && data?.verseText) {
+          decodeText = data.verseText;
+          setText(data.verseText);
+          // Store the lookup result to show immediately
+          if (data.plainMeaning) {
+            setVerbalInterpretation({
+              plainMeaning: data.plainMeaning,
+              scienceSays: '',
+              faithSays: '',
+              bridge: '',
+              miracle: '',
+              insight: '',
+              _source: data.source || '',
+            } as any);
+          }
+        } else {
+          // Fallback: use reference as text
+          decodeText = decodeRef;
+        }
+        setIsLoadingInterpretation(false);
       }
-    }, 50);
+
+      if (!decodeText) decodeText = decodeRef;
+
+      const r = decodeVerse(decodeRef, decodeText, hebrewText);
+      setResult(r);
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } catch (e) {
+      console.error("Decode error:", e);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const handlePreset = (preset: typeof PRESET_VERSES[0]) => {
@@ -325,6 +358,18 @@ const BiblicalDecoder = () => {
           </CardContent>
         </Card>
 
+        {/* Loading indicator when looking up verse */}
+        {isLoadingInterpretation && !result && (
+          <Card className="border-primary/30 bg-card/80">
+            <CardContent className="py-12 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <p className="text-sm text-muted-foreground">
+                {language === 'pl' ? 'Szukam tekstu wersetu i przygotowuję tłumaczenie...' : 'Looking up verse text and preparing translation...'}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* ══════════════════════ RESULTS ══════════════════════ */}
         {result && (
           <div ref={resultsRef} className="space-y-4 animate-fade-in">
@@ -358,7 +403,8 @@ const BiblicalDecoder = () => {
                   </Card>
                 )}
 
-                {/* Detailed Ψ-718 analysis */}
+                {/* Detailed Ψ-718 analysis — only show if we have actual content */}
+                {verbalInterpretation.scienceSays && (
                 <Card className="border-primary/30 bg-card/80">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-mono flex items-center gap-2 text-primary">
@@ -407,6 +453,7 @@ const BiblicalDecoder = () => {
                     </div>
                   </CardContent>
                 </Card>
+                )}
               </div>
             )}
 
