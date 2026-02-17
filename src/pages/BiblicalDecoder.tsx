@@ -63,6 +63,7 @@ const BiblicalDecoder = () => {
   const handleReferenceChange = (val: string) => {
     setReference(val);
     if (hebrewFromPreset) {
+      setText("");
       setHebrewText("");
       setHebrewFromPreset(false);
     }
