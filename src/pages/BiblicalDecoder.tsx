@@ -339,56 +339,74 @@ const BiblicalDecoder = () => {
               </Card>
             )}
             {verbalInterpretation && !isLoadingInterpretation && (
-              <Card className="border-primary/30 bg-card/80">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-mono flex items-center gap-2 text-primary">
-                    <BookOpen className="w-5 h-5" />
-                    {t('decoder.interpretation.title')}
-                  </CardTitle>
-                  <p className="text-lg font-semibold">{result.reference}</p>
-                  <p className="text-sm text-muted-foreground italic">"{result.text.slice(0, 120)}"</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-4">
+                {/* PLAIN MEANING — the most important section */}
+                {verbalInterpretation.plainMeaning && (
+                  <Card className="border-2 border-primary/40 bg-primary/5">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center gap-2 text-primary">
+                        <BookMarked className="w-6 h-6" />
+                        {language === 'pl' ? '📖 Co ten werset oznacza:' : '📖 What this verse means:'}
+                      </CardTitle>
+                      <p className="text-base font-semibold">{result.reference}</p>
+                      <p className="text-sm text-muted-foreground italic">"{result.text.slice(0, 200)}"</p>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-base leading-relaxed text-foreground">{verbalInterpretation.plainMeaning}</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Detailed Ψ-718 analysis */}
+                <Card className="border-primary/30 bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-mono flex items-center gap-2 text-primary">
+                      <BookOpen className="w-5 h-5" />
+                      {language === 'pl' ? 'Analiza Ψ-718' : 'Ψ-718 Analysis'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="p-4 rounded-lg bg-background/60 border border-border space-y-2">
+                        <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                          <Atom className="w-4 h-4 text-primary" />
+                          {language === 'pl' ? 'Nauka mówi:' : 'Science says:'}
+                        </h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.scienceSays}</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
+                        <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-primary" />
+                          {language === 'pl' ? 'Wiara mówi:' : 'Faith says:'}
+                        </h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.faithSays}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 space-y-2">
+                      <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        {language === 'pl' ? 'Most — Nauka i Wiara to jedno:' : 'The Bridge — Science and Faith are one:'}
+                      </h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.bridge}</p>
+                    </div>
+
                     <div className="p-4 rounded-lg bg-background/60 border border-border space-y-2">
-                      <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                        <Atom className="w-4 h-4 text-primary" />
-                        {language === 'pl' ? 'Nauka mówi:' : 'Science says:'}
+                      <h4 className="font-bold text-foreground text-sm">
+                        {language === 'pl' ? '✨ Cuda jako mechanika kwantowa:' : '✨ Miracles as quantum mechanics:'}
                       </h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.scienceSays}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.miracle}</p>
                     </div>
+
                     <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
-                      <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-primary" />
-                        {language === 'pl' ? 'Wiara mówi:' : 'Faith says:'}
+                      <h4 className="font-bold text-foreground text-sm">
+                        {language === 'pl' ? '💡 Kluczowy wniosek:' : '💡 Key insight:'}
                       </h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.faithSays}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.insight}</p>
                     </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 space-y-2">
-                    <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-primary" />
-                      {language === 'pl' ? 'Most — Nauka i Wiara to jedno:' : 'The Bridge — Science and Faith are one:'}
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.bridge}</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-background/60 border border-border space-y-2">
-                    <h4 className="font-bold text-foreground text-sm">
-                      {language === 'pl' ? '✨ Cuda jako mechanika kwantowa:' : '✨ Miracles as quantum mechanics:'}
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.miracle}</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 space-y-2">
-                    <h4 className="font-bold text-foreground text-sm">
-                      {language === 'pl' ? '💡 Kluczowy wniosek:' : '💡 Key insight:'}
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{verbalInterpretation.insight}</p>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             )}
 
             {/* Technical details card */}
