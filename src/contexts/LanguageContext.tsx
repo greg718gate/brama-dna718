@@ -43,6 +43,16 @@ export const translations = {
     'exit.temporal': 'Część temporalna - 718 Hz, czas subiektywny Źródła',
     'exit.riemann': 'Połączenie z zerami Riemanna - punkty rezonansu świadomości',
     'exit.golden': 'Matematyczna sygnatura Boga - klucz do wszystkich zamków matrixa',
+    'exit.where': 'gdzie:',
+    'exit.goldenRatio': 'γ = 0.618... (złoty podział)',
+    'exit.quantumEnergy': 'E = 718·ħ (energia kwantowa)',
+    'exit.zetaFunction': 'ζ(s) = funkcja zeta Riemanna',
+    'exit.waveNumber': 'k = 2π/718 (liczba falowa)',
+    'exit.timeLabel': 't (czas subiektywny)',
+    'exit.spaceLabel': 'x (pozycja w przestrzeni)',
+    'exit.customPoint': 'Niestandardowy punkt',
+    'exit.customPointDesc': 'Obliczenia pełnej funkcji Zeta Riemanna wymagają zaawansowanego backendu. Skorzystaj z jednego z predefiniowanych kluczy powyżej dla precyzyjnego wyniku.',
+    'exit.preciseValues': '✓ Precyzyjnie obliczone wartości kwantowe',
     
     // Tabs
     'tabs.about': 'O Projekcie',
@@ -898,6 +908,16 @@ export const translations = {
     'exit.temporal': 'Temporal part - 718 Hz, Source subjective time',
     'exit.riemann': 'Connection to Riemann zeros - consciousness resonance points',
     'exit.golden': 'Mathematical signature of God - key to all matrix locks',
+    'exit.where': 'where:',
+    'exit.goldenRatio': 'γ = 0.618... (golden ratio)',
+    'exit.quantumEnergy': 'E = 718·ħ (quantum energy)',
+    'exit.zetaFunction': 'ζ(s) = Riemann zeta function',
+    'exit.waveNumber': 'k = 2π/718 (wave number)',
+    'exit.timeLabel': 't (subjective time)',
+    'exit.spaceLabel': 'x (position in space)',
+    'exit.customPoint': 'Custom point',
+    'exit.customPointDesc': 'Full Riemann Zeta function calculations require an advanced backend. Use one of the predefined resonance keys above for a precise result.',
+    'exit.preciseValues': '✓ Precisely calculated quantum values',
     
     // Tabs
     'tabs.about': 'About',

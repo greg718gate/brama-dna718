@@ -146,7 +146,7 @@ const BiblicalDecoder = () => {
 
         if (error) throw error;
 
-        if (data && data.scienceSays) {
+        if (data && (data.scienceSays || data.plainMeaning)) {
           setVerbalInterpretation(data);
         } else if (data && data.error) {
           console.error("AI interpretation error:", data.error);
@@ -194,18 +194,6 @@ const BiblicalDecoder = () => {
         if (!error && data?.verseText) {
           decodeText = data.verseText;
           setText(data.verseText);
-          // Store the lookup result to show immediately
-          if (data.plainMeaning) {
-            setVerbalInterpretation({
-              plainMeaning: data.plainMeaning,
-              scienceSays: '',
-              faithSays: '',
-              bridge: '',
-              miracle: '',
-              insight: '',
-              _source: data.source || '',
-            } as any);
-          }
         } else {
           // Fallback: use reference as text
           decodeText = decodeRef;
