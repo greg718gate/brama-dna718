@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -15,29 +15,35 @@ serve(async (req) => {
     const { reference, text, lang, gematriaTotal, coherence, quantumState, gateName, gatePosition } = await req.json();
 
     const langLabel = lang === "pl" ? "Polish" : "English";
-    const prompt = `You are a scholar bridging quantum physics, biblical theology, and the Ψ-718 unified theory (which maps biblical texts to DNA gates via gematria and wave functions).
+    const prompt = `You are a biblical scholar and theologian who explains Bible verses in clear, accessible language.
 
 Given this biblical verse:
 - Reference: ${reference}
-- Text: "${text}"
+- Full text: "${text}"
+
+Additionally, this verse has been analyzed through the Ψ-718 framework:
 - Gematria sum (Σ): ${gematriaTotal}
 - Quantum coherence: ${coherence}%
 - Quantum state: ${quantumState}
 - DNA gate: ${gateName} at mtDNA position ${gatePosition}
 
-Write a UNIQUE, SPECIFIC interpretation of THIS verse in ${langLabel}. The interpretation MUST directly reference the actual content and meaning of the verse text. Do NOT write generic templates.
+Write ALL responses in ${langLabel}.
 
-Return a JSON object with exactly these 5 fields (all in ${langLabel}):
+Return a JSON object with exactly these 6 fields:
+
 {
-  "scienceSays": "2-4 sentences. What does modern science (physics, biology, neuroscience) say that connects to the SPECIFIC MESSAGE of this verse? Reference actual scientific concepts relevant to this verse's content.",
-  "faithSays": "2-4 sentences. What is the theological/spiritual meaning of THIS SPECIFIC verse? Reference the actual words and message.",
-  "bridge": "2-4 sentences. How do the scientific and spiritual perspectives on THIS verse converge? Show they describe the same truth.",
-  "miracle": "2-4 sentences. How does this verse illuminate the nature of miracles through the lens of quantum mechanics? Be specific to this verse.",
-  "insight": "1-2 sentences. One powerful, memorable takeaway that connects this verse's gematria (${gematriaTotal}), its DNA gate (${gateName}), and its spiritual message."
+  "plainMeaning": "3-5 sentences. A CLEAR, SIMPLE explanation of what this verse literally says and means. Like a normal Bible study explanation that anyone can understand. What is the context? What is the message? Why is this verse important? Write as if explaining to someone who has never read this verse before. THIS IS THE MOST IMPORTANT FIELD - it must be specific to the actual text '${text}' and reference '${reference}'.",
+  "scienceSays": "2-3 sentences. What does modern science (physics, biology, neuroscience) say that connects to the SPECIFIC MESSAGE of this verse?",
+  "faithSays": "2-3 sentences. What is the deeper theological/spiritual meaning of THIS SPECIFIC verse?",
+  "bridge": "2-3 sentences. How do the scientific and spiritual perspectives on THIS verse converge?",
+  "miracle": "2-3 sentences. How does this verse illuminate the nature of miracles through quantum mechanics?",
+  "insight": "1-2 sentences. One powerful takeaway connecting this verse's gematria (${gematriaTotal}), its DNA gate (${gateName}), and its spiritual message."
 }
 
-CRITICAL: Every field must be UNIQUE to this specific verse "${reference}". Do not use generic phrases like "this text carries a gematria value" — instead interpret what that value MEANS for this specific verse.
-Return ONLY the JSON object, no markdown.`;
+CRITICAL RULES:
+1. The "plainMeaning" field MUST explain what "${text}" actually says in simple words. It must be UNIQUE to this exact verse.
+2. Every field must reference the actual content of the verse "${reference}" - do NOT use generic phrases.
+3. Return ONLY the JSON object, no markdown, no code fences.`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
@@ -51,16 +57,16 @@ Return ONLY the JSON object, no markdown.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 1500,
+        max_tokens: 2000,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI Gateway error:", errorText);
+      console.error("AI Gateway error:", response.status, errorText);
       throw new Error(`AI Gateway returned ${response.status}`);
     }
 
@@ -71,7 +77,6 @@ Return ONLY the JSON object, no markdown.`;
       throw new Error("No content in AI response");
     }
 
-    // Parse JSON from response (handle possible markdown wrapping)
     let parsed;
     try {
       const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
