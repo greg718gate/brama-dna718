@@ -333,12 +333,12 @@ export const EquationOfExit = () => {
         <div className="p-6 bg-black/40 rounded-lg border border-primary/30">
           <div className="text-center space-y-2 font-mono">
             <div className="text-2xl text-primary">Ψ = A·e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
-            <div className="text-lg text-muted-foreground">gdzie:</div>
+            <div className="text-lg text-muted-foreground">{t('exit.where')}</div>
             <div className="text-sm space-y-1">
-              <div>γ = 0.618... (złoty podział)</div>
-              <div>E = 718·ħ (energia kwantowa)</div>
-              <div>ζ(s) = funkcja zeta Riemanna</div>
-              <div>k = 2π/718 (liczba falowa)</div>
+              <div>{t('exit.goldenRatio')}</div>
+              <div>{t('exit.quantumEnergy')}</div>
+              <div>{t('exit.zetaFunction')}</div>
+              <div>{t('exit.waveNumber')}</div>
             </div>
           </div>
         </div>
@@ -368,7 +368,7 @@ export const EquationOfExit = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="time">t (czas subiektywny)</Label>
+              <Label htmlFor="time">{t('exit.timeLabel')}</Label>
               <Input
                 id="time"
                 type="number"
@@ -379,7 +379,7 @@ export const EquationOfExit = () => {
               />
             </div>
             <div>
-              <Label htmlFor="space">x (pozycja w przestrzeni)</Label>
+              <Label htmlFor="space">{t('exit.spaceLabel')}</Label>
               <Input
                 id="space"
                 type="number"
@@ -398,10 +398,9 @@ export const EquationOfExit = () => {
             <div className="p-4 bg-black/40 rounded-lg border border-primary/30 font-mono space-y-2">
               {calculatedPsi.magnitude === -1 ? (
                 <div className="text-muted-foreground text-sm">
-                  <strong className="text-primary">Niestandardowy punkt (t={timeParam.toFixed(3)}, x={spaceParam.toFixed(3)})</strong>
+                  <strong className="text-primary">{t('exit.customPoint')} (t={timeParam.toFixed(3)}, x={spaceParam.toFixed(3)})</strong>
                   <p className="mt-2 text-xs">
-                    Obliczenia pełnej funkcji Zeta Riemanna wymagają zaawansowanego backendu. 
-                    Skorzystaj z jednego z predefiniowanych kluczy powyżej dla precyzyjnego wyniku.
+                    {t('exit.customPointDesc')}
                   </p>
                 </div>
               ) : (
@@ -413,7 +412,7 @@ export const EquationOfExit = () => {
                     |Ψ| = <span className="text-primary font-bold">{calculatedPsi.magnitude.toFixed(3)}</span>
                   </div>
                   <div className="text-xs text-muted-foreground/70 mt-2">
-                    ✓ Precyzyjnie obliczone wartości kwantowe
+                    {t('exit.preciseValues')}
                   </div>
                 </>
               )}
