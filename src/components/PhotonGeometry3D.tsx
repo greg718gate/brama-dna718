@@ -29,13 +29,16 @@ function fibonacciSphere(count: number, radius: number): Float32Array {
 interface PhotonCloudProps {
   coherence: number;
   isPhotonic: boolean;
+  focusIntensity: number; // 0–1 from WillPowerController
+  isCollapsed: boolean;   // freeze into symmetry
 }
 
 /** The main particle system */
-function PhotonCloud({ coherence, isPhotonic }: PhotonCloudProps) {
+function PhotonCloud({ coherence, isPhotonic, focusIntensity, isCollapsed }: PhotonCloudProps) {
   const pointsRef = useRef<THREE.Points>(null!);
   const mouseRef = useRef(new THREE.Vector2(0, 0));
   const { viewport } = useThree();
+  const collapseTimeRef = useRef<number | null>(null);
 
   const basePositions = useMemo(() => fibonacciSphere(PARTICLE_COUNT, 2.5), []);
 
@@ -77,50 +80,96 @@ function PhotonCloud({ coherence, isPhotonic }: PhotonCloudProps) {
     const col = geo.attributes.color as THREE.BufferAttribute;
     const t = clock.getElapsedTime();
 
+    // Track collapse animation progress
+    if (isCollapsed && !collapseTimeRef.current) {
+      collapseTimeRef.current = t;
+    } else if (!isCollapsed) {
+      collapseTimeRef.current = null;
+    }
+    const collapseProgress = isCollapsed && collapseTimeRef.current
+      ? Math.min(1, (t - collapseTimeRef.current) / 1.5)
+      : 0;
+
+    // Focus: squash Y axis to create lens shape (sphere → disc)
+    const lensSquash = 1 - focusIntensity * 0.85; // 1.0 → 0.15
+    const lensExpand = 1 + focusIntensity * 0.3;   // radial expansion
+
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const bx = basePositions[i * 3];
       const by = basePositions[i * 3 + 1];
       const bz = basePositions[i * 3 + 2];
 
-      // Observer effect: mouse curves photon trajectories
+      // Observer effect
       const mx = mouseRef.current.x * 0.8;
       const my = mouseRef.current.y * 0.8;
       const distToMouse = Math.sqrt(
         (bx / 2.5 - mx) ** 2 + (by / 2.5 - my) ** 2
       );
-      const influence = Math.max(0, 1 - distToMouse) * 0.6;
+      const influence = Math.max(0, 1 - distToMouse) * 0.6 * (1 - collapseProgress);
 
-      if (isPhotonic) {
-        // EXPLOSION: chaotic pulsation
-        const pulse = Math.sin(t * 3 + i * 0.1) * 0.4;
-        const chaos = Math.sin(t * 7 + i * PHI) * 0.15;
+      if (isCollapsed) {
+        // COLLAPSE: lerp from current chaotic position to perfect icosahedron-like symmetry
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        const yTarget = (1 - (i / (PARTICLE_COUNT - 1)) * 2) * 2.0;
+        const rTarget = Math.sqrt(Math.max(0, 1 - (yTarget / 2.0) ** 2)) * 2.0;
+        const thetaTarget = goldenAngle * i;
+        const xTarget = Math.cos(thetaTarget) * rTarget;
+        const zTarget = Math.sin(thetaTarget) * rTarget;
+
+        // Smooth ease-out lerp
+        const ease = 1 - Math.pow(1 - collapseProgress, 3);
+        const cx = bx + (xTarget - bx) * ease;
+        const cy = by + (yTarget - by) * ease;
+        const cz = bz + (zTarget - bz) * ease;
+
+        pos.setXYZ(i, cx, cy, cz);
+
+        // Shift to cyan-white during collapse
+        const cMix = ease;
+        col.setXYZ(
+          i,
+          0.2 + 0.6 * cMix,
+          0.8 * cMix + 0.5 * (1 - cMix),
+          0.9 * cMix + 0.3 * (1 - cMix)
+        );
+      } else if (isPhotonic) {
+        // EXPLOSION with focus-based damping
+        const dampedChaos = 1 - focusIntensity * 0.7;
+        const pulse = Math.sin(t * 3 + i * 0.1) * 0.4 * dampedChaos;
+        const chaos = Math.sin(t * 7 + i * PHI) * 0.15 * dampedChaos;
         const scale = 1 + pulse + chaos;
 
         pos.setXYZ(
           i,
-          bx * scale + Math.sin(t * 2 + i) * 0.15 + mx * influence,
-          by * scale + Math.cos(t * 3 + i * 0.7) * 0.15 + my * influence,
-          bz * scale + Math.sin(t * 1.5 + i * 1.3) * 0.1
+          bx * scale * lensExpand + Math.sin(t * 2 + i) * 0.15 * dampedChaos + mx * influence,
+          by * scale * lensSquash + Math.cos(t * 3 + i * 0.7) * 0.15 * dampedChaos + my * influence,
+          bz * scale * lensExpand + Math.sin(t * 1.5 + i * 1.3) * 0.1 * dampedChaos
         );
 
-        // Flash gold-white colors
         const flash = Math.sin(t * 5 + i * 0.3) * 0.3 + 0.7;
-        col.setXYZ(i, 1.0, 0.85 * flash + 0.15, flash * 0.5 + 0.5);
+        // Shift towards purple at high focus
+        const focusColor = focusIntensity * 0.4;
+        col.setXYZ(
+          i,
+          1.0 - focusColor * 0.3,
+          0.85 * flash + 0.15 - focusColor * 0.2,
+          flash * 0.5 + 0.5 + focusColor * 0.3
+        );
       } else {
-        // GEOMETRIC ORDER: slow, precise rotation
+        // GEOMETRIC ORDER with lens effect
         const angle = t * 0.3 + i * 0.001;
         const breathe = Math.sin(t * 0.5 + i * 0.02) * 0.05;
         const r = 1 + breathe;
 
         const cos = Math.cos(angle);
         const sin = Math.sin(angle);
-        const rx = bx * cos - bz * sin;
-        const rz = bx * sin + bz * cos;
+        const rx = (bx * cos - bz * sin) * lensExpand;
+        const rz = (bx * sin + bz * cos) * lensExpand;
 
         pos.setXYZ(
           i,
           rx * r + mx * influence * 0.3,
-          by * r + my * influence * 0.3,
+          by * r * lensSquash + my * influence * 0.3,
           rz * r
         );
       }
@@ -129,8 +178,9 @@ function PhotonCloud({ coherence, isPhotonic }: PhotonCloudProps) {
     pos.needsUpdate = true;
     col.needsUpdate = true;
 
-    // Slow rotation of whole system
-    pointsRef.current.rotation.y += isPhotonic ? 0.003 : 0.001;
+    // Slow rotation
+    const rotSpeed = isCollapsed ? 0.0005 : isPhotonic ? 0.003 : 0.001;
+    pointsRef.current.rotation.y += rotSpeed;
   });
 
   return (
@@ -193,9 +243,11 @@ function GlowSphere({ isPhotonic }: { isPhotonic: boolean }) {
 
 interface PhotonGeometry3DProps {
   coherence: number;
+  focusIntensity?: number;
+  isCollapsed?: boolean;
 }
 
-export const PhotonGeometry3D = ({ coherence }: PhotonGeometry3DProps) => {
+export const PhotonGeometry3D = ({ coherence, focusIntensity = 0, isCollapsed = false }: PhotonGeometry3DProps) => {
   const { language } = useLanguage();
   const pl = language === "pl";
   const isPhotonic = coherence < 0.3;
@@ -233,7 +285,7 @@ export const PhotonGeometry3D = ({ coherence }: PhotonGeometry3DProps) => {
             style={{ background: "hsl(220, 25%, 4%)" }}
           >
             <ambientLight intensity={0.2} />
-            <PhotonCloud coherence={coherence} isPhotonic={isPhotonic} />
+            <PhotonCloud coherence={coherence} isPhotonic={isPhotonic} focusIntensity={focusIntensity} isCollapsed={isCollapsed} />
             <GlowSphere isPhotonic={isPhotonic} />
             <OrbitControls
               enableZoom={false}

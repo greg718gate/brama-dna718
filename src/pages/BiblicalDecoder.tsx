@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QuantumCommandCard } from "@/components/QuantumCommandCard";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
 import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
+import { WillPowerController } from "@/components/WillPowerController";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -61,6 +62,8 @@ const BiblicalDecoder = () => {
   const [result, setResult] = useState<DecoderResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const [photonFocus, setPhotonFocus] = useState(0);
+  const [photonCollapsed, setPhotonCollapsed] = useState(false);
 
   // When user manually edits reference or text, clear preset Hebrew to avoid stale data
   const handleReferenceChange = (val: string) => {
@@ -208,6 +211,8 @@ const BiblicalDecoder = () => {
 
       const r = decodeVerse(decodeRef, decodeText, hebrewText);
       setResult(r);
+      setPhotonFocus(0);
+      setPhotonCollapsed(false);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     } catch (e) {
       console.error("Decode error:", e);
@@ -226,6 +231,8 @@ const BiblicalDecoder = () => {
       try {
         const r = decodeVerse(preset.reference, preset.text, preset.hebrew);
         setResult(r);
+        setPhotonFocus(0);
+        setPhotonCollapsed(false);
         setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
       } catch (e) {
         console.error("Decode error:", e);
@@ -453,7 +460,19 @@ const BiblicalDecoder = () => {
             )}
 
             {/* PHOTON GEOMETRY 3D — Fibonacci Sphere */}
-            <PhotonGeometry3D coherence={result.psi.coherence} />
+            <PhotonGeometry3D
+              coherence={result.psi.coherence}
+              focusIntensity={photonFocus}
+              isCollapsed={photonCollapsed}
+            />
+
+            {/* WILL POWER CONTROLLER — Gates 10-12 */}
+            <WillPowerController
+              coherence={result.psi.coherence}
+              onFocusChange={setPhotonFocus}
+              onCollapse={() => setPhotonCollapsed(true)}
+              isCollapsed={photonCollapsed}
+            />
 
             {/* EMOTIONAL BRIDGE — Lindblad model & DNA activation */}
             <EmotionalBridge
