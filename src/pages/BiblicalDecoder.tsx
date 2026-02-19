@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { QuantumCommandCard } from "@/components/QuantumCommandCard";
+import { EmotionalBridge } from "@/components/EmotionalBridge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -449,6 +450,14 @@ const BiblicalDecoder = () => {
             {result.gatePosition && (
               <QuantumCommandCard gatePosition={result.gatePosition} />
             )}
+
+            {/* EMOTIONAL BRIDGE — Lindblad model & DNA activation */}
+            <EmotionalBridge
+              coherence={result.psi.coherence}
+              thermalNoise={result.decoherence.thermalNoise}
+              stability={result.decoherence.stability}
+              dominantGateIndex={result.intentionOperator.dominantGateIdx + 1}
+            />
 
             {/* Technical details card */}
             <Card className="border-border bg-card/80">
