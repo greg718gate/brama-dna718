@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { QuantumCommandCard } from "@/components/QuantumCommandCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -443,6 +444,10 @@ const BiblicalDecoder = () => {
                 </Card>
                 )}
               </div>
+            )}
+            {/* QUANTUM COMMAND for dominant gate */}
+            {result.gatePosition && (
+              <QuantumCommandCard gatePosition={result.gatePosition} />
             )}
 
             {/* Technical details card */}

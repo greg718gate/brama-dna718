@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import Unified from "./pages/Unified";
 import Letter from "./pages/Letter";
 import BiblicalDecoder from "./pages/BiblicalDecoder";
+import GatesAtlas from "./pages/GatesAtlas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,9 @@ const App = () => (
 
               <Route path="/decoder" element={<BiblicalDecoder />} />
               <Route path="/decoder/*" element={<BiblicalDecoder />} />
+
+              <Route path="/gates" element={<GatesAtlas />} />
+              <Route path="/gates/*" element={<GatesAtlas />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
