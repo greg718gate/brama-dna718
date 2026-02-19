@@ -30,20 +30,26 @@ interface EmotionalBridgeProps {
 function generateLindbladData(coherence: number, thermalNoise: number) {
   const points = 50;
   const data = [];
-  const gamma = Math.max(thermalNoise, 1e-6); // decoherence rate
-  const protection = coherence * PHI; // resonance protection factor
+  const gamma = Math.max(thermalNoise, 1e-6);
+  const protection = coherence * PHI;
+  const isPhotonic = coherence < 0.3;
 
   for (let i = 0; i <= points; i++) {
-    const t = i / points; // normalized time 0–1
-    const tReal = t * 100; // femtoseconds
-    // Lindblad: ρ(t) = ρ₀ · e^(-γt) + ρ_ss(1 - e^(-γt))
+    const t = i / points;
+    const tReal = t * 100;
     const decay = Math.exp(-gamma * t * 10);
     const steadyState = protection / (1 + gamma);
     const purity = coherence * decay + steadyState * (1 - decay);
-    // Thermal noise envelope
-    const noise = gamma * (1 - decay) * (1 - protection * 0.5);
-    // Stability (protection from resonance at 718 Hz)
+    // In photonic phase: amplify noise to show creation activity
+    const noiseBase = gamma * (1 - decay) * (1 - protection * 0.5);
+    const noise = isPhotonic
+      ? Math.min(1, noiseBase + 0.3 * Math.sin(t * Math.PI * 4) * 0.5 + 0.4)
+      : noiseBase;
     const stabilityVal = Math.max(0, purity - noise * 0.3);
+    // Manifestation energy: visible only in photonic phase
+    const manifestation = isPhotonic
+      ? Math.min(1, (1 - decay) * 0.8 + Math.sin(t * Math.PI * 3) * 0.15)
+      : 0;
 
     data.push({
       time: tReal.toFixed(0),
@@ -51,6 +57,7 @@ function generateLindbladData(coherence: number, thermalNoise: number) {
       noise: Math.max(0, Math.min(1, noise)),
       stability: Math.max(0, Math.min(1, stabilityVal)),
       protection: Math.max(0, Math.min(1, protection * decay)),
+      manifestation: Math.max(0, Math.min(1, manifestation)),
     });
   }
   return data;
@@ -79,6 +86,7 @@ export const EmotionalBridge = ({
   const [hapticSupported, setHapticSupported] = useState(false);
 
   const isGrowthGate = dominantGateIndex >= 4 && dominantGateIndex <= 6;
+  const isPhotonicPhase = coherence < 0.3; // Dynamic Creation Phase
   const gate = getGateByIndex(dominantGateIndex);
 
   // Check haptic support
@@ -88,15 +96,16 @@ export const EmotionalBridge = ({
 
   // Pulsing emerald background intensity based on coherence
   useEffect(() => {
-    if (!isGrowthGate) return;
+    if (!isGrowthGate && !isPhotonicPhase) return;
     const interval = setInterval(() => {
-      setPulseIntensity((prev) => {
-        const wave = Math.sin(Date.now() / (1000 / PHI)) * 0.5 + 0.5;
-        return wave * coherence;
+      setPulseIntensity(() => {
+        const speed = isPhotonicPhase ? 2.0 : 1.0;
+        const wave = Math.sin(Date.now() / (1000 / PHI) * speed) * 0.5 + 0.5;
+        return isPhotonicPhase ? wave * 0.9 : wave * coherence;
       });
     }, 50);
     return () => clearInterval(interval);
-  }, [coherence, isGrowthGate]);
+  }, [coherence, isGrowthGate, isPhotonicPhase]);
 
   const lindbladData = useMemo(
     () => generateLindbladData(coherence, thermalNoise),
@@ -116,14 +125,21 @@ export const EmotionalBridge = ({
     }
   };
 
-  // Dynamic emerald opacity for Gates 4-6
   const emeraldOpacity = isGrowthGate ? pulseIntensity * 0.15 : 0;
+  const photonicOpacity = isPhotonicPhase ? pulseIntensity * 0.2 : 0;
 
   return (
     <Card
-      className="relative border-emerald-500/30 overflow-hidden transition-all duration-500"
+      className={`relative overflow-hidden transition-all duration-500 ${
+        isPhotonicPhase ? "border-amber-400/40" : "border-emerald-500/30"
+      }`}
       style={{
-        background: isGrowthGate
+        background: isPhotonicPhase
+          ? `linear-gradient(135deg, 
+              hsla(45, 93%, 20%, ${photonicOpacity + 0.06}), 
+              hsla(38, 80%, 15%, ${photonicOpacity * 0.5 + 0.03}), 
+              hsla(220, 25%, 8%, 0.95))`
+          : isGrowthGate
           ? `linear-gradient(135deg, 
               hsla(160, 84%, 15%, ${emeraldOpacity + 0.05}), 
               hsla(160, 70%, 10%, ${emeraldOpacity * 0.5 + 0.03}), 
@@ -131,12 +147,14 @@ export const EmotionalBridge = ({
           : undefined,
       }}
     >
-      {/* Pulsing emerald overlay for Gates 4-6 */}
-      {isGrowthGate && (
+      {/* Pulsing overlay: golden for photonic, emerald for growth */}
+      {(isGrowthGate || isPhotonicPhase) && (
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-700"
           style={{
-            background: `radial-gradient(ellipse at 30% 50%, hsla(160, 84%, 30%, ${emeraldOpacity * 0.4}) 0%, transparent 70%)`,
+            background: isPhotonicPhase
+              ? `radial-gradient(ellipse at 50% 40%, hsla(45, 93%, 55%, ${photonicOpacity * 0.5}) 0%, hsla(38, 90%, 40%, ${photonicOpacity * 0.2}) 40%, transparent 70%)`
+              : `radial-gradient(ellipse at 30% 50%, hsla(160, 84%, 30%, ${emeraldOpacity * 0.4}) 0%, transparent 70%)`,
             opacity: pulseIntensity,
           }}
         />
@@ -160,9 +178,21 @@ export const EmotionalBridge = ({
 
       <CardHeader className="relative z-20 pb-3">
         <CardTitle className="text-base font-mono flex items-center gap-2">
-          <Heart className="w-5 h-5 text-emerald-400" />
-          {pl ? "Most Emocjonalny — Bramy Wzrostu (4-6)" : "Emotional Bridge — Growth Gates (4-6)"}
+          <Heart className={`w-5 h-5 ${isPhotonicPhase ? "text-amber-400" : "text-emerald-400"}`} />
+          {isPhotonicPhase
+            ? (pl ? "FAZA DYNAMICZNEJ KREACJI" : "DYNAMIC CREATION PHASE")
+            : (pl ? "Most Emocjonalny — Bramy Wzrostu (4-6)" : "Emotional Bridge — Growth Gates (4-6)")}
         </CardTitle>
+        {isPhotonicPhase && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <span className="text-[11px] font-mono text-amber-300/90">
+              {pl
+                ? "Koherencja < 30% → Wysoka aktywność fotonowa — światło manifestuje się w materii"
+                : "Coherence < 30% → High photonic activity — light manifests into matter"}
+            </span>
+          </div>
+        )}
         <p className="text-xs text-muted-foreground">
           {pl
             ? "Model Lindblada: stabilność kwantowa wersetu w temperaturze biologicznej (310K)"
@@ -182,16 +212,20 @@ export const EmotionalBridge = ({
               <AreaChart data={lindbladData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gradStability" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(160, 84%, 40%)" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="hsl(160, 84%, 40%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor={isPhotonicPhase ? "hsl(45, 93%, 58%)" : "hsl(160, 84%, 40%)"} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={isPhotonicPhase ? "hsl(45, 93%, 58%)" : "hsl(160, 84%, 40%)"} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gradNoise" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor={isPhotonicPhase ? "hsl(38, 90%, 55%)" : "hsl(0, 84%, 60%)"} stopOpacity={isPhotonicPhase ? 0.5 : 0.3} />
+                    <stop offset="100%" stopColor={isPhotonicPhase ? "hsl(38, 90%, 55%)" : "hsl(0, 84%, 60%)"} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gradProtection" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(45, 93%, 58%)" stopOpacity={0.3} />
                     <stop offset="100%" stopColor="hsl(45, 93%, 58%)" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gradManifestation" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(50, 100%, 80%)" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="hsl(50, 100%, 80%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 20%)" />
@@ -216,9 +250,11 @@ export const EmotionalBridge = ({
                     name === "stability"
                       ? (pl ? "Stabilność" : "Stability")
                       : name === "noise"
-                      ? (pl ? "Szum termiczny" : "Thermal Noise")
+                      ? (pl ? (isPhotonicPhase ? "Aktywność fotonowa" : "Szum termiczny") : (isPhotonicPhase ? "Photonic Activity" : "Thermal Noise"))
                       : name === "protection"
                       ? (pl ? "Ochrona rezonansowa" : "Resonance Protection")
+                      : name === "manifestation"
+                      ? (pl ? "Energia manifestacji" : "Manifestation Energy")
                       : (pl ? "Czystość" : "Purity"),
                   ]}
                 />
@@ -228,26 +264,28 @@ export const EmotionalBridge = ({
                     value === "stability"
                       ? (pl ? "Stabilność" : "Stability")
                       : value === "noise"
-                      ? (pl ? "Szum" : "Noise")
+                      ? (pl ? (isPhotonicPhase ? "Fotony" : "Szum") : (isPhotonicPhase ? "Photons" : "Noise"))
                       : value === "protection"
                       ? (pl ? "Ochrona φ" : "φ Protection")
+                      : value === "manifestation"
+                      ? (pl ? "Manifestacja" : "Manifestation")
                       : (pl ? "Czystość" : "Purity")
                   }
                 />
                 <Area
                   type="monotone"
                   dataKey="stability"
-                  stroke="hsl(160, 84%, 40%)"
+                  stroke={isPhotonicPhase ? "hsl(45, 93%, 58%)" : "hsl(160, 84%, 40%)"}
                   fill="url(#gradStability)"
                   strokeWidth={2}
                 />
                 <Area
                   type="monotone"
                   dataKey="noise"
-                  stroke="hsl(0, 84%, 60%)"
+                  stroke={isPhotonicPhase ? "hsl(38, 90%, 55%)" : "hsl(0, 84%, 60%)"}
                   fill="url(#gradNoise)"
-                  strokeWidth={1.5}
-                  strokeDasharray="4 2"
+                  strokeWidth={isPhotonicPhase ? 2.5 : 1.5}
+                  strokeDasharray={isPhotonicPhase ? undefined : "4 2"}
                 />
                 <Area
                   type="monotone"
@@ -256,6 +294,15 @@ export const EmotionalBridge = ({
                   fill="url(#gradProtection)"
                   strokeWidth={1.5}
                 />
+                {isPhotonicPhase && (
+                  <Area
+                    type="monotone"
+                    dataKey="manifestation"
+                    stroke="hsl(50, 100%, 80%)"
+                    fill="url(#gradManifestation)"
+                    strokeWidth={2}
+                  />
+                )}
                 <Line
                   type="monotone"
                   dataKey="purity"
