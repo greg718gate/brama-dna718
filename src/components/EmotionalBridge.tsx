@@ -24,14 +24,17 @@ interface EmotionalBridgeProps {
   thermalNoise: number;    // from decoherence result
   stability: string;       // STABLE | METASTABLE | UNSTABLE
   dominantGateIndex: number; // 1-18
+  focusIntensity?: number; // 0–1 from WillPowerController
 }
 
 /** Generate Lindblad model data: stability vs thermal noise over time */
-function generateLindbladData(coherence: number, thermalNoise: number) {
+function generateLindbladData(coherence: number, thermalNoise: number, focusIntensity: number = 0) {
   const points = 50;
   const data = [];
   const gamma = Math.max(thermalNoise, 1e-6);
-  const protection = coherence * PHI;
+  // Focus boosts protection: higher focus → higher resonance shielding
+  const focusBoost = 1 + focusIntensity * PHI;
+  const protection = coherence * PHI * focusBoost;
   const isPhotonic = coherence < 0.3;
 
   for (let i = 0; i <= points; i++) {
@@ -78,6 +81,7 @@ export const EmotionalBridge = ({
   thermalNoise,
   stability,
   dominantGateIndex,
+  focusIntensity = 0,
 }: EmotionalBridgeProps) => {
   const { language } = useLanguage();
   const pl = language === "pl";
@@ -108,9 +112,16 @@ export const EmotionalBridge = ({
   }, [coherence, isGrowthGate, isPhotonicPhase]);
 
   const lindbladData = useMemo(
-    () => generateLindbladData(coherence, thermalNoise),
-    [coherence, thermalNoise]
+    () => generateLindbladData(coherence, thermalNoise, focusIntensity),
+    [coherence, thermalNoise, focusIntensity]
   );
+
+  // Compute Tr(Ô) modulated by focus
+  const traceValue = useMemo(() => {
+    const baseTrace = coherence * 18; // base: coherence × 18 gates
+    const focusBoost = 1 + focusIntensity * PHI;
+    return baseTrace * focusBoost;
+  }, [coherence, focusIntensity]);
 
   const handleActivateDNA = () => {
     setIsActivated(true);
@@ -315,7 +326,7 @@ export const EmotionalBridge = ({
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+          <div className="grid grid-cols-4 gap-2 text-xs font-mono">
             <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-center">
               <div className="text-muted-foreground">{pl ? "Koherencja" : "Coherence"}</div>
               <div className="text-emerald-400 font-bold text-sm">{(coherence * 100).toFixed(1)}%</div>
@@ -323,6 +334,10 @@ export const EmotionalBridge = ({
             <div className="p-2 rounded-lg bg-destructive/10 border border-destructive/20 text-center">
               <div className="text-muted-foreground">{pl ? "Szum" : "Noise"}</div>
               <div className="text-destructive font-bold text-sm">{thermalNoise.toExponential(2)}</div>
+            </div>
+            <div className="p-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-center">
+              <div className="text-muted-foreground">Tr(Ô)</div>
+              <div className="text-purple-400 font-bold text-sm">{traceValue.toFixed(2)}</div>
             </div>
             <div className={`p-2 rounded-lg border text-center ${
               stability === "STABLE"

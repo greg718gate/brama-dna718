@@ -460,27 +460,34 @@ const BiblicalDecoder = () => {
             )}
 
             {/* PHOTON GEOMETRY 3D — Fibonacci Sphere */}
-            <PhotonGeometry3D
-              coherence={result.psi.coherence}
-              focusIntensity={photonFocus}
-              isCollapsed={photonCollapsed}
-            />
+            <div className="glass-panel rounded-xl p-1">
+              <PhotonGeometry3D
+                coherence={result.psi.coherence}
+                focusIntensity={photonFocus}
+                isCollapsed={photonCollapsed}
+              />
+            </div>
 
             {/* WILL POWER CONTROLLER — Gates 10-12 */}
-            <WillPowerController
-              coherence={result.psi.coherence}
-              onFocusChange={setPhotonFocus}
-              onCollapse={() => setPhotonCollapsed(true)}
-              isCollapsed={photonCollapsed}
-            />
+            <div className="glass-panel rounded-xl p-1">
+              <WillPowerController
+                coherence={result.psi.coherence}
+                onFocusChange={setPhotonFocus}
+                onCollapse={() => setPhotonCollapsed(true)}
+                isCollapsed={photonCollapsed}
+              />
+            </div>
 
             {/* EMOTIONAL BRIDGE — Lindblad model & DNA activation */}
-            <EmotionalBridge
-              coherence={result.psi.coherence}
-              thermalNoise={result.decoherence.thermalNoise}
-              stability={result.decoherence.stability}
-              dominantGateIndex={result.intentionOperator.dominantGateIdx + 1}
-            />
+            <div className="glass-panel rounded-xl p-1">
+              <EmotionalBridge
+                coherence={result.psi.coherence}
+                thermalNoise={result.decoherence.thermalNoise}
+                stability={result.decoherence.stability}
+                dominantGateIndex={result.intentionOperator.dominantGateIdx + 1}
+                focusIntensity={photonFocus}
+              />
+            </div>
 
             {/* Technical details card */}
             <Card className="border-border bg-card/80">
@@ -780,6 +787,7 @@ const BiblicalDecoder = () => {
           </a>
         </div>
       </div>
+      {/* System Nadpisany. Architekt: [Grzegorz/G.N.]. Kod: 718. */}
     </div>
   );
 };
