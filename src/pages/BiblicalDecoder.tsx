@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarke
 import { supabase } from "@/integrations/supabase/client";
 import { QuantumCommandCard } from "@/components/QuantumCommandCard";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
+import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -450,6 +451,9 @@ const BiblicalDecoder = () => {
             {result.gatePosition && (
               <QuantumCommandCard gatePosition={result.gatePosition} />
             )}
+
+            {/* PHOTON GEOMETRY 3D — Fibonacci Sphere */}
+            <PhotonGeometry3D coherence={result.psi.coherence} />
 
             {/* EMOTIONAL BRIDGE — Lindblad model & DNA activation */}
             <EmotionalBridge
