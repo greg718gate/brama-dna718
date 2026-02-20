@@ -185,6 +185,8 @@ const BiblicalDecoder = () => {
     if (!hasText && !hasRef) return;
 
     setIsCalculating(true);
+    setResult(null);
+    setVerbalInterpretation(null);
 
     try {
       let decodeText = text.trim();
@@ -226,6 +228,8 @@ const BiblicalDecoder = () => {
     setText(preset.text);
     setHebrewText(preset.hebrew);
     setHebrewFromPreset(true);
+    setResult(null);
+    setVerbalInterpretation(null);
     setIsCalculating(true);
     setTimeout(() => {
       try {
