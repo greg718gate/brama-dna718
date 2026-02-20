@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { QuantumCommandCard } from "@/components/QuantumCommandCard";
+import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
 import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
 import { WillPowerController } from "@/components/WillPowerController";
@@ -458,10 +458,13 @@ const BiblicalDecoder = () => {
                 )}
               </div>
             )}
-            {/* QUANTUM COMMAND for dominant gate */}
-            {result.gatePosition && (
-              <QuantumCommandCard gatePosition={result.gatePosition} />
-            )}
+            {/* GATE ACTIVATION PANEL — All 18 Gates, dynamic per verse */}
+            <GateActivationPanel
+              key={result.reference}
+              gateIndex={result.hamiltonGate + 1}
+              coherence={result.psi.coherence}
+              materializationPotential={result.vi.materializationPotential}
+            />
 
             {/* PHOTON GEOMETRY 3D — Fibonacci Sphere */}
             <div className="glass-panel rounded-xl p-1">
