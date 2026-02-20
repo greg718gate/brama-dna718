@@ -475,6 +475,7 @@ const BiblicalDecoder = () => {
             {/* WILL POWER CONTROLLER — Gates 10-12 */}
             <div className="glass-panel rounded-xl p-1">
               <WillPowerController
+                key={result.reference}
                 coherence={result.psi.coherence}
                 onFocusChange={setPhotonFocus}
                 onCollapse={() => setPhotonCollapsed(true)}
