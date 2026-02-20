@@ -478,7 +478,7 @@ const BiblicalDecoder = () => {
                 key={result.reference}
                 coherence={result.psi.coherence}
                 onFocusChange={setPhotonFocus}
-                onCollapse={() => setPhotonCollapsed(true)}
+                onToggleCollapse={() => setPhotonCollapsed(prev => !prev)}
                 isCollapsed={photonCollapsed}
               />
             </div>

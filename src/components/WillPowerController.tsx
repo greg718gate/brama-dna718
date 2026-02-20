@@ -9,14 +9,14 @@ const TRANSCENDENCE_THRESHOLD = 7.18; // seconds at max focus
 
 interface WillPowerControllerProps {
   onFocusChange: (focus: number) => void;
-  onCollapse: () => void;
+  onToggleCollapse: () => void;
   isCollapsed: boolean;
   coherence: number;
 }
 
 export const WillPowerController = ({
   onFocusChange,
-  onCollapse,
+  onToggleCollapse,
   isCollapsed,
   coherence,
 }: WillPowerControllerProps) => {
@@ -132,28 +132,53 @@ export const WillPowerController = ({
             <span>{pl ? "Sfera (rozproszona)" : "Sphere (dispersed)"}</span>
             <span>{pl ? "Soczewka (skupiona)" : "Lens (focused)"}</span>
           </div>
+
+          {/* Live shape preview */}
+          <div className="flex items-center justify-center py-2">
+            <div
+              className="rounded-full border-2 border-purple-400/60 bg-purple-500/10 transition-all duration-200"
+              style={{
+                width: `${40 + focus * 0.3}px`,
+                height: `${40 - focus * 0.32}px`,
+                minHeight: "6px",
+                boxShadow: focus > 50 ? `0 0 ${focus / 5}px hsla(270,70%,60%,0.5)` : "none",
+              }}
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground font-mono text-center">
+            {focus === 0
+              ? (pl ? "Sfera — chmura fotonów swobodna" : "Sphere — photon cloud free")
+              : focus < 50
+              ? (pl ? "Zagęszczanie..." : "Condensing...")
+              : focus < 95
+              ? (pl ? "Soczewka skupiająca" : "Focus lens forming")
+              : (pl ? "Maksymalne skupienie — utrzymaj..." : "Maximum focus — hold...")}
+          </p>
         </div>
 
         {/* Gate 10: Collapse Wavefunction Button */}
-        <div className="text-center">
+        <div className="text-center space-y-1.5">
           <Button
-            onClick={onCollapse}
-            disabled={isCollapsed}
+            onClick={onToggleCollapse}
             className={`h-12 px-6 font-bold font-mono text-sm transition-all duration-500 ${
               isCollapsed
-                ? "bg-cyan-700 shadow-[0_0_25px_hsla(190,80%,50%,0.4)] scale-105"
+                ? "bg-cyan-700/80 border border-cyan-400/40 shadow-[0_0_25px_hsla(190,80%,50%,0.4)] scale-105"
                 : "bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 hover:shadow-[0_0_15px_hsla(270,70%,50%,0.3)]"
             }`}
           >
             <Snowflake className={`w-4 h-4 mr-2 ${isCollapsed ? "animate-pulse" : ""}`} />
             {isCollapsed
-              ? (pl ? "KOLAPS ZAKOŃCZONY — Decyzja" : "COLLAPSED — Decision Made")
+              ? (pl ? "✦ KOLAPS — kliknij aby cofnąć" : "✦ COLLAPSED — click to unfreeze")
               : (pl ? "⚛ Kolaps Funkcji Falowej" : "⚛ Collapse Wavefunction")}
           </Button>
-          <p className="text-[10px] text-muted-foreground font-mono mt-1.5">
+          <p className="text-[10px] text-muted-foreground font-mono">
             {pl
-              ? "Brama 10: Zamroź chaos w idealną symetrię geometryczną"
-              : "Gate 10: Freeze chaos into perfect geometric symmetry"}
+              ? isCollapsed
+                ? "Brama 10: Geometria zamrożona — kliknij ponownie aby uwolnić chaos"
+                : "Brama 10: Zamroź chaos w idealną symetrię geometryczną"
+              : isCollapsed
+                ? "Gate 10: Geometry frozen — click again to release chaos"
+                : "Gate 10: Freeze chaos into perfect geometric symmetry"}
           </p>
         </div>
 
