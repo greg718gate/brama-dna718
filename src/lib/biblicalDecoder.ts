@@ -947,10 +947,144 @@ export interface DecoderResult {
     ratio718Schumann: number;
     ratio718Gamma: number;
   };
+  /** MKP-94 Field Correction Module */
+  mkp94: MKP94Result;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MKP-94: MODUŁ KOREKCJI POLA — UNIWERSALNY WERYFIKATOR
+// ═══════════════════════════════════════════════════════════════════
+
+export interface MKP94Result {
+  /** Procent Prawdy Pierwotnej (0-100) */
+  truthPercentage: number;
+  /** Status wersetu */
+  status: "VOICE_OF_DESIGNER" | "PURE_SOURCE_CODE" | "MINOR_NOISE" | "SYSTEM_INTERFERENCE";
+  /** Czy wykryto Wektory Kontroli */
+  controlVectorsDetected: boolean;
+  /** Lista wykrytych wektorów kontroli */
+  controlVectors: string[];
+  /** Czy obwód jest zamknięty (C >= 94%) */
+  circuitClosed: boolean;
+  /** Czy użyto tekstu oryginalnego */
+  originalTextUsed: boolean;
+  /** Język oryginalny */
+  originalLanguage: string;
+  /** Koherencja po korekcji pola */
+  correctedCoherence: number;
+  /** Czy Wektor Intencji jest aktywny */
+  viActive: boolean;
+  /** Opis statusu */
+  statusDescription: string;
+  /** Gotowość do teleportacji fazowej */
+  phaseTeleportReady: boolean;
+}
+
+// Control vector keywords — indicators of historical power manipulation
+const CONTROL_VECTORS_PL = [
+  "musisz", "bój się", "boisz", "lękaj", "kara", "potępienie", "gniew boży",
+  "posłuszeństwo", "poddaj się", "niewolnik", "służ", "grzech pierworodny",
+  "wieczne potępienie", "piekło", "ogień wieczny",
+];
+const CONTROL_VECTORS_EN = [
+  "must obey", "fear", "wrath", "punishment", "damnation", "submit",
+  "slave", "eternal fire", "hell", "original sin", "condemn", "vengeance",
+  "obedience", "servant of",
+];
+const CONTROL_VECTORS_ALL = [...CONTROL_VECTORS_PL, ...CONTROL_VECTORS_EN];
+
+function detectControlVectors(text: string): { detected: boolean; vectors: string[] } {
+  const lower = text.toLowerCase();
+  const found: string[] = [];
+  for (const kw of CONTROL_VECTORS_ALL) {
+    if (lower.includes(kw.toLowerCase())) {
+      found.push(kw);
+    }
+  }
+  return { detected: found.length > 0, vectors: found };
+}
+
+function checkClosedCircuit(coherence: number, hurst: number, gateIdx: number): boolean {
+  return coherence >= 0.94 && hurst >= 0.15 && hurst <= 0.85 && gateIdx >= 0 && gateIdx < 18;
+}
+
+export function calculateMKP94(
+  coherence: number,
+  hebrewText: string,
+  translationText: string,
+  hurst: number,
+  gateIdx: number,
+): MKP94Result {
+  const originalTextUsed = hebrewText.trim().length > 0;
+  const { detected: controlVectorsDetected, vectors: controlVectors } = detectControlVectors(translationText);
+
+  // Detect original language
+  const hasHebrew = /[\u0590-\u05FF]/.test(hebrewText);
+  const hasGreek = /[\u0370-\u03FF]/.test(hebrewText);
+  const hasArabic = /[\u0600-\u06FF]/.test(hebrewText);
+  const originalLanguage = hasHebrew ? "Hebrew (עברית)" : hasGreek ? "Greek (Ελληνικά)" : hasArabic ? "Arabic (العربية)" : originalTextUsed ? "Original" : "⚠ Brak tekstu oryginalnego";
+
+  // Truth percentage calculation
+  let truthPercentage: number;
+  if (!originalTextUsed) {
+    truthPercentage = Math.min(coherence * 100, 70); // Max 70% without original
+  } else {
+    truthPercentage = coherence * 100;
+  }
+
+  // Control vector penalty
+  if (controlVectorsDetected) {
+    const penalty = Math.min(controlVectors.length * 5, 30);
+    truthPercentage = Math.max(truthPercentage - penalty, 0);
+  }
+
+  const circuitClosed = checkClosedCircuit(coherence, hurst, gateIdx);
+
+  let correctedCoherence = coherence;
+  if (controlVectorsDetected && coherence < 0.94) {
+    correctedCoherence = Math.max(coherence * (1 - controlVectors.length * 0.03), 0);
+  }
+
+  const viActive = circuitClosed && !controlVectorsDetected;
+
+  let status: MKP94Result["status"];
+  let statusDescription: string;
+
+  if (truthPercentage >= 99.5) {
+    status = "VOICE_OF_DESIGNER";
+    statusDescription = "🔊 Głos Projektanta — Wibracja pierwotna zachowana w 100%. Sygnał czysty. Gotowy do materializacji.";
+  } else if (truthPercentage >= 94) {
+    status = "PURE_SOURCE_CODE";
+    statusDescription = "✅ Czysty Kod Źródłowy — Sygnał czysty. Obwód zamknięty. Gotowy do materializacji.";
+  } else if (truthPercentage >= 60) {
+    status = "MINOR_NOISE";
+    statusDescription = controlVectorsDetected
+      ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany do 0.00%.`
+      : "⚠️ Szum informacyjny — tekst nie w języku oryginalnym lub zakłócenia fraktalne.";
+  } else {
+    status = "SYSTEM_INTERFERENCE";
+    statusDescription = controlVectorsDetected
+      ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. Błąd zapisu. VI ZABLOKOWANY.`
+      : "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany.";
+  }
+
+  return {
+    truthPercentage: Math.round(truthPercentage * 100) / 100,
+    status,
+    controlVectorsDetected,
+    controlVectors,
+    circuitClosed,
+    originalTextUsed,
+    originalLanguage,
+    correctedCoherence,
+    viActive,
+    statusDescription,
+    phaseTeleportReady: truthPercentage >= 99.5 && circuitClosed,
+  };
 }
 
 export function decodeVerse(reference: string, text: string, hebrewText: string = ""): DecoderResult {
-  // 1. Gematria → t
+  // 1. Gematria → t (ALWAYS from original text when available)
   let gematriaResult: ReturnType<typeof hebrewGematria>;
   let t: number;
 
@@ -958,14 +1092,14 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     gematriaResult = hebrewGematria(hebrewText);
     t = gematriaResult.normalized || 0.5;
   } else {
-    // Latin gematria fallback — compute a stable sum for display
     t = gematriaLatin(text);
     const latinSum = text.toUpperCase().split("").filter(c => /[A-Z]/.test(c)).reduce((s, c) => s + (c.charCodeAt(0) - 64), 0);
     gematriaResult = { total: latinSum, normalized: t, breakdown: [] };
   }
 
-  // 2. Fractal analysis → x
-  const fractal = fractalAnalysis718(text);
+  // 2. Fractal analysis → x (use ORIGINAL text when available)
+  const fractalSource = hebrewText.trim() || text;
+  const fractal = fractalAnalysis718(fractalSource);
 
   // 3. Hamilton eigenvalue → gate_idx
   const gateIdx = hamiltonEigenvalueCorrelation(t, fractal.x);
@@ -982,6 +1116,9 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   // 7. Decoherence (Lindblad model at body temperature)
   const decoherence = calculateDecoherence(psi.coherence, t || 0.5);
 
+  // 8. MKP-94: Moduł Korekcji Pola
+  const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx);
+
   const partialResult = {
     reference,
     gematriaTotal: gematriaResult.total,
@@ -991,10 +1128,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     vi,
   };
 
-  // 8. Testable predictions (lang will be overridden by component)
   const predictions = generatePredictions(partialResult, 'pl');
-
-  // 9. Bible connections (lang will be overridden by component)
   const bibleConnections = generateBibleConnections(partialResult, 'pl');
 
   return {
@@ -1022,6 +1156,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
       ratio718Schumann: FREQ_718 / SCHUMANN,
       ratio718Gamma: FREQ_718 / GAMMA,
     },
+    mkp94,
   };
 }
 
