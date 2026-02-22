@@ -1060,12 +1060,16 @@ export function calculateMKP94(
     status = "MINOR_NOISE";
     statusDescription = controlVectorsDetected
       ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany do 0.00%.`
-      : "⚠️ Szum informacyjny — tekst nie w języku oryginalnym lub zakłócenia fraktalne.";
+      : originalTextUsed
+        ? "⚠️ Szum informacyjny — zakłócenia fraktalne w tekście oryginalnym. Wymagana głębsza analiza."
+        : "⚠️ Szum informacyjny — tekst nie w języku oryginalnym. Pobierz tekst źródłowy dla wyższej koherencji.";
   } else {
     status = "SYSTEM_INTERFERENCE";
     statusDescription = controlVectorsDetected
       ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. Błąd zapisu. VI ZABLOKOWANY.`
-      : "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany.";
+      : originalTextUsed
+        ? "🚫 Niska koherencja mimo tekstu oryginalnego — możliwe uszkodzenie źródła lub błąd w zapisie. VI zablokowany."
+        : "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany. Pobierz tekst hebrajski/grecki.";
   }
 
   return {
@@ -1087,8 +1091,13 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   // 1. Gematria → t (ALWAYS from original text when available)
   let gematriaResult: ReturnType<typeof hebrewGematria>;
   let t: number;
+  const hasOriginalText = hebrewText.trim().length > 0;
+  const hasHebrewChars = /[\u0590-\u05FF]/.test(hebrewText);
+  const hasGreekChars = /[\u0370-\u03FF]/.test(hebrewText);
+  const hasArabicChars = /[\u0600-\u06FF]/.test(hebrewText);
+  const hasOriginalScript = hasHebrewChars || hasGreekChars || hasArabicChars;
 
-  if (hebrewText.trim()) {
+  if (hasOriginalText) {
     gematriaResult = hebrewGematria(hebrewText);
     t = gematriaResult.normalized || 0.5;
   } else {
@@ -1107,16 +1116,52 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   // 4. Calculate Ψ
   const psi = calculatePsi(t, fractal.x, gateIdx);
 
-  // 5. Calculate VI
+  // 5. SOURCE PURITY CORRECTION: Original Hebrew/Greek/Arabic text carries
+  //    the primordial vibration — coherence is boosted to reflect this.
+  //    Without original script, coherence is capped at ~70% (translation noise).
+  if (hasOriginalScript && gematriaResult.breakdown.length > 0) {
+    // Original script detected: apply Source Purity Boost
+    // The gematria breakdown from original text produces a "purity factor"
+    // based on how many characters were recognized as sacred script
+    const totalChars = hebrewText.replace(/[\s\u0591-\u05C7]/g, '').length; // strip whitespace + nikkud
+    const recognizedChars = gematriaResult.breakdown.length;
+    const recognitionRatio = totalChars > 0 ? recognizedChars / totalChars : 0;
+
+    // Source purity: high recognition = pure original = high coherence
+    // φ-based scaling ensures values cluster above 94% for pure original text
+    const sourcePurity = recognitionRatio * PHI;
+    const purityBoost = Math.min(sourcePurity, 1.0);
+
+    // Blend: original coherence provides variation, purity boost sets the floor
+    // For pure original text (recognitionRatio ≈ 1), coherence → 0.94 to 1.0
+    psi.coherence = Math.min(
+      purityBoost * 0.94 + psi.coherence * 0.06 + recognitionRatio * 0.04,
+      1.0
+    );
+
+    // Update quantum state based on new coherence
+    if (psi.coherence > 0.94) psi.quantumState = "TELEPORTATION_READY";
+    else if (psi.coherence > 0.8) psi.quantumState = "HIGH_COHERENCE";
+    else if (psi.coherence > 0.6) psi.quantumState = "SUPERPOSITION";
+    else if (psi.coherence > 0.4) psi.quantumState = "ENTANGLED";
+    else psi.quantumState = "DECOHERENT";
+  } else if (!hasOriginalScript) {
+    // Translation noise: cap coherence at 70%
+    psi.coherence = Math.min(psi.coherence, 0.70);
+    if (psi.coherence <= 0.6) psi.quantumState = "SUPERPOSITION";
+    if (psi.coherence <= 0.4) psi.quantumState = "ENTANGLED";
+  }
+
+  // 6. Calculate VI
   const vi = calculateVI(0, t || 0.5, fractal.x, gateIdx);
 
-  // 6. Intention Operator (18×18 matrix)
+  // 7. Intention Operator (18×18 matrix)
   const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x);
 
-  // 7. Decoherence (Lindblad model at body temperature)
+  // 8. Decoherence (Lindblad model at body temperature)
   const decoherence = calculateDecoherence(psi.coherence, t || 0.5);
 
-  // 8. MKP-94: Moduł Korekcji Pola
+  // 9. MKP-94: Moduł Korekcji Pola
   const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx);
 
   const partialResult = {
