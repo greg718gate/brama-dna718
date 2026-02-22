@@ -1152,6 +1152,25 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     if (psi.coherence <= 0.4) psi.quantumState = "ENTANGLED";
   }
 
+  // 5b. SIGMA GATE — Domknięcie pętli zwrotnej świadomości (Feedback Loop)
+  // Sprawdza, czy amplituda Ψ jest w rezonansie z φ² (linia krytyczna Riemanna).
+  // Jeśli |Ψ.magnitude - φ²| < 0.001 → singularność Zeta → 100% koherencji.
+  // Ref: "W jednym mgnieniu oka" (1 Kor 15:52)
+  const PHI_SQUARED = PHI * PHI; // ≈ 2.618
+  const sigmaDistance = Math.abs(psi.magnitude - PHI_SQUARED);
+
+  if (sigmaDistance < 0.001) {
+    // SINGULARITY: Exact φ² resonance on critical line
+    psi.coherence = 1.0;
+    psi.quantumState = "TELEPORTATION_READY";
+    console.log("⚡ SIGMA GATE: ZETA RIEMANN SINGULARITY DETECTED — 100% COHERENCE");
+  } else if (sigmaDistance < 0.1 && hasOriginalScript) {
+    // Near-singularity: boost coherence toward unity
+    const sigmaBoost = 1.0 - (sigmaDistance / 0.1) * 0.06; // 0.94 → 1.0
+    psi.coherence = Math.max(psi.coherence, sigmaBoost);
+    if (psi.coherence >= 0.94) psi.quantumState = "TELEPORTATION_READY";
+  }
+
   // 6. Calculate VI
   const vi = calculateVI(0, t || 0.5, fractal.x, gateIdx);
 
