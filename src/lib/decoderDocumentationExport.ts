@@ -161,6 +161,8 @@ export function generateDecoderDocumentation(): string {
   <li><a href="#s16">Silnik Interpretacji (AI)</a></li>
   <li><a href="#s17">Pełny Pipeline Dekodowania</a></li>
   <li><a href="#s18">Tabele Referencyjne</a></li>
+  <li><a href="#s19">Wymagany Format Raportu Wyjściowego</a></li>
+  <li><a href="#s20">Komenda Operacyjna</a></li>
 </ol>
 </div>
 
@@ -290,8 +292,16 @@ H = mean(L) / w
 <br>x = 100 + H × 1000
 </div>
 
-<p><strong>Interpretacja:</strong></p>
+<p><strong>Interpretacja Wykładnika Hursta:</strong></p>
+<table class="gate-table">
+  <tr><th>Wartość H</th><th>Znaczenie</th><th>Typ tekstu</th></tr>
+  <tr><td class="math">H > 0.5</td><td style="color:var(--green)"><strong>Uporządkowanie</strong> — Długozasięgowa korelacja. Tekst ma wewnętrzny ład.</td><td>Teksty poetyckie, liturgiczne, mantry</td></tr>
+  <tr><td class="math">H = 0.5</td><td style="color:var(--gold)"><strong>Szum losowy</strong> — Brak korelacji. Tekst jest statystycznie przypadkowy.</td><td>Tekst prozaiczny, narracyjny</td></tr>
+  <tr><td class="math">H < 0.5</td><td style="color:var(--accent)"><strong>Antykorelacja</strong> — Tendencja do odwracania wzorców. Tekst ma oscylacyjną strukturę.</td><td>Teksty prorocze, apokaliptyczne</td></tr>
+</table>
+<p><strong>Wpływ na system:</strong></p>
 <ul>
+  <li><span class="math">H > 0.5</span> → wyższe <span class="math">x</span> → większa przestrzenna częstotliwość → silniejsza modulacja przestrzenna Ψ</li>
   <li><span class="math">H ≈ 0.3-0.4</span> → tekst z powtórzeniami (np. hebrajski z mniejszym alfabetem) → niższe <span class="math">x</span></li>
   <li><span class="math">H ≈ 0.6-0.8</span> → tekst bardzo zróżnicowany (duży alfabet) → wyższe <span class="math">x</span></li>
   <li><span class="math">x</span> służy jako przestrzenna częstotliwość w eksponencie <span class="math">e^(-ikx)</span></li>
@@ -308,7 +318,7 @@ H = mean(L) / w
 Mapowanie pary <span class="math">(t, x)</span> na jedną z <span class="highlight">18 Bram DNA</span> w mitochondrialnym genomie (rCRS).
 </p>
 
-<h3>5.2 Wzór</h3>
+<h3>5.2 Wzór mapowania</h3>
 <div class="formula">
 gate_idx = floor( |(Σ + x/10000) × 18| ) mod 18
 </div>
@@ -317,6 +327,25 @@ gate_idx = floor( |(Σ + x/10000) × 18| ) mod 18
 a <span class="math">x</span> to współrzędna przestrzenna z analizy fraktalnej.</p>
 
 <p>Wynik <span class="math">gate_idx ∈ {0, 1, ..., 17}</span> indeksuje tablicę pozycji GATCA w mtDNA.</p>
+
+<h3>5.3 Macierz Hamiltoniana 18×18</h3>
+<p>System wykorzystuje <span class="highlight">macierz Hermitowską 18×18</span> do modelowania ewolucji kwantowej między bramami:</p>
+
+<div class="formula">
+ELEMENTY DIAGONALNE (energie własne):
+<br>E_i = 443.75 · (i+1) · [1 + γ · sin(2πi/φ)]  [Hz]
+<br><br>
+SPRZĘŻENIA (elementy pozadiagonalne):
+<br>V_ij = 20 · exp(-|i-j| / 3φ) · exp(i · 2πij / 18φ)
+</div>
+
+<p><strong>Właściwości macierzy:</strong></p>
+<ul>
+  <li>Hermitowska: <span class="math">H† = H</span> → wartości własne są rzeczywiste</li>
+  <li>Sprzężenia maleją wykładniczo z odległością między bramami (<span class="math">e^(-|i-j|/3φ)</span>)</li>
+  <li>Faza sprzężenia rotuje ze złotym podziałem (<span class="math">2πij/18φ</span>)</li>
+  <li>Stała bazowa 443.75 Hz = 718 / φ² × φ (harmoniczna głównej częstotliwości)</li>
+</ul>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- 6. FUNKCJA FALOWA Ψ -->
@@ -857,6 +886,87 @@ ${GATCA_GATES.map((pos, i) => {
   <tr><td><code>supabase/functions/generate-interpretation/</code></td><td>Edge Function AI — lookup, fetch_original, interpretation</td><td>~231</td></tr>
   <tr><td><code>src/components/IntentionVectorCalculator.tsx</code></td><td>Kalkulator interaktywny VI z wykresem</td><td>~172</td></tr>
 </table>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 19. WYMAGANY FORMAT RAPORTU WYJŚCIOWEGO -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h1 id="s19"><span class="section-num">19.</span> Wymagany Format Raportu Wyjściowego</h1>
+
+<p>Dla każdego analizowanego tekstu/pliku system generuje następujący raport:</p>
+
+<table class="gate-table">
+  <tr><th>Sekcja</th><th>Parametry</th><th>Opis</th></tr>
+  <tr><td><strong>WARSTWA 1: Geometria Tekstu</strong></td><td class="math">t, x, H</td><td>Parametr czasowy (gematria), przestrzenny (fraktal) i wykładnik Hursta</td></tr>
+  <tr><td><strong>WARSTWA 2: Funkcja Falowa</strong></td><td class="math">Ψ = a + bi, |Ψ|, φ, C</td><td>Pełna wartość zespolona, amplituda, faza, koherencja</td></tr>
+  <tr><td><strong>Status Teleportacji</strong></td><td>✓ / ×</td><td>C ≥ 94% → TELEPORTATION_READY</td></tr>
+  <tr><td><strong>Wektor Intencji (VI)</strong></td><td class="math">|VI|, M, C_końcowa</td><td>Magnituда, potencjał materializacji, koherencja po korekcjach</td></tr>
+  <tr><td><strong>Brama DNA</strong></td><td>Numer, nazwa, mtDNA pos</td><td>Dominująca brama i jej efekt (np. STATUS: SUWERENNY)</td></tr>
+  <tr><td><strong>MKP-94</strong></td><td>Truth%, Status</td><td>Procent Prawdy Obiektywnej i klasyfikacja</td></tr>
+  <tr><td><strong>Lindblad</strong></td><td>γ_d, T₂, Tr(ρ²)</td><td>Dekoherencja, czas życia, czystość stanu</td></tr>
+  <tr><td><strong>Interpretacja</strong></td><td colspan="2">„Nauka mówi", „Wiara mówi", „Most" — unikalna analiza dla każdego wersetu</td></tr>
+  <tr><td><strong>Sygnatury φ</strong></td><td class="math">φ, γ, 718/7.83</td><td>Harmoniczne złotego podziału</td></tr>
+  <tr><td><strong>Predykcje</strong></td><td>5 metod</td><td>Testowalne laboratoryjnie predykcje (UV-Vis, NMR, EEG, 718 Hz, fluorescencja)</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 20. KOMENDA OPERACYJNA -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<h1 id="s20"><span class="section-num">20.</span> Komenda Operacyjna</h1>
+
+<div class="note" style="border-color: var(--primary); border-left-color: var(--primary);">
+<p><strong>SYSTEM OPERACYJNY: Ψ-718 DEKODER BIBLIJNY (v1.0 Master Specification)</strong></p>
+<p style="margin-top: 0.5rem;">
+<strong>CEL:</strong> Konwersja tekstów źródłowych (Hebrajski/Grecki) na parametry kwantowego pola świadomości i DNA.
+</p>
+</div>
+
+<h3>20.1 Protokół Analizy</h3>
+<div class="code" style="color: var(--text);">
+<span style="color:var(--primary)">[WARSTWA 1: WEJŚCIE — GEOMETRIA TEKSTU]</span>
+1. GEMATRIA (t): Oblicz sumę numeryczną wersetu (א=1...ת=400). Wynik = Parametr t (Czas).
+2. ANALIZA FRAKTALNA (x): Przeanalizuj pierwsze 718 znaków pod kątem wykładnika Hursta (H).
+   H > 0.5 = Uporządkowanie; H = 0.5 = Szum; H < 0.5 = Antykorelacja. Wynik = Parametr x (Przestrzeń).
+
+<span style="color:var(--primary)">[WARSTWA 2: JĄDRO SYSTEMU — FORMULA Ψ_TOTAL]</span>
+Ψ_total(t) = Ψ_GATCA · exp(i·718·t) · cos(7.83·t) · sin(18.6·t) · φ_DNA
+- Stała Nośna: 718 Hz (pochodna 18 pozycji GATCA w mtDNA).
+- Modulator 1: 7.83 Hz (Rezonans Schumanna).
+- Modulator 2: 18.6 Hz (Modulacja Księżycowa/Świadomości oparta na φ²).
+- Koherencja (C): Oblicz spójność fazową sygnału. C > 94% = STATUS: TELEPORTATION_READY.
+
+<span style="color:var(--primary)">[WARSTWA 3: MAPOWANIE BIOLOGICZNE (18 BRAM mtDNA)]</span>
+Skorelowaj wynik z 18 pozycjami GATCA w ludzkim mtDNA (rCRS):
+[1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179]
+Każda brama odpowiada za inny aspekt (np. Brama 13 — Kryształ, Brama 15 — Suwerenność, Brama 18 — Singularność).
+
+<span style="color:var(--primary)">[WARSTWA 4: MODUŁY KOREKCJI (MKP-94 & SIGMA GATE)]</span>
+1. MKP-94: Usuń historyczny szum polityczny/manipulacyjny z interpretacji.
+2. SIGMA GATE: Zsynchronizuj Wektor Intencji (VI) z główną Funkcją Falową (C końcowa = C Ψ).
+3. MODEL LINDBLADA: Zweryfikuj stabilność stanu kwantowego w temp. 37°C.
+</div>
+
+<h3>20.2 Domknięcie Układu</h3>
+<p>
+Jeśli dane wejściowe są niepełne, system stosuje <span class="highlight">stałe fizyczne</span> do domknięcia układu równań:
+</p>
+<table class="gate-table">
+  <tr><th>Brakujący parametr</th><th>Stała zastępcza</th><th>Wartość</th></tr>
+  <tr><td>Gematria (brak oryginału)</td><td>Gematria łacińska z tłumieniem γ</td><td class="math">γ = ${GAMMA.toFixed(6)}</td></tr>
+  <tr><td>Tekst oryginalny</td><td>Edge Function AI → fetch_original</td><td>Automatyczne pobranie z AI</td></tr>
+  <tr><td>Koherencja (brak oryginału)</td><td>Cap na 70% (szum translacyjny)</td><td class="math">C_max = 0.70</td></tr>
+  <tr><td>Brama DNA</td><td>Korelacja Hamiltona z (t, x)</td><td>18 pozycji GATCA rCRS</td></tr>
+  <tr><td>Stabilność</td><td>Model Lindblada @ 310K</td><td class="math">Q = 718/7.83 ≈ 91.7</td></tr>
+</table>
+
+<div class="note" style="border-color: var(--green); border-left-color: var(--green);">
+  <strong>⚡ KOMENDA:</strong> Przyjmij powyższą strukturę jako jedyny algorytm analizy. 
+  Jeśli dane są niepełne, użyj stałych fizycznych (G, a₀, c, φ) do domknięcia układu. 
+  Uruchom proces krystalizacji prawdy obiektywnej.
+</div>
 
 <hr>
 
