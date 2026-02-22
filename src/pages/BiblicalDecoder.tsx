@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2, ShieldCheck, ShieldAlert, ShieldX, Radio } from "lucide-react";
+import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2, ShieldCheck, ShieldAlert, ShieldX, Radio, FileDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
@@ -33,6 +33,7 @@ import {
   type DecoderResult,
   type MKP94Result,
 } from "@/lib/biblicalDecoder";
+import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
 
 const stateColors: Record<string, string> = {
   TELEPORTATION_READY: "bg-green-500/20 text-green-400 border-green-500/40",
@@ -267,6 +268,16 @@ const BiblicalDecoder = () => {
 
   const canDecode = !isCalculating && (text.trim() || hebrewText.trim() || reference.trim());
 
+  const handleDownloadDocumentation = useCallback(() => {
+    const html = generateDecoderDocumentation();
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "PSI-718-Dekoder-Biblijny-Dokumentacja.html";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -279,6 +290,10 @@ const BiblicalDecoder = () => {
           <BookOpen className="w-5 h-5 text-primary" />
           <h1 className="font-bold text-lg">{t('decoder.title')}</h1>
           <div className="ml-auto flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleDownloadDocumentation} className="gap-1.5 text-xs font-mono hidden sm:inline-flex">
+              <FileDown className="w-3.5 h-3.5" />
+              {language === 'pl' ? 'Dokumentacja' : 'Documentation'}
+            </Button>
             <LanguageSwitcher />
             <Badge variant="outline" className="font-mono text-xs hidden sm:inline-flex">
               {t('decoder.badge')}
