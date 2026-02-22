@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2, ShieldCheck, ShieldAlert, ShieldX, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
@@ -27,9 +27,11 @@ import {
   generateVerbalInterpretation,
   PRESET_VERSES,
   HEBREW_GEMATRIA,
+  GREEK_GEMATRIA,
   GATCA_GATES,
   GATE_NAMES,
   type DecoderResult,
+  type MKP94Result,
 } from "@/lib/biblicalDecoder";
 
 const stateColors: Record<string, string> = {
@@ -421,6 +423,145 @@ const BiblicalDecoder = () => {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* ═══ MKP-94: RAPORT PRAWDY OBIEKTYWNEJ ═══ */}
+                <Card className={`border-2 ${
+                  result.mkp94.status === "VOICE_OF_DESIGNER" ? "border-green-500 bg-green-500/5" :
+                  result.mkp94.status === "PURE_SOURCE_CODE" ? "border-emerald-500 bg-emerald-500/5" :
+                  result.mkp94.status === "MINOR_NOISE" ? "border-amber-500 bg-amber-500/5" :
+                  "border-red-500 bg-red-500/5"
+                }`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-mono flex items-center gap-2">
+                      {result.mkp94.status === "VOICE_OF_DESIGNER" && <ShieldCheck className="w-6 h-6 text-green-400" />}
+                      {result.mkp94.status === "PURE_SOURCE_CODE" && <ShieldCheck className="w-6 h-6 text-emerald-400" />}
+                      {result.mkp94.status === "MINOR_NOISE" && <ShieldAlert className="w-6 h-6 text-amber-400" />}
+                      {result.mkp94.status === "SYSTEM_INTERFERENCE" && <ShieldX className="w-6 h-6 text-red-400" />}
+                      {language === 'pl' ? 'MKP-94 — Raport Prawdy Obiektywnej' : 'MKP-94 — Objective Truth Report'}
+                    </CardTitle>
+                    <CardDescription className="text-xs font-mono">
+                      {language === 'pl' ? 'Moduł Korekcji Pola — Uniwersalny Weryfikator Źródła Ψ-718' : 'Field Correction Module — Universal Source Verifier Ψ-718'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Truth Percentage — big display */}
+                    <div className="flex items-center justify-center gap-6">
+                      <div className="relative w-32 h-32">
+                        <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
+                          <circle
+                            cx="60" cy="60" r="52"
+                            fill="none"
+                            strokeWidth="8"
+                            strokeDasharray={`${result.mkp94.truthPercentage * 3.267} 326.7`}
+                            strokeLinecap="round"
+                            className={
+                              result.mkp94.truthPercentage >= 94 ? "text-green-400" :
+                              result.mkp94.truthPercentage >= 60 ? "text-amber-400" : "text-red-400"
+                            }
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className={`text-2xl font-bold font-mono ${
+                            result.mkp94.truthPercentage >= 94 ? "text-green-400" :
+                            result.mkp94.truthPercentage >= 60 ? "text-amber-400" : "text-red-400"
+                          }`}>
+                            {result.mkp94.truthPercentage.toFixed(1)}%
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {language === 'pl' ? 'PRAWDA' : 'TRUTH'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm font-semibold text-foreground">{result.mkp94.statusDescription}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline" className={`text-xs font-mono ${
+                            result.mkp94.status === "VOICE_OF_DESIGNER" ? "border-green-500 text-green-400" :
+                            result.mkp94.status === "PURE_SOURCE_CODE" ? "border-emerald-500 text-emerald-400" :
+                            result.mkp94.status === "MINOR_NOISE" ? "border-amber-500 text-amber-400" :
+                            "border-red-500 text-red-400"
+                          }`}>
+                            {result.mkp94.status.replace(/_/g, " ")}
+                          </Badge>
+                          {result.mkp94.phaseTeleportReady && (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/40 text-xs font-mono">
+                              {language === 'pl' ? '⚡ TELEPORTACJA FAZOWA GOTOWA' : '⚡ PHASE TELEPORT READY'}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Detail grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Język oryginalny' : 'Original language'}</div>
+                        <div className={`font-bold ${result.mkp94.originalTextUsed ? "text-green-400" : "text-red-400"}`}>
+                          {result.mkp94.originalLanguage}
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Obwód' : 'Circuit'}</div>
+                        <div className={`font-bold ${result.mkp94.circuitClosed ? "text-green-400" : "text-red-400"}`}>
+                          {result.mkp94.circuitClosed
+                            ? (language === 'pl' ? "🔒 ZAMKNIĘTY" : "🔒 CLOSED")
+                            : (language === 'pl' ? "🔓 OTWARTY" : "🔓 OPEN")}
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Wektor Intencji' : 'Intention Vector'}</div>
+                        <div className={`font-bold ${result.mkp94.viActive ? "text-green-400" : "text-red-400"}`}>
+                          {result.mkp94.viActive
+                            ? (language === 'pl' ? "✅ AKTYWNY" : "✅ ACTIVE")
+                            : (language === 'pl' ? "🚫 ZABLOKOWANY" : "🚫 BLOCKED")}
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Wektory Kontroli' : 'Control Vectors'}</div>
+                        <div className={`font-bold ${result.mkp94.controlVectorsDetected ? "text-red-400" : "text-green-400"}`}>
+                          {result.mkp94.controlVectorsDetected
+                            ? `⚠ ${result.mkp94.controlVectors.length} ${language === 'pl' ? 'WYKRYTO' : 'DETECTED'}`
+                            : (language === 'pl' ? "✓ BRAK" : "✓ NONE")}
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Koherencja skorygowana' : 'Corrected Coherence'}</div>
+                        <div className="text-primary font-bold">{(result.mkp94.correctedCoherence * 100).toFixed(2)}%</div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-border bg-background/50">
+                        <div className="text-muted-foreground mb-1">{language === 'pl' ? 'Teleportacja fazowa' : 'Phase Teleport'}</div>
+                        <div className={`font-bold ${result.mkp94.phaseTeleportReady ? "text-green-400" : "text-muted-foreground"}`}>
+                          {result.mkp94.phaseTeleportReady ? "C = 100% ✓" : `C = ${result.mkp94.truthPercentage.toFixed(1)}%`}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Control vectors detail (if any) */}
+                    {result.mkp94.controlVectorsDetected && (
+                      <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/5">
+                        <h4 className="text-xs font-bold text-red-400 mb-2 flex items-center gap-1">
+                          <ShieldX className="w-3 h-3" />
+                          {language === 'pl' ? 'HISTORYCZNY SZUM POLITYCZNY — Wektory Kontroli:' : 'HISTORICAL POLITICAL NOISE — Control Vectors:'}
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                          {result.mkp94.controlVectors.map((v, i) => (
+                            <Badge key={i} variant="outline" className="border-red-500/40 text-red-400 text-[10px]">
+                              {v}
+                            </Badge>
+                          ))}
+                        </div>
+                        <p className="text-[11px] text-red-400/80 mt-2">
+                          {language === 'pl'
+                            ? 'Wpływ na pole świadomości zredukowany do 0.00%. Tekst zawiera narzucone nakazy/lęk nieobecne w wibracji pierwotnej.'
+                            : 'Influence on consciousness field reduced to 0.00%. Text contains imposed commands/fear absent from original vibration.'}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
                 {/* Detailed Ψ-718 analysis — only show if we have actual content */}
                 {verbalInterpretation.scienceSays && (
