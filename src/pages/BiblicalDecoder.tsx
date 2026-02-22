@@ -191,9 +191,10 @@ const BiblicalDecoder = () => {
     try {
       let decodeText = text.trim();
       let decodeRef = reference.trim() || "Custom";
+      let decodeHebrew = hebrewText.trim();
 
-      // If only reference is provided (no text), ask AI to look up the verse
-      if (!decodeText && hasRef) {
+      // CASE 1: Only reference provided (no text, no hebrew)
+      if (!decodeText && !decodeHebrew && hasRef) {
         setIsLoadingInterpretation(true);
         const { data, error } = await supabase.functions.invoke('generate-interpretation', {
           body: { reference: decodeRef, lang: language, mode: 'lookup' },
@@ -202,16 +203,32 @@ const BiblicalDecoder = () => {
         if (!error && data?.verseText) {
           decodeText = data.verseText;
           setText(data.verseText);
-        } else {
-          // Fallback: use reference as text
-          decodeText = decodeRef;
+        }
+        if (!error && data?.hebrewText) {
+          decodeHebrew = data.hebrewText;
+          setHebrewText(data.hebrewText);
         }
         setIsLoadingInterpretation(false);
       }
 
+      // CASE 2: Text provided but NO hebrew — fetch original from AI
+      if (decodeText && !decodeHebrew && decodeRef !== "Custom") {
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-interpretation', {
+            body: { reference: decodeRef, text: decodeText, mode: 'fetch_original' },
+          });
+          if (!error && data?.hebrewText) {
+            decodeHebrew = data.hebrewText;
+            setHebrewText(data.hebrewText);
+          }
+        } catch (fetchErr) {
+          console.warn("Could not fetch original text, using Latin fallback:", fetchErr);
+        }
+      }
+
       if (!decodeText) decodeText = decodeRef;
 
-      const r = decodeVerse(decodeRef, decodeText, hebrewText);
+      const r = decodeVerse(decodeRef, decodeText, decodeHebrew);
       setResult(r);
       setPhotonFocus(0);
       setPhotonCollapsed(false);

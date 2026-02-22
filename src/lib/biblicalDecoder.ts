@@ -30,6 +30,17 @@ export const HEBREW_GEMATRIA: Record<string, number> = {
   'ק': 100, 'ר': 200, 'ש': 300, 'ת': 400,
 };
 
+// Greek Isopsephy (gematria for NT Greek texts)
+export const GREEK_GEMATRIA: Record<string, number> = {
+  'α': 1, 'Α': 1, 'β': 2, 'Β': 2, 'γ': 3, 'Γ': 3, 'δ': 4, 'Δ': 4,
+  'ε': 5, 'Ε': 5, 'ζ': 7, 'Ζ': 7, 'η': 8, 'Η': 8, 'θ': 9, 'Θ': 9,
+  'ι': 10, 'Ι': 10, 'κ': 20, 'Κ': 20, 'λ': 30, 'Λ': 30, 'μ': 40, 'Μ': 40,
+  'ν': 50, 'Ν': 50, 'ξ': 60, 'Ξ': 60, 'ο': 70, 'Ο': 70, 'π': 80, 'Π': 80,
+  'ρ': 100, 'Ρ': 100, 'σ': 200, 'Σ': 200, 'ς': 200,
+  'τ': 300, 'Τ': 300, 'υ': 400, 'Υ': 400, 'φ': 500, 'Φ': 500,
+  'χ': 600, 'Χ': 600, 'ψ': 700, 'Ψ': 700, 'ω': 800, 'Ω': 800,
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // 18 GATCA GATES - MITOCHONDRIAL DNA POSITIONS (rCRS)
 // ═══════════════════════════════════════════════════════════════════
@@ -74,7 +85,8 @@ export function hebrewGematria(text: string): { total: number; normalized: numbe
   const breakdown: { char: string; value: number }[] = [];
 
   for (const char of text) {
-    const val = HEBREW_GEMATRIA[char];
+    // Try Hebrew first, then Greek
+    const val = HEBREW_GEMATRIA[char] ?? GREEK_GEMATRIA[char];
     if (val !== undefined) {
       total += val;
       breakdown.push({ char, value: val });
