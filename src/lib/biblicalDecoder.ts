@@ -1171,8 +1171,12 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     if (psi.coherence >= 0.94) psi.quantumState = "TELEPORTATION_READY";
   }
 
-  // 6. Calculate VI
+  // 6. Calculate VI — then override coherence with the boosted Ψ coherence
+  //    (calculateVI uses raw calculatePsi which lacks MKP-94/Sigma Gate boosts)
   const vi = calculateVI(0, t || 0.5, fractal.x, gateIdx);
+  vi.coherenceAtEnd = psi.coherence;
+  vi.teleportReady = psi.coherence >= 0.94;
+  vi.materializationPotential = vi.viMagnitude * psi.coherence;
 
   // 7. Intention Operator (18×18 matrix)
   const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x);
