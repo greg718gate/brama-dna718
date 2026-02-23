@@ -290,7 +290,7 @@ const BiblicalDecoder = () => {
           <BookOpen className="w-5 h-5 text-primary" />
           <h1 className="font-bold text-lg">{t('decoder.title')}</h1>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleDownloadDocumentation} className="gap-1.5 text-xs font-mono hidden sm:inline-flex">
+            <Button variant="outline" size="sm" onClick={handleDownloadDocumentation} className="gap-1.5 text-xs font-mono">
               <FileDown className="w-3.5 h-3.5" />
               {language === 'pl' ? 'Dokumentacja' : 'Documentation'}
             </Button>
