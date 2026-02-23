@@ -131,7 +131,7 @@ export function generateDecoderDocumentation(): string {
 <div class="header-meta">
   <p>© 2026 Grzegorz | BRAMA-718-UNIFIED | Licencja: CC BY-NC 4.0</p>
   <p>Wersja dokumentu: 1.0 | Data generacji: ${now}</p>
-  <p>Projekt: freq-gate-magic.lovable.app</p>
+  <p>Projekt: brama-dna718.com</p>
 </div>
 
 <hr>
