@@ -270,14 +270,13 @@ const BiblicalDecoder = () => {
 
   const handleDownloadDocumentation = useCallback(() => {
     const html = generateDecoderDocumentation();
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(html);
-    win.document.close();
-    // Give fonts/styles time to load, then trigger print-to-PDF
-    setTimeout(() => {
-      win.print();
-    }, 800);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "PSI-718-Dekoder-Biblijny-Dokumentacja.html";
+    a.click();
+    URL.revokeObjectURL(url);
   }, []);
 
   return (
