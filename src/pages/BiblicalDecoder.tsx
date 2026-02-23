@@ -268,15 +268,75 @@ const BiblicalDecoder = () => {
 
   const canDecode = !isCalculating && (text.trim() || hebrewText.trim() || reference.trim());
 
-  const handleDownloadDocumentation = useCallback(() => {
+  const handleDownloadDocumentation = useCallback(async () => {
     const html = generateDecoderDocumentation();
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "PSI-718-Dekoder-Biblijny-Dokumentacja.html";
-    a.click();
-    URL.revokeObjectURL(url);
+
+    // Render HTML in a hidden container
+    const container = document.createElement("div");
+    container.style.position = "fixed";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.width = "800px";
+    container.style.background = "#fff";
+    container.innerHTML = html.replace(/<html[^>]*>|<\/html>|<head>[\s\S]*?<\/head>|<\/?body[^>]*>/gi, "");
+    
+    // Inject styles inline so html2canvas can read them
+    const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+    if (styleMatch) {
+      const style = document.createElement("style");
+      style.textContent = styleMatch[1];
+      container.prepend(style);
+    }
+    
+    document.body.appendChild(container);
+
+    try {
+      const { default: html2canvas } = await import("html2canvas");
+      const { jsPDF } = await import("jspdf");
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        width: 800,
+        windowWidth: 800,
+      });
+
+      const pdfWidth = 210; // A4 mm
+      const pdfHeight = 297;
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgData = canvas.toDataURL("image/png");
+
+      let position = 0;
+      let heightLeft = imgHeight;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save("PSI-718-Dekoder-Biblijny-Dokumentacja.pdf");
+    } catch (error) {
+      console.error("PDF generation failed, falling back to HTML:", error);
+      // Fallback to HTML
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "PSI-718-Dekoder-Biblijny-Dokumentacja.html";
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      document.body.removeChild(container);
+    }
   }, []);
 
   return (
