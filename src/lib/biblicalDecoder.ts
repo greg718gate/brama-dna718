@@ -186,7 +186,11 @@ function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
 
   // DNA gate factor
   const gatePos = GATCA_GATES[gateIdx % 18];
-  const dnaFactor = (gatePos / MTDNA_LENGTH) * GAMMA;
+  // Use resonance-based modulation instead of linear scaling
+  // This ensures each gate has a unique "fingerprint" that depends on
+  // its position relative to the golden angle, not just its mtDNA number
+  const gatePhase = (gatePos / MTDNA_LENGTH) * 2 * Math.PI * PHI;
+  const dnaFactor = GAMMA * (0.5 + 0.5 * Math.sin(gatePhase + gateIdx * GAMMA));
 
   // Combine: temporal * spatial
   let psi = complexMul(temporal, spatial);
@@ -1127,17 +1131,16 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     const recognizedChars = gematriaResult.breakdown.length;
     const recognitionRatio = totalChars > 0 ? recognizedChars / totalChars : 0;
 
-    // Source purity: high recognition = pure original = high coherence
-    // φ-based scaling ensures values cluster above 94% for pure original text
-    const sourcePurity = recognitionRatio * PHI;
-    const purityBoost = Math.min(sourcePurity, 1.0);
-
-    // Blend: original coherence provides variation, purity boost sets the floor
-    // For pure original text (recognitionRatio ≈ 1), coherence → 0.94 to 1.0
-    psi.coherence = Math.min(
-      purityBoost * 0.94 + psi.coherence * 0.06 + recognitionRatio * 0.04,
-      1.0
-    );
+    // Source purity: original text gives a bonus, but actual Ψ coherence
+    // must still dominate to preserve variation between different verses.
+    // Formula: blend 60% actual coherence + 40% purity bonus
+    // This way original text boosts score but doesn't flatten everything to 100%.
+    const sourcePurity = recognitionRatio * GAMMA; // 0..0.618
+    const purityFloor = 0.55 + sourcePurity * 0.35; // floor: 0.55..0.77
+    
+    // Actual coherence carries most weight; purity sets a floor
+    const blended = psi.coherence * 0.6 + purityFloor * 0.4;
+    psi.coherence = Math.min(Math.max(blended, purityFloor), 1.0);
 
     // Update quantum state based on new coherence
     if (psi.coherence > 0.94) psi.quantumState = "TELEPORTATION_READY";
