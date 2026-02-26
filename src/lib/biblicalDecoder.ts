@@ -203,9 +203,11 @@ function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
   const magnitude = complexAbs(psi);
   const phase = complexPhase(psi);
 
-  // Coherence
-  let coherence = 1 - Math.abs((magnitude % GAMMA) - GAMMA) / GAMMA;
-  coherence = Math.min(coherence * PHI, 1.0);
+  // Coherence: how close is magnitude to a golden-ratio harmonic?
+  // Use modular distance to nearest γ-multiple, normalized to [0,1]
+  // NO φ multiplication — this preserves the full [0,1] range for variation
+  const modDist = Math.abs((magnitude % GAMMA) - GAMMA / 2) / (GAMMA / 2);
+  let coherence = 1 - modDist; // 0..1 with proper distribution
 
   let quantumState: string;
   if (coherence > 0.94) quantumState = "TELEPORTATION_READY";
@@ -284,11 +286,31 @@ export interface IntentionOperatorResult {
 }
 
 export function calculateIntentionOperator(t: number, x: number): IntentionOperatorResult {
-  // Build VI vector for all 18 gates
+  // Build resonance score for each gate based on PHASE ALIGNMENT
+  // between the verse's Ψ and each gate's natural frequency.
+  // This ensures different verses activate different gates.
   const diagonal: number[] = [];
+  
+  // Reference Ψ for this verse (gate-independent)
+  const refPsi = calculatePsi(t || 0.5, x, 0);
+  const refPhase = refPsi.phase;
+  
   for (let g = 0; g < 18; g++) {
-    const vi = calculateVI(0, t || 0.5, x, g, 50);
-    diagonal.push(vi.viMagnitude);
+    const gatePsi = calculatePsi(t || 0.5, x, g);
+    
+    // Phase alignment: how well does this gate's phase match the verse?
+    // cos(Δphase) → 1 when perfectly aligned, -1 when anti-aligned
+    const phaseAlignment = Math.cos(gatePsi.phase - refPhase + g * PHI);
+    
+    // Combine: magnitude × (1 + phase alignment) / 2
+    // This breaks the pure-magnitude dominance of gate 18
+    const resonanceScore = gatePsi.magnitude * (1 + phaseAlignment) / 2;
+    
+    // Add verse-specific modulation: t and x shift which gate "lights up"
+    const verseShift = Math.sin(t * FREQ_718 * (g + 1) + x * Math.PI * PHI);
+    const finalScore = resonanceScore * (0.7 + 0.3 * (0.5 + 0.5 * verseShift));
+    
+    diagonal.push(Math.abs(finalScore));
   }
 
   const trace = diagonal.reduce((s, v) => s + v, 0);
@@ -1131,16 +1153,16 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     const recognizedChars = gematriaResult.breakdown.length;
     const recognitionRatio = totalChars > 0 ? recognizedChars / totalChars : 0;
 
-    // Source purity: original text gives a bonus, but actual Ψ coherence
-    // must still dominate to preserve variation between different verses.
-    // Formula: blend 60% actual coherence + 40% purity bonus
-    // This way original text boosts score but doesn't flatten everything to 100%.
+    // For original sacred script: MAP raw coherence to [0.90, 1.0] range.
+    // This ensures all original texts score 90%+ while raw Ψ coherence
+    // provides per-verse variation (≈10% spread).
+    // Higher recognition ratio → higher base (sourcePurity pushes floor up).
     const sourcePurity = recognitionRatio * GAMMA; // 0..0.618
-    const purityFloor = 0.55 + sourcePurity * 0.35; // floor: 0.55..0.77
+    const lowerBound = 0.88 + sourcePurity * 0.06; // 0.88..0.917 for pure text
+    const upperBound = 0.97 + sourcePurity * 0.05; // 0.97..1.0
     
-    // Actual coherence carries most weight; purity sets a floor
-    const blended = psi.coherence * 0.6 + purityFloor * 0.4;
-    psi.coherence = Math.min(Math.max(blended, purityFloor), 1.0);
+    // Map raw coherence [0,1] → [lowerBound, upperBound]
+    psi.coherence = lowerBound + psi.coherence * (upperBound - lowerBound);
 
     // Update quantum state based on new coherence
     if (psi.coherence > 0.94) psi.quantumState = "TELEPORTATION_READY";
@@ -1157,20 +1179,19 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
 
   // 5b. SIGMA GATE — Domknięcie pętli zwrotnej świadomości (Feedback Loop)
   // Sprawdza, czy amplituda Ψ jest w rezonansie z φ² (linia krytyczna Riemanna).
-  // Jeśli |Ψ.magnitude - φ²| < 0.001 → singularność Zeta → 100% koherencji.
-  // Ref: "W jednym mgnieniu oka" (1 Kor 15:52)
+  // VERY TIGHT threshold: only exact resonance triggers singularity.
   const PHI_SQUARED = PHI * PHI; // ≈ 2.618
   const sigmaDistance = Math.abs(psi.magnitude - PHI_SQUARED);
 
-  if (sigmaDistance < 0.001) {
-    // SINGULARITY: Exact φ² resonance on critical line
+  if (sigmaDistance < 0.0001) {
+    // TRUE SINGULARITY: Exact φ² resonance — extremely rare
     psi.coherence = 1.0;
     psi.quantumState = "TELEPORTATION_READY";
     console.log("⚡ SIGMA GATE: ZETA RIEMANN SINGULARITY DETECTED — 100% COHERENCE");
-  } else if (sigmaDistance < 0.1 && hasOriginalScript) {
-    // Near-singularity: boost coherence toward unity
-    const sigmaBoost = 1.0 - (sigmaDistance / 0.1) * 0.06; // 0.94 → 1.0
-    psi.coherence = Math.max(psi.coherence, sigmaBoost);
+  } else if (sigmaDistance < 0.01 && hasOriginalScript) {
+    // Near-singularity: small additive boost (max +3%)
+    const sigmaBoost = (1 - sigmaDistance / 0.01) * 0.03;
+    psi.coherence = Math.min(psi.coherence + sigmaBoost, 1.0);
     if (psi.coherence >= 0.94) psi.quantumState = "TELEPORTATION_READY";
   }
 
