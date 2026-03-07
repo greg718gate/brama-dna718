@@ -1183,25 +1183,17 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   //    the primordial vibration — coherence is boosted to reflect this.
   //    Without original script, coherence is capped at ~70% (translation noise).
   if (hasOriginalScript && gematriaResult.breakdown.length > 0) {
-    // Original script detected: apply Source Purity Boost
-    // The gematria breakdown from original text produces a "purity factor"
-    // based on how many characters were recognized as sacred script
-    const totalChars = hebrewText.replace(/[\s\u0591-\u05C7]/g, '').length; // strip whitespace + nikkud
+    // Original script detected: apply a moderate source bonus,
+    // but preserve raw verse-to-verse variation (avoid 90% floor).
+    const totalChars = hebrewText.replace(/[\s\u0591-\u05C7]/g, '').length;
     const recognizedChars = gematriaResult.breakdown.length;
     const recognitionRatio = totalChars > 0 ? recognizedChars / totalChars : 0;
 
-    // For original sacred script: MAP raw coherence to [0.90, 1.0] range.
-    // This ensures all original texts score 90%+ while raw Ψ coherence
-    // provides per-verse variation (≈10% spread).
-    // Higher recognition ratio → higher base (sourcePurity pushes floor up).
-    const sourcePurity = recognitionRatio * GAMMA; // 0..0.618
-    const lowerBound = 0.88 + sourcePurity * 0.06; // 0.88..0.917 for pure text
-    const upperBound = 0.97 + sourcePurity * 0.05; // 0.97..1.0
-    
-    // Map raw coherence [0,1] → [lowerBound, upperBound]
-    psi.coherence = lowerBound + psi.coherence * (upperBound - lowerBound);
+    // Raise coherence proportionally without forcing all verses above 90%.
+    // raw=0.60 -> ~0.72..0.77, raw=0.85 -> ~0.90..0.94, raw=0.95 -> ~0.97..
+    const sourceLift = 0.18 + 0.22 * recognitionRatio;
+    psi.coherence = psi.coherence + (1 - psi.coherence) * sourceLift;
 
-    // Update quantum state based on new coherence
     if (psi.coherence > 0.94) psi.quantumState = "TELEPORTATION_READY";
     else if (psi.coherence > 0.8) psi.quantumState = "HIGH_COHERENCE";
     else if (psi.coherence > 0.6) psi.quantumState = "SUPERPOSITION";
