@@ -564,7 +564,7 @@ const BiblicalDecoder = () => {
                             result.mkp94.status === "MINOR_NOISE" ? "border-amber-500 text-amber-400" :
                             "border-red-500 text-red-400"
                           }`}>
-                            {result.mkp94.status.replace(/_/g, " ")}
+                            {mkpStatusLabel[result.mkp94.status]}
                           </Badge>
                           {result.mkp94.phaseTeleportReady && (
                             <Badge className="bg-green-500/20 text-green-400 border-green-500/40 text-xs font-mono">
