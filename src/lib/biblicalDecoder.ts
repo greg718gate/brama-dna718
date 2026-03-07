@@ -285,38 +285,58 @@ export interface IntentionOperatorResult {
   spectralGap: number;
 }
 
-export function calculateIntentionOperator(t: number, x: number): IntentionOperatorResult {
-  // Build resonance score for each gate based on PHASE ALIGNMENT
-  // between the verse's Ψ and each gate's natural frequency.
-  // This ensures different verses activate different gates.
+export function calculateIntentionOperator(t: number, x: number, anchorGateIdx?: number): IntentionOperatorResult {
+  const safeT = t || 0.5;
   const diagonal: number[] = [];
-  
-  // Reference Ψ for this verse (gate-independent)
-  const refPsi = calculatePsi(t || 0.5, x, 0);
-  const refPhase = refPsi.phase;
-  
+
+  // Compute all gate states first so we can normalize and remove magnitude bias.
+  const gateStates = Array.from({ length: 18 }, (_, g) => ({
+    gate: g,
+    psi: calculatePsi(safeT, x, g),
+  }));
+
+  const magnitudes = gateStates.map((s) => s.psi.magnitude);
+  const minMag = Math.min(...magnitudes);
+  const maxMag = Math.max(...magnitudes);
+  const magSpan = Math.max(maxMag - minMag, 1e-12);
+
+  // Verse phase baseline from the active (or first) gate.
+  const refPhase = gateStates[anchorGateIdx ?? 0]?.psi.phase ?? gateStates[0].psi.phase;
+
   for (let g = 0; g < 18; g++) {
-    const gatePsi = calculatePsi(t || 0.5, x, g);
-    
-    // Phase alignment: how well does this gate's phase match the verse?
-    // cos(Δphase) → 1 when perfectly aligned, -1 when anti-aligned
-    const phaseAlignment = Math.cos(gatePsi.phase - refPhase + g * PHI);
-    
-    // Combine: magnitude × (1 + phase alignment) / 2
-    // This breaks the pure-magnitude dominance of gate 18
-    const resonanceScore = gatePsi.magnitude * (1 + phaseAlignment) / 2;
-    
-    // Add verse-specific modulation: t and x shift which gate "lights up"
-    const verseShift = Math.sin(t * FREQ_718 * (g + 1) + x * Math.PI * PHI);
-    const finalScore = resonanceScore * (0.7 + 0.3 * (0.5 + 0.5 * verseShift));
-    
-    diagonal.push(Math.abs(finalScore));
+    const gatePsi = gateStates[g].psi;
+
+    // 0..1 phase alignment score
+    const phaseAlignment = 0.5 + 0.5 * Math.cos(gatePsi.phase - refPhase + g * PHI);
+
+    // 0..1 magnitude score (normalized across all 18 gates)
+    const normalizedMagnitude = (gatePsi.magnitude - minMag) / magSpan;
+
+    // Optional anchor bias: keep operator aligned with verse's Hamilton gate,
+    // while still allowing neighbor gates to compete.
+    let anchorScore = 0.5;
+    if (typeof anchorGateIdx === "number") {
+      const d = Math.abs(g - anchorGateIdx);
+      const circularDistance = Math.min(d, 18 - d);
+      anchorScore = Math.exp(-(circularDistance ** 2) / (2 * 2.2 ** 2));
+    }
+
+    // Verse-specific modulation that depends on text-derived t and x.
+    const verseShift = 0.5 + 0.5 * Math.sin(safeT * FREQ_718 * (g + 1) + x * Math.PI * PHI);
+
+    // Weighted blend — prevents systematic bias to gate 18.
+    const finalScore =
+      0.45 * phaseAlignment +
+      0.25 * normalizedMagnitude +
+      0.20 * anchorScore +
+      0.10 * verseShift;
+
+    diagonal.push(finalScore);
   }
 
   const trace = diagonal.reduce((s, v) => s + v, 0);
   const determinant = diagonal.reduce((p, v) => p * (v || 1e-12), 1);
 
-  // Find dominant gate
   let maxVal = -Infinity;
   let maxIdx = 0;
   const sorted = [...diagonal].sort((a, b) => b - a);
@@ -1040,6 +1060,7 @@ export function calculateMKP94(
   translationText: string,
   hurst: number,
   gateIdx: number,
+  lang: 'pl' | 'en' = 'pl',
 ): MKP94Result {
   const originalTextUsed = hebrewText.trim().length > 0;
   const { detected: controlVectorsDetected, vectors: controlVectors } = detectControlVectors(translationText);
@@ -1078,24 +1099,40 @@ export function calculateMKP94(
 
   if (truthPercentage >= 99.5) {
     status = "VOICE_OF_DESIGNER";
-    statusDescription = "🔊 Głos Projektanta — Wibracja pierwotna zachowana w 100%. Sygnał czysty. Gotowy do materializacji.";
+    statusDescription = lang === "pl"
+      ? "🔊 Głos Projektanta — Wibracja pierwotna zachowana w 100%. Sygnał czysty. Gotowy do materializacji."
+      : "🔊 Voice of the Designer — Primordial vibration preserved at 100%. Clean signal. Ready for materialization.";
   } else if (truthPercentage >= 94) {
     status = "PURE_SOURCE_CODE";
-    statusDescription = "✅ Czysty Kod Źródłowy — Sygnał czysty. Obwód zamknięty. Gotowy do materializacji.";
+    statusDescription = lang === "pl"
+      ? "✅ Czysty Kod Źródłowy — Sygnał czysty. Obwód zamknięty. Gotowy do materializacji."
+      : "✅ Pure Source Code — Clean signal. Circuit closed. Ready for materialization.";
   } else if (truthPercentage >= 60) {
     status = "MINOR_NOISE";
     statusDescription = controlVectorsDetected
-      ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany do 0.00%.`
+      ? (lang === "pl"
+          ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany.`
+          : `⚠️ Historical political noise detected: [${controlVectors.join(", ")}]. Influence on the consciousness field reduced.`)
       : originalTextUsed
-        ? "⚠️ Szum informacyjny — zakłócenia fraktalne w tekście oryginalnym. Wymagana głębsza analiza."
-        : "⚠️ Szum informacyjny — tekst nie w języku oryginalnym. Pobierz tekst źródłowy dla wyższej koherencji.";
+        ? (lang === "pl"
+            ? "⚠️ Szum informacyjny — zakłócenia fraktalne w tekście oryginalnym. Wymagana głębsza analiza."
+            : "⚠️ Informational noise — fractal disturbances in the original text. Deeper analysis required.")
+        : (lang === "pl"
+            ? "⚠️ Szum informacyjny — tekst nie w języku oryginalnym. Pobierz tekst źródłowy dla wyższej koherencji."
+            : "⚠️ Informational noise — text is not in original language. Use source text for higher coherence.");
   } else {
     status = "SYSTEM_INTERFERENCE";
     statusDescription = controlVectorsDetected
-      ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. Błąd zapisu. VI ZABLOKOWANY.`
+      ? (lang === "pl"
+          ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. VI ZABLOKOWANY.`
+          : `🚫 Local System Interference — Control vectors: [${controlVectors.join(", ")}]. VI BLOCKED.`)
       : originalTextUsed
-        ? "🚫 Niska koherencja mimo tekstu oryginalnego — możliwe uszkodzenie źródła lub błąd w zapisie. VI zablokowany."
-        : "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany. Pobierz tekst hebrajski/grecki.";
+        ? (lang === "pl"
+            ? "🚫 Niska koherencja mimo tekstu oryginalnego — możliwe uszkodzenie źródła lub błąd w zapisie. VI zablokowany."
+            : "🚫 Low coherence despite original text — possible source corruption or recording error. VI blocked.")
+        : (lang === "pl"
+            ? "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany."
+            : "🚫 Recording error / informational noise — missing original text. VI blocked.");
   }
 
   return {
@@ -1113,7 +1150,7 @@ export function calculateMKP94(
   };
 }
 
-export function decodeVerse(reference: string, text: string, hebrewText: string = ""): DecoderResult {
+export function decodeVerse(reference: string, text: string, hebrewText: string = "", lang: 'pl' | 'en' = 'pl'): DecoderResult {
   // 1. Gematria → t (ALWAYS from original text when available)
   let gematriaResult: ReturnType<typeof hebrewGematria>;
   let t: number;
@@ -1146,25 +1183,17 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   //    the primordial vibration — coherence is boosted to reflect this.
   //    Without original script, coherence is capped at ~70% (translation noise).
   if (hasOriginalScript && gematriaResult.breakdown.length > 0) {
-    // Original script detected: apply Source Purity Boost
-    // The gematria breakdown from original text produces a "purity factor"
-    // based on how many characters were recognized as sacred script
-    const totalChars = hebrewText.replace(/[\s\u0591-\u05C7]/g, '').length; // strip whitespace + nikkud
+    // Original script detected: apply a moderate source bonus,
+    // but preserve raw verse-to-verse variation (avoid 90% floor).
+    const totalChars = hebrewText.replace(/[\s\u0591-\u05C7]/g, '').length;
     const recognizedChars = gematriaResult.breakdown.length;
     const recognitionRatio = totalChars > 0 ? recognizedChars / totalChars : 0;
 
-    // For original sacred script: MAP raw coherence to [0.90, 1.0] range.
-    // This ensures all original texts score 90%+ while raw Ψ coherence
-    // provides per-verse variation (≈10% spread).
-    // Higher recognition ratio → higher base (sourcePurity pushes floor up).
-    const sourcePurity = recognitionRatio * GAMMA; // 0..0.618
-    const lowerBound = 0.88 + sourcePurity * 0.06; // 0.88..0.917 for pure text
-    const upperBound = 0.97 + sourcePurity * 0.05; // 0.97..1.0
-    
-    // Map raw coherence [0,1] → [lowerBound, upperBound]
-    psi.coherence = lowerBound + psi.coherence * (upperBound - lowerBound);
+    // Raise coherence proportionally without forcing all verses above 90%.
+    // raw=0.60 -> ~0.72..0.77, raw=0.85 -> ~0.90..0.94, raw=0.95 -> ~0.97..
+    const sourceLift = 0.18 + 0.22 * recognitionRatio;
+    psi.coherence = psi.coherence + (1 - psi.coherence) * sourceLift;
 
-    // Update quantum state based on new coherence
     if (psi.coherence > 0.94) psi.quantumState = "TELEPORTATION_READY";
     else if (psi.coherence > 0.8) psi.quantumState = "HIGH_COHERENCE";
     else if (psi.coherence > 0.6) psi.quantumState = "SUPERPOSITION";
@@ -1203,13 +1232,13 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   vi.materializationPotential = vi.viMagnitude * psi.coherence;
 
   // 7. Intention Operator (18×18 matrix)
-  const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x);
+  const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x, gateIdx);
 
   // 8. Decoherence (Lindblad model at body temperature)
   const decoherence = calculateDecoherence(psi.coherence, t || 0.5);
 
   // 9. MKP-94: Moduł Korekcji Pola
-  const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx);
+  const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx, lang);
 
   const partialResult = {
     reference,
