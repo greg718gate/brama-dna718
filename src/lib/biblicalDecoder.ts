@@ -1060,6 +1060,7 @@ export function calculateMKP94(
   translationText: string,
   hurst: number,
   gateIdx: number,
+  lang: 'pl' | 'en' = 'pl',
 ): MKP94Result {
   const originalTextUsed = hebrewText.trim().length > 0;
   const { detected: controlVectorsDetected, vectors: controlVectors } = detectControlVectors(translationText);
