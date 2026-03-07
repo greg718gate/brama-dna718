@@ -231,7 +231,7 @@ const BiblicalDecoder = () => {
 
       if (!decodeText) decodeText = decodeRef;
 
-      const r = decodeVerse(decodeRef, decodeText, decodeHebrew);
+      const r = decodeVerse(decodeRef, decodeText, decodeHebrew, language);
       setResult(r);
       setPhotonFocus(0);
       setPhotonCollapsed(false);
@@ -253,7 +253,7 @@ const BiblicalDecoder = () => {
     setIsCalculating(true);
     setTimeout(() => {
       try {
-        const r = decodeVerse(preset.reference, preset.text, preset.hebrew);
+        const r = decodeVerse(preset.reference, preset.text, preset.hebrew, language);
         setResult(r);
         setPhotonFocus(0);
         setPhotonCollapsed(false);
