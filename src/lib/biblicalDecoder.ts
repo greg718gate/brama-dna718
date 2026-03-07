@@ -1232,13 +1232,13 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   vi.materializationPotential = vi.viMagnitude * psi.coherence;
 
   // 7. Intention Operator (18×18 matrix)
-  const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x);
+  const intentionOperator = calculateIntentionOperator(t || 0.5, fractal.x, gateIdx);
 
   // 8. Decoherence (Lindblad model at body temperature)
   const decoherence = calculateDecoherence(psi.coherence, t || 0.5);
 
   // 9. MKP-94: Moduł Korekcji Pola
-  const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx);
+  const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx, lang);
 
   const partialResult = {
     reference,
