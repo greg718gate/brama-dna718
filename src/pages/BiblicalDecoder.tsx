@@ -108,6 +108,13 @@ const BiblicalDecoder = () => {
 
   const PRESET_REFERENCES = ["Genesis 1:1", "Genesis 1:3", "John 1:1", "Exodus 3:14", "Psalm 23:1", "1 John 4:8", "Revelation 22:13"];
 
+  const mkpStatusLabel: Record<MKP94Result["status"], string> = {
+    VOICE_OF_DESIGNER: language === 'pl' ? 'GŁOS PROJEKTANTA' : 'VOICE OF DESIGNER',
+    PURE_SOURCE_CODE: language === 'pl' ? 'CZYSTY KOD ŹRÓDŁOWY' : 'PURE SOURCE CODE',
+    MINOR_NOISE: language === 'pl' ? 'DROBNY SZUM' : 'MINOR NOISE',
+    SYSTEM_INTERFERENCE: language === 'pl' ? 'INTERFERENCJA SYSTEMU' : 'SYSTEM INTERFERENCE',
+  };
+
   const [verbalInterpretation, setVerbalInterpretation] = useState<ReturnType<typeof generateVerbalInterpretation> | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
 
