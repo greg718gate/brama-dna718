@@ -285,38 +285,58 @@ export interface IntentionOperatorResult {
   spectralGap: number;
 }
 
-export function calculateIntentionOperator(t: number, x: number): IntentionOperatorResult {
-  // Build resonance score for each gate based on PHASE ALIGNMENT
-  // between the verse's Ψ and each gate's natural frequency.
-  // This ensures different verses activate different gates.
+export function calculateIntentionOperator(t: number, x: number, anchorGateIdx?: number): IntentionOperatorResult {
+  const safeT = t || 0.5;
   const diagonal: number[] = [];
-  
-  // Reference Ψ for this verse (gate-independent)
-  const refPsi = calculatePsi(t || 0.5, x, 0);
-  const refPhase = refPsi.phase;
-  
+
+  // Compute all gate states first so we can normalize and remove magnitude bias.
+  const gateStates = Array.from({ length: 18 }, (_, g) => ({
+    gate: g,
+    psi: calculatePsi(safeT, x, g),
+  }));
+
+  const magnitudes = gateStates.map((s) => s.psi.magnitude);
+  const minMag = Math.min(...magnitudes);
+  const maxMag = Math.max(...magnitudes);
+  const magSpan = Math.max(maxMag - minMag, 1e-12);
+
+  // Verse phase baseline from the active (or first) gate.
+  const refPhase = gateStates[anchorGateIdx ?? 0]?.psi.phase ?? gateStates[0].psi.phase;
+
   for (let g = 0; g < 18; g++) {
-    const gatePsi = calculatePsi(t || 0.5, x, g);
-    
-    // Phase alignment: how well does this gate's phase match the verse?
-    // cos(Δphase) → 1 when perfectly aligned, -1 when anti-aligned
-    const phaseAlignment = Math.cos(gatePsi.phase - refPhase + g * PHI);
-    
-    // Combine: magnitude × (1 + phase alignment) / 2
-    // This breaks the pure-magnitude dominance of gate 18
-    const resonanceScore = gatePsi.magnitude * (1 + phaseAlignment) / 2;
-    
-    // Add verse-specific modulation: t and x shift which gate "lights up"
-    const verseShift = Math.sin(t * FREQ_718 * (g + 1) + x * Math.PI * PHI);
-    const finalScore = resonanceScore * (0.7 + 0.3 * (0.5 + 0.5 * verseShift));
-    
-    diagonal.push(Math.abs(finalScore));
+    const gatePsi = gateStates[g].psi;
+
+    // 0..1 phase alignment score
+    const phaseAlignment = 0.5 + 0.5 * Math.cos(gatePsi.phase - refPhase + g * PHI);
+
+    // 0..1 magnitude score (normalized across all 18 gates)
+    const normalizedMagnitude = (gatePsi.magnitude - minMag) / magSpan;
+
+    // Optional anchor bias: keep operator aligned with verse's Hamilton gate,
+    // while still allowing neighbor gates to compete.
+    let anchorScore = 0.5;
+    if (typeof anchorGateIdx === "number") {
+      const d = Math.abs(g - anchorGateIdx);
+      const circularDistance = Math.min(d, 18 - d);
+      anchorScore = Math.exp(-(circularDistance ** 2) / (2 * 2.2 ** 2));
+    }
+
+    // Verse-specific modulation that depends on text-derived t and x.
+    const verseShift = 0.5 + 0.5 * Math.sin(safeT * FREQ_718 * (g + 1) + x * Math.PI * PHI);
+
+    // Weighted blend — prevents systematic bias to gate 18.
+    const finalScore =
+      0.45 * phaseAlignment +
+      0.25 * normalizedMagnitude +
+      0.20 * anchorScore +
+      0.10 * verseShift;
+
+    diagonal.push(finalScore);
   }
 
   const trace = diagonal.reduce((s, v) => s + v, 0);
   const determinant = diagonal.reduce((p, v) => p * (v || 1e-12), 1);
 
-  // Find dominant gate
   let maxVal = -Infinity;
   let maxIdx = 0;
   const sorted = [...diagonal].sort((a, b) => b - a);
