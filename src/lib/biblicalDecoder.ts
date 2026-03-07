@@ -1150,7 +1150,7 @@ export function calculateMKP94(
   };
 }
 
-export function decodeVerse(reference: string, text: string, hebrewText: string = ""): DecoderResult {
+export function decodeVerse(reference: string, text: string, hebrewText: string = "", lang: 'pl' | 'en' = 'pl'): DecoderResult {
   // 1. Gematria → t (ALWAYS from original text when available)
   let gematriaResult: ReturnType<typeof hebrewGematria>;
   let t: number;
