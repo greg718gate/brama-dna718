@@ -1098,24 +1098,40 @@ export function calculateMKP94(
 
   if (truthPercentage >= 99.5) {
     status = "VOICE_OF_DESIGNER";
-    statusDescription = "🔊 Głos Projektanta — Wibracja pierwotna zachowana w 100%. Sygnał czysty. Gotowy do materializacji.";
+    statusDescription = lang === "pl"
+      ? "🔊 Głos Projektanta — Wibracja pierwotna zachowana w 100%. Sygnał czysty. Gotowy do materializacji."
+      : "🔊 Voice of the Designer — Primordial vibration preserved at 100%. Clean signal. Ready for materialization.";
   } else if (truthPercentage >= 94) {
     status = "PURE_SOURCE_CODE";
-    statusDescription = "✅ Czysty Kod Źródłowy — Sygnał czysty. Obwód zamknięty. Gotowy do materializacji.";
+    statusDescription = lang === "pl"
+      ? "✅ Czysty Kod Źródłowy — Sygnał czysty. Obwód zamknięty. Gotowy do materializacji."
+      : "✅ Pure Source Code — Clean signal. Circuit closed. Ready for materialization.";
   } else if (truthPercentage >= 60) {
     status = "MINOR_NOISE";
     statusDescription = controlVectorsDetected
-      ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany do 0.00%.`
+      ? (lang === "pl"
+          ? `⚠️ Wykryto historyczny szum polityczny: [${controlVectors.join(", ")}]. Wpływ na pole świadomości zredukowany.`
+          : `⚠️ Historical political noise detected: [${controlVectors.join(", ")}]. Influence on the consciousness field reduced.`)
       : originalTextUsed
-        ? "⚠️ Szum informacyjny — zakłócenia fraktalne w tekście oryginalnym. Wymagana głębsza analiza."
-        : "⚠️ Szum informacyjny — tekst nie w języku oryginalnym. Pobierz tekst źródłowy dla wyższej koherencji.";
+        ? (lang === "pl"
+            ? "⚠️ Szum informacyjny — zakłócenia fraktalne w tekście oryginalnym. Wymagana głębsza analiza."
+            : "⚠️ Informational noise — fractal disturbances in the original text. Deeper analysis required.")
+        : (lang === "pl"
+            ? "⚠️ Szum informacyjny — tekst nie w języku oryginalnym. Pobierz tekst źródłowy dla wyższej koherencji."
+            : "⚠️ Informational noise — text is not in original language. Use source text for higher coherence.");
   } else {
     status = "SYSTEM_INTERFERENCE";
     statusDescription = controlVectorsDetected
-      ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. Błąd zapisu. VI ZABLOKOWANY.`
+      ? (lang === "pl"
+          ? `🚫 Lokalna Ingerencja Systemu Władzy — Wektory Kontroli: [${controlVectors.join(", ")}]. VI ZABLOKOWANY.`
+          : `🚫 Local System Interference — Control vectors: [${controlVectors.join(", ")}]. VI BLOCKED.`)
       : originalTextUsed
-        ? "🚫 Niska koherencja mimo tekstu oryginalnego — możliwe uszkodzenie źródła lub błąd w zapisie. VI zablokowany."
-        : "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany. Pobierz tekst hebrajski/grecki.";
+        ? (lang === "pl"
+            ? "🚫 Niska koherencja mimo tekstu oryginalnego — możliwe uszkodzenie źródła lub błąd w zapisie. VI zablokowany."
+            : "🚫 Low coherence despite original text — possible source corruption or recording error. VI blocked.")
+        : (lang === "pl"
+            ? "🚫 Błąd zapisu / Szum informacyjny — brak tekstu oryginalnego. VI zablokowany."
+            : "🚫 Recording error / informational noise — missing original text. VI blocked.");
   }
 
   return {
