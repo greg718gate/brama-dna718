@@ -114,7 +114,7 @@ export const BiometricIntegration = () => {
 
   // Ritual timer effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isRitualActive && ritualTime > 0) {
       interval = setInterval(() => {
         setRitualTime((prev) => {
