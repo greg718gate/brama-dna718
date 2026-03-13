@@ -1249,8 +1249,8 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     vi,
   };
 
-  const predictions = generatePredictions(partialResult, 'pl');
-  const bibleConnections = generateBibleConnections(partialResult, 'pl');
+  const predictions = generatePredictions(partialResult, lang);
+  const bibleConnections = generateBibleConnections(partialResult, lang);
 
   return {
     reference,

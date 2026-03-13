@@ -13,7 +13,7 @@ interface UseResonancePlaybackOptions {
 export function useResonancePlayback(options: UseResonancePlaybackOptions = {}) {
   const { updateInterval = 100 } = options;
   const { updateResonance, triggerVisualEffect, tunedFrequency } = useResonance();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastGateRef = useRef<number>(0);
 
   /**
