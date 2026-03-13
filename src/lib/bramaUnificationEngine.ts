@@ -7,8 +7,15 @@
 export const GAMMA = (1 + Math.sqrt(5)) / 2 - 1; // 0.618... (Złoty podział)
 export const PHI = (1 + Math.sqrt(5)) / 2;       // 1.618... (Złoty podział)
 export const H_BAR = 1.0545718e-34;              // Stała Plancka zredukowana
-export const FREQ_718 = 718;                      // Stała rezonansowa
+export const FREQ_718 = 718;                      // Stała rezonansowa bazowa
 export const BINAURAL_OFFSET = 7.83;              // Rezonans Schumanna
+
+// 448th Riemann Zero — precise Exit Gate frequency
+export const RIEMANN_ZERO = 718.57012515;
+// Phase shift: arg(ζ(1/2 + i·718.57))
+export const PHASE_SHIFT_ZETA = -1.2094;
+// Planetary modulation
+export const F_NUTATION = 18.6;                   // Lunar nutation (Hz)
 
 export interface ComplexNumber {
   re: number;
