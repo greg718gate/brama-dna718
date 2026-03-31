@@ -35,9 +35,25 @@ export interface DecoderVersionConfig {
   weights: DecoderWeights;
 }
 
+export interface ReferenceResult {
+  name: string;
+  C_total: number;
+  IM: number;
+  status: "AUTENTYCZNY" | "INTERPOLACJA" | "USZKODZONY";
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // STABLE v1.0.0 — IMMUTABLE REFERENCE
 // ═══════════════════════════════════════════════════════════════════
+
+/** Immutable reference results for v1.0.0 — these NEVER change */
+export const STABLE_V1_REFERENCE_RESULTS: readonly ReferenceResult[] = Object.freeze([
+  { name: "Ap 22,13 (Greek)",              C_total: 96.3, IM:  5, status: "AUTENTYCZNY" },
+  { name: "Wj 3,14 (Hebrew)",              C_total: 63.3, IM: 12, status: "AUTENTYCZNY" },
+  { name: "Kohelet 3,21 (Hebrew)",          C_total: 50.6, IM:  8, status: "AUTENTYCZNY" },
+  { name: "1 J 5,7 — Comma Johanneum",     C_total: 31.2, IM: 82, status: "INTERPOLACJA" },
+  { name: "Tabliczka z Koptos (fragment)",  C_total: 25.6, IM: 51, status: "USZKODZONY" },
+]) as ReferenceResult[];
 
 export const STABLE_V1_CONFIG: DecoderVersionConfig = Object.freeze({
   version: "1.0.0",
