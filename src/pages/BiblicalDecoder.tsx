@@ -1015,6 +1015,173 @@ const BiblicalDecoder = () => {
                   </CardContent>
                 </Card>
 
+                {/* ═══ MANIPULATION DETECTION ═══ */}
+                <Card className={`border-2 ${
+                  result.manipulationReport.im.IM < 20 ? 'border-green-500/40 bg-green-500/5' :
+                  result.manipulationReport.im.IM < 40 ? 'border-amber-500/40 bg-amber-500/5' :
+                  result.manipulationReport.im.IM < 60 ? 'border-orange-500/40 bg-orange-500/5' :
+                  'border-red-500/40 bg-red-500/5'
+                }`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-mono flex items-center gap-2">
+                      <Search className="w-5 h-5 text-primary" />
+                      {language === 'pl' ? 'Detekcja Manipulacji' : 'Manipulation Detection'}
+                    </CardTitle>
+                    <CardDescription className="text-xs font-mono">
+                      {language === 'pl' ? 'Indeks Manipulacji (IM) — 8 sygnatur autentyczności' : 'Manipulation Index (MI) — 8 authenticity signatures'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* IM Score - big display */}
+                    <div className="flex items-center gap-6">
+                      <div className="relative w-28 h-28">
+                        <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
+                          <circle
+                            cx="60" cy="60" r="52"
+                            fill="none" strokeWidth="8"
+                            strokeDasharray={`${result.manipulationReport.im.IM * 3.267} 326.7`}
+                            strokeLinecap="round"
+                            className={
+                              result.manipulationReport.im.IM < 20 ? "text-green-400" :
+                              result.manipulationReport.im.IM < 40 ? "text-amber-400" :
+                              result.manipulationReport.im.IM < 60 ? "text-orange-400" : "text-red-400"
+                            }
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className={`text-2xl font-bold font-mono ${
+                            result.manipulationReport.im.IM < 20 ? "text-green-400" :
+                            result.manipulationReport.im.IM < 40 ? "text-amber-400" :
+                            result.manipulationReport.im.IM < 60 ? "text-orange-400" : "text-red-400"
+                          }`}>
+                            {result.manipulationReport.im.IM.toFixed(1)}%
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">IM</span>
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm font-bold text-foreground">
+                          {language === 'pl' ? result.manipulationReport.im.statusLabel.pl : result.manipulationReport.im.statusLabel.en}
+                        </p>
+                        <Badge variant="outline" className={`text-xs font-mono ${
+                          result.manipulationReport.im.IM < 20 ? "border-green-500/40 text-green-400" :
+                          result.manipulationReport.im.IM < 40 ? "border-amber-500/40 text-amber-400" :
+                          result.manipulationReport.im.IM < 60 ? "border-orange-500/40 text-orange-400" :
+                          "border-red-500/40 text-red-400"
+                        }`}>
+                          {result.manipulationReport.im.status}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Top 3 signatures */}
+                    <div>
+                      <h4 className="text-xs text-muted-foreground mb-2 font-mono">
+                        {language === 'pl' ? 'NAJWYŻSZE SYGNATURY:' : 'TOP SIGNATURES:'}
+                      </h4>
+                      <div className="space-y-2">
+                        {result.manipulationReport.topSignatures.map((sig, i) => (
+                          <div key={i} className="flex items-center gap-3">
+                            <span className="text-xs font-mono font-bold text-primary w-8">{sig.name}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-muted-foreground">
+                                  {language === 'pl' ? sig.label.pl : sig.label.en}
+                                </span>
+                                <span className="text-xs font-mono font-bold">{sig.value.toFixed(1)}%</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-muted/30 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${
+                                    sig.value < 30 ? 'bg-green-500/60' :
+                                    sig.value < 60 ? 'bg-amber-500/60' : 'bg-red-500/60'
+                                  }`}
+                                  style={{ width: `${Math.min(sig.value, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* All 8 signatures grid */}
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="all-sigs">
+                        <AccordionTrigger className="text-xs font-mono">
+                          {language === 'pl' ? 'Wszystkie 8 sygnatur (F₁–F₈)' : 'All 8 signatures (F₁–F₈)'}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            {[
+                              { name: 'F₁', val: result.manipulationReport.F1.F1, label: language === 'pl' ? 'Fragmentacja' : 'Fragmentation' },
+                              { name: 'F₂', val: result.manipulationReport.F2.F2, label: language === 'pl' ? 'Cₛ–Cₘ' : 'Cₛ–Cₘ' },
+                              { name: 'F₃', val: result.manipulationReport.F3.F3, label: language === 'pl' ? 'Entropia' : 'Entropy' },
+                              { name: 'F₄', val: result.manipulationReport.F4.F4, label: language === 'pl' ? 'Profil' : 'Profile' },
+                              { name: 'F₅', val: result.manipulationReport.F5.F5, label: language === 'pl' ? 'Bramy' : 'Gates' },
+                              { name: 'F₆', val: result.manipulationReport.F6.F6, label: language === 'pl' ? 'T₂ sem.' : 'T₂ sem.' },
+                              { name: 'F₇', val: result.manipulationReport.F7.F7, label: language === 'pl' ? 'Hurst lok.' : 'Local H' },
+                              { name: 'F₈', val: result.manipulationReport.F8.F8, label: language === 'pl' ? 'Gematria' : 'Gematria' },
+                            ].map(sig => (
+                              <div key={sig.name} className="p-2 rounded-lg border border-border bg-background/50 text-center">
+                                <div className="text-[10px] text-muted-foreground">{sig.label}</div>
+                                <div className={`text-sm font-bold font-mono ${
+                                  sig.val < 30 ? 'text-green-400' : sig.val < 60 ? 'text-amber-400' : 'text-red-400'
+                                }`}>{sig.val.toFixed(1)}%</div>
+                                <div className="text-[10px] font-mono text-muted-foreground">{sig.name}</div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Signature interpretations */}
+                          <div className="mt-3 space-y-2">
+                            {[
+                              { name: 'F₁', interp: result.manipulationReport.F1.interpretacja },
+                              { name: 'F₂', interp: result.manipulationReport.F2.interpretacja },
+                              { name: 'F₃', interp: result.manipulationReport.F3.interpretacja },
+                              { name: 'F₄', interp: result.manipulationReport.F4.interpretacja },
+                              { name: 'F₅', interp: result.manipulationReport.F5.interpretacja },
+                              { name: 'F₆', interp: result.manipulationReport.F6.interpretacja },
+                              { name: 'F₇', interp: result.manipulationReport.F7.interpretacja },
+                              { name: 'F₈', interp: result.manipulationReport.F8.interpretacja },
+                            ].map(sig => (
+                              <div key={sig.name} className="text-[11px] text-muted-foreground">
+                                <span className="font-mono font-bold text-foreground">{sig.name}:</span>{' '}
+                                {language === 'pl' ? sig.interp.pl : sig.interp.en}
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+
+                    <Separator />
+
+                    {/* Recommendation */}
+                    <div className="p-4 rounded-lg bg-background/60 border border-border">
+                      <h4 className="text-xs text-muted-foreground mb-1 font-mono flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        {language === 'pl' ? 'ZALECENIE:' : 'RECOMMENDATION:'}
+                      </h4>
+                      <p className="text-sm text-foreground font-semibold leading-relaxed">
+                        {language === 'pl' ? result.manipulationReport.recommendation.pl : result.manipulationReport.recommendation.en}
+                      </p>
+                    </div>
+
+                    {/* Segmentation info */}
+                    <div className="text-[10px] text-muted-foreground font-mono">
+                      {language === 'pl'
+                        ? `Analiza oparta na ${result.manipulationReport.segmentCount} segmentach tekstu`
+                        : `Analysis based on ${result.manipulationReport.segmentCount} text segments`}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Detailed Ψ-718 analysis — only show if we have actual content */}
                 {verbalInterpretation.scienceSays && (
                 <Card className="border-primary/30 bg-card/80">
