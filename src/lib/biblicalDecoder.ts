@@ -1941,6 +1941,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     teleportationThreshold,
     finalReport,
     manipulationReport,
+    decoderVersion: getActiveVersionString(),
   };
 }
 
