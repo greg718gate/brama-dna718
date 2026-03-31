@@ -56,18 +56,24 @@ export function getActiveThresholds(): CalibrationThresholds {
   return { ..._activeThresholds };
 }
 
+import { getActiveVersion, type DecoderWeights } from "./decoderVersionConfig";
+
+let _activeWeights: DecoderWeights = {
+  F1: 0.15, F2: 0.10, F3: 0.15, F4: 0.20,
+  F5: 0.15, F6: 0.10, F7: 0.10, F8: 0.05,
+};
+
+export function setActiveWeights(w: DecoderWeights) {
+  _activeWeights = { ...w };
+}
+
+export function getActiveWeights(): DecoderWeights {
+  return { ..._activeWeights };
+}
+
 const CONFIG = {
   get progi() { return _activeThresholds; },
-  wagi: {
-    F1: 0.15,
-    F2: 0.10,
-    F3: 0.15,
-    F4: 0.20,
-    F5: 0.15,
-    F6: 0.10,
-    F7: 0.10,
-    F8: 0.05,
-  },
+  get wagi() { return _activeWeights; },
 };
 
 // ═══════════════════════════════════════════════════════════════════
