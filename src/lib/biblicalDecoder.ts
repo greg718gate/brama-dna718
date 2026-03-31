@@ -24,6 +24,8 @@ import {
   type ManipulationReport,
 } from "./manipulationDetector";
 
+import { getActiveVersionString } from "./decoderVersionConfig";
+
 // ═══════════════════════════════════════════════════════════════════
 // HEBREW GEMATRIA MAP
 // ═══════════════════════════════════════════════════════════════════
