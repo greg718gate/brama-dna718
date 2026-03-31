@@ -8,31 +8,30 @@
 // License: CC BY-NC 4.0
 // ═══════════════════════════════════════════════════════════════════
 
-const PHI = (1 + Math.sqrt(5)) / 2;
-const GAMMA = 1 / PHI;
-const SAMPLE_RATE = 44100;
-const DURATION = 108; // Sacred number
-const MTDNA_LENGTH = 16569;
+import {
+  PHI,
+  GAMMA,
+  SAMPLE_RATE,
+  DURATION,
+  MTDNA_LENGTH,
+  RIEMANN_ZERO_FREQ,
+  PHASE_SHIFT_ZETA as PHASE_SHIFT_ZETA_CONST,
+  SCHUMANN_FREQ,
+  MOON_MOD_FREQ,
+  VI_GATE_18,
+  GATCA_POSITIONS as GATCA_POS,
+  CARRIER_FREQ,
+  getGateFrequency,
+  getGateStartTime,
+} from './gatca718Constants';
 
-// 448th Riemann Zero — the exact Exit Gate frequency
-export const RIEMANN_ZERO = 718.57012515;
+// Re-export for backward compatibility
+export const RIEMANN_ZERO = RIEMANN_ZERO_FREQ;
+export const PHASE_SHIFT_ZETA = PHASE_SHIFT_ZETA_CONST;
 
-// Phase shift from Zeta: arg(ζ(1/2 + i·718.57)) 
-// Pre-calculated: mpmath.arg(mpmath.zeta(0.5 + 718.57012515j))
-export const PHASE_SHIFT_ZETA = -1.2094;
-
-// Planetary Modulation
-const F_SCHUMANN = 7.83;   // Earth radial pulsation (Hz)
-const F_NUTATION = 18.6;   // Lunar nutation twist (Hz)
-
-// Intention Vector for Gate 18
-const VI_GATE_18 = 1.1628;
-
-// 18 confirmed GATCA positions (1-based, rCRS)
-const GATCA_POSITIONS = [
-  1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
-  7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179
-];
+const F_SCHUMANN = SCHUMANN_FREQ;
+const F_NUTATION = MOON_MOD_FREQ;
+const GATCA_POSITIONS = [...GATCA_POS];
 
 export interface SymphonyData {
   audioBuffer: AudioBuffer;
