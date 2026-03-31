@@ -43,7 +43,7 @@ export interface ReferenceResult {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STABLE v1.0.0 — IMMUTABLE REFERENCE
+// STABLE v2.0.0 — RIEMANN ZERO #448 REFERENCE
 // ═══════════════════════════════════════════════════════════════════
 
 /** Immutable reference results for v1.0.0 — these NEVER change */
