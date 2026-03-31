@@ -346,6 +346,318 @@ export interface DualGate {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// 6. DUAL DECOHERENCE SCALES (physical + semantic)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface SemanticDecoherence {
+  /** Physical T₂ (femtoseconds) — Lindblad model, already exists */
+  physicalT2: number;
+  physicalT2Label: string;
+  /** Semantic T₂ (seconds/minutes) — human-scale stability */
+  semanticT2: number;
+  semanticT2Label: string;
+  /** Summary description */
+  summary: { pl: string; en: string };
+}
+
+export function calculateSemanticDecoherence(
+  textType: TextType,
+  textLength: number,
+  physicalT2: number,
+  coherence: number,
+): SemanticDecoherence {
+  // Semantic stability depends on text type, length, and coherence
+  const typeFactors: Record<TextType, number> = {
+    declarative: 18,    // "I AM" — holds attention longest
+    initiatory: 15,     // mystery texts — immersive
+    poetic: 12,         // psalms — rhythmic memory
+    legal: 10,          // laws — structured but dry
+    communicative: 6,   // letters — informational, fast decay
+    questioning: 4,     // questions — unstable by nature
+  };
+
+  const baseDuration = typeFactors[textType];
+  const lengthFactor = Math.min(textLength / 200, 2.0); // longer text = longer engagement
+  const coherenceFactor = 0.5 + coherence; // higher coherence = more stable
+  const parallelInterpretations = textType === "questioning" ? 5 : textType === "initiatory" ? 4 : textType === "poetic" ? 3 : 2;
+  const interpretationPenalty = 1 / Math.sqrt(parallelInterpretations);
+
+  const semanticT2 = baseDuration * lengthFactor * coherenceFactor * interpretationPenalty;
+
+  const physLabel = physicalT2 < 1e-12
+    ? `${(physicalT2 * 1e15).toFixed(1)} fs`
+    : physicalT2 < 1e-9
+    ? `${(physicalT2 * 1e12).toFixed(1)} ps`
+    : `${(physicalT2 * 1e9).toFixed(1)} ns`;
+
+  const semLabel = semanticT2 < 60
+    ? `${semanticT2.toFixed(1)} s`
+    : semanticT2 < 3600
+    ? `${(semanticT2 / 60).toFixed(1)} min`
+    : `${(semanticT2 / 3600).toFixed(1)} h`;
+
+  return {
+    physicalT2,
+    physicalT2Label: physLabel,
+    semanticT2,
+    semanticT2Label: semLabel,
+    summary: {
+      pl: `Stan kwantowo metastabilny (T₂ fizyczne: ${physLabel}, ultrakrótkie), semantycznie stabilny przez ok. ${semLabel} przy pełnej uwadze.`,
+      en: `Quantum metastable state (physical T₂: ${physLabel}, ultrashort), semantically stable for ~${semLabel} at full attention.`,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 7. HURST EXPONENT INTERPRETATION (per-text, not constant)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface HurstInterpretation {
+  H: number;
+  category: "fractal" | "random" | "chaotic";
+  label: { pl: string; en: string };
+  description: { pl: string; en: string };
+}
+
+export function interpretHurst(H: number): HurstInterpretation {
+  if (H > 0.5) {
+    return {
+      H,
+      category: "fractal",
+      label: { pl: "Fraktalny (samopodobny)", en: "Fractal (self-similar)" },
+      description: {
+        pl: `H = ${H.toFixed(4)} > 0.5 — tekst ma strukturę długotrwałych korelacji. Każda część odzwierciedla całość. Tekst ma pamięć.`,
+        en: `H = ${H.toFixed(4)} > 0.5 — text has long-range correlation structure. Each part reflects the whole. Text has memory.`,
+      },
+    };
+  } else if (H >= 0.45) {
+    return {
+      H,
+      category: "random",
+      label: { pl: "Losowy (brak korelacji)", en: "Random (no correlation)" },
+      description: {
+        pl: `H = ${H.toFixed(4)} ≈ 0.5 — znaki są niezależne. Brak wyraźnej struktury fraktalnej. Tekst może być fragmentaryczny lub uszkodzony.`,
+        en: `H = ${H.toFixed(4)} ≈ 0.5 — characters are independent. No clear fractal structure. Text may be fragmentary or damaged.`,
+      },
+    };
+  } else {
+    return {
+      H,
+      category: "chaotic",
+      label: { pl: "Chaotyczny (anty-korelacja)", en: "Chaotic (anti-correlated)" },
+      description: {
+        pl: `H = ${H.toFixed(4)} < 0.45 — tekst jest chaotyczny lub celowo rozbity. Każdy fragment neguje poprzedni. Możliwe uszkodzenie lub celowa destrukcja struktury.`,
+        en: `H = ${H.toFixed(4)} < 0.45 — text is chaotic or deliberately fragmented. Each segment negates the previous. Possible damage or intentional structure destruction.`,
+      },
+    };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 8. OPTIONAL GEMATRIA — WRITING SYSTEM DETECTION
+// ═══════════════════════════════════════════════════════════════════
+
+export type WritingSystem = "hebrew" | "greek" | "arabic" | "latin" | "unknown";
+
+export interface WritingSystemDetection {
+  system: WritingSystem;
+  hasNumericalValues: boolean;
+  label: { pl: string; en: string };
+  gematriaNote: { pl: string; en: string };
+}
+
+export function detectWritingSystem(text: string): WritingSystemDetection {
+  const hasHebrew = /[\u0590-\u05FF]/.test(text);
+  const hasGreek = /[\u0370-\u03FF]/.test(text);
+  const hasArabic = /[\u0600-\u06FF]/.test(text);
+  const hasLatin = /[A-Za-z]/.test(text);
+
+  if (hasHebrew) return {
+    system: "hebrew", hasNumericalValues: true,
+    label: { pl: "Hebrajski (עברית)", en: "Hebrew (עברית)" },
+    gematriaNote: { pl: "Gematria hebrajska aktywna", en: "Hebrew gematria active" },
+  };
+  if (hasGreek) return {
+    system: "greek", hasNumericalValues: true,
+    label: { pl: "Grecki (Ελληνικά)", en: "Greek (Ελληνικά)" },
+    gematriaNote: { pl: "Izopsefia grecka aktywna", en: "Greek isopsephy active" },
+  };
+  if (hasArabic) return {
+    system: "arabic", hasNumericalValues: false,
+    label: { pl: "Arabski (العربية)", en: "Arabic (العربية)" },
+    gematriaNote: { pl: "Brak systemu liczbowego — analiza wyłącznie strukturalna i semantyczna", en: "No numerical system — structural and semantic analysis only" },
+  };
+  if (hasLatin) return {
+    system: "latin", hasNumericalValues: true,
+    label: { pl: "Łaciński (fallback)", en: "Latin (fallback)" },
+    gematriaNote: { pl: "Gematria łacińska (A=1, B=2...) — przybliżenie", en: "Latin gematria (A=1, B=2...) — approximation" },
+  };
+  return {
+    system: "unknown", hasNumericalValues: false,
+    label: { pl: "Nierozpoznany", en: "Unknown" },
+    gematriaNote: { pl: "Brak systemu liczbowego — analiza wyłącznie strukturalna i semantyczna", en: "No numerical system — structural and semantic analysis only" },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 9. TELEPORTATION THRESHOLD ANALYSIS
+// ═══════════════════════════════════════════════════════════════════
+
+export interface TeleportationThreshold {
+  /** Current coherence */
+  currentC: number;
+  /** Threshold (94%) */
+  threshold: number;
+  /** Distance in percentage points */
+  distancePP: number;
+  /** Is threshold reached? */
+  reached: boolean;
+  /** Trend: does coherence rise on reading or fall on interpretation? */
+  trend: "rising" | "falling" | "stable";
+  /** Is this an "unreachable threshold" text? */
+  unreachable: boolean;
+  /** Human-readable status */
+  status: { pl: string; en: string };
+}
+
+export function calculateTeleportationThreshold(
+  coherence: number,
+  textType: TextType,
+  tripleCoherence: TripleCoherence,
+): TeleportationThreshold {
+  const threshold = 0.94;
+  const distancePP = Math.max(0, (threshold - coherence) * 100);
+  const reached = coherence >= threshold;
+
+  // Trend: structural > quantum means reading helps; quantum > structural means interpretation decays
+  const trend = reached ? "stable" as const
+    : tripleCoherence.structural > tripleCoherence.quantum ? "rising" as const
+    : tripleCoherence.structural < tripleCoherence.quantum - 0.1 ? "falling" as const
+    : "stable" as const;
+
+  // Unreachable for inherently ambiguous texts
+  const unreachable = !reached && (textType === "initiatory" || textType === "questioning");
+
+  let statusPl: string;
+  let statusEn: string;
+
+  if (reached) {
+    statusPl = "✅ Próg teleportacji OSIĄGNIĘTY — fazowa teleportacja gotowa";
+    statusEn = "✅ Teleportation threshold REACHED — phase teleport ready";
+  } else if (unreachable) {
+    statusPl = `⚠ Tekst progu nieosiągalnego (typ: ${textType}) — wieloznaczność jest celem, nie przeszkodą. Brakuje ${distancePP.toFixed(1)} p.p.`;
+    statusEn = `⚠ Unreachable threshold text (type: ${textType}) — ambiguity is the goal, not an obstacle. Missing ${distancePP.toFixed(1)} pp.`;
+  } else if (trend === "rising") {
+    statusPl = `↗ Koherencja rośnie przy czytaniu (Cₛ > C_q). Brakuje ${distancePP.toFixed(1)} p.p. do teleportacji`;
+    statusEn = `↗ Coherence rises on reading (Cₛ > C_q). Missing ${distancePP.toFixed(1)} pp to teleportation`;
+  } else if (trend === "falling") {
+    statusPl = `↘ Koherencja spada przy interpretacji (C_q > Cₛ). Brakuje ${distancePP.toFixed(1)} p.p. do teleportacji`;
+    statusEn = `↘ Coherence falls on interpretation (C_q > Cₛ). Missing ${distancePP.toFixed(1)} pp to teleportation`;
+  } else {
+    statusPl = `→ Koherencja stabilna. Brakuje ${distancePP.toFixed(1)} p.p. do teleportacji`;
+    statusEn = `→ Coherence stable. Missing ${distancePP.toFixed(1)} pp to teleportation`;
+  }
+
+  return {
+    currentC: coherence,
+    threshold,
+    distancePP,
+    reached,
+    trend,
+    unreachable,
+    status: { pl: statusPl, en: statusEn },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 10. FINAL HUMAN-READABLE REPORT
+// ═══════════════════════════════════════════════════════════════════
+
+export interface FinalReport {
+  /** One sentence — what this text DOES (not what it means) */
+  whatItDoes: { pl: string; en: string };
+  /** Decision score 0-10: is it worth reading further? */
+  worthReading: number;
+  /** Recommendation: how to approach this text */
+  recommendation: { pl: string; en: string };
+  recommendationType: "meditation" | "analysis" | "contemplation" | "translation" | "rejection" | "declaration";
+}
+
+export function generateFinalReport(
+  textType: TextType,
+  coherence: number,
+  hurst: HurstInterpretation,
+  teleportation: TeleportationThreshold,
+  intentionVector4: IntentionVector4,
+): FinalReport {
+  // What it does
+  const doesMap: Record<TextType, { pl: string; en: string }> = {
+    declarative: {
+      pl: "Ten tekst się sam wykonuje — jest aktem mowy, który zmienia rzeczywistość w momencie wypowiedzenia.",
+      en: "This text executes itself — it's a speech act that changes reality upon utterance.",
+    },
+    initiatory: {
+      pl: "Ten tekst zmienia stan odbiorcy — jest bramą inicjacji, przekształcającą świadomość czytelnika.",
+      en: "This text transforms the receiver — it's an initiation gate that reshapes the reader's consciousness.",
+    },
+    poetic: {
+      pl: "Ten tekst rezonuje emocjonalnie — tworzy pole wibracyjne, które synchronizuje czytelnika z intencją autora.",
+      en: "This text resonates emotionally — it creates a vibrational field that synchronizes the reader with the author's intention.",
+    },
+    legal: {
+      pl: "Ten tekst ustanawia normę — jest dekretem, który definiuje granice dozwolonego i zakazanego.",
+      en: "This text establishes a norm — it's a decree that defines the boundaries of the permitted and forbidden.",
+    },
+    communicative: {
+      pl: "Ten tekst transmituje informację — przenosi dane z punktu A do punktu B bez transformacji odbiorcy.",
+      en: "This text transmits information — it carries data from point A to B without transforming the receiver.",
+    },
+    questioning: {
+      pl: "Ten tekst otwiera przestrzeń — jest pytaniem, które celowo pozostawia lukę do wypełnienia przez czytelnika.",
+      en: "This text opens space — it's a question that deliberately leaves a gap for the reader to fill.",
+    },
+  };
+
+  // Worth reading score (0-10)
+  const coherenceScore = coherence * 4; // max 4
+  const hurstScore = hurst.category === "fractal" ? 3 : hurst.category === "random" ? 1.5 : 0.5;
+  const intentionScore = (intentionVector4.transformation + intentionVector4.illumination) * 1.5; // max 3
+  const worthReading = Math.min(10, Math.round((coherenceScore + hurstScore + intentionScore) * 10) / 10);
+
+  // Recommendation
+  type RecType = FinalReport["recommendationType"];
+  const recMap: Record<TextType, RecType> = {
+    declarative: "declaration",
+    initiatory: "meditation",
+    poetic: "contemplation",
+    legal: "analysis",
+    communicative: "translation",
+    questioning: "contemplation",
+  };
+
+  // Override for low coherence
+  let recType: RecType = recMap[textType];
+  if (coherence < 0.3) recType = "rejection";
+  if (hurst.category === "chaotic" && coherence < 0.5) recType = "rejection";
+
+  const recLabels: Record<RecType, { pl: string; en: string }> = {
+    meditation: { pl: "🧘 Zalecenie: MEDYTACJA — wejdź w ciszę z tym tekstem, nie analizuj", en: "🧘 Recommendation: MEDITATION — enter silence with this text, don't analyze" },
+    analysis: { pl: "🔬 Zalecenie: ANALIZA — rozbierz tekst na czynniki, szukaj struktury", en: "🔬 Recommendation: ANALYSIS — deconstruct the text, look for structure" },
+    contemplation: { pl: "🌀 Zalecenie: KONTEMPLACJA — pozwól tekstowi działać, nie wymuszaj znaczenia", en: "🌀 Recommendation: CONTEMPLATION — let the text work, don't force meaning" },
+    translation: { pl: "📝 Zalecenie: TŁUMACZENIE — przetłumacz na język oryginalny dla wyższej koherencji", en: "📝 Recommendation: TRANSLATION — translate to original language for higher coherence" },
+    rejection: { pl: "❌ Zalecenie: ODRZUCENIE — tekst uszkodzony lub chaotyczny, niska wartość informacyjna", en: "❌ Recommendation: REJECTION — text damaged or chaotic, low information value" },
+    declaration: { pl: "⚡ Zalecenie: DEKLARACJA — wypowiedz ten tekst na głos, jest aktem mocy", en: "⚡ Recommendation: DECLARATION — speak this text aloud, it's an act of power" },
+  };
+
+  return {
+    whatItDoes: doesMap[textType],
+    worthReading,
+    recommendation: recLabels[recType],
+    recommendationType: recType,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FRACTAL ANALYSIS (first 718 chars)
 // ═══════════════════════════════════════════════════════════════════
 
