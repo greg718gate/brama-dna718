@@ -1495,6 +1495,38 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   // 9. MKP-94: Moduł Korekcji Pola
   const mkp94 = calculateMKP94(psi.coherence, hebrewText, text, fractal.hurstApprox, gateIdx, lang);
 
+  // 10. TEXT TYPE CLASSIFIER
+  const textClassification = classifyText(text, reference);
+
+  // 11. TRIPLE COHERENCE
+  const tripleCoherence = calculateTripleCoherence(
+    psi.coherence, textClassification.type, fractal.hurstApprox,
+    gematriaResult.total, text.length,
+  );
+
+  // 12. ENTROPY ANALYSIS
+  const entropyAnalysis = calculateEntropy(
+    psi.coherence, textClassification.type, hasOriginalScript, fractal.hurstApprox,
+  );
+
+  // 13. 4-COMPONENT INTENTION VECTOR
+  const intentionVector4 = calculateIntentionVector4(
+    textClassification.type, psi.coherence, vi.viMagnitude, psi.phase,
+  );
+
+  // 14. DUAL GATE (source vs collapse)
+  const collapseGateIdx = intentionOperator.dominantGateIdx;
+  const collapseGatePos = GATCA_GATES[collapseGateIdx];
+  const dualGate: DualGate = {
+    sourceGateIdx: gateIdx,
+    sourceGateName: GATE_NAMES[GATCA_GATES[gateIdx]] || `Gate-${gateIdx + 1}`,
+    sourceGatePosition: GATCA_GATES[gateIdx],
+    collapseGateIdx,
+    collapseGateName: GATE_NAMES[collapseGatePos] || `Gate-${collapseGateIdx + 1}`,
+    collapseGatePosition: collapseGatePos,
+    gateShift: gateIdx !== collapseGateIdx,
+  };
+
   const partialResult = {
     reference,
     gematriaTotal: gematriaResult.total,
@@ -1533,6 +1565,11 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
       ratio718Gamma: FREQ_718 / GAMMA,
     },
     mkp94,
+    textClassification,
+    tripleCoherence,
+    entropyAnalysis,
+    intentionVector4,
+    dualGate,
   };
 }
 
