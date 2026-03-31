@@ -1605,10 +1605,10 @@ const BiblicalDecoder = () => {
           </a>
           <button
             onClick={() => setIsCalibrationAdmin(prev => !prev)}
-            className="block mx-auto mt-2 text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors font-mono"
+            className="block mx-auto mt-3 px-4 py-2 text-xs text-amber-400/70 hover:text-amber-400 hover:bg-amber-500/10 border border-amber-500/20 hover:border-amber-500/40 rounded transition-all font-mono"
             title="Toggle calibration mode"
           >
-            Ψ-718
+            ⚙ Ψ-718 {isCalibrationAdmin ? '(ON)' : ''}
           </button>
         </div>
       </div>
