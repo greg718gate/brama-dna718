@@ -24,6 +24,8 @@ import {
   type ManipulationReport,
 } from "./manipulationDetector";
 
+import { getActiveVersionString } from "./decoderVersionConfig";
+
 // ═══════════════════════════════════════════════════════════════════
 // HEBREW GEMATRIA MAP
 // ═══════════════════════════════════════════════════════════════════
@@ -1579,6 +1581,8 @@ export interface DecoderResult {
   finalReport: FinalReport;
   /** 11. Manipulation detection report */
   manipulationReport: ManipulationReport;
+  /** 12. Decoder version used for this analysis */
+  decoderVersion: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1937,6 +1941,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     teleportationThreshold,
     finalReport,
     manipulationReport,
+    decoderVersion: getActiveVersionString(),
   };
 }
 

@@ -35,6 +35,16 @@ import {
 } from "@/lib/biblicalDecoder";
 import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
 import { CalibrationPanel } from "@/components/CalibrationPanel";
+import {
+  getActiveVersion,
+  switchToStable,
+  switchToVersion,
+  getVersionHistory,
+  isCurrentBeta,
+  getActiveVersionString,
+  type DecoderVersionConfig,
+} from "@/lib/decoderVersionConfig";
+import { setActiveThresholds, setActiveWeights } from "@/lib/manipulationDetector";
 
 const stateColors: Record<string, string> = {
   TELEPORTATION_READY: "bg-green-500/20 text-green-400 border-green-500/40",
@@ -69,6 +79,16 @@ const BiblicalDecoder = () => {
   const [photonFocus, setPhotonFocus] = useState(0);
   const [photonCollapsed, setPhotonCollapsed] = useState(false);
   const [isCalibrationAdmin, setIsCalibrationAdmin] = useState(false);
+  const [activeVersion, setActiveVersionState] = useState(getActiveVersionString());
+  const isBeta = isCurrentBeta();
+
+  const handleSwitchToStable = () => {
+    switchToStable();
+    const cfg = getActiveVersion();
+    setActiveThresholds(cfg.thresholds);
+    setActiveWeights(cfg.weights);
+    setActiveVersionState(cfg.version);
+  };
 
   // When user manually edits reference or text, clear preset Hebrew to avoid stale data
   const handleReferenceChange = (val: string) => {
@@ -366,6 +386,14 @@ const BiblicalDecoder = () => {
             <LanguageSwitcher />
             <Badge variant="outline" className="font-mono text-xs hidden sm:inline-flex">
               {t('decoder.badge')}
+            </Badge>
+            <Badge 
+              variant={isBeta ? "destructive" : "outline"} 
+              className="font-mono text-[10px] cursor-pointer"
+              onClick={isBeta ? handleSwitchToStable : undefined}
+              title={isBeta ? (language === 'pl' ? 'Kliknij aby wrócić do stabilnej v1.0.0' : 'Click to revert to stable v1.0.0') : ''}
+            >
+              v{activeVersion}{isBeta ? ' BETA' : ''}
             </Badge>
           </div>
         </div>

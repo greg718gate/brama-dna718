@@ -27,6 +27,10 @@ import {
   type ManipulationReport,
 } from "@/lib/manipulationDetector";
 import {
+  createCalibrationVersion,
+  getActiveVersion,
+} from "@/lib/decoderVersionConfig";
+import {
   decodeVerse,
 } from "@/lib/biblicalDecoder";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -193,6 +197,8 @@ export function CalibrationPanel({ isAdmin }: CalibrationPanelProps) {
 
   const saveAsConfig = () => {
     setActiveThresholds(thresholds);
+    const weights = getActiveVersion().weights;
+    createCalibrationVersion(thresholds, weights);
     setSaved(true);
   };
 
