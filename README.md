@@ -98,13 +98,15 @@ Configuration: `2026-03-31`
 
 ### Reference Text Results (v1.0.0)
 
-| Text | Expected IM |
-|---|---|
-| Ap 22,13 (Greek) | 0–5% |
-| Wj 3,14 (Hebrew) | 0–10% |
-| Kohelet 3,21 (Hebrew) | 0–15% |
-| 1 J 5,7 — Comma Johanneum (Latin) | 70–90% |
-| Tabliczka z Koptos (fragment) | 40–60% |
+| Text | C_total | IM | Status |
+|---|---|---|---|
+| Ap 22,13 (Greek) | 96.3% | 5% | AUTENTYCZNY |
+| Wj 3,14 (Hebrew) | 63.3% | 12% | AUTENTYCZNY |
+| Kohelet 3,21 (Hebrew) | 50.6% | 8% | AUTENTYCZNY |
+| 1 J 5,7 — Comma Johanneum (Latin) | 31.2% | 82% | INTERPOLACJA |
+| Tabliczka z Koptos (fragment) | 25.6% | 51% | USZKODZONY |
+
+*Wyniki dla wersji 1.0.0 są niezmienne.*
 
 ---
 
