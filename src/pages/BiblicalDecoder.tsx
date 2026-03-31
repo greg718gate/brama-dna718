@@ -838,6 +838,183 @@ const BiblicalDecoder = () => {
                   </CardContent>
                 </Card>
 
+                {/* ═══ 6. DUAL DECOHERENCE SCALES ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Dwie Skale Dekoherencji' : 'Dual Decoherence Scales'}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {language === 'pl' ? 'Fizyczna (femtosekundy) + Semantyczna (sekundy/minuty)' : 'Physical (femtoseconds) + Semantic (seconds/minutes)'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 rounded-lg border border-border bg-background/50 text-center space-y-1">
+                        <div className="text-xs text-muted-foreground">{language === 'pl' ? 'T₂ Fizyczne' : 'Physical T₂'}</div>
+                        <div className="text-lg font-bold font-mono text-primary">{result.semanticDecoherence.physicalT2Label}</div>
+                        <div className="text-[10px] text-muted-foreground">{language === 'pl' ? 'Lindblad @ 310K' : 'Lindblad @ 310K'}</div>
+                      </div>
+                      <div className="p-3 rounded-lg border border-primary/30 bg-primary/5 text-center space-y-1">
+                        <div className="text-xs text-muted-foreground">{language === 'pl' ? 'T₂ Semantyczne' : 'Semantic T₂'}</div>
+                        <div className="text-lg font-bold font-mono text-primary">{result.semanticDecoherence.semanticT2Label}</div>
+                        <div className="text-[10px] text-muted-foreground">{language === 'pl' ? 'Przy pełnej uwadze' : 'At full attention'}</div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground font-mono leading-relaxed">
+                      {language === 'pl' ? result.semanticDecoherence.summary.pl : result.semanticDecoherence.summary.en}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ 7. HURST EXPONENT INTERPRETATION ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Wykładnik Hursta' : 'Hurst Exponent'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-background/50">
+                      <div className="text-2xl font-bold font-mono text-primary">{result.hurstInterpretation.H.toFixed(4)}</div>
+                      <div>
+                        <Badge variant="outline" className={`text-xs font-mono ${
+                          result.hurstInterpretation.category === 'fractal' ? 'border-green-500/40 text-green-400' :
+                          result.hurstInterpretation.category === 'random' ? 'border-amber-500/40 text-amber-400' :
+                          'border-red-500/40 text-red-400'
+                        }`}>
+                          {language === 'pl' ? result.hurstInterpretation.label.pl : result.hurstInterpretation.label.en}
+                        </Badge>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {language === 'pl' ? result.hurstInterpretation.description.pl : result.hurstInterpretation.description.en}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ 8. WRITING SYSTEM & GEMATRIA STATUS ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Type className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'System Pisma & Gematria' : 'Writing System & Gematria'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-background/50">
+                      <div>
+                        <p className="font-bold text-foreground text-sm">
+                          {language === 'pl' ? result.writingSystem.label.pl : result.writingSystem.label.en}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {language === 'pl' ? result.writingSystem.gematriaNote.pl : result.writingSystem.gematriaNote.en}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className={`ml-auto text-xs font-mono ${
+                        result.writingSystem.hasNumericalValues ? 'border-green-500/40 text-green-400' : 'border-amber-500/40 text-amber-400'
+                      }`}>
+                        {result.writingSystem.hasNumericalValues
+                          ? (language === 'pl' ? 'AKTYWNA' : 'ACTIVE')
+                          : (language === 'pl' ? 'POMINIĘTA' : 'SKIPPED')}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ 9. TELEPORTATION THRESHOLD ═══ */}
+                <Card className={`border-border bg-card/80 ${result.teleportationThreshold.reached ? 'border-green-500/40' : ''}`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Crosshair className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Próg Teleportacji (C > 94%)' : 'Teleportation Threshold (C > 94%)'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="relative h-6 rounded-full bg-muted/30 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          result.teleportationThreshold.reached ? 'bg-green-500/60' : 'bg-primary/60'
+                        }`}
+                        style={{ width: `${Math.min(result.teleportationThreshold.currentC * 100, 100)}%` }}
+                      />
+                      <div className="absolute top-0 left-[94%] w-px h-full bg-foreground/40" />
+                      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-[10px] font-mono font-bold text-foreground">
+                        {(result.teleportationThreshold.currentC * 100).toFixed(1)}% / 94%
+                      </div>
+                    </div>
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {language === 'pl' ? result.teleportationThreshold.status.pl : result.teleportationThreshold.status.en}
+                    </p>
+                    {result.teleportationThreshold.unreachable && (
+                      <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <p className="text-[10px] text-amber-400">
+                          {language === 'pl'
+                            ? '⚠ Tekst z założenia wieloznaczny — próg teleportacji jest nieosiągalny z definicji'
+                            : '⚠ Inherently ambiguous text — teleportation threshold is unreachable by definition'}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* ═══ 10. FINAL HUMAN-READABLE REPORT ═══ */}
+                <Card className="border-2 border-primary/30 bg-primary/5">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-mono flex items-center gap-2 text-primary">
+                      <FileText className="w-5 h-5" />
+                      {language === 'pl' ? 'Raport Końcowy' : 'Final Report'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* What it does */}
+                    <div className="p-4 rounded-lg bg-background/60 border border-border">
+                      <h4 className="text-xs text-muted-foreground mb-1 font-mono">
+                        {language === 'pl' ? 'CO TEN TEKST ROBI:' : 'WHAT THIS TEXT DOES:'}
+                      </h4>
+                      <p className="text-sm text-foreground leading-relaxed font-semibold">
+                        {language === 'pl' ? result.finalReport.whatItDoes.pl : result.finalReport.whatItDoes.en}
+                      </p>
+                    </div>
+
+                    {/* Worth reading score */}
+                    <div className="flex items-center gap-4 p-4 rounded-lg bg-background/60 border border-border">
+                      <div className="text-center">
+                        <div className={`text-3xl font-bold font-mono ${
+                          result.finalReport.worthReading >= 7 ? 'text-green-400' :
+                          result.finalReport.worthReading >= 4 ? 'text-amber-400' : 'text-red-400'
+                        }`}>
+                          {result.finalReport.worthReading.toFixed(1)}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">/10</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="h-3 rounded-full bg-muted/30 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              result.finalReport.worthReading >= 7 ? 'bg-green-500/60' :
+                              result.finalReport.worthReading >= 4 ? 'bg-amber-500/60' : 'bg-red-500/60'
+                            }`}
+                            style={{ width: `${result.finalReport.worthReading * 10}%` }}
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          {language === 'pl' ? 'Czy warto czytać dalej?' : 'Worth reading further?'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Recommendation */}
+                    <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                      <p className="text-sm font-semibold text-foreground">
+                        {language === 'pl' ? result.finalReport.recommendation.pl : result.finalReport.recommendation.en}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Detailed Ψ-718 analysis — only show if we have actual content */}
                 {verbalInterpretation.scienceSays && (
                 <Card className="border-primary/30 bg-card/80">
