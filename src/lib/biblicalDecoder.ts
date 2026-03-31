@@ -19,6 +19,11 @@ import {
   type ComplexNumber,
 } from "./bramaUnificationEngine";
 
+import {
+  generateManipulationReport,
+  type ManipulationReport,
+} from "./manipulationDetector";
+
 // ═══════════════════════════════════════════════════════════════════
 // HEBREW GEMATRIA MAP
 // ═══════════════════════════════════════════════════════════════════
@@ -1572,6 +1577,8 @@ export interface DecoderResult {
   teleportationThreshold: TeleportationThreshold;
   /** 10. Final human-readable report */
   finalReport: FinalReport;
+  /** 11. Manipulation detection report */
+  manipulationReport: ManipulationReport;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1872,6 +1879,15 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     teleportationThreshold, intentionVector4,
   );
 
+  // 20. MANIPULATION DETECTION
+  const manipulationReport = generateManipulationReport(
+    text, textClassification.type, tripleCoherence, intentionVector4,
+    entropyAnalysis.physicalEntropy, entropyAnalysis.semanticEntropy,
+    gateIdx, collapseGateIdx, semanticDecoherence,
+    writingSystem.system, gematriaResult.total, psi.coherence,
+    fractal.hurstApprox, gematriaResult.breakdown.length,
+  );
+
   const partialResult = {
     reference,
     gematriaTotal: gematriaResult.total,
@@ -1920,6 +1936,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     writingSystem,
     teleportationThreshold,
     finalReport,
+    manipulationReport,
   };
 }
 
