@@ -76,15 +76,15 @@ export async function generateSymphony(audioContext: AudioContext): Promise<Symp
       bramaPhase = -PHASE_SHIFT_ZETA; // Exit Equation phase alignment
       ampWeight = VI_GATE_18; // Intention Vector
     } else {
-      // Kronecker Sequence: lowest entropy (i * γ % 1)
-      baseFreq = 718 + (144 * (((gateIndex + 1) * GAMMA) % 1));
+      // Canonical formula: f_gate = 144 × (1 + (index × γ % 1)) + 718
+      baseFreq = getGateFrequency(gateIndex);
       bramaPhase = theta_k; // Unique inertia "viewing angle"
       ampWeight = ((PHI ** (gateIndex % 7)) % 1) * GAMMA;
     }
 
     for (let i = 0; i < numSamples; i++) {
-      // Fractal Envelope (DNA fuse)
-      const envelope = Math.exp(-((t[i] - startTime) ** 2) / (2 * (1.618 ** 2)));
+      // Fractal Envelope (DNA fuse) — sigma = φ
+      const envelope = Math.exp(-((t[i] - startTime) ** 2) / (2 * (PHI ** 2)));
 
       // Triple Toroidal Modulation (Exit Hyperboloid)
       // 718 (Rotation) * 7.83 (Pulsation) * 18.6 (Twist)
