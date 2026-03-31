@@ -34,6 +34,7 @@ import {
   type MKP94Result,
 } from "@/lib/biblicalDecoder";
 import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
+import { CalibrationPanel } from "@/components/CalibrationPanel";
 
 const stateColors: Record<string, string> = {
   TELEPORTATION_READY: "bg-green-500/20 text-green-400 border-green-500/40",
