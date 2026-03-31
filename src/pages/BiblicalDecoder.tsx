@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2, ShieldCheck, ShieldAlert, ShieldX, Radio, FileDown } from "lucide-react";
+import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarked, Grid3x3, Loader2, ShieldCheck, ShieldAlert, ShieldX, Radio, FileDown, Layers, Brain, Target, GitBranch } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
