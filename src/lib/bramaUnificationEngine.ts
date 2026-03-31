@@ -42,6 +42,9 @@ import {
   PHI,
 } from './gatca718Constants';
 
+// Local alias for backward compat with internal usage
+const FREQ_718 = CARRIER_FREQ;
+
 export interface ComplexNumber {
   re: number;
   im: number;
