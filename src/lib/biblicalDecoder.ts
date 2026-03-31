@@ -1936,6 +1936,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     writingSystem,
     teleportationThreshold,
     finalReport,
+    manipulationReport,
   };
 }
 
