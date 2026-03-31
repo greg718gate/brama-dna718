@@ -1552,16 +1552,26 @@ export interface DecoderResult {
   };
   /** MKP-94 Field Correction Module */
   mkp94: MKP94Result;
-  /** NEW: Text type classification */
+  /** Text type classification */
   textClassification: TextClassification;
-  /** NEW: Triple coherence (Cₛ, Cₘ, C_q) */
+  /** Triple coherence (Cₛ, Cₘ, C_q) */
   tripleCoherence: TripleCoherence;
-  /** NEW: Entropy analysis (noise vs ambiguity) */
+  /** Entropy analysis (noise vs ambiguity) */
   entropyAnalysis: EntropyAnalysis;
-  /** NEW: 4-component intention vector */
+  /** 4-component intention vector */
   intentionVector4: IntentionVector4;
-  /** NEW: Source gate vs collapse gate */
+  /** Source gate vs collapse gate */
   dualGate: DualGate;
+  /** 6. Dual decoherence (physical + semantic) */
+  semanticDecoherence: SemanticDecoherence;
+  /** 7. Hurst exponent interpretation */
+  hurstInterpretation: HurstInterpretation;
+  /** 8. Writing system detection */
+  writingSystem: WritingSystemDetection;
+  /** 9. Teleportation threshold analysis */
+  teleportationThreshold: TeleportationThreshold;
+  /** 10. Final human-readable report */
+  finalReport: FinalReport;
 }
 
 // ═══════════════════════════════════════════════════════════════════
