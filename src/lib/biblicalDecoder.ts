@@ -1849,7 +1849,29 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     gateShift: gateIdx !== collapseGateIdx,
   };
 
-  const partialResult = {
+  // 15. SEMANTIC DECOHERENCE (dual scale)
+  const semanticDecoherence = calculateSemanticDecoherence(
+    textClassification.type, text.length, decoherence.coherenceTime, psi.coherence,
+  );
+
+  // 16. HURST INTERPRETATION (per-text)
+  const hurstInterpretation = interpretHurst(fractal.hurstApprox);
+
+  // 17. WRITING SYSTEM DETECTION
+  const fractalSource = hebrewText.trim() || text;
+  const writingSystem = detectWritingSystem(fractalSource);
+
+  // 18. TELEPORTATION THRESHOLD
+  const teleportationThreshold = calculateTeleportationThreshold(
+    psi.coherence, textClassification.type, tripleCoherence,
+  );
+
+  // 19. FINAL HUMAN-READABLE REPORT
+  const finalReport = generateFinalReport(
+    textClassification.type, psi.coherence, hurstInterpretation,
+    teleportationThreshold, intentionVector4,
+  );
+
     reference,
     gematriaTotal: gematriaResult.total,
     hamiltonGate: gateIdx,
