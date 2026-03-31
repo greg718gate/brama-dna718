@@ -68,6 +68,7 @@ const BiblicalDecoder = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [photonFocus, setPhotonFocus] = useState(0);
   const [photonCollapsed, setPhotonCollapsed] = useState(false);
+  const [isCalibrationAdmin, setIsCalibrationAdmin] = useState(false);
 
   // When user manually edits reference or text, clear preset Hebrew to avoid stale data
   const handleReferenceChange = (val: string) => {
