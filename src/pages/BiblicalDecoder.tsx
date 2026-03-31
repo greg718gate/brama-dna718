@@ -387,6 +387,14 @@ const BiblicalDecoder = () => {
             <Badge variant="outline" className="font-mono text-xs hidden sm:inline-flex">
               {t('decoder.badge')}
             </Badge>
+            <Badge 
+              variant={isBeta ? "destructive" : "outline"} 
+              className="font-mono text-[10px] cursor-pointer"
+              onClick={isBeta ? handleSwitchToStable : undefined}
+              title={isBeta ? (language === 'pl' ? 'Kliknij aby wrócić do stabilnej v1.0.0' : 'Click to revert to stable v1.0.0') : ''}
+            >
+              v{activeVersion}{isBeta ? ' BETA' : ''}
+            </Badge>
           </div>
         </div>
       </div>
