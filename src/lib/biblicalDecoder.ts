@@ -1879,6 +1879,15 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     teleportationThreshold, intentionVector4,
   );
 
+  // 20. MANIPULATION DETECTION
+  const manipulationReport = generateManipulationReport(
+    text, textClassification.type, tripleCoherence, intentionVector4,
+    entropyAnalysis.physicalEntropy, entropyAnalysis.semanticEntropy,
+    gateIdx, collapseGateIdx, semanticDecoherence,
+    writingSystem.system, gematriaResult.total, psi.coherence,
+    fractal.hurstApprox, gematriaResult.breakdown.length,
+  );
+
   const partialResult = {
     reference,
     gematriaTotal: gematriaResult.total,
