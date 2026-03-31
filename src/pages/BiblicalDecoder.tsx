@@ -35,7 +35,17 @@ import {
 } from "@/lib/biblicalDecoder";
 import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
 import { CalibrationPanel } from "@/components/CalibrationPanel";
-
+import {
+  getActiveVersion,
+  switchToStable,
+  switchToVersion,
+  getVersionHistory,
+  isCurrentBeta,
+  getActiveVersionString,
+  type DecoderVersionConfig,
+} from "@/lib/decoderVersionConfig";
+import { setActiveThresholds } from "@/lib/manipulationDetector";
+import { setActiveWeights } from "@/lib/manipulationDetector";
 const stateColors: Record<string, string> = {
   TELEPORTATION_READY: "bg-green-500/20 text-green-400 border-green-500/40",
   HIGH_COHERENCE: "bg-amber-500/20 text-amber-400 border-amber-500/40",
