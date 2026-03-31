@@ -19,6 +19,11 @@ import {
   type ComplexNumber,
 } from "./bramaUnificationEngine";
 
+import {
+  generateManipulationReport,
+  type ManipulationReport,
+} from "./manipulationDetector";
+
 // ═══════════════════════════════════════════════════════════════════
 // HEBREW GEMATRIA MAP
 // ═══════════════════════════════════════════════════════════════════
