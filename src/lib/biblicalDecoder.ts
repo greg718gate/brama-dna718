@@ -1240,6 +1240,16 @@ export interface DecoderResult {
   };
   /** MKP-94 Field Correction Module */
   mkp94: MKP94Result;
+  /** NEW: Text type classification */
+  textClassification: TextClassification;
+  /** NEW: Triple coherence (Cₛ, Cₘ, C_q) */
+  tripleCoherence: TripleCoherence;
+  /** NEW: Entropy analysis (noise vs ambiguity) */
+  entropyAnalysis: EntropyAnalysis;
+  /** NEW: 4-component intention vector */
+  intentionVector4: IntentionVector4;
+  /** NEW: Source gate vs collapse gate */
+  dualGate: DualGate;
 }
 
 // ═══════════════════════════════════════════════════════════════════
