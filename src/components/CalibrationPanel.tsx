@@ -27,6 +27,10 @@ import {
   type ManipulationReport,
 } from "@/lib/manipulationDetector";
 import {
+  createCalibrationVersion,
+  getActiveVersion,
+} from "@/lib/decoderVersionConfig";
+import {
   decodeVerse,
 } from "@/lib/biblicalDecoder";
 import { useLanguage } from "@/contexts/LanguageContext";
