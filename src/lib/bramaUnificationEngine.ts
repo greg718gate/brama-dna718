@@ -1,21 +1,49 @@
 /**
  * BRAMA Unification Engine
  * Implementacja równania wyjścia: Ψ = A · e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+ *
+ * UWAGA: Stałe importowane z gatca718Constants.ts — jedynego źródła prawdy.
  */
 
-// Stałe fizyczne
-export const GAMMA = (1 + Math.sqrt(5)) / 2 - 1; // 0.618... (Złoty podział)
-export const PHI = (1 + Math.sqrt(5)) / 2;       // 1.618... (Złoty podział)
-export const H_BAR = 1.0545718e-34;              // Stała Plancka zredukowana
-export const FREQ_718 = 718;                      // Stała rezonansowa bazowa
-export const BINAURAL_OFFSET = 7.83;              // Rezonans Schumanna
+// Re-export canonical constants for backward compatibility
+export {
+  GAMMA,
+  PHI,
+  H_BAR,
+  CARRIER_FREQ as FREQ_718,
+  SCHUMANN_FREQ as BINAURAL_OFFSET,
+  RIEMANN_ZERO_FREQ as RIEMANN_ZERO,
+  PHASE_SHIFT_ZETA,
+  MOON_MOD_FREQ as F_NUTATION,
+  CARRIER_FREQ,
+  SCHUMANN_FREQ,
+  MOON_MOD_FREQ,
+  MTDNA_LENGTH,
+  GATCA_POSITIONS,
+  ZERO_POINT_FREQ,
+  BINAURAL_OFFSET as BINAURAL_OFFSET_CONST,
+  SAMPLE_RATE,
+  SACRED_144,
+  COHERENCE_THRESHOLD,
+  VI_GATE_18,
+  RIEMANN_ZERO_FREQ,
+  RIEMANN_ZERO_N,
+  getGateFrequency,
+  getGateStartTime,
+  getGateEnvelope,
+  isHarmonic,
+  SYSTEM_VERSION,
+} from './gatca718Constants';
 
-// 448th Riemann Zero — precise Exit Gate frequency
-export const RIEMANN_ZERO = 718.57012515;
-// Phase shift: arg(ζ(1/2 + i·718.57))
-export const PHASE_SHIFT_ZETA = -1.2094;
-// Planetary modulation
-export const F_NUTATION = 18.6;                   // Lunar nutation (Hz)
+import {
+  CARRIER_FREQ,
+  GAMMA,
+  H_BAR,
+  PHI,
+} from './gatca718Constants';
+
+// Local alias for backward compat with internal usage
+const FREQ_718 = CARRIER_FREQ;
 
 export interface ComplexNumber {
   re: number;
