@@ -70,7 +70,9 @@ Pełne warunki licencji: [LICENSE.md](LICENSE.md)
 
 ---
 
-## Ψ-718 Decoder — Stable Version Reference (v1.0.0)
+## Ψ-718 Decoder — Stable Version Reference (v2.0.0)
+
+**Od wersji 2.0.0 stała bazowa dekodera = Zero Riemanna nr 448 (718.57012515 Hz)**
 
 Configuration: `2026-03-31`
 
@@ -83,7 +85,7 @@ Configuration: `2026-03-31`
 | T₂ Semantic (F₆) | 30 |
 | H chaos (F₇) | 0.30 |
 | H excess (F₇) | 0.95 |
-| Gematria mod (F₈) | 718 |
+| Gematria mod (F₈) | 718.57012515 |
 
 | Weight | Value |
 |---|---|
@@ -96,7 +98,7 @@ Configuration: `2026-03-31`
 | F₇ | 0.10 |
 | F₈ | 0.05 |
 
-### Reference Text Results (v1.0.0)
+### Reference Text Results (v1.0.0 — archiwalne)
 
 | Text | C_total | IM | Status |
 |---|---|---|---|
@@ -106,7 +108,7 @@ Configuration: `2026-03-31`
 | 1 J 5,7 — Comma Johanneum (Latin) | 31.2% | 82% | INTERPOLACJA |
 | Tabliczka z Koptos (fragment) | 25.6% | 51% | USZKODZONY |
 
-*Wyniki dla wersji 1.0.0 są niezmienne.*
+*Wyniki v1.0.0 są archiwalne. Od v2.0.0 stała bazowa = 718.57012515 Hz (Zero Riemanna #448).*
 
 ---
 

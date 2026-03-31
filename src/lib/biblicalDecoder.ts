@@ -102,7 +102,7 @@ export function hebrewGematria(text: string): { total: number; normalized: numbe
 
   return {
     total,
-    normalized: total > 0 ? (total % 718) / 718 : 0,
+    normalized: total > 0 ? (total % FREQ_718) / FREQ_718 : 0,
     breakdown,
   };
 }

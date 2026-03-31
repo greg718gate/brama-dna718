@@ -22,7 +22,7 @@
 
 // === STAŁE MSM (Mitochondrial Synchronization Model) ===
 /** Hz — stała DNA z mtDNA GATCA */
-export const CARRIER_FREQ = 718.0;
+export const CARRIER_FREQ = 718.57012515;  // Zero Riemanna nr 448
 /** Hz — rezonans Ziemi (pomiar 1952) */
 export const SCHUMANN_FREQ = 7.83;
 /** Hz — autorska korekta: nutacja Księżyca 18.6 lat (nie φ²×7.83≈20.5) */

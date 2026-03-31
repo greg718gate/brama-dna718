@@ -43,7 +43,7 @@ export interface ReferenceResult {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STABLE v1.0.0 — IMMUTABLE REFERENCE
+// STABLE v2.0.0 — RIEMANN ZERO #448 REFERENCE
 // ═══════════════════════════════════════════════════════════════════
 
 /** Immutable reference results for v1.0.0 — these NEVER change */
@@ -56,9 +56,9 @@ export const STABLE_V1_REFERENCE_RESULTS: readonly ReferenceResult[] = Object.fr
 ]) as ReferenceResult[];
 
 export const STABLE_V1_CONFIG: DecoderVersionConfig = Object.freeze({
-  version: "1.0.0",
+  version: "2.0.0",
   date: "2026-03-31",
-  label: "Stable Release",
+  label: "Riemann Zero #448 Release",
   isBeta: false,
   thresholds: Object.freeze({
     fragmentacja: 30,
@@ -68,7 +68,7 @@ export const STABLE_V1_CONFIG: DecoderVersionConfig = Object.freeze({
     T2_sem_paradoks: 30,
     H_chaos: 0.3,
     H_nadmiar: 0.95,
-    gematria_mod: 718,
+    gematria_mod: 718.57012515,
     gematria_min_dlugosc: 10,
     gematria_min_wartosc: 5000,
   }),

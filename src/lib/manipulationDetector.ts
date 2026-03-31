@@ -40,7 +40,7 @@ export const DEFAULT_THRESHOLDS: CalibrationThresholds = {
   T2_sem_paradoks: 30,
   H_chaos: 0.3,
   H_nadmiar: 0.95,
-  gematria_mod: 718,
+  gematria_mod: 718.57012515,
   gematria_min_dlugosc: 10,
   gematria_min_wartosc: 5000,
 };
