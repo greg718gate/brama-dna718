@@ -645,6 +645,199 @@ const BiblicalDecoder = () => {
                   </CardContent>
                 </Card>
 
+
+                {/* ═══ TEXT TYPE CLASSIFICATION ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Klasyfikator Typu Tekstu' : 'Text Type Classifier'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                      <span className="text-2xl">{result.textClassification.icon}</span>
+                      <div>
+                        <p className="font-bold text-foreground">
+                          {language === 'pl' ? result.textClassification.label.pl : result.textClassification.label.en}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {language === 'pl' ? result.textClassification.purpose.pl : result.textClassification.purpose.en}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="ml-auto text-xs font-mono">
+                        {(result.textClassification.confidence * 100).toFixed(0)}%
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ TRIPLE COHERENCE ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Brain className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Trzy Koherencje' : 'Triple Coherence'}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {language === 'pl'
+                        ? 'Cₛ = spójność strukturalna, Cₘ = spójność semantyczna, C_q = koherencja kwantowa'
+                        : 'Cₛ = structural coherence, Cₘ = semantic coherence, C_q = quantum coherence'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { key: 'Cₛ', val: result.tripleCoherence.structural, label: language === 'pl' ? 'Strukturalna' : 'Structural', desc: language === 'pl' ? 'Gramatyka, składnia, logika' : 'Grammar, syntax, logic' },
+                        { key: 'Cₘ', val: result.tripleCoherence.semantic, label: language === 'pl' ? 'Semantyczna' : 'Semantic', desc: language === 'pl' ? 'Zgoda interpretacyjna' : 'Interpretive agreement' },
+                        { key: 'C_q', val: result.tripleCoherence.quantum, label: language === 'pl' ? 'Kwantowa' : 'Quantum', desc: language === 'pl' ? 'Splątanie z obserwatorem' : 'Observer entanglement' },
+                      ].map(({ key, val, label, desc }) => (
+                        <div key={key} className="p-3 rounded-lg border border-border bg-background/50 text-center space-y-1">
+                          <div className="text-xs text-muted-foreground">{label}</div>
+                          <div className="text-lg font-bold font-mono text-primary">{(val * 100).toFixed(1)}%</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">{key}</div>
+                          <div className="text-[10px] text-muted-foreground">{desc}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ ENTROPY ANALYSIS ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Radio className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Analiza Entropii' : 'Entropy Analysis'}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {language === 'pl' ? 'Szum fizyczny vs. wieloznaczność celowa' : 'Physical noise vs. intentional ambiguity'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm text-foreground font-mono">
+                      {language === 'pl' ? result.entropyAnalysis.description.pl : result.entropyAnalysis.description.en}
+                    </p>
+                    <div className="h-4 rounded-full overflow-hidden bg-muted/30 flex">
+                      {result.entropyAnalysis.semanticEntropy > 0 && (
+                        <div
+                          className="bg-primary/60 h-full transition-all"
+                          style={{ width: `${(result.entropyAnalysis.semanticEntropy / Math.max(result.entropyAnalysis.totalEntropy, 0.1)) * 100}%` }}
+                          title={language === 'pl' ? 'Wieloznaczność celowa' : 'Intentional ambiguity'}
+                        />
+                      )}
+                      {result.entropyAnalysis.physicalEntropy > 0 && (
+                        <div
+                          className="bg-destructive/60 h-full transition-all"
+                          style={{ width: `${(result.entropyAnalysis.physicalEntropy / Math.max(result.entropyAnalysis.totalEntropy, 0.1)) * 100}%` }}
+                          title={language === 'pl' ? 'Szum fizyczny' : 'Physical noise'}
+                        />
+                      )}
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-primary/60 inline-block" />
+                        {language === 'pl' ? 'Wieloznaczność celowa' : 'Intentional ambiguity'}: {result.entropyAnalysis.semanticEntropy.toFixed(1)} p.p.
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-destructive/60 inline-block" />
+                        {language === 'pl' ? 'Szum fizyczny' : 'Physical noise'}: {result.entropyAnalysis.physicalEntropy.toFixed(1)} p.p.
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ 4-COMPONENT INTENTION VECTOR ═══ */}
+                <Card className="border-border bg-card/80">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <Target className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Wektor Intencji (4 składowe)' : 'Intention Vector (4 components)'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { key: 'materialization', val: result.intentionVector4.materialization, label: language === 'pl' ? 'Materializacja' : 'Materialization', icon: '🔨', desc: language === 'pl' ? 'Czy tekst wywołuje fizyczne zdarzenia?' : 'Does text cause physical events?' },
+                        { key: 'transformation', val: result.intentionVector4.transformation, label: language === 'pl' ? 'Transformacja' : 'Transformation', icon: '🔄', desc: language === 'pl' ? 'Czy tekst zmienia stan czytelnika?' : 'Does text change reader state?' },
+                        { key: 'illumination', val: result.intentionVector4.illumination, label: language === 'pl' ? 'Iluminacja' : 'Illumination', icon: '💡', desc: language === 'pl' ? 'Czy tekst wywołuje wgląd?' : 'Does text trigger insight?' },
+                        { key: 'communication', val: result.intentionVector4.communication, label: language === 'pl' ? 'Komunikacja' : 'Communication', icon: '📡', desc: language === 'pl' ? 'Czy tekst przekazuje informację A→B?' : 'Does text transmit info A→B?' },
+                      ].map(({ key, val, label, icon, desc }) => (
+                        <div key={key} className="p-3 rounded-lg border border-border bg-background/50 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span>{icon}</span>
+                            <span className="text-xs font-semibold text-foreground">{label}</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-muted/30 overflow-hidden">
+                            <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${val * 100}%` }} />
+                          </div>
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-muted-foreground">{desc}</span>
+                            <span className="font-mono text-primary font-bold">{(val * 100).toFixed(0)}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ═══ DUAL GATE (Source vs Collapse) ═══ */}
+                <Card className={`border-border bg-card/80 ${result.dualGate.gateShift ? 'border-primary/40' : ''}`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-mono flex items-center gap-2">
+                      <GitBranch className="w-4 h-4 text-primary" />
+                      {language === 'pl' ? 'Brama Źródłowa vs. Brama Kolapsu' : 'Source Gate vs. Collapse Gate'}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {language === 'pl'
+                        ? 'Brama tekstu (przed kolapsem) vs. brama po akcie czytania/deklaracji'
+                        : 'Gate of text (pre-collapse) vs. gate after reading/declaration act'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg border border-border bg-background/50 text-center space-y-2">
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {language === 'pl' ? 'BRAMA ŹRÓDŁOWA' : 'SOURCE GATE'}
+                        </div>
+                        <div className="text-2xl font-bold text-foreground font-mono">
+                          {result.dualGate.sourceGateIdx + 1}
+                        </div>
+                        <div className="text-xs text-primary">{result.dualGate.sourceGateName}</div>
+                        <div className="text-[10px] text-muted-foreground">mtDNA: {result.dualGate.sourceGatePosition}</div>
+                      </div>
+                      <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 text-center space-y-2">
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {language === 'pl' ? 'BRAMA KOLAPSU' : 'COLLAPSE GATE'}
+                        </div>
+                        <div className="text-2xl font-bold text-primary font-mono">
+                          {result.dualGate.collapseGateIdx + 1}
+                        </div>
+                        <div className="text-xs text-primary">{result.dualGate.collapseGateName}</div>
+                        <div className="text-[10px] text-muted-foreground">mtDNA: {result.dualGate.collapseGatePosition}</div>
+                      </div>
+                    </div>
+                    {result.dualGate.gateShift && (
+                      <div className="mt-3 p-2 rounded-lg bg-primary/10 border border-primary/20 text-center">
+                        <p className="text-xs font-mono text-primary">
+                          ⚡ {language === 'pl'
+                            ? `PRZESKOK BRAMOWY: ${result.dualGate.sourceGateIdx + 1} → ${result.dualGate.collapseGateIdx + 1} — akt czytania zmienił bramę`
+                            : `GATE SHIFT: ${result.dualGate.sourceGateIdx + 1} → ${result.dualGate.collapseGateIdx + 1} — reading act changed the gate`}
+                        </p>
+                      </div>
+                    )}
+                    {!result.dualGate.gateShift && (
+                      <div className="mt-3 p-2 rounded-lg bg-muted/20 border border-border text-center">
+                        <p className="text-xs font-mono text-muted-foreground">
+                          {language === 'pl'
+                            ? '🔒 Brama stabilna — akt obserwacji nie zmienił stanu kwantowego'
+                            : '🔒 Gate stable — observation act did not change quantum state'}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
                 {/* Detailed Ψ-718 analysis — only show if we have actual content */}
                 {verbalInterpretation.scienceSays && (
                 <Card className="border-primary/30 bg-card/80">
