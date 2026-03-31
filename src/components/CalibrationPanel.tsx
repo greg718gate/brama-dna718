@@ -198,6 +198,8 @@ export function CalibrationPanel({ isAdmin }: CalibrationPanelProps) {
 
   const allInRange = results.length === REFERENCE_TEXTS.length && results.every(r => r.inRange);
 
+  if (!isAdmin) return null;
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
