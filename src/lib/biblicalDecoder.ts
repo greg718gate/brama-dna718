@@ -101,6 +101,251 @@ export function hebrewGematria(text: string): { total: number; normalized: numbe
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// 1. TEXT TYPE CLASSIFIER (6 types)
+// ═══════════════════════════════════════════════════════════════════
+
+export type TextType = "communicative" | "initiatory" | "legal" | "poetic" | "questioning" | "declarative";
+
+export interface TextClassification {
+  type: TextType;
+  label: { pl: string; en: string };
+  icon: string;
+  purpose: { pl: string; en: string };
+  confidence: number;
+}
+
+const TEXT_TYPE_DEFINITIONS: Record<TextType, { label: { pl: string; en: string }; icon: string; purpose: { pl: string; en: string }; keywords: string[] }> = {
+  communicative: {
+    label: { pl: "Komunikacyjny", en: "Communicative" },
+    icon: "📨",
+    purpose: { pl: "Przekazanie informacji z punktu A do B", en: "Transmit information from point A to B" },
+    keywords: ["wrote", "letter", "greetings", "send", "tell", "said to", "napisał", "list", "pozdrowienia", "powiedzcie", "powiedział do", "brethren", "brothers", "beloved", "dear"],
+  },
+  initiatory: {
+    label: { pl: "Inicjacyjny", en: "Initiatory" },
+    icon: "🔮",
+    purpose: { pl: "Zmiana stanu odbiorcy — inicjacja", en: "Transform the receiver's state — initiation" },
+    keywords: ["baptize", "anoint", "consecrate", "holy", "sacred", "mystery", "seal", "ochrzcić", "namaścić", "poświęcić", "święty", "tajemnica", "pieczęć", "transform", "born again", "nowo narodzony"],
+  },
+  legal: {
+    label: { pl: "Prawny", en: "Legal" },
+    icon: "⚖️",
+    purpose: { pl: "Ustanowienie normy — dekret", en: "Establish a norm — decree" },
+    keywords: ["commandment", "law", "statute", "decree", "thou shalt", "shall not", "przykazanie", "prawo", "ustawa", "dekret", "nie będziesz", "musisz", "judgment", "ordinance", "covenant"],
+  },
+  poetic: {
+    label: { pl: "Poetycki", en: "Poetic" },
+    icon: "🎵",
+    purpose: { pl: "Wyrażenie stanu emocjonalnego/duchowego", en: "Express an emotional/spiritual state" },
+    keywords: ["psalm", "song", "praise", "rejoice", "my soul", "sing", "glory", "pieśń", "chwalcie", "radujcie", "dusza moja", "śpiewaj", "chwała", "selah", "hymn", "shepherd", "pastures", "waters"],
+  },
+  questioning: {
+    label: { pl: "Pytający", en: "Questioning" },
+    icon: "❓",
+    purpose: { pl: "Otwarcie przestrzeni — pytanie bez zamknięcia", en: "Open space — question without closure" },
+    keywords: ["why", "how long", "where", "what is", "who can", "dlaczego", "jak długo", "gdzie", "co jest", "kto może", "vanity", "meaningless", "marność", "cóż", "whence", "wherefore"],
+  },
+  declarative: {
+    label: { pl: "Deklaratywny", en: "Declarative" },
+    icon: "⚡",
+    purpose: { pl: "Akt mowy — zdanie, które samo się wykonuje", en: "Speech act — a sentence that executes itself" },
+    keywords: ["i am", "let there be", "it is finished", "this is", "jestem", "niech się stanie", "wykonało się", "to jest", "behold", "oto", "in the beginning", "na początku", "alpha", "omega", "the word was"],
+  },
+};
+
+export function classifyText(text: string, reference: string): TextClassification {
+  const lower = (text + " " + reference).toLowerCase();
+  const scores: { type: TextType; score: number }[] = [];
+
+  for (const [type, def] of Object.entries(TEXT_TYPE_DEFINITIONS) as [TextType, typeof TEXT_TYPE_DEFINITIONS[TextType]][]) {
+    let score = 0;
+    for (const kw of def.keywords) {
+      if (lower.includes(kw.toLowerCase())) score++;
+    }
+    scores.push({ type, score });
+  }
+
+  scores.sort((a, b) => b.score - a.score);
+  const best = scores[0];
+  const totalKeywords = scores.reduce((s, x) => s + x.score, 0);
+  const confidence = totalKeywords > 0 ? best.score / totalKeywords : 0.2;
+
+  // Default to declarative if no keywords match (sacred texts are often declarative)
+  const chosenType = best.score > 0 ? best.type : "declarative";
+  const def = TEXT_TYPE_DEFINITIONS[chosenType];
+
+  return {
+    type: chosenType,
+    label: def.label,
+    icon: def.icon,
+    purpose: def.purpose,
+    confidence: Math.max(confidence, 0.2),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 2. TRIPLE COHERENCE (Cₛ, Cₘ, C_q)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface TripleCoherence {
+  /** Cₛ — structural coherence (grammar, syntax, internal logic) */
+  structural: number;
+  /** Cₘ — semantic coherence (agreement across interpretations) */
+  semantic: number;
+  /** C_q — quantum coherence (entanglement with observer) */
+  quantum: number;
+}
+
+export function calculateTripleCoherence(
+  rawCoherence: number,
+  textType: TextType,
+  hurst: number,
+  gematriaTotal: number,
+  textLength: number,
+): TripleCoherence {
+  // Structural coherence: based on Hurst exponent (text internal structure)
+  // Short, complete texts have high structural coherence
+  const lengthFactor = Math.min(textLength / 100, 1);
+  const structural = 0.5 + 0.5 * (1 - Math.abs(hurst - 0.5)) * lengthFactor;
+
+  // Semantic coherence: inversely related to text ambiguity
+  // Declarative, legal, communicative = high semantic coherence
+  // Questioning, poetic, initiatory = low semantic coherence (by design!)
+  const semanticWeights: Record<TextType, number> = {
+    communicative: 0.85,
+    legal: 0.90,
+    declarative: 0.40, // "I AM WHO I AM" — low semantic consensus
+    poetic: 0.50,
+    initiatory: 0.35,
+    questioning: 0.25,
+  };
+  const semanticBase = semanticWeights[textType];
+  // Modulate by gematria uniqueness
+  const gematriaVariation = Math.sin(gematriaTotal * PHI) * 0.15;
+  const semantic = Math.max(0, Math.min(1, semanticBase + gematriaVariation));
+
+  // Quantum coherence: the raw Ψ coherence IS the quantum coherence
+  const quantum = rawCoherence;
+
+  return { structural, semantic, quantum };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 3. ENTROPY ANALYSIS (noise vs intentional ambiguity)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface EntropyAnalysis {
+  /** Total entropy (1 - coherence) */
+  totalEntropy: number;
+  /** Physical entropy — actual noise/damage (percentage points) */
+  physicalEntropy: number;
+  /** Semantic entropy — intentional ambiguity (percentage points) */
+  semanticEntropy: number;
+  /** Description */
+  description: { pl: string; en: string };
+}
+
+export function calculateEntropy(
+  coherence: number,
+  textType: TextType,
+  hasOriginalScript: boolean,
+  hurst: number,
+): EntropyAnalysis {
+  const totalEntropy = (1 - coherence) * 100; // in percentage points
+
+  // Semantic ambiguity ratio depends on text type
+  const semanticRatios: Record<TextType, number> = {
+    communicative: 0.1,    // letters — little intentional ambiguity
+    legal: 0.15,           // laws — some interpretive space
+    declarative: 0.75,     // "I AM" — mostly intentional openness
+    poetic: 0.70,          // psalms — richly ambiguous by design
+    initiatory: 0.80,      // mystery texts — maximum intentional ambiguity
+    questioning: 0.85,     // Ecclesiastes — questions ARE the point
+  };
+
+  const semanticRatio = semanticRatios[textType];
+
+  // If no original script, more physical noise
+  const scriptPenalty = hasOriginalScript ? 0 : 15;
+
+  const semanticEntropy = Math.max(0, totalEntropy * semanticRatio - scriptPenalty * 0.3);
+  const physicalEntropy = Math.max(0, totalEntropy - semanticEntropy);
+
+  const plDesc = `${totalEntropy.toFixed(1)}% entropii, z czego ${semanticEntropy.toFixed(1)} p.p. to wieloznaczność celowa, a ${physicalEntropy.toFixed(1)} p.p. to szum fizyczny`;
+  const enDesc = `${totalEntropy.toFixed(1)}% entropy, of which ${semanticEntropy.toFixed(1)} pp is intentional ambiguity, and ${physicalEntropy.toFixed(1)} pp is physical noise`;
+
+  return {
+    totalEntropy,
+    physicalEntropy,
+    semanticEntropy,
+    description: { pl: plDesc, en: enDesc },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 4. EXPANDED INTENTION VECTOR (4 components)
+// ═══════════════════════════════════════════════════════════════════
+
+export interface IntentionVector4 {
+  /** Materialization — does text cause physical events? (decree) */
+  materialization: number;
+  /** Transformation — does text change inner state of reader? (initiation) */
+  transformation: number;
+  /** Illumination — does text trigger insight/enlightenment? (Gate 11) */
+  illumination: number;
+  /** Communication — does text transmit information A→B? (letter) */
+  communication: number;
+}
+
+export function calculateIntentionVector4(
+  textType: TextType,
+  coherence: number,
+  viMagnitude: number,
+  psiPhase: number,
+): IntentionVector4 {
+  // Base weights per text type
+  const weights: Record<TextType, { mat: number; trans: number; illum: number; comm: number }> = {
+    communicative: { mat: 0.1, trans: 0.2, illum: 0.1, comm: 0.9 },
+    initiatory:    { mat: 0.1, trans: 0.9, illum: 0.8, comm: 0.1 },
+    legal:         { mat: 0.8, trans: 0.3, illum: 0.1, comm: 0.5 },
+    poetic:        { mat: 0.05, trans: 0.7, illum: 0.6, comm: 0.3 },
+    questioning:   { mat: 0.0, trans: 0.5, illum: 0.9, comm: 0.2 },
+    declarative:   { mat: 0.7, trans: 0.6, illum: 0.5, comm: 0.3 },
+  };
+
+  const w = weights[textType];
+
+  // Modulate by quantum parameters
+  const phaseModulation = 0.5 + 0.5 * Math.sin(psiPhase * PHI);
+  const coherenceFactor = coherence;
+  const viFactor = Math.min(viMagnitude, 2) / 2;
+
+  return {
+    materialization: Math.min(1, w.mat * coherenceFactor * (0.7 + 0.3 * viFactor)),
+    transformation: Math.min(1, w.trans * (0.6 + 0.4 * phaseModulation)),
+    illumination: Math.min(1, w.illum * (0.5 + 0.5 * coherenceFactor)),
+    communication: Math.min(1, w.comm * (0.8 + 0.2 * (1 - phaseModulation))),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 5. SOURCE GATE vs COLLAPSE GATE
+// ═══════════════════════════════════════════════════════════════════
+
+export interface DualGate {
+  /** Gate of the text itself (pre-collapse, Hamilton eigenvalue) */
+  sourceGateIdx: number;
+  sourceGateName: string;
+  sourceGatePosition: number;
+  /** Gate after observer measurement (post-collapse, Intention Operator dominant) */
+  collapseGateIdx: number;
+  collapseGateName: string;
+  collapseGatePosition: number;
+  /** Did the gate shift during observation? */
+  gateShift: boolean;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FRACTAL ANALYSIS (first 718 chars)
 // ═══════════════════════════════════════════════════════════════════
 
