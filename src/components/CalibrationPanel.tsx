@@ -197,6 +197,8 @@ export function CalibrationPanel({ isAdmin }: CalibrationPanelProps) {
 
   const saveAsConfig = () => {
     setActiveThresholds(thresholds);
+    const weights = getActiveVersion().weights;
+    createCalibrationVersion(thresholds, weights);
     setSaved(true);
   };
 
