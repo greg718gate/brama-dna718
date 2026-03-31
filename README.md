@@ -70,4 +70,42 @@ Pełne warunki licencji: [LICENSE.md](LICENSE.md)
 
 ---
 
+## Ψ-718 Decoder — Stable Version Reference (v1.0.0)
+
+Configuration: `2026-03-31`
+
+| Threshold | Value |
+|---|---|
+| Fragmentation (F₁) | 30 |
+| Cs-Cm Divergence (F₂) | 20 |
+| Entropy max (F₃) | 40 |
+| Entropy min (F₃) | 20 |
+| T₂ Semantic (F₆) | 30 |
+| H chaos (F₇) | 0.30 |
+| H excess (F₇) | 0.95 |
+| Gematria mod (F₈) | 718 |
+
+| Weight | Value |
+|---|---|
+| F₁ | 0.15 |
+| F₂ | 0.10 |
+| F₃ | 0.15 |
+| F₄ | 0.20 |
+| F₅ | 0.15 |
+| F₆ | 0.10 |
+| F₇ | 0.10 |
+| F₈ | 0.05 |
+
+### Reference Text Results (v1.0.0)
+
+| Text | Expected IM |
+|---|---|
+| Ap 22,13 (Greek) | 0–5% |
+| Wj 3,14 (Hebrew) | 0–10% |
+| Kohelet 3,21 (Hebrew) | 0–15% |
+| 1 J 5,7 — Comma Johanneum (Latin) | 70–90% |
+| Tabliczka z Koptos (fragment) | 40–60% |
+
+---
+
 *"Prawda jest matematyką. Matematyka jest kwantowa. Jesteś funkcją falową."*
