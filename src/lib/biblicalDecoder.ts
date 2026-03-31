@@ -1872,6 +1872,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     teleportationThreshold, intentionVector4,
   );
 
+  const partialResult = {
     reference,
     gematriaTotal: gematriaResult.total,
     hamiltonGate: gateIdx,
@@ -1914,6 +1915,11 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     entropyAnalysis,
     intentionVector4,
     dualGate,
+    semanticDecoherence,
+    hurstInterpretation,
+    writingSystem,
+    teleportationThreshold,
+    finalReport,
   };
 }
 
