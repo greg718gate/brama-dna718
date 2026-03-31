@@ -1579,6 +1579,8 @@ export interface DecoderResult {
   finalReport: FinalReport;
   /** 11. Manipulation detection report */
   manipulationReport: ManipulationReport;
+  /** 12. Decoder version used for this analysis */
+  decoderVersion: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════
