@@ -19,19 +19,45 @@ import {
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════
 
+export interface CalibrationThresholds {
+  fragmentacja: number;
+  rozbieznosc_Cs_Cm: number;
+  entropia_fizyczna_max: number;
+  entropia_celowa_min: number;
+  T2_sem_paradoks: number;
+  H_chaos: number;
+  H_nadmiar: number;
+  gematria_mod: number;
+  gematria_min_dlugosc: number;
+  gematria_min_wartosc: number;
+}
+
+export const DEFAULT_THRESHOLDS: CalibrationThresholds = {
+  fragmentacja: 30,
+  rozbieznosc_Cs_Cm: 20,
+  entropia_fizyczna_max: 40,
+  entropia_celowa_min: 20,
+  T2_sem_paradoks: 30,
+  H_chaos: 0.3,
+  H_nadmiar: 0.95,
+  gematria_mod: 718,
+  gematria_min_dlugosc: 10,
+  gematria_min_wartosc: 5000,
+};
+
+// Mutable active thresholds — set via calibration panel
+let _activeThresholds: CalibrationThresholds = { ...DEFAULT_THRESHOLDS };
+
+export function setActiveThresholds(t: CalibrationThresholds) {
+  _activeThresholds = { ...t };
+}
+
+export function getActiveThresholds(): CalibrationThresholds {
+  return { ..._activeThresholds };
+}
+
 const CONFIG = {
-  progi: {
-    fragmentacja: 30,
-    rozbieznosc_Cs_Cm: 20,
-    entropia_fizyczna_max: 40,
-    entropia_celowa_min: 20,
-    T2_sem_paradoks: 30,
-    H_chaos: 0.3,
-    H_nadmiar: 0.95,
-    gematria_mod: 718,
-    gematria_min_dlugosc: 10,
-    gematria_min_wartosc: 5000,
-  },
+  get progi() { return _activeThresholds; },
   wagi: {
     F1: 0.15,
     F2: 0.10,

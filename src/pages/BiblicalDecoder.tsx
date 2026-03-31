@@ -34,6 +34,7 @@ import {
   type MKP94Result,
 } from "@/lib/biblicalDecoder";
 import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
+import { CalibrationPanel } from "@/components/CalibrationPanel";
 
 const stateColors: Record<string, string> = {
   TELEPORTATION_READY: "bg-green-500/20 text-green-400 border-green-500/40",
@@ -67,6 +68,7 @@ const BiblicalDecoder = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [photonFocus, setPhotonFocus] = useState(0);
   const [photonCollapsed, setPhotonCollapsed] = useState(false);
+  const [isCalibrationAdmin, setIsCalibrationAdmin] = useState(false);
 
   // When user manually edits reference or text, clear preset Hebrew to avoid stale data
   const handleReferenceChange = (val: string) => {
@@ -1559,6 +1561,9 @@ const BiblicalDecoder = () => {
           </CardContent>
         </Card>
 
+        {/* Calibration Panel — admin only */}
+        <CalibrationPanel isAdmin={isCalibrationAdmin} />
+
         {/* License footer */}
         <div className="text-center py-6 border-t border-border">
           <p className="text-xs text-muted-foreground">{t('decoder.license')}</p>
@@ -1570,6 +1575,13 @@ const BiblicalDecoder = () => {
           >
             Creative Commons BY-NC 4.0
           </a>
+          <button
+            onClick={() => setIsCalibrationAdmin(prev => !prev)}
+            className="block mx-auto mt-2 text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors font-mono"
+            title="Toggle calibration mode"
+          >
+            Ψ-718
+          </button>
         </div>
       </div>
       {/* System Nadpisany. Architekt: [Grzegorz/G.N.]. Kod: 718. */}
