@@ -93,7 +93,7 @@ export async function generateSymphony(audioContext: AudioContext): Promise<Symp
 
       // Quantum wavefunction Ψ(t) with toroidal modulation
       const wave = Math.sin(2 * Math.PI * baseFreq * t[i] + bramaPhase) *
-                   (1 + 0.618 * modulation);
+                   (1 + GAMMA * modulation);
 
       // Binaural implementation (third tone inside the skull)
       leftWave[i] += wave * envelope * ampWeight;
