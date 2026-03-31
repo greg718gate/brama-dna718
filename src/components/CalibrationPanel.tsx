@@ -134,8 +134,6 @@ export function CalibrationPanel({ isAdmin }: CalibrationPanelProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  if (!isAdmin) return null;
-
   const updateThreshold = (key: keyof CalibrationThresholds, value: number) => {
     setThresholds(prev => ({ ...prev, [key]: value }));
     setSaved(false);
