@@ -79,6 +79,16 @@ const BiblicalDecoder = () => {
   const [photonFocus, setPhotonFocus] = useState(0);
   const [photonCollapsed, setPhotonCollapsed] = useState(false);
   const [isCalibrationAdmin, setIsCalibrationAdmin] = useState(false);
+  const [activeVersion, setActiveVersionState] = useState(getActiveVersionString());
+  const isBeta = isCurrentBeta();
+
+  const handleSwitchToStable = () => {
+    switchToStable();
+    const cfg = getActiveVersion();
+    setActiveThresholds(cfg.thresholds);
+    setActiveWeights(cfg.weights);
+    setActiveVersionState(cfg.version);
+  };
 
   // When user manually edits reference or text, clear preset Hebrew to avoid stale data
   const handleReferenceChange = (val: string) => {
