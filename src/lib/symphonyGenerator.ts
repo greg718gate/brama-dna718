@@ -182,6 +182,7 @@ function writeString(view: DataView, offset: number, string: string) {
 export const SYMPHONY_INFO = {
   positions: GATCA_POSITIONS,
   duration: DURATION,
+  carrierFreq: CARRIER_FREQ,
   phi: PHI,
   gamma: GAMMA,
   mtdnaLength: MTDNA_LENGTH,
@@ -190,6 +191,8 @@ export const SYMPHONY_INFO = {
   fSchumann: F_SCHUMANN,
   fNutation: F_NUTATION,
   viGate18: VI_GATE_18,
+  sampleRate: SAMPLE_RATE,
   stereo: true,
   protocol: "EXIT_TO_PLEROMA_STATUS_1",
+  version: "2.0.0",
 };
