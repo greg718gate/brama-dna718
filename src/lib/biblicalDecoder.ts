@@ -1858,8 +1858,8 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
   const hurstInterpretation = interpretHurst(fractal.hurstApprox);
 
   // 17. WRITING SYSTEM DETECTION
-  const fractalSource = hebrewText.trim() || text;
-  const writingSystem = detectWritingSystem(fractalSource);
+  const wsSource = hebrewText.trim() || text;
+  const writingSystem = detectWritingSystem(wsSource);
 
   // 18. TELEPORTATION THRESHOLD
   const teleportationThreshold = calculateTeleportationThreshold(
