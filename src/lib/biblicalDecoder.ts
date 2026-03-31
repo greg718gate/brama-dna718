@@ -1577,6 +1577,8 @@ export interface DecoderResult {
   teleportationThreshold: TeleportationThreshold;
   /** 10. Final human-readable report */
   finalReport: FinalReport;
+  /** 11. Manipulation detection report */
+  manipulationReport: ManipulationReport;
 }
 
 // ═══════════════════════════════════════════════════════════════════
