@@ -1561,6 +1561,9 @@ const BiblicalDecoder = () => {
           </CardContent>
         </Card>
 
+        {/* Calibration Panel — admin only */}
+        <CalibrationPanel isAdmin={isCalibrationAdmin} />
+
         {/* License footer */}
         <div className="text-center py-6 border-t border-border">
           <p className="text-xs text-muted-foreground">{t('decoder.license')}</p>
@@ -1572,6 +1575,13 @@ const BiblicalDecoder = () => {
           >
             Creative Commons BY-NC 4.0
           </a>
+          <button
+            onClick={() => setIsCalibrationAdmin(prev => !prev)}
+            className="block mx-auto mt-2 text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors font-mono"
+            title="Toggle calibration mode"
+          >
+            Ψ-718
+          </button>
         </div>
       </div>
       {/* System Nadpisany. Architekt: [Grzegorz/G.N.]. Kod: 718. */}
