@@ -52,7 +52,7 @@ export const IntentionVectorCalculator = () => {
     for (let i = 0; i <= numPoints; i++) {
       const t = (i / numPoints) * timeActivation;
       const exp = Math.cos(frequency * t);
-      const harm = Math.cos(SCHUMANN_FREQ * t) * Math.sin(LUNAR_NODE_FREQ * t);
+      const harm = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
       const psi = amplitude * exp * harm * (PHI ** 2);
 
       if (i % 2 === 0) data.push({ t: Math.round(t * 1000) / 1000, psi: Math.round(psi * 10000) / 10000 });
