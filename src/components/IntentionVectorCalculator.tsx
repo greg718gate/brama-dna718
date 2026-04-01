@@ -43,7 +43,8 @@ export const IntentionVectorCalculator = () => {
   const [timeActivation, setTimeActivation] = useState(13);
   const [frequency, setFrequency] = useState(CARRIER_FREQ);
   const [result, setResult] = useState<number | null>(null);
-  const [chartData, setChartData] = useState<{ t: number; psi: number }[]>([]);
+  const [resultLegacy, setResultLegacy] = useState<number | null>(null);
+  const [chartData, setChartData] = useState<{ t: number; psi: number; psiLegacy: number }[]>([]);
 
   const handleCalculate = () => {
     const numPoints = timeActivation * 200; // fewer points for chart clarity
