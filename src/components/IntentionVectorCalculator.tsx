@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Zap, Atom } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-
-const SCHUMANN_FREQ = 7.83;
-const LUNAR_NODE_FREQ = 18.6;
-const PHI = (1 + Math.sqrt(5)) / 2;
+import { CARRIER_FREQ, SCHUMANN_FREQ, MOON_MOD_FREQ, PHI } from "@/lib/gatca718Constants";
 
 function calculateIntentionVector(
   amplitudeA: number,
