@@ -23,7 +23,7 @@ function calculateIntentionVector(
     const exponentialConsciousness = Math.cos(frequencySignature * t);
 
     // Harmonizacja Schumanna i Cykl Księżycowy
-    const harmonics = Math.cos(SCHUMANN_FREQ * t) * Math.sin(LUNAR_NODE_FREQ * t);
+    const harmonics = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
 
     // Iloczyn kwantowy z Amplitudą A i Kluczem DNA (phi)
     const psiTotal = amplitudeA * exponentialConsciousness * harmonics * (PHI ** 2);
