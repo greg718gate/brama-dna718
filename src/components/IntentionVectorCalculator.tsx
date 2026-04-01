@@ -47,25 +47,36 @@ export const IntentionVectorCalculator = () => {
   const [chartData, setChartData] = useState<{ t: number; psi: number; psiLegacy: number }[]>([]);
 
   const handleCalculate = () => {
-    const numPoints = timeActivation * 200; // fewer points for chart clarity
+    const numPoints = timeActivation * 200;
     const dt = timeActivation / numPoints;
-    const data: { t: number; psi: number }[] = [];
+    const data: { t: number; psi: number; psiLegacy: number }[] = [];
     let sum = 0;
+    let sumLegacy = 0;
 
     for (let i = 0; i <= numPoints; i++) {
       const t = (i / numPoints) * timeActivation;
-      const exp = Math.cos(frequency * t);
       const harm = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
+
+      const exp = Math.cos(frequency * t);
       const psi = amplitude * exp * harm * (PHI ** 2);
 
-      if (i % 2 === 0) data.push({ t: Math.round(t * 1000) / 1000, psi: Math.round(psi * 10000) / 10000 });
+      const expLegacy = Math.cos(LEGACY_FREQ * t);
+      const psiLegacy = amplitude * expLegacy * harm * (PHI ** 2);
+
+      if (i % 2 === 0) data.push({
+        t: Math.round(t * 1000) / 1000,
+        psi: Math.round(psi * 10000) / 10000,
+        psiLegacy: Math.round(psiLegacy * 10000) / 10000,
+      });
 
       const weight = (i === 0 || i === numPoints) ? 0.5 : 1.0;
       sum += weight * psi;
+      sumLegacy += weight * psiLegacy;
     }
 
     setChartData(data);
     setResult(Math.round(sum * dt * 10000) / 10000);
+    setResultLegacy(Math.round(sumLegacy * dt * 10000) / 10000);
   };
 
   return (
