@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { findOptimalResonancePrecise, ScanResult, DEFAULT_GATE_POSITIONS } from "@/lib/resonanceTuner";
+import { CARRIER_FREQ } from "@/lib/gatca718Constants";
 
 // Struktura stanu rezonansu
 export interface ResonanceState {
