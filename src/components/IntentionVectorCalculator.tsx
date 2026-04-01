@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Zap, Atom } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-
-const SCHUMANN_FREQ = 7.83;
-const LUNAR_NODE_FREQ = 18.6;
-const PHI = (1 + Math.sqrt(5)) / 2;
+import { CARRIER_FREQ, SCHUMANN_FREQ, MOON_MOD_FREQ, PHI } from "@/lib/gatca718Constants";
 
 function calculateIntentionVector(
   amplitudeA: number,
@@ -26,7 +23,7 @@ function calculateIntentionVector(
     const exponentialConsciousness = Math.cos(frequencySignature * t);
 
     // Harmonizacja Schumanna i Cykl Księżycowy
-    const harmonics = Math.cos(SCHUMANN_FREQ * t) * Math.sin(LUNAR_NODE_FREQ * t);
+    const harmonics = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
 
     // Iloczyn kwantowy z Amplitudą A i Kluczem DNA (phi)
     const psiTotal = amplitudeA * exponentialConsciousness * harmonics * (PHI ** 2);
@@ -42,7 +39,7 @@ function calculateIntentionVector(
 export const IntentionVectorCalculator = () => {
   const [amplitude, setAmplitude] = useState(6);
   const [timeActivation, setTimeActivation] = useState(13);
-  const [frequency, setFrequency] = useState(718);
+  const [frequency, setFrequency] = useState(CARRIER_FREQ);
   const [result, setResult] = useState<number | null>(null);
   const [chartData, setChartData] = useState<{ t: number; psi: number }[]>([]);
 
@@ -55,7 +52,7 @@ export const IntentionVectorCalculator = () => {
     for (let i = 0; i <= numPoints; i++) {
       const t = (i / numPoints) * timeActivation;
       const exp = Math.cos(frequency * t);
-      const harm = Math.cos(SCHUMANN_FREQ * t) * Math.sin(LUNAR_NODE_FREQ * t);
+      const harm = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
       const psi = amplitude * exp * harm * (PHI ** 2);
 
       if (i % 2 === 0) data.push({ t: Math.round(t * 1000) / 1000, psi: Math.round(psi * 10000) / 10000 });
@@ -85,7 +82,7 @@ export const IntentionVectorCalculator = () => {
           <p>Ψ_total = A · e<sup>i·f·t</sup> · cos(ω<sub>S</sub>·t) · sin(ω<sub>L</sub>·t) · φ²</p>
           <p>VI = ∫₀ᵀ Ψ_total(t) dt</p>
           <p className="text-primary/70 mt-2">
-            ω<sub>S</sub> = {SCHUMANN_FREQ} Hz (Schumann) | ω<sub>L</sub> = {LUNAR_NODE_FREQ} Hz (Lunar) | φ = {PHI.toFixed(6)}
+            ω<sub>S</sub> = {SCHUMANN_FREQ} Hz (Schumann) | ω<sub>L</sub> = {MOON_MOD_FREQ} Hz (Lunar) | φ = {PHI.toFixed(6)}
           </p>
         </div>
 
