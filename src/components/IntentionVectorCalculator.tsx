@@ -82,7 +82,7 @@ export const IntentionVectorCalculator = () => {
           <p>Ψ_total = A · e<sup>i·f·t</sup> · cos(ω<sub>S</sub>·t) · sin(ω<sub>L</sub>·t) · φ²</p>
           <p>VI = ∫₀ᵀ Ψ_total(t) dt</p>
           <p className="text-primary/70 mt-2">
-            ω<sub>S</sub> = {SCHUMANN_FREQ} Hz (Schumann) | ω<sub>L</sub> = {LUNAR_NODE_FREQ} Hz (Lunar) | φ = {PHI.toFixed(6)}
+            ω<sub>S</sub> = {SCHUMANN_FREQ} Hz (Schumann) | ω<sub>L</sub> = {MOON_MOD_FREQ} Hz (Lunar) | φ = {PHI.toFixed(6)}
           </p>
         </div>
 
