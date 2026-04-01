@@ -1,9 +1,10 @@
 /**
  * Resonance Tuner - Kalibracja częstotliwości do zer Riemanna
- * Skanuje zakres wokół 718 Hz aby znaleźć optymalne dopasowanie
+ * Skanuje zakres wokół 718.57 Hz aby znaleźć optymalne dopasowanie
  */
 
 import { riemannZeta, complexAbs, H_BAR } from './bramaUnificationEngine';
+import { CARRIER_FREQ } from './gatca718Constants';
 
 // Długość referencyjnego mtDNA (rCRS)
 export const R_CRS_MTDNA_LENGTH = 16569;
