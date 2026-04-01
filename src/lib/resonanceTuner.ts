@@ -44,12 +44,12 @@ export const findOptimalResonance = (
   } = {}
 ): ScanResult => {
   const {
-    minFreq = 717.5,
-    maxFreq = 718.5,
+    minFreq = CARRIER_FREQ - 0.5,
+    maxFreq = CARRIER_FREQ + 0.5,
     step = 0.001,
   } = options;
 
-  let bestFreq = 718.0;
+  let bestFreq = CARRIER_FREQ;
   let minAvgZeta = Infinity;
   let iterations = 0;
 
