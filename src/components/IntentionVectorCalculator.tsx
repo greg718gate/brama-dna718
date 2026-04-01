@@ -192,7 +192,6 @@ export const IntentionVectorCalculator = () => {
             </ResponsiveContainer>
           </div>
         )}
-        )}
       </CardContent>
     </Card>
   );
