@@ -95,8 +95,8 @@ export const findOptimalResonancePrecise = (
 ): ScanResult => {
   // Faza 1: Grube skanowanie (wszystkie pozycje)
   const coarseResult = findOptimalResonance(gatcaPositions, {
-    minFreq: 717.0,
-    maxFreq: 719.0,
+    minFreq: CARRIER_FREQ - 1.0,
+    maxFreq: CARRIER_FREQ + 1.0,
     step: 0.01,
   });
 

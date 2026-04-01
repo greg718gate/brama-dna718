@@ -98,7 +98,7 @@ const parseDnaInput = (input: string): number[] => {
 export function ResonanceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ResonanceState>(defaultState);
   const [activeEffect, setActiveEffect] = useState<VisualEffectPayload | null>(null);
-  const [tunedFrequency, setTunedFrequency] = useState(718.0);
+  const [tunedFrequency, setTunedFrequency] = useState(CARRIER_FREQ);
   const [dnaData, setDnaData] = useState<number[]>(DEFAULT_DNA_POSITIONS);
   const [rawDnaInput, setRawDnaInput] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
