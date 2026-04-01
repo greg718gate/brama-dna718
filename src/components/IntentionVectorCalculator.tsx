@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Zap, Atom } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { CARRIER_FREQ, SCHUMANN_FREQ, MOON_MOD_FREQ, PHI } from "@/lib/gatca718Constants";
+import { CARRIER_FREQ, SCHUMANN_FREQ, MOON_MOD_FREQ, PHI, RIEMANN_ZERO_FREQ } from "@/lib/gatca718Constants";
+
+const LEGACY_FREQ = 718; // Oryginalna stała kalibracyjna (VI_GATE_18 = 1.1628)
 
 function calculateIntentionVector(
   amplitudeA: number,
