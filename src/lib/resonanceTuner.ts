@@ -1,9 +1,10 @@
 /**
  * Resonance Tuner - Kalibracja częstotliwości do zer Riemanna
- * Skanuje zakres wokół 718 Hz aby znaleźć optymalne dopasowanie
+ * Skanuje zakres wokół 718.57 Hz aby znaleźć optymalne dopasowanie
  */
 
 import { riemannZeta, complexAbs, H_BAR } from './bramaUnificationEngine';
+import { CARRIER_FREQ } from './gatca718Constants';
 
 // Długość referencyjnego mtDNA (rCRS)
 export const R_CRS_MTDNA_LENGTH = 16569;
@@ -43,12 +44,12 @@ export const findOptimalResonance = (
   } = {}
 ): ScanResult => {
   const {
-    minFreq = 717.5,
-    maxFreq = 718.5,
+    minFreq = CARRIER_FREQ - 0.5,
+    maxFreq = CARRIER_FREQ + 0.5,
     step = 0.001,
   } = options;
 
-  let bestFreq = 718.0;
+  let bestFreq = CARRIER_FREQ;
   let minAvgZeta = Infinity;
   let iterations = 0;
 
@@ -94,8 +95,8 @@ export const findOptimalResonancePrecise = (
 ): ScanResult => {
   // Faza 1: Grube skanowanie (wszystkie pozycje)
   const coarseResult = findOptimalResonance(gatcaPositions, {
-    minFreq: 717.0,
-    maxFreq: 719.0,
+    minFreq: CARRIER_FREQ - 1.0,
+    maxFreq: CARRIER_FREQ + 1.0,
     step: 0.01,
   });
 
