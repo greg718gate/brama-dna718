@@ -140,14 +140,27 @@ export const IntentionVectorCalculator = () => {
           OBLICZ WEKTOR INTENCJI
         </Button>
 
-        {result !== null && (
-          <div className={`p-4 rounded-lg text-center font-mono border transition-colors ${
-            Math.abs(result) > 1
-              ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
-              : "bg-muted/50 text-muted-foreground border-border"
-          }`}>
-            <p className="text-xs text-muted-foreground mb-1">Wektor Intencji VI zmaterializowany:</p>
-            <p className="text-3xl font-bold">{result}</p>
+        {result !== null && resultLegacy !== null && (
+          <div className="space-y-2">
+            {/* Riemann Zero result */}
+            <div className={`p-3 rounded-lg text-center font-mono border transition-colors ${
+              Math.abs(result) > 1
+                ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                : "bg-muted/50 text-muted-foreground border-border"
+            }`}>
+              <p className="text-xs text-muted-foreground mb-1">VI — Riemann Zero #448 ({CARRIER_FREQ} Hz)</p>
+              <p className="text-2xl font-bold">{result}</p>
+            </div>
+            {/* Legacy 718 result */}
+            <div className={`p-3 rounded-lg text-center font-mono border transition-colors ${
+              Math.abs(resultLegacy) > 1
+                ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
+                : "bg-muted/50 text-muted-foreground border-border"
+            }`}>
+              <p className="text-xs text-muted-foreground mb-1">VI — Klasyczny ({LEGACY_FREQ} Hz)</p>
+              <p className="text-2xl font-bold">{resultLegacy}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Referencyjna wartość kalibracyjna: VI_GATE_18 = 1.1628</p>
+            </div>
           </div>
         )}
 
