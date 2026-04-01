@@ -76,9 +76,9 @@ function generateWaveChartData(
 }
 
 export const IntentionVectorCalculator = () => {
-  const [amplitude, setAmplitude] = useState(GATE_18_REFERENCE.amplitude);
-  const [timeActivation, setTimeActivation] = useState(GATE_18_REFERENCE.timeActivation);
-  const [frequency, setFrequency] = useState(GATE_18_REFERENCE.frequency);
+  const [amplitude, setAmplitude] = useState<number>(GATE_18_REFERENCE.amplitude);
+  const [timeActivation, setTimeActivation] = useState<number>(GATE_18_REFERENCE.timeActivation);
+  const [frequency, setFrequency] = useState<number>(GATE_18_REFERENCE.frequency);
   const [result, setResult] = useState<number | null>(null);
   const [referenceResult, setReferenceResult] = useState<number | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
