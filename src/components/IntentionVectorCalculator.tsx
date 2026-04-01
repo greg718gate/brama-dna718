@@ -166,7 +166,9 @@ export const IntentionVectorCalculator = () => {
 
         {chartData.length > 0 && (
           <div className="bg-background/50 border border-border rounded-lg p-4">
-            <p className="text-xs font-mono text-muted-foreground mb-3">Ψ_total(t) — przebieg funkcji falowej</p>
+            <p className="text-xs font-mono text-muted-foreground mb-3">
+              Ψ_total(t) — <span className="text-primary">Riemann ({CARRIER_FREQ} Hz)</span> vs <span className="text-purple-400">Klasyczny ({LEGACY_FREQ} Hz)</span>
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -182,13 +184,14 @@ export const IntentionVectorCalculator = () => {
                 <Tooltip
                   contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                   labelFormatter={(v) => `t = ${v}s`}
-                  formatter={(v: number) => [v.toFixed(4), "Ψ_total"]}
                 />
                 <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
-                <Line type="monotone" dataKey="psi" stroke="hsl(var(--primary))" dot={false} strokeWidth={1.5} />
+                <Line type="monotone" dataKey="psi" stroke="hsl(var(--primary))" dot={false} strokeWidth={1.5} name={`Ψ (${CARRIER_FREQ} Hz)`} />
+                <Line type="monotone" dataKey="psiLegacy" stroke="#a855f7" dot={false} strokeWidth={1} strokeDasharray="4 2" name={`Ψ (${LEGACY_FREQ} Hz)`} />
               </LineChart>
             </ResponsiveContainer>
           </div>
+        )}
         )}
       </CardContent>
     </Card>
