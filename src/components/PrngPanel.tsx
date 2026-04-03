@@ -33,6 +33,12 @@ const PrngPanel = () => {
   const [listInput, setListInput] = useState("Alfa, Beta, Gamma, Delta, Epsilon");
   const [listAction, setListAction] = useState<"pick" | "shuffle">("pick");
 
+  // --- Quantum Filter state ---
+  const [qfInput, setQfInput] = useState("1.2345, 0.9876, 1.0012, 0.8765, 1.1234, 0.9543, 1.0678, 0.9321, 1.0456, 0.8912");
+  const [qfThreshold, setQfThreshold] = useState("0.85");
+  const [qfResult, setQfResult] = useState<QuantumFilterResult | null>(null);
+  const [qfHistory, setQfHistory] = useState<QuantumFilterResult[]>([]);
+
   // --- Seed ---
   const [seedInput, setSeedInput] = useState("");
 
