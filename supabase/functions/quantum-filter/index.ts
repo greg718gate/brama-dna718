@@ -68,9 +68,9 @@ function analyzeSignal(
   // Composite signal
   const compositeSignal = (layer1 + Math.abs(layer2) + Math.abs(layer3)) / (PHI + EULER_MASCHERONI + 1);
   
-  // Confidence with calibrated amplifier (factor 10)
-  // weak ~30-50%, medium ~55-75%, strong ~80-96%
-  const AMPLIFIER = 10;
+  // Confidence with calibrated amplifier (factor 30)
+  // weak ~30-50%, medium ~55-80%, strong ~85-97%
+  const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const decision = confidence / 100 > threshold ? (compositeSignal > 0 ? 1 : -1) : 0;
 
