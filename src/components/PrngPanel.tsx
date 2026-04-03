@@ -7,8 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus, Download, FileText } from "lucide-react";
 import { toast } from "sonner";
+
+/** Wpis dziennika sygnałów QF */
+interface SignalLogEntry {
+  timestamp: string;
+  action: "BUY" | "SELL";
+  confidence: number;
+  price: number;
+  compositeSignal: number;
+  gateSignature: string;
+  correlation: number;
+  harmonicStrength: number;
+  phaseCoherence: number;
+}
 
 const PrngPanel = () => {
   const [prng] = useState(() => new Gatca718Prng());
@@ -36,8 +49,10 @@ const PrngPanel = () => {
   // --- Quantum Filter state ---
   const [qfInput, setQfInput] = useState("1.2345, 0.9876, 1.0012, 0.8765, 1.1234, 0.9543, 1.0678, 0.9321, 1.0456, 0.8912");
   const [qfThreshold, setQfThreshold] = useState("0.85");
+  const [qfPrice, setQfPrice] = useState("");
   const [qfResult, setQfResult] = useState<QuantumFilterResult | null>(null);
   const [qfHistory, setQfHistory] = useState<QuantumFilterResult[]>([]);
+  const [signalLog, setSignalLog] = useState<SignalLogEntry[]>([]);
 
   // --- Seed ---
   const [seedInput, setSeedInput] = useState("");
@@ -124,11 +139,60 @@ const PrngPanel = () => {
       return;
     }
     const threshold = parseFloat(qfThreshold) || 0.85;
+    const price = parseFloat(qfPrice) || 0;
     const result = prng.analyzeSignal(values, threshold);
     setQfResult(result);
     setQfHistory(prev => [result, ...prev].slice(0, 20));
     addToHistory("QF", `${result.decisionLabel} (${result.confidence.toFixed(1)}%)`);
-  }, [prng, qfInput, qfThreshold, addToHistory]);
+
+    // Auto-log BUY/SELL signals
+    if (result.decision !== 0) {
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).padStart(3,'0')}`;
+      const entry: SignalLogEntry = {
+        timestamp,
+        action: result.decisionLabel as "BUY" | "SELL",
+        confidence: result.confidence,
+        price,
+        compositeSignal: result.compositeSignal,
+        gateSignature: result.gateSignature,
+        correlation: result.correlation,
+        harmonicStrength: result.harmonicStrength,
+        phaseCoherence: result.phaseCoherence,
+      };
+      setSignalLog(prev => [entry, ...prev]);
+      toast.success(`⚡ Sygnał ${entry.action} zarejestrowany @ ${price || "brak ceny"}`);
+    }
+  }, [prng, qfInput, qfThreshold, qfPrice, addToHistory]);
+
+  /** Eksport dziennika sygnałów do CSV */
+  const exportSignalLogCSV = useCallback(() => {
+    if (signalLog.length === 0) {
+      toast.error("Brak sygnałów do eksportu");
+      return;
+    }
+    const header = "Timestamp,Action,Confidence(%),Price,Composite,Gate,Correlation,HarmonicStrength,PhaseCoherence";
+    const rows = signalLog.map(e =>
+      `${e.timestamp},${e.action},${e.confidence.toFixed(4)},${e.price},${e.compositeSignal.toFixed(8)},${e.gateSignature},${e.correlation.toFixed(6)},${e.harmonicStrength.toFixed(6)},${e.phaseCoherence.toFixed(6)}`
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gatca_performance_log_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Wyeksportowano ${signalLog.length} sygnałów`);
+  }, [signalLog]);
+
+  /** Eksport pełnego JSON odpowiedzi QF */
+  const exportQfJson = useCallback(() => {
+    if (!qfResult) return;
+    const json = JSON.stringify(qfResult, null, 2);
+    copyToClipboard(json);
+    toast.success("JSON skopiowany do schowka");
+  }, [qfResult, copyToClipboard]);
 
   const stats = useMemo(() => prng.stats(), [results, history]);
 
@@ -208,13 +272,24 @@ const PrngPanel = () => {
                   placeholder="1.2345, 0.9876, 1.0012, ..."
                 />
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground">Próg decyzji (0.0–1.0)</label>
-                <Input
-                  value={qfThreshold}
-                  onChange={(e) => setQfThreshold(e.target.value)}
-                  className="font-mono"
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Próg decyzji (0.0–1.0)</label>
+                  <Input
+                    value={qfThreshold}
+                    onChange={(e) => setQfThreshold(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Cena rynkowa (price)</label>
+                  <Input
+                    value={qfPrice}
+                    onChange={(e) => setQfPrice(e.target.value)}
+                    className="font-mono"
+                    placeholder="np. 42567.89"
+                  />
+                </div>
               </div>
               <Button onClick={runQuantumFilter} className="w-full">
                 <Activity className="w-4 h-4 mr-2" /> Analizuj sygnał
@@ -316,6 +391,44 @@ const PrngPanel = () => {
                     ))}
                   </div>
                 </details>
+              )}
+
+              {/* Signal Log — Dziennik Pokładowy */}
+              {signalLog.length > 0 && (
+                <Card className="bg-background/50 border-primary/30 mt-4">
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                    <CardTitle className="text-xs font-mono flex items-center gap-1">
+                      <FileText className="w-3 h-3 text-primary" />
+                      Dziennik sygnałów ({signalLog.length})
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={exportQfJson} title="Kopiuj JSON ostatniego wyniku">
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={exportSignalLogCSV} title="Eksport CSV">
+                        <Download className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                      {signalLog.map((entry, i) => (
+                        <div key={i} className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+                          <span className="text-[9px] shrink-0">{entry.timestamp.split(" ")[1]}</span>
+                          <Badge variant="outline" className={`text-[9px] ${
+                            entry.action === "BUY" ? "border-emerald-500/50 text-emerald-500" :
+                            "border-red-500/50 text-red-500"
+                          }`}>
+                            {entry.action}
+                          </Badge>
+                          <span>{entry.confidence.toFixed(1)}%</span>
+                          {entry.price > 0 && <span className="text-foreground">${entry.price}</span>}
+                          <span className="text-[9px]">{entry.gateSignature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </CardContent>
           </Card>
