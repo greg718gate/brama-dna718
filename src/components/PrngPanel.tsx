@@ -194,6 +194,8 @@ const PrngPanel = () => {
     toast.success("JSON skopiowany do schowka");
   }, [qfResult, copyToClipboard]);
 
+  const stats = useMemo(() => prng.stats(), [results, history]);
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 p-4">
       {/* Header */}
