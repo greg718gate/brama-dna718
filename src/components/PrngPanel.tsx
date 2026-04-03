@@ -174,11 +174,12 @@ const PrngPanel = () => {
       </Card>
 
       {/* Generator Tabs */}
-      <Tabs defaultValue="integer" className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full">
-          <TabsTrigger value="integer" className="text-xs"><Hash className="w-3 h-3 mr-1" />Integer</TabsTrigger>
+      <Tabs defaultValue="quantum" className="w-full">
+        <TabsList className="grid grid-cols-4 md:grid-cols-7 w-full">
+          <TabsTrigger value="quantum" className="text-xs"><Activity className="w-3 h-3 mr-1" />QF</TabsTrigger>
+          <TabsTrigger value="integer" className="text-xs"><Hash className="w-3 h-3 mr-1" />Int</TabsTrigger>
           <TabsTrigger value="float" className="text-xs"><Zap className="w-3 h-3 mr-1" />Float</TabsTrigger>
-          <TabsTrigger value="dice" className="text-xs"><Dice1 className="w-3 h-3 mr-1" />Kostki</TabsTrigger>
+          <TabsTrigger value="dice" className="text-xs"><Dice1 className="w-3 h-3 mr-1" />Dice</TabsTrigger>
           <TabsTrigger value="list" className="text-xs"><Shuffle className="w-3 h-3 mr-1" />Lista</TabsTrigger>
           <TabsTrigger value="uuid" className="text-xs">UUID</TabsTrigger>
           <TabsTrigger value="gauss" className="text-xs"><BarChart3 className="w-3 h-3 mr-1" />Gauss</TabsTrigger>
