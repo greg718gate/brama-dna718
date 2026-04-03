@@ -7,8 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus, Download, FileText } from "lucide-react";
 import { toast } from "sonner";
+
+/** Wpis dziennika sygnałów QF */
+interface SignalLogEntry {
+  timestamp: string;
+  action: "BUY" | "SELL";
+  confidence: number;
+  price: number;
+  compositeSignal: number;
+  gateSignature: string;
+  correlation: number;
+  harmonicStrength: number;
+  phaseCoherence: number;
+}
 
 const PrngPanel = () => {
   const [prng] = useState(() => new Gatca718Prng());
