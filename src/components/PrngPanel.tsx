@@ -117,6 +117,19 @@ const PrngPanel = () => {
     toast.success(`Reseed: ${seed}`);
   }, [prng, seedInput]);
 
+  const runQuantumFilter = useCallback(() => {
+    const values = qfInput.split(",").map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    if (values.length < 2) {
+      toast.error("Wprowadź min. 2 wartości liczbowe");
+      return;
+    }
+    const threshold = parseFloat(qfThreshold) || 0.85;
+    const result = prng.analyzeSignal(values, threshold);
+    setQfResult(result);
+    setQfHistory(prev => [result, ...prev].slice(0, 20));
+    addToHistory("QF", `${result.decisionLabel} (${result.confidence.toFixed(1)}%)`);
+  }, [prng, qfInput, qfThreshold, addToHistory]);
+
   const stats = useMemo(() => prng.stats(), [results, history]);
 
   return (
