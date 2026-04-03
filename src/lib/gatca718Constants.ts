@@ -33,6 +33,8 @@ export const MOON_MOD_FREQ = 18.6;
 export const PHI = (1 + Math.sqrt(5)) / 2;
 /** Odwrotność φ: 1/φ = 0.6180339887498949 */
 export const GAMMA = 1 / PHI;
+/** Stała Eulera-Mascheroniego: 0.577215664901532 — waga warstwy rezonansu harmonicznego */
+export const EULER_MASCHERONI = 0.577215664901532;
 /** φ² = 2.618033988749895 */
 export const PHI_SQUARED = PHI ** 2;
 

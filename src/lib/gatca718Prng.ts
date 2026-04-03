@@ -15,6 +15,7 @@ import {
   MTDNA_LENGTH,
   GATCA_POSITIONS,
   GAMMA,
+  EULER_MASCHERONI,
   SCHUMANN_FREQ,
 } from "./gatca718Constants";
 
