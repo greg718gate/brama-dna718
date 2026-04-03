@@ -54,6 +54,8 @@ const App = () => (
               <Route path="/gates" element={<GatesAtlas />} />
               <Route path="/gates/*" element={<GatesAtlas />} />
 
+              <Route path="/prng" element={<Prng />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
