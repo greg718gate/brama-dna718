@@ -139,13 +139,60 @@ const PrngPanel = () => {
       return;
     }
     const threshold = parseFloat(qfThreshold) || 0.85;
+    const price = parseFloat(qfPrice) || 0;
     const result = prng.analyzeSignal(values, threshold);
     setQfResult(result);
     setQfHistory(prev => [result, ...prev].slice(0, 20));
     addToHistory("QF", `${result.decisionLabel} (${result.confidence.toFixed(1)}%)`);
-  }, [prng, qfInput, qfThreshold, addToHistory]);
 
-  const stats = useMemo(() => prng.stats(), [results, history]);
+    // Auto-log BUY/SELL signals
+    if (result.decision !== 0) {
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).padStart(3,'0')}`;
+      const entry: SignalLogEntry = {
+        timestamp,
+        action: result.decisionLabel as "BUY" | "SELL",
+        confidence: result.confidence,
+        price,
+        compositeSignal: result.compositeSignal,
+        gateSignature: result.gateSignature,
+        correlation: result.correlation,
+        harmonicStrength: result.harmonicStrength,
+        phaseCoherence: result.phaseCoherence,
+      };
+      setSignalLog(prev => [entry, ...prev]);
+      toast.success(`⚡ Sygnał ${entry.action} zarejestrowany @ ${price || "brak ceny"}`);
+    }
+  }, [prng, qfInput, qfThreshold, qfPrice, addToHistory]);
+
+  /** Eksport dziennika sygnałów do CSV */
+  const exportSignalLogCSV = useCallback(() => {
+    if (signalLog.length === 0) {
+      toast.error("Brak sygnałów do eksportu");
+      return;
+    }
+    const header = "Timestamp,Action,Confidence(%),Price,Composite,Gate,Correlation,HarmonicStrength,PhaseCoherence";
+    const rows = signalLog.map(e =>
+      `${e.timestamp},${e.action},${e.confidence.toFixed(4)},${e.price},${e.compositeSignal.toFixed(8)},${e.gateSignature},${e.correlation.toFixed(6)},${e.harmonicStrength.toFixed(6)},${e.phaseCoherence.toFixed(6)}`
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gatca_performance_log_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Wyeksportowano ${signalLog.length} sygnałów`);
+  }, [signalLog]);
+
+  /** Eksport pełnego JSON odpowiedzi QF */
+  const exportQfJson = useCallback(() => {
+    if (!qfResult) return;
+    const json = JSON.stringify(qfResult, null, 2);
+    copyToClipboard(json);
+    toast.success("JSON skopiowany do schowka");
+  }, [qfResult, copyToClipboard]);
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 p-4">
