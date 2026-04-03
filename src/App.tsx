@@ -14,6 +14,7 @@ import Unified from "./pages/Unified";
 import Letter from "./pages/Letter";
 import BiblicalDecoder from "./pages/BiblicalDecoder";
 import GatesAtlas from "./pages/GatesAtlas";
+import Prng from "./pages/Prng";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
