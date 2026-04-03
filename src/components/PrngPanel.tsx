@@ -272,13 +272,24 @@ const PrngPanel = () => {
                   placeholder="1.2345, 0.9876, 1.0012, ..."
                 />
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground">Próg decyzji (0.0–1.0)</label>
-                <Input
-                  value={qfThreshold}
-                  onChange={(e) => setQfThreshold(e.target.value)}
-                  className="font-mono"
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Próg decyzji (0.0–1.0)</label>
+                  <Input
+                    value={qfThreshold}
+                    onChange={(e) => setQfThreshold(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Cena rynkowa (price)</label>
+                  <Input
+                    value={qfPrice}
+                    onChange={(e) => setQfPrice(e.target.value)}
+                    className="font-mono"
+                    placeholder="np. 42567.89"
+                  />
+                </div>
               </div>
               <Button onClick={runQuantumFilter} className="w-full">
                 <Activity className="w-4 h-4 mr-2" /> Analizuj sygnał
