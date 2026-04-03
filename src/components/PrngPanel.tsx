@@ -392,6 +392,44 @@ const PrngPanel = () => {
                   </div>
                 </details>
               )}
+
+              {/* Signal Log — Dziennik Pokładowy */}
+              {signalLog.length > 0 && (
+                <Card className="bg-background/50 border-primary/30 mt-4">
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                    <CardTitle className="text-xs font-mono flex items-center gap-1">
+                      <FileText className="w-3 h-3 text-primary" />
+                      Dziennik sygnałów ({signalLog.length})
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={exportQfJson} title="Kopiuj JSON ostatniego wyniku">
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={exportSignalLogCSV} title="Eksport CSV">
+                        <Download className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                      {signalLog.map((entry, i) => (
+                        <div key={i} className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+                          <span className="text-[9px] shrink-0">{entry.timestamp.split(" ")[1]}</span>
+                          <Badge variant="outline" className={`text-[9px] ${
+                            entry.action === "BUY" ? "border-emerald-500/50 text-emerald-500" :
+                            "border-red-500/50 text-red-500"
+                          }`}>
+                            {entry.action}
+                          </Badge>
+                          <span>{entry.confidence.toFixed(1)}%</span>
+                          {entry.price > 0 && <span className="text-foreground">${entry.price}</span>}
+                          <span className="text-[9px]">{entry.gateSignature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
