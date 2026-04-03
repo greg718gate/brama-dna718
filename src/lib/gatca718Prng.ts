@@ -277,19 +277,19 @@ export class Gatca718Prng {
       dataVector, entropy, PHI, CARRIER_FREQ
     );
 
-    // Sygnał kompozytowy: średnia ważona 3 warstw (wagi: φ, γ, 1)
+    // Sygnał kompozytowy: (L1 + L2 + L3) / (φ + γ_Euler + 1)
     const compositeSignal =
-      (correlation * PHI + harmonicStrength * GAMMA + phaseCoherence) /
-      (PHI + GAMMA + 1);
+      (correlation + harmonicStrength + phaseCoherence) /
+      (PHI + EULER_MASCHERONI + 1);
 
-    // Core GATCA transform na sygnale kompozytowym
-    const coreResult = gatca718Core(compositeSignal, PHI, CARRIER_FREQ, MTDNA_LENGTH);
+    // Confidence: tanh(|composite × 718.57|) × 100  — Python-exact
+    const confidence = Math.tanh(Math.abs(compositeSignal * CARRIER_FREQ)) * 100;
 
-    // Decyzja
-    const decision = executeDecision(coreResult, threshold);
-
-    // Confidence (0-100%)
-    const confidence = Math.tanh(Math.abs(coreResult)) * 100;
+    // Decyzja high-confidence
+    const decision: -1 | 0 | 1 =
+      confidence / 100 > threshold
+        ? (compositeSignal > 0 ? 1 : -1)
+        : 0;
 
     // Gate signature — unikalna sygnatura bazująca na aktywnej bramie
     const gateIdx = stats.gateIndex;
