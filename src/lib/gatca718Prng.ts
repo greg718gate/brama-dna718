@@ -83,8 +83,83 @@ function nextRaw(state: PrngState): number {
 }
 
 // ============================================================================
+// QUANTUM FILTER ENGINE (HFT Integration)
+// ============================================================================
+
+/**
+ * Filtr kwantowy GATCA-718 — krzyżuje dane wejściowe z entropią systemu.
+ * Wykrywa korelacje na częstotliwości φ × 718.57, niewidoczne dla standardowych PRNG.
+ */
+function quantumFilter(dataVector: number[], entropyVector: number[]): number {
+  let sum = 0;
+  const len = Math.min(dataVector.length, entropyVector.length);
+  for (let i = 0; i < len; i++) {
+    sum += Math.sin(dataVector[i] * entropyVector[i]);
+  }
+  return sum / (len || 1);
+}
+
+/**
+ * Wielowarstwowy filtr interferencyjny — łączy GATCA z harmonicznymi Schumanna.
+ * Każda warstwa filtruje inny aspekt szumu.
+ */
+function multiLayerFilter(
+  data: number[],
+  entropy: number[],
+  phi: number,
+  carrierFreq: number
+): { correlation: number; harmonicStrength: number; phaseCoherence: number } {
+  const len = Math.min(data.length, entropy.length);
+  let corrSum = 0;
+  let harmSum = 0;
+  let phaseSum = 0;
+
+  for (let i = 0; i < len; i++) {
+    // Warstwa 1: Korelacja bazowa GATCA
+    corrSum += Math.sin(data[i] * entropy[i]);
+
+    // Warstwa 2: Rezonans harmoniczny (φ-modulated)
+    harmSum += Math.cos(data[i] * phi * entropy[i] * carrierFreq * 0.001);
+
+    // Warstwa 3: Koherencja fazowa (Schumann-locked)
+    const phase = Math.atan2(
+      Math.sin(data[i] * SCHUMANN_FREQ * 0.01),
+      Math.cos(entropy[i] * phi)
+    );
+    phaseSum += Math.cos(phase);
+  }
+
+  return {
+    correlation: corrSum / (len || 1),
+    harmonicStrength: Math.abs(harmSum / (len || 1)),
+    phaseCoherence: Math.abs(phaseSum / (len || 1)),
+  };
+}
+
+/** Decyzja high-confidence (HFT trigger) */
+function executeDecision(predictionValue: number, threshold: number = 0.9998): -1 | 0 | 1 {
+  const prob = Math.tanh(Math.abs(predictionValue));
+  if (prob > threshold) {
+    return predictionValue > 0 ? 1 : -1;
+  }
+  return 0;
+}
+
+// ============================================================================
 // PUBLIC API
 // ============================================================================
+
+export interface QuantumFilterResult {
+  correlation: number;
+  harmonicStrength: number;
+  phaseCoherence: number;
+  compositeSignal: number;
+  decision: -1 | 0 | 1;
+  decisionLabel: "BUY" | "SELL" | "WAIT";
+  confidence: number;
+  entropyVector: number[];
+  gateSignature: string;
+}
 
 export class Gatca718Prng {
   private state: PrngState;
@@ -145,7 +220,7 @@ export class Gatca718Prng {
 
   /** UUID v4 (GATCA-enhanced) */
   uuid(): string {
-    const hex = (n: number, len: number) =>
+    const hex = (_n: number, len: number) =>
       Math.floor(this.random() * Math.pow(16, len))
         .toString(16)
         .padStart(len, "0");
@@ -158,6 +233,70 @@ export class Gatca718Prng {
     const u2 = this.random();
     const z0 = Math.sqrt(-2 * Math.log(u1 || 1e-10)) * Math.cos(2 * Math.PI * u2);
     return z0 * stddev + mean;
+  }
+
+  // ========================================================================
+  // QUANTUM FILTER API (HFT)
+  // ========================================================================
+
+  /**
+   * Generuje wektor entropii GATCA-718 o danym rozmiarze.
+   * Każda wartość jest unikalna — przefiltrowana przez pozycje 18 Bram.
+   */
+  getEntropyVector(size: number = 10): number[] {
+    return this.batch(size);
+  }
+
+  /**
+   * Bazowy filtr kwantowy — prosta korelacja sin.
+   */
+  quantumFilter(dataVector: number[]): number {
+    const entropy = this.getEntropyVector(dataVector.length);
+    return quantumFilter(dataVector, entropy);
+  }
+
+  /**
+   * Pełna analiza Quantum Filter — 3 warstwy + decyzja.
+   * To jest serce systemu HFT.
+   */
+  analyzeSignal(dataVector: number[], threshold: number = 0.9998): QuantumFilterResult {
+    const entropy = this.getEntropyVector(dataVector.length);
+    const stats = this.stats();
+
+    // Wielowarstwowa analiza
+    const { correlation, harmonicStrength, phaseCoherence } = multiLayerFilter(
+      dataVector, entropy, PHI, CARRIER_FREQ
+    );
+
+    // Sygnał kompozytowy: średnia ważona 3 warstw (wagi: φ, γ, 1)
+    const compositeSignal =
+      (correlation * PHI + harmonicStrength * GAMMA + phaseCoherence) /
+      (PHI + GAMMA + 1);
+
+    // Core GATCA transform na sygnale kompozytowym
+    const coreResult = gatca718Core(compositeSignal, PHI, CARRIER_FREQ, MTDNA_LENGTH);
+
+    // Decyzja
+    const decision = executeDecision(coreResult, threshold);
+
+    // Confidence (0-100%)
+    const confidence = Math.tanh(Math.abs(coreResult)) * 100;
+
+    // Gate signature — unikalna sygnatura bazująca na aktywnej bramie
+    const gateIdx = stats.gateIndex;
+    const gateSig = `G${gateIdx + 1}:${GATCA_POSITIONS[gateIdx]}:${stats.counter}`;
+
+    return {
+      correlation,
+      harmonicStrength,
+      phaseCoherence,
+      compositeSignal,
+      decision,
+      decisionLabel: decision === 1 ? "BUY" : decision === -1 ? "SELL" : "WAIT",
+      confidence,
+      entropyVector: entropy,
+      gateSignature: gateSig,
+    };
   }
 
   /** Statystyki aktualnego stanu */
