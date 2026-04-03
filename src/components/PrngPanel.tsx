@@ -1,12 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
-import { Gatca718Prng } from "@/lib/gatca718Prng";
+import { Gatca718Prng, QuantumFilterResult } from "@/lib/gatca718Prng";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 const PrngPanel = () => {
