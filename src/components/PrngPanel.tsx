@@ -1,12 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
-import { Gatca718Prng } from "@/lib/gatca718Prng";
+import { Gatca718Prng, QuantumFilterResult } from "@/lib/gatca718Prng";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Dna, Dice1, Hash, Shuffle, BarChart3, Copy, RefreshCw, Zap, Activity, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 const PrngPanel = () => {
@@ -31,6 +32,12 @@ const PrngPanel = () => {
   // --- List state ---
   const [listInput, setListInput] = useState("Alfa, Beta, Gamma, Delta, Epsilon");
   const [listAction, setListAction] = useState<"pick" | "shuffle">("pick");
+
+  // --- Quantum Filter state ---
+  const [qfInput, setQfInput] = useState("1.2345, 0.9876, 1.0012, 0.8765, 1.1234, 0.9543, 1.0678, 0.9321, 1.0456, 0.8912");
+  const [qfThreshold, setQfThreshold] = useState("0.85");
+  const [qfResult, setQfResult] = useState<QuantumFilterResult | null>(null);
+  const [qfHistory, setQfHistory] = useState<QuantumFilterResult[]>([]);
 
   // --- Seed ---
   const [seedInput, setSeedInput] = useState("");
@@ -110,6 +117,19 @@ const PrngPanel = () => {
     toast.success(`Reseed: ${seed}`);
   }, [prng, seedInput]);
 
+  const runQuantumFilter = useCallback(() => {
+    const values = qfInput.split(",").map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    if (values.length < 2) {
+      toast.error("Wprowadź min. 2 wartości liczbowe");
+      return;
+    }
+    const threshold = parseFloat(qfThreshold) || 0.85;
+    const result = prng.analyzeSignal(values, threshold);
+    setQfResult(result);
+    setQfHistory(prev => [result, ...prev].slice(0, 20));
+    addToHistory("QF", `${result.decisionLabel} (${result.confidence.toFixed(1)}%)`);
+  }, [prng, qfInput, qfThreshold, addToHistory]);
+
   const stats = useMemo(() => prng.stats(), [results, history]);
 
   return (
@@ -154,15 +174,152 @@ const PrngPanel = () => {
       </Card>
 
       {/* Generator Tabs */}
-      <Tabs defaultValue="integer" className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full">
-          <TabsTrigger value="integer" className="text-xs"><Hash className="w-3 h-3 mr-1" />Integer</TabsTrigger>
+      <Tabs defaultValue="quantum" className="w-full">
+        <TabsList className="grid grid-cols-4 md:grid-cols-7 w-full">
+          <TabsTrigger value="quantum" className="text-xs"><Activity className="w-3 h-3 mr-1" />QF</TabsTrigger>
+          <TabsTrigger value="integer" className="text-xs"><Hash className="w-3 h-3 mr-1" />Int</TabsTrigger>
           <TabsTrigger value="float" className="text-xs"><Zap className="w-3 h-3 mr-1" />Float</TabsTrigger>
-          <TabsTrigger value="dice" className="text-xs"><Dice1 className="w-3 h-3 mr-1" />Kostki</TabsTrigger>
+          <TabsTrigger value="dice" className="text-xs"><Dice1 className="w-3 h-3 mr-1" />Dice</TabsTrigger>
           <TabsTrigger value="list" className="text-xs"><Shuffle className="w-3 h-3 mr-1" />Lista</TabsTrigger>
           <TabsTrigger value="uuid" className="text-xs">UUID</TabsTrigger>
           <TabsTrigger value="gauss" className="text-xs"><BarChart3 className="w-3 h-3 mr-1" />Gauss</TabsTrigger>
         </TabsList>
+
+        {/* Quantum Filter */}
+        <TabsContent value="quantum">
+          <Card className="bg-card/50 border-border border-primary/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-mono flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                Quantum Filter GATCA-718
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Filtr interferencyjny φ × 718.57 × mtDNA — 3 warstwy analizy
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <label className="text-xs text-muted-foreground">Wektor danych (wartości oddzielone przecinkami)</label>
+                <Textarea
+                  value={qfInput}
+                  onChange={(e) => setQfInput(e.target.value)}
+                  className="font-mono text-xs"
+                  rows={3}
+                  placeholder="1.2345, 0.9876, 1.0012, ..."
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Próg decyzji (0.0–1.0)</label>
+                <Input
+                  value={qfThreshold}
+                  onChange={(e) => setQfThreshold(e.target.value)}
+                  className="font-mono"
+                />
+              </div>
+              <Button onClick={runQuantumFilter} className="w-full">
+                <Activity className="w-4 h-4 mr-2" /> Analizuj sygnał
+              </Button>
+
+              {qfResult && (
+                <div className="space-y-3 mt-4">
+                  {/* Decision */}
+                  <div className={`text-center p-4 rounded-lg border ${
+                    qfResult.decision === 1 ? "bg-emerald-500/10 border-emerald-500/30" :
+                    qfResult.decision === -1 ? "bg-red-500/10 border-red-500/30" :
+                    "bg-muted/30 border-border"
+                  }`}>
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {qfResult.decision === 1 ? <TrendingUp className="w-6 h-6 text-emerald-500" /> :
+                       qfResult.decision === -1 ? <TrendingDown className="w-6 h-6 text-red-500" /> :
+                       <Minus className="w-6 h-6 text-muted-foreground" />}
+                      <span className={`text-2xl font-bold font-mono ${
+                        qfResult.decision === 1 ? "text-emerald-500" :
+                        qfResult.decision === -1 ? "text-red-500" :
+                        "text-muted-foreground"
+                      }`}>
+                        {qfResult.decisionLabel}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      Confidence: {qfResult.confidence.toFixed(2)}%
+                    </span>
+                  </div>
+
+                  {/* 3-Layer Analysis */}
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-xs font-mono mb-1">
+                        <span className="text-muted-foreground">Korelacja GATCA</span>
+                        <span className="text-primary">{qfResult.correlation.toFixed(6)}</span>
+                      </div>
+                      <Progress value={Math.abs(qfResult.correlation) * 100} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-mono mb-1">
+                        <span className="text-muted-foreground">Rezonans harmoniczny</span>
+                        <span className="text-primary">{qfResult.harmonicStrength.toFixed(6)}</span>
+                      </div>
+                      <Progress value={qfResult.harmonicStrength * 100} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-mono mb-1">
+                        <span className="text-muted-foreground">Koherencja fazowa</span>
+                        <span className="text-primary">{qfResult.phaseCoherence.toFixed(6)}</span>
+                      </div>
+                      <Progress value={qfResult.phaseCoherence * 100} className="h-2" />
+                    </div>
+                  </div>
+
+                  {/* Meta */}
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="bg-background/50 p-2 rounded">
+                      <span className="text-muted-foreground">Composite:</span>{" "}
+                      <span className="text-foreground">{qfResult.compositeSignal.toFixed(8)}</span>
+                    </div>
+                    <div className="bg-background/50 p-2 rounded">
+                      <span className="text-muted-foreground">Gate:</span>{" "}
+                      <span className="text-foreground">{qfResult.gateSignature}</span>
+                    </div>
+                  </div>
+
+                  {/* Entropy vector */}
+                  <details className="text-xs">
+                    <summary className="text-muted-foreground cursor-pointer font-mono">
+                      Wektor entropii ({qfResult.entropyVector.length} wartości)
+                    </summary>
+                    <pre className="mt-1 p-2 bg-background/50 rounded font-mono text-[10px] text-muted-foreground overflow-x-auto">
+                      {qfResult.entropyVector.map(v => v.toFixed(8)).join("\n")}
+                    </pre>
+                  </details>
+                </div>
+              )}
+
+              {/* QF History */}
+              {qfHistory.length > 1 && (
+                <details className="text-xs">
+                  <summary className="text-muted-foreground cursor-pointer font-mono">
+                    Historia QF ({qfHistory.length})
+                  </summary>
+                  <div className="mt-1 space-y-1 max-h-[150px] overflow-y-auto">
+                    {qfHistory.map((r, i) => (
+                      <div key={i} className="flex items-center gap-2 font-mono text-[10px]">
+                        <Badge variant="outline" className={`text-[9px] ${
+                          r.decision === 1 ? "border-emerald-500/50 text-emerald-500" :
+                          r.decision === -1 ? "border-red-500/50 text-red-500" :
+                          ""
+                        }`}>
+                          {r.decisionLabel}
+                        </Badge>
+                        <span className="text-muted-foreground">{r.confidence.toFixed(1)}%</span>
+                        <span className="text-muted-foreground">{r.gateSignature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Integer */}
         <TabsContent value="integer">
