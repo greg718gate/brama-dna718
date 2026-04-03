@@ -67,7 +67,10 @@ function analyzeSignal(
 
   // Composite signal
   const compositeSignal = (layer1 + Math.abs(layer2) + Math.abs(layer3)) / (PHI + EULER_MASCHERONI + 1);
-  const confidence = Math.tanh(Math.abs(compositeSignal * CARRIER_FREQ)) * 100;
+  
+  // Confidence based on raw composite — WITHOUT carrier multiplier
+  // This gives meaningful spread: weak signals ~30-70%, strong ~85-99%
+  const confidence = Math.tanh(Math.abs(compositeSignal)) * 100;
   const decision = confidence / 100 > threshold ? (compositeSignal > 0 ? 1 : -1) : 0;
 
   const gateIdx = state.counter % 18;
