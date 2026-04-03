@@ -101,39 +101,47 @@ function quantumFilter(dataVector: number[], entropyVector: number[]): number {
 }
 
 /**
- * Wielowarstwowy filtr interferencyjny — łączy GATCA z harmonicznymi Schumanna.
- * Każda warstwa filtruje inny aspekt szumu.
+ * Wielowarstwowy filtr interferencyjny — QF Aggregator.
+ * Implementacja calculate_composite_signal z Pythona:
+ * - Warstwa 1: Korelacja GATCA (waga PHI)
+ * - Warstwa 2: Rezonans harmoniczny (waga Euler-Mascheroni γ)
+ * - Warstwa 3: Koherencja fazowa Schumanna (waga 1)
  */
 function multiLayerFilter(
   data: number[],
   entropy: number[],
   phi: number,
-  carrierFreq: number
+  _carrierFreq: number
 ): { correlation: number; harmonicStrength: number; phaseCoherence: number } {
   const len = Math.min(data.length, entropy.length);
+
+  // Warstwa 1: Korelacja GATCA — sin(market × entropy) × φ
   let corrSum = 0;
-  let harmSum = 0;
-  let phaseSum = 0;
-
   for (let i = 0; i < len; i++) {
-    // Warstwa 1: Korelacja bazowa GATCA
     corrSum += Math.sin(data[i] * entropy[i]);
-
-    // Warstwa 2: Rezonans harmoniczny (φ-modulated)
-    harmSum += Math.cos(data[i] * phi * entropy[i] * carrierFreq * 0.001);
-
-    // Warstwa 3: Koherencja fazowa (Schumann-locked)
-    const phase = Math.atan2(
-      Math.sin(data[i] * SCHUMANN_FREQ * 0.01),
-      Math.cos(entropy[i] * phi)
-    );
-    phaseSum += Math.cos(phase);
   }
+  const layer1 = (corrSum / (len || 1)) * phi;
+
+  // Warstwa 2: Rezonans harmoniczny — cos(market / φ) × γ_Euler
+  let harmSum = 0;
+  for (let i = 0; i < len; i++) {
+    harmSum += Math.cos(data[i] / phi);
+  }
+  const layer2 = (harmSum / (len || 1)) * EULER_MASCHERONI;
+
+  // Warstwa 3: Koherencja fazowa — cos(arg(exp(i × (market % Schumann))))
+  let phaseSum = 0;
+  for (let i = 0; i < len; i++) {
+    // arg(exp(i·x)) = x mod 2π mapped to [-π, π]
+    const phaseShift = (data[i] % SCHUMANN_FREQ);
+    phaseSum += Math.cos(phaseShift);
+  }
+  const layer3 = phaseSum / (len || 1);
 
   return {
-    correlation: corrSum / (len || 1),
-    harmonicStrength: Math.abs(harmSum / (len || 1)),
-    phaseCoherence: Math.abs(phaseSum / (len || 1)),
+    correlation: layer1,
+    harmonicStrength: Math.abs(layer2),
+    phaseCoherence: Math.abs(layer3),
   };
 }
 
