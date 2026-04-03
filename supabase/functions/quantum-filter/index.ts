@@ -108,7 +108,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = 0.9998, seed } = body;
+    const { data, price, threshold = 0.75, seed } = body;
 
     if (!data || !Array.isArray(data) || data.length < 2) {
       return new Response(
