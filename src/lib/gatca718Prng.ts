@@ -15,6 +15,7 @@ import {
   MTDNA_LENGTH,
   GATCA_POSITIONS,
   GAMMA,
+  EULER_MASCHERONI,
   SCHUMANN_FREQ,
 } from "./gatca718Constants";
 
@@ -100,39 +101,47 @@ function quantumFilter(dataVector: number[], entropyVector: number[]): number {
 }
 
 /**
- * Wielowarstwowy filtr interferencyjny — łączy GATCA z harmonicznymi Schumanna.
- * Każda warstwa filtruje inny aspekt szumu.
+ * Wielowarstwowy filtr interferencyjny — QF Aggregator.
+ * Implementacja calculate_composite_signal z Pythona:
+ * - Warstwa 1: Korelacja GATCA (waga PHI)
+ * - Warstwa 2: Rezonans harmoniczny (waga Euler-Mascheroni γ)
+ * - Warstwa 3: Koherencja fazowa Schumanna (waga 1)
  */
 function multiLayerFilter(
   data: number[],
   entropy: number[],
   phi: number,
-  carrierFreq: number
+  _carrierFreq: number
 ): { correlation: number; harmonicStrength: number; phaseCoherence: number } {
   const len = Math.min(data.length, entropy.length);
+
+  // Warstwa 1: Korelacja GATCA — sin(market × entropy) × φ
   let corrSum = 0;
-  let harmSum = 0;
-  let phaseSum = 0;
-
   for (let i = 0; i < len; i++) {
-    // Warstwa 1: Korelacja bazowa GATCA
     corrSum += Math.sin(data[i] * entropy[i]);
-
-    // Warstwa 2: Rezonans harmoniczny (φ-modulated)
-    harmSum += Math.cos(data[i] * phi * entropy[i] * carrierFreq * 0.001);
-
-    // Warstwa 3: Koherencja fazowa (Schumann-locked)
-    const phase = Math.atan2(
-      Math.sin(data[i] * SCHUMANN_FREQ * 0.01),
-      Math.cos(entropy[i] * phi)
-    );
-    phaseSum += Math.cos(phase);
   }
+  const layer1 = (corrSum / (len || 1)) * phi;
+
+  // Warstwa 2: Rezonans harmoniczny — cos(market / φ) × γ_Euler
+  let harmSum = 0;
+  for (let i = 0; i < len; i++) {
+    harmSum += Math.cos(data[i] / phi);
+  }
+  const layer2 = (harmSum / (len || 1)) * EULER_MASCHERONI;
+
+  // Warstwa 3: Koherencja fazowa — cos(arg(exp(i × (market % Schumann))))
+  let phaseSum = 0;
+  for (let i = 0; i < len; i++) {
+    // arg(exp(i·x)) = x mod 2π mapped to [-π, π]
+    const phaseShift = (data[i] % SCHUMANN_FREQ);
+    phaseSum += Math.cos(phaseShift);
+  }
+  const layer3 = phaseSum / (len || 1);
 
   return {
-    correlation: corrSum / (len || 1),
-    harmonicStrength: Math.abs(harmSum / (len || 1)),
-    phaseCoherence: Math.abs(phaseSum / (len || 1)),
+    correlation: layer1,
+    harmonicStrength: Math.abs(layer2),
+    phaseCoherence: Math.abs(layer3),
   };
 }
 
@@ -268,19 +277,19 @@ export class Gatca718Prng {
       dataVector, entropy, PHI, CARRIER_FREQ
     );
 
-    // Sygnał kompozytowy: średnia ważona 3 warstw (wagi: φ, γ, 1)
+    // Sygnał kompozytowy: (L1 + L2 + L3) / (φ + γ_Euler + 1)
     const compositeSignal =
-      (correlation * PHI + harmonicStrength * GAMMA + phaseCoherence) /
-      (PHI + GAMMA + 1);
+      (correlation + harmonicStrength + phaseCoherence) /
+      (PHI + EULER_MASCHERONI + 1);
 
-    // Core GATCA transform na sygnale kompozytowym
-    const coreResult = gatca718Core(compositeSignal, PHI, CARRIER_FREQ, MTDNA_LENGTH);
+    // Confidence: tanh(|composite × 718.57|) × 100  — Python-exact
+    const confidence = Math.tanh(Math.abs(compositeSignal * CARRIER_FREQ)) * 100;
 
-    // Decyzja
-    const decision = executeDecision(coreResult, threshold);
-
-    // Confidence (0-100%)
-    const confidence = Math.tanh(Math.abs(coreResult)) * 100;
+    // Decyzja high-confidence
+    const decision: -1 | 0 | 1 =
+      confidence / 100 > threshold
+        ? (compositeSignal > 0 ? 1 : -1)
+        : 0;
 
     // Gate signature — unikalna sygnatura bazująca na aktywnej bramie
     const gateIdx = stats.gateIndex;
