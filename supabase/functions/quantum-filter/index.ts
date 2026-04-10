@@ -132,7 +132,17 @@ serve(async (req) => {
       parsedData = data.map(Number).filter((n: number) => !isNaN(n));
     }
 
-    const state = createState(seed ?? Date.now());
+    // Deterministic seed from price data — same data = same result
+    let determinedSeed = seed;
+    if (!determinedSeed) {
+      let hash = 0;
+      for (let i = 0; i < parsedData.length; i++) {
+        hash = ((hash << 5) - hash + Math.round(parsedData[i] * 100)) | 0;
+      }
+      determinedSeed = Math.abs(hash);
+    }
+
+    const state = createState(determinedSeed);
     const result = analyzeSignal(parsedData, state, threshold);
 
     return new Response(
