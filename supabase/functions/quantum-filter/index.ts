@@ -40,7 +40,7 @@ function getEntropyVector(state: PrngState, size: number): number[] {
 }
 
 // === Fetch real BTC/USDT prices from Binance ===
-async function fetchBinancePrices(limit = 50): Promise<{ prices: number[]; currentPrice: number }> {
+async function fetchBinancePrices(limit = 200): Promise<{ prices: number[]; currentPrice: number }> {
   const url = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=${limit}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Binance API error: ${res.status}`);
