@@ -57,6 +57,9 @@ const App = () => (
 
               <Route path="/prng" element={<Prng />} />
 
+              <Route path="/qf" element={<QuantumFilterDashboard />} />
+              <Route path="/qf/*" element={<QuantumFilterDashboard />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
