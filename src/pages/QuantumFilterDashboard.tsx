@@ -51,7 +51,6 @@ const QuantumFilterDashboard = () => {
           body: JSON.stringify({
             live: true,
             threshold: 0.98,
-            seed: 2912,
           }),
         }
       );
