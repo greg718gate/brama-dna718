@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-qf-key",
 };
 
 // === GATCA-718 Constants ===
@@ -39,12 +39,20 @@ function getEntropyVector(state: PrngState, size: number): number[] {
   return r;
 }
 
+// === Fetch real BTC/USDT prices from Binance ===
+async function fetchBinancePrices(limit = 50): Promise<{ prices: number[]; currentPrice: number }> {
+  const url = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Binance API error: ${res.status}`);
+  const klines = await res.json();
+  // Each kline: [openTime, open, high, low, close, volume, ...]
+  const prices = klines.map((k: any) => parseFloat(k[4])); // close prices
+  const currentPrice = prices[prices.length - 1];
+  return { prices, currentPrice };
+}
+
 // === 3-Layer Quantum Filter ===
-function analyzeSignal(
-  data: number[],
-  state: PrngState,
-  threshold: number
-) {
+function analyzeSignal(data: number[], state: PrngState, threshold: number) {
   const entropy = getEntropyVector(state, data.length);
 
   // Layer 1: GATCA Correlation (weight: PHI)
@@ -65,11 +73,8 @@ function analyzeSignal(
   }
   const layer3 = sum3 / data.length;
 
-  // Composite signal
   const compositeSignal = (layer1 + Math.abs(layer2) + Math.abs(layer3)) / (PHI + EULER_MASCHERONI + 1);
   
-  // Confidence with calibrated amplifier (factor 30)
-  // weak ~30-50%, medium ~55-80%, strong ~85-97%
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const decision = confidence / 100 > threshold ? (compositeSignal > 0 ? 1 : -1) : 0;
@@ -98,7 +103,6 @@ serve(async (req) => {
   }
 
   try {
-    // Auth check
     const authHeader = req.headers.get("x-qf-key");
     if (authHeader !== "2912") {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -108,25 +112,36 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = 0.75, seed } = body;
+    const { data, price, threshold = 0.75, seed, live = false } = body;
 
-    if (!data || !Array.isArray(data) || data.length < 2) {
-      return new Response(
-        JSON.stringify({ error: "Provide 'data' array with at least 2 numbers" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    let parsedData: number[];
+    let currentPrice: number | null = price ?? null;
+
+    if (live || !data) {
+      // Fetch real Binance prices
+      const binance = await fetchBinancePrices(50);
+      parsedData = binance.prices;
+      currentPrice = binance.currentPrice;
+    } else {
+      if (!Array.isArray(data) || data.length < 2) {
+        return new Response(
+          JSON.stringify({ error: "Provide 'data' array with at least 2 numbers" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      parsedData = data.map(Number).filter((n: number) => !isNaN(n));
     }
 
-    const parsedData = data.map(Number).filter((n: number) => !isNaN(n));
     const state = createState(seed ?? Date.now());
     const result = analyzeSignal(parsedData, state, threshold);
 
     return new Response(
       JSON.stringify({
         ...result,
-        price: price ?? null,
-        engine: "GATCA-718 QF v2.0.0",
+        price: currentPrice,
+        engine: "GATCA-718 QF v2.1.0",
         carrier: CARRIER_FREQ,
+        source: (live || !data) ? "BINANCE_LIVE" : "CUSTOM_DATA",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

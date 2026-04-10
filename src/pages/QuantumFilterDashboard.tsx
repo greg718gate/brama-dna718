@@ -20,21 +20,11 @@ interface Signal {
     phaseCoherence: number;
   };
   gateSignature: string;
+  source?: string;
 }
 
 const MAX_HISTORY = 100;
-const REFRESH_INTERVAL = 3000;
-
-// Simulated price feed (since we don't have ccxt in browser)
-function generateSimulatedPrices(count: number, base = 97000): number[] {
-  const prices: number[] = [];
-  let price = base;
-  for (let i = 0; i < count; i++) {
-    price += (Math.random() - 0.49) * 50;
-    prices.push(parseFloat(price.toFixed(2)));
-  }
-  return prices;
-}
+const REFRESH_INTERVAL = 5000;
 
 const QuantumFilterDashboard = () => {
   const navigate = useNavigate();
@@ -47,20 +37,9 @@ const QuantumFilterDashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({ buy: 0, sell: 0, wait: 0, total: 0 });
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const priceBufferRef = useRef<number[]>(generateSimulatedPrices(50));
 
   const fetchSignal = useCallback(async () => {
     try {
-      // Add new simulated price point
-      const lastPrice = priceBufferRef.current[priceBufferRef.current.length - 1];
-      const newPrice = lastPrice + (Math.random() - 0.49) * 50;
-      priceBufferRef.current.push(parseFloat(newPrice.toFixed(2)));
-      if (priceBufferRef.current.length > 100) {
-        priceBufferRef.current = priceBufferRef.current.slice(-60);
-      }
-
-      const currentPrice = priceBufferRef.current[priceBufferRef.current.length - 1];
-
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quantum-filter`,
         {
@@ -70,8 +49,7 @@ const QuantumFilterDashboard = () => {
             "x-qf-key": "2912",
           },
           body: JSON.stringify({
-            data: priceBufferRef.current.slice(-50),
-            price: currentPrice,
+            live: true,
             threshold: 0.75,
           }),
         }
@@ -82,10 +60,7 @@ const QuantumFilterDashboard = () => {
       const result: Signal = await response.json();
       
       setLastSignal(result);
-      setSignals((prev) => {
-        const updated = [result, ...prev].slice(0, MAX_HISTORY);
-        return updated;
-      });
+      setSignals((prev) => [result, ...prev].slice(0, MAX_HISTORY));
       setStats((prev) => ({
         buy: prev.buy + (result.decisionLabel === "BUY" ? 1 : 0),
         sell: prev.sell + (result.decisionLabel === "SELL" ? 1 : 0),
@@ -145,7 +120,6 @@ const QuantumFilterDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4">
-      {/* Nav */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <LanguageSwitcher />
         <Button onClick={() => navigate("/")} variant="secondary" size="sm" className="gap-2">
@@ -158,17 +132,15 @@ const QuantumFilterDashboard = () => {
       </div>
 
       <div className="container mx-auto max-w-5xl pt-16 space-y-6">
-        {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 via-primary to-purple-500 bg-clip-text text-transparent">
-            ⚛ Quantum Filter — Live Dashboard
+            ⚛ Quantum Filter — Live BTC/USDT
           </h1>
           <p className="text-muted-foreground text-sm">
-            GATCA-718 QF v2.0.0 • {tr("Symulowane dane BTC/USDT", "Simulated BTC/USDT data")}
+            GATCA-718 QF v2.1.0 • {tr("Prawdziwe dane z Binance", "Real Binance data")} • {tr("Odświeżanie co 5s", "Refresh every 5s")}
           </p>
         </div>
 
-        {/* Control */}
         <div className="flex justify-center gap-4">
           {!isRunning ? (
             <Button onClick={startEngine} className="gap-2 bg-green-600 hover:bg-green-700 text-white px-8">
@@ -193,7 +165,6 @@ const QuantumFilterDashboard = () => {
           </div>
         )}
 
-        {/* Current Signal */}
         {lastSignal && (
           <Card className={`border-2 ${getDecisionBg(lastSignal.decisionLabel)}`}>
             <CardContent className="p-6">
@@ -227,7 +198,14 @@ const QuantumFilterDashboard = () => {
                 )}
               </div>
 
-              {/* Layers */}
+              {lastSignal.source && (
+                <div className="mt-2 text-center">
+                  <Badge variant="outline" className="text-xs bg-cyan-500/10 border-cyan-500/50 text-cyan-400">
+                    {lastSignal.source === "BINANCE_LIVE" ? "🔴 LIVE BINANCE" : "CUSTOM"}
+                  </Badge>
+                </div>
+              )}
+
               <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border/50">
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-1">{tr("Korelacja GATCA", "GATCA Correlation")}</div>
@@ -250,7 +228,6 @@ const QuantumFilterDashboard = () => {
           </Card>
         )}
 
-        {/* Stats */}
         <div className="grid grid-cols-4 gap-3">
           <Card>
             <CardContent className="p-4 text-center">
@@ -278,7 +255,6 @@ const QuantumFilterDashboard = () => {
           </Card>
         </div>
 
-        {/* Signal History */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{tr("Historia sygnałów", "Signal History")}</CardTitle>
