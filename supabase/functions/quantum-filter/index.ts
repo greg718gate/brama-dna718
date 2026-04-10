@@ -112,7 +112,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = 0.75, seed, live = false } = body;
+    const { data, price, threshold = 0.98, seed, live = false } = body;
 
     let parsedData: number[];
     let currentPrice: number | null = price ?? null;
