@@ -92,7 +92,7 @@ function normalizeThreshold(value: unknown): number {
   return Math.max(MIN_TRADE_CONFIDENCE, Math.min(1, ratio));
 }
 
-function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown) {
+function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown, rawPrices: number[] | null = null) {
   const threshold = normalizeThreshold(thresholdInput);
   const entropy = getEntropyVector(state, data.length);
 
@@ -119,8 +119,21 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const thresholdPercent = threshold * 100;
-  const thresholdPassed = confidence >= thresholdPercent;
-  const decision = thresholdPassed ? (compositeSignal > 0 ? 1 : -1) : 0;
+  const confidencePassed = confidence >= thresholdPercent;
+
+  // === FILTR PROWIZJI ===
+  // Sygnał wykonalny tylko jeśli oczekiwany ruch ceny pokryje prowizję + spread + bufor
+  const pricesForVol = rawPrices ?? data;
+  const expectedMove = estimateExpectedMove(pricesForVol, compositeSignal);
+  const profitablePassed = expectedMove >= MIN_PROFITABLE_MOVE;
+
+  const tradeable = confidencePassed && profitablePassed;
+  const decision = tradeable ? (compositeSignal > 0 ? 1 : -1) : 0;
+
+  let blockReason: string | null = null;
+  if (!confidencePassed && !profitablePassed) blockReason = "LOW_CONFIDENCE_AND_UNPROFITABLE";
+  else if (!confidencePassed) blockReason = "LOW_CONFIDENCE";
+  else if (!profitablePassed) blockReason = "MOVE_BELOW_FEES";
 
   const gateIdx = state.counter % 18;
 
@@ -130,8 +143,16 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
     decisionLabel: decision === 1 ? "BUY" : decision === -1 ? "SELL" : "WAIT",
     confidence,
     threshold: thresholdPercent,
-    thresholdPassed,
-    blockedByThreshold: !thresholdPassed,
+    thresholdPassed: tradeable,
+    blockedByThreshold: !tradeable,
+    blockReason,
+    profitability: {
+      expectedMovePct: expectedMove * 100,
+      requiredMovePct: MIN_PROFITABLE_MOVE * 100,
+      feeTotalPct: FEE_PER_SIDE * 2 * 100,
+      spreadPct: SPREAD_ESTIMATE * 100,
+      profitablePassed,
+    },
     compositeSignal,
     layers: {
       correlation: layer1,
