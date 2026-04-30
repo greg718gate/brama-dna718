@@ -52,6 +52,13 @@ async function fetchBinancePrices(limit = 50): Promise<{ prices: number[]; curre
   return { prices, currentPrice };
 }
 
+async function fetchBinanceCurrentPrice(): Promise<number> {
+  const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+  if (!res.ok) throw new Error(`Binance ticker error: ${res.status}`);
+  const ticker = await res.json();
+  return Number(ticker.price);
+}
+
 // === 3-Layer Quantum Filter ===
 function normalizeThreshold(value: unknown): number {
   const numeric = typeof value === "number" ? value : Number(value);
@@ -131,11 +138,11 @@ serve(async (req) => {
     let currentPrice: number | null = price ?? null;
 
     if (priceOnly) {
-      const binance = await fetchBinancePrices(2);
+      const currentPrice = await fetchBinanceCurrentPrice();
       return new Response(
         JSON.stringify({
           timestamp: new Date().toISOString(),
-          price: binance.currentPrice,
+          price: currentPrice,
           source: "BINANCE_LIVE",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
