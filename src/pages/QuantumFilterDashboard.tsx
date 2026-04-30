@@ -12,6 +12,9 @@ interface Signal {
   decision: number;
   decisionLabel: "BUY" | "SELL" | "WAIT";
   confidence: number;
+  threshold?: number;
+  thresholdPassed?: boolean;
+  blockedByThreshold?: boolean;
   compositeSignal: number;
   price: number | null;
   layers: {
@@ -25,6 +28,27 @@ interface Signal {
 
 const MAX_HISTORY = 100;
 const REFRESH_INTERVAL = 5000;
+const MIN_TRADE_CONFIDENCE = 98;
+
+const enforceTradeThreshold = (signal: Signal): Signal => {
+  const confidence = Number(signal.confidence) || 0;
+  const threshold = Math.max(MIN_TRADE_CONFIDENCE, Number(signal.threshold) || MIN_TRADE_CONFIDENCE);
+  const thresholdPassed = confidence > threshold;
+
+  if (thresholdPassed) {
+    return { ...signal, confidence, threshold, thresholdPassed: true, blockedByThreshold: false };
+  }
+
+  return {
+    ...signal,
+    decision: 0,
+    decisionLabel: "WAIT",
+    confidence,
+    threshold,
+    thresholdPassed: false,
+    blockedByThreshold: true,
+  };
+};
 
 const QuantumFilterDashboard = () => {
   const navigate = useNavigate();
@@ -57,7 +81,8 @@ const QuantumFilterDashboard = () => {
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      const result: Signal = await response.json();
+      const rawResult: Signal = await response.json();
+      const result = enforceTradeThreshold(rawResult);
       
       setLastSignal(result);
       setSignals((prev) => [result, ...prev].slice(0, MAX_HISTORY));
