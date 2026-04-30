@@ -145,8 +145,10 @@ function multiLayerFilter(
   };
 }
 
+const QF_TRADE_THRESHOLD = 0.998;
+
 /** Decyzja high-confidence (HFT trigger) */
-function executeDecision(predictionValue: number, threshold: number = 0.9998): -1 | 0 | 1 {
+function executeDecision(predictionValue: number, threshold: number = QF_TRADE_THRESHOLD): -1 | 0 | 1 {
   const prob = Math.tanh(Math.abs(predictionValue));
   if (prob > threshold) {
     return predictionValue > 0 ? 1 : -1;
@@ -268,7 +270,7 @@ export class Gatca718Prng {
    * Pełna analiza Quantum Filter — 3 warstwy + decyzja.
    * To jest serce systemu HFT.
    */
-  analyzeSignal(dataVector: number[], threshold: number = 0.9998): QuantumFilterResult {
+  analyzeSignal(dataVector: number[], threshold: number = QF_TRADE_THRESHOLD): QuantumFilterResult {
     const entropy = this.getEntropyVector(dataVector.length);
     const stats = this.stats();
 
