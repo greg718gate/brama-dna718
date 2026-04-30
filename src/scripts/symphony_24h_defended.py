@@ -245,9 +245,10 @@ def generate_cycle(cycle_idx, global_time_offset,
         right += wave_r * envelope * amp_weight
 
     # Normalizacja per cykl (zachowuje dynamikę bez clipping)
-    peak = max(np.max(np.abs(left)), np.max(np.abs(right)), 1e-12)
-    left  /= peak
-    right /= peak
+    # Stała normalizacja przez liczbę bram — zachowuje hierarchię amplitudową
+    # (VI_GATE_18=1.1628 vs pozostałe) przez całe 24h. Bez per-cycle peak pumping.
+    left  /= NUM_GATES
+    right /= NUM_GATES
 
     return left, right
 
