@@ -27,13 +27,14 @@ interface Signal {
 }
 
 const MAX_HISTORY = 100;
-const REFRESH_INTERVAL = 5000;
+const PRICE_HISTORY_LIMIT = 32;
+const REFRESH_INTERVAL = 2000;
 const MIN_TRADE_CONFIDENCE = 98;
 
 const enforceTradeThreshold = (signal: Signal): Signal => {
   const confidence = Number(signal.confidence) || 0;
   const threshold = Math.max(MIN_TRADE_CONFIDENCE, Number(signal.threshold) || MIN_TRADE_CONFIDENCE);
-  const thresholdPassed = confidence > threshold;
+  const thresholdPassed = confidence >= threshold;
 
   if (thresholdPassed) {
     return { ...signal, confidence, threshold, thresholdPassed: true, blockedByThreshold: false };
@@ -61,9 +62,34 @@ const QuantumFilterDashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({ buy: 0, sell: 0, wait: 0, total: 0 });
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const priceHistoryRef = useRef<number[]>([]);
 
   const fetchSignal = useCallback(async () => {
     try {
+      const priceResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quantum-filter`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-qf-key": "2912",
+          },
+          body: JSON.stringify({
+            priceOnly: true,
+          }),
+        }
+      );
+
+      if (!priceResponse.ok) throw new Error(`HTTP ${priceResponse.status}`);
+
+      const priceResult = await priceResponse.json();
+      const currentPrice = Number(priceResult.price);
+      if (!Number.isFinite(currentPrice)) throw new Error("Invalid Binance price");
+
+      priceHistoryRef.current = [...priceHistoryRef.current, currentPrice].slice(-PRICE_HISTORY_LIMIT);
+
+      if (priceHistoryRef.current.length < 2) return;
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quantum-filter`,
         {
@@ -73,7 +99,8 @@ const QuantumFilterDashboard = () => {
             "x-qf-key": "2912",
           },
           body: JSON.stringify({
-            live: true,
+            data: priceHistoryRef.current,
+            price: currentPrice,
             threshold: 0.98,
           }),
         }
@@ -162,7 +189,7 @@ const QuantumFilterDashboard = () => {
             ⚛ Quantum Filter — Live BTC/USDT
           </h1>
           <p className="text-muted-foreground text-sm">
-            GATCA-718 QF v2.1.0 • {tr("Prawdziwe dane z Binance", "Real Binance data")} • {tr("Odświeżanie co 5s", "Refresh every 5s")}
+            GATCA-718 QF v2.1.0 • {tr("Prawdziwe dane z Binance", "Real Binance data")} • {tr("Odświeżanie co 2s", "Refresh every 2s")}
           </p>
         </div>
 

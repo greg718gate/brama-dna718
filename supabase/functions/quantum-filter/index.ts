@@ -52,6 +52,13 @@ async function fetchBinancePrices(limit = 50): Promise<{ prices: number[]; curre
   return { prices, currentPrice };
 }
 
+async function fetchBinanceCurrentPrice(): Promise<number> {
+  const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+  if (!res.ok) throw new Error(`Binance ticker error: ${res.status}`);
+  const ticker = await res.json();
+  return Number(ticker.price);
+}
+
 // === 3-Layer Quantum Filter ===
 function normalizeThreshold(value: unknown): number {
   const numeric = typeof value === "number" ? value : Number(value);
@@ -86,7 +93,7 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const thresholdPercent = threshold * 100;
-  const thresholdPassed = confidence > thresholdPercent;
+  const thresholdPassed = confidence >= thresholdPercent;
   const decision = thresholdPassed ? (compositeSignal > 0 ? 1 : -1) : 0;
 
   const gateIdx = state.counter % 18;
@@ -125,10 +132,22 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = MIN_TRADE_CONFIDENCE, seed, live = false } = body;
+    const { data, price, threshold = MIN_TRADE_CONFIDENCE, seed, live = false, priceOnly = false } = body;
 
     let parsedData: number[];
     let currentPrice: number | null = price ?? null;
+
+    if (priceOnly) {
+      const currentPrice = await fetchBinanceCurrentPrice();
+      return new Response(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          price: currentPrice,
+          source: "BINANCE_LIVE",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (live || !data) {
       // Fetch real Binance prices
