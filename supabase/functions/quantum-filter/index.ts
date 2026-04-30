@@ -15,6 +15,32 @@ const MTDNA_LENGTH = 16569;
 const GATCA_POSITIONS = [1,740,951,1227,2996,3424,4166,4832,6393,7756,8415,10059,11200,11336,11915,13703,14784,16179];
 const MIN_TRADE_CONFIDENCE = 0.98;
 
+// === Realne koszty handlu na Binance Spot ===
+// Prowizja maker/taker bez BNB: 0.10% (0.001) na każdą stronę → razem 0.20%
+// Spread BTC/USDT (typowy): ~0.01-0.02%
+// Bufor bezpieczeństwa: 0.05%
+// Łączny próg: ruch ceny musi być ≥ 0.27% żeby transakcja miała sens
+const FEE_PER_SIDE = 0.001;        // 0.10%
+const SPREAD_ESTIMATE = 0.0002;    // 0.02%
+const SAFETY_BUFFER = 0.0005;      // 0.05%
+const MIN_PROFITABLE_MOVE = (FEE_PER_SIDE * 2) + SPREAD_ESTIMATE + SAFETY_BUFFER; // 0.27%
+
+// Szacowanie oczekiwanego ruchu z bufora cen: realizowana zmienność (stdev procentowych zmian)
+// pomnożona przez compositeSignal — to jest "spodziewana amplituda ruchu w kierunku sygnału"
+function estimateExpectedMove(prices: number[], compositeSignal: number): number {
+  if (prices.length < 2) return 0;
+  const returns: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0) returns.push((prices[i] - prices[i - 1]) / prices[i - 1]);
+  }
+  if (returns.length === 0) return 0;
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + (b - mean) ** 2, 0) / returns.length;
+  const stdev = Math.sqrt(variance);
+  // Oczekiwany ruch = zmienność × siła sygnału (|composite| ∈ ~[0,1])
+  return stdev * Math.abs(compositeSignal) * PHI; // PHI jako wzmocnienie sygnału kierunkowego
+}
+
 // === Core PRNG ===
 interface PrngState { seed: number; counter: number; entropy: number[]; }
 
