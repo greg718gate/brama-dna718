@@ -443,6 +443,27 @@ export const PentagramSphere = () => {
           <span>φ = {phi.toFixed(4)}</span>
           <span>γ = {gamma.toFixed(4)}</span>
           <span className="text-amber-500 font-mono">f = {tunedFrequency.toFixed(4)} Hz</span>
+          {(() => {
+            const BASE = 718.57012515;
+            const delta = tunedFrequency - BASE;
+            const absDelta = Math.abs(delta);
+            const sign = delta >= 0 ? "+" : "−";
+            const color =
+              absDelta < 0.01 ? "text-emerald-400"
+              : absDelta < 0.5 ? "text-cyan-400"
+              : absDelta < 1.5 ? "text-amber-400"
+              : "text-red-400";
+            const status =
+              absDelta < 0.01 ? (language === 'pl' ? "ZSYNCHRONIZOWANE" : "LOCKED")
+              : absDelta < 0.5 ? (language === 'pl' ? "stabilny dryf" : "stable drift")
+              : absDelta < 1.5 ? (language === 'pl' ? "skan rezonansu" : "resonance scan")
+              : (language === 'pl' ? "poza oknem" : "out of window");
+            return (
+              <span className={`font-mono ${color}`} title={language === 'pl' ? `Odchylenie od bazy 718.57012515 Hz (Zero Riemanna #448)` : `Deviation from base 718.57012515 Hz (Riemann Zero #448)`}>
+                Δf = {sign}{absDelta.toFixed(4)} Hz · {status}
+              </span>
+            );
+          })()}
         </div>
         <Legend language={language} resonanceEffect={resonanceEffect} tunedFrequency={tunedFrequency} />
       </div>
