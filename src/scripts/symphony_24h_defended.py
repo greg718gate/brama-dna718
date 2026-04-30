@@ -70,8 +70,10 @@ LOG_JITTER     = "jitter_statistics.csv"
 # Parametry zabezpieczeń
 PRECISION_COMP_INTERVAL = 100   # co ile cykli kumulujemy resztę precyzji
 PLL_CORRECTION_INTERVAL = 10    # co ile cykli aktywna jest korekta PLL
+PLL_LOOP_GAIN           = 0.125 # współczynnik tłumienia pętli PLL (1/8)
 AA_FILTER_ORDER         = 8     # rząd filtru Butterworth
 AA_FILTER_CUTOFF        = 20000 # Hz
+NUM_GATES               = 18    # stały dzielnik dla normalizacji (zachowuje hierarchię amp)
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -107,14 +109,15 @@ def aa_filter(signal_left, signal_right):
 
 
 # ──────────────────────────────────────────────────────────────────
-# 3. DITHERING TPDF (Triangular PDF) dla redukcji do 24-bit
+# 3. DITHERING TPDF (Triangular PDF) — wewnątrz WavStreamWriter (po normalizacji,
+#    PRZED kwantyzacją). NIE używać przed clipowaniem — niszczy rozkład trójkątny.
 # ──────────────────────────────────────────────────────────────────
-def tpdf_dither(signal, bit_depth=24):
-    """TPDF dither — suma dwóch jednostajnych szumów = trójkątny rozkład."""
+def _tpdf_noise(shape, bit_depth=24):
+    """Generuje sam szum trójkątny TPDF o amplitudzie ±1 LSB."""
     lsb = 1.0 / (2 ** (bit_depth - 1))
-    n1 = np.random.uniform(-0.5, 0.5, signal.shape)
-    n2 = np.random.uniform(-0.5, 0.5, signal.shape)
-    return signal + (n1 + n2) * lsb
+    n1 = np.random.uniform(-0.5, 0.5, shape)
+    n2 = np.random.uniform(-0.5, 0.5, shape)
+    return (n1 + n2) * lsb
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -158,7 +161,7 @@ class WavStreamWriter:
         self.f.write(b'data')
         self.f.write(struct.pack('<I', 0))            # placeholder
 
-    def write_block(self, left, right):
+    def write_block(self, left, right, apply_tpdf=False):
         # Interleave L,R,L,R,...
         interleaved = np.empty(left.size + right.size, dtype=np.float64)
         interleaved[0::2] = left
@@ -167,7 +170,12 @@ class WavStreamWriter:
         if self.bit_depth == 32:
             data = interleaved.astype(np.float32).tobytes()
         else:  # 24-bit PCM
+            # KROK 1: dither TPDF jako OSTATNIA operacja przed kwantyzacją
+            if apply_tpdf:
+                interleaved = interleaved + _tpdf_noise(interleaved.shape, bit_depth=24)
+            # KROK 2: clip dopiero po dodaniu ditheru (zabezpieczenie skrajnych próbek)
             clipped = np.clip(interleaved, -1.0, 1.0)
+            # KROK 3: kwantyzacja int24
             ints32 = (clipped * (2**23 - 1)).astype(np.int32)
             # Tylko 3 dolne bajty (little-endian)
             raw = ints32.view(np.uint8).reshape(-1, 4)[:, :3]
@@ -237,9 +245,10 @@ def generate_cycle(cycle_idx, global_time_offset,
         right += wave_r * envelope * amp_weight
 
     # Normalizacja per cykl (zachowuje dynamikę bez clipping)
-    peak = max(np.max(np.abs(left)), np.max(np.abs(right)), 1e-12)
-    left  /= peak
-    right /= peak
+    # Stała normalizacja przez liczbę bram — zachowuje hierarchię amplitudową
+    # (VI_GATE_18=1.1628 vs pozostałe) przez całe 24h. Bez per-cycle peak pumping.
+    left  /= NUM_GATES
+    right /= NUM_GATES
 
     return left, right
 
@@ -292,10 +301,9 @@ def main():
         # ── Master 32-bit float (bez ditheringu — pełna precyzja) ──
         writer_master.write_block(left, right)
 
-        # ── Focusrite 24-bit z TPDF dither ──
-        left_d  = tpdf_dither(left,  bit_depth=24)
-        right_d = tpdf_dither(right, bit_depth=24)
-        writer_focusrite.write_block(left_d, right_d)
+        # ── Focusrite 24-bit: dither TPDF stosowany WEWNĄTRZ writera,
+        #    jako ostatnia operacja przed kwantyzacją int24. ──
+        writer_focusrite.write_block(left, right, apply_tpdf=True)
 
         # ── Pomiar jittera (perf_counter_ns) ──
         t_cycle_end   = time.perf_counter_ns()
@@ -305,10 +313,11 @@ def main():
         # Błąd fazy = 2π·f·Δt
         phase_error   = 2 * np.pi * RIEMANN_ZERO_LP * (jitter_ms / 1000.0)
 
-        # ── Software PLL — korekta co 10 cykli ──
+        # ── Software PLL — korekta co 10 cykli z tłumieniem pętli (loop gain 1/8)
+        #    Bez tłumienia PLL przereagowuje na pojedynczy spike jittera. ──
         if cycle > 0 and cycle % PLL_CORRECTION_INTERVAL == 0:
-            pll_phase_correction = (pll_phase_correction + phase_error) \
-                                   % (2 * np.pi)
+            pll_phase_correction = (pll_phase_correction
+                                    + phase_error * PLL_LOOP_GAIN) % (2 * np.pi)
 
         # ── Logi ──
         phase_csv.writerow([cycle, f"{global_time_offset:.6f}",
@@ -320,7 +329,9 @@ def main():
                              f"{jitter_ms:+.4f}",
                              f"{phase_error:+.6f}"])
 
-        global_time_offset += DURATION_CYCLE
+        # Akumulacja czasu globalnego po ZMIERZONYM trwaniu cyklu — spójne z PLL.
+        # Zapobiega rozsynchronizowaniu fazy względem czasu rzeczywistego.
+        global_time_offset += measured_s
         t_prev_cycle = t_cycle_end
 
         # ── Postęp ──
