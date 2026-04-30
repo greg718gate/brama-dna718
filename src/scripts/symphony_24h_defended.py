@@ -161,7 +161,7 @@ class WavStreamWriter:
         self.f.write(b'data')
         self.f.write(struct.pack('<I', 0))            # placeholder
 
-    def write_block(self, left, right):
+    def write_block(self, left, right, apply_tpdf=False):
         # Interleave L,R,L,R,...
         interleaved = np.empty(left.size + right.size, dtype=np.float64)
         interleaved[0::2] = left
@@ -170,7 +170,12 @@ class WavStreamWriter:
         if self.bit_depth == 32:
             data = interleaved.astype(np.float32).tobytes()
         else:  # 24-bit PCM
+            # KROK 1: dither TPDF jako OSTATNIA operacja przed kwantyzacją
+            if apply_tpdf:
+                interleaved = interleaved + _tpdf_noise(interleaved.shape, bit_depth=24)
+            # KROK 2: clip dopiero po dodaniu ditheru (zabezpieczenie skrajnych próbek)
             clipped = np.clip(interleaved, -1.0, 1.0)
+            # KROK 3: kwantyzacja int24
             ints32 = (clipped * (2**23 - 1)).astype(np.int32)
             # Tylko 3 dolne bajty (little-endian)
             raw = ints32.view(np.uint8).reshape(-1, 4)[:, :3]
