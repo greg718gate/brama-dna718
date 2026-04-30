@@ -70,8 +70,10 @@ LOG_JITTER     = "jitter_statistics.csv"
 # Parametry zabezpieczeń
 PRECISION_COMP_INTERVAL = 100   # co ile cykli kumulujemy resztę precyzji
 PLL_CORRECTION_INTERVAL = 10    # co ile cykli aktywna jest korekta PLL
+PLL_LOOP_GAIN           = 0.125 # współczynnik tłumienia pętli PLL (1/8)
 AA_FILTER_ORDER         = 8     # rząd filtru Butterworth
 AA_FILTER_CUTOFF        = 20000 # Hz
+NUM_GATES               = 18    # stały dzielnik dla normalizacji (zachowuje hierarchię amp)
 
 
 # ──────────────────────────────────────────────────────────────────
