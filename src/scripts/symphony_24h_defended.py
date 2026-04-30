@@ -301,10 +301,9 @@ def main():
         # ── Master 32-bit float (bez ditheringu — pełna precyzja) ──
         writer_master.write_block(left, right)
 
-        # ── Focusrite 24-bit z TPDF dither ──
-        left_d  = tpdf_dither(left,  bit_depth=24)
-        right_d = tpdf_dither(right, bit_depth=24)
-        writer_focusrite.write_block(left_d, right_d)
+        # ── Focusrite 24-bit: dither TPDF stosowany WEWNĄTRZ writera,
+        #    jako ostatnia operacja przed kwantyzacją int24. ──
+        writer_focusrite.write_block(left, right, apply_tpdf=True)
 
         # ── Pomiar jittera (perf_counter_ns) ──
         t_cycle_end   = time.perf_counter_ns()
@@ -314,10 +313,11 @@ def main():
         # Błąd fazy = 2π·f·Δt
         phase_error   = 2 * np.pi * RIEMANN_ZERO_LP * (jitter_ms / 1000.0)
 
-        # ── Software PLL — korekta co 10 cykli ──
+        # ── Software PLL — korekta co 10 cykli z tłumieniem pętli (loop gain 1/8)
+        #    Bez tłumienia PLL przereagowuje na pojedynczy spike jittera. ──
         if cycle > 0 and cycle % PLL_CORRECTION_INTERVAL == 0:
-            pll_phase_correction = (pll_phase_correction + phase_error) \
-                                   % (2 * np.pi)
+            pll_phase_correction = (pll_phase_correction
+                                    + phase_error * PLL_LOOP_GAIN) % (2 * np.pi)
 
         # ── Logi ──
         phase_csv.writerow([cycle, f"{global_time_offset:.6f}",
@@ -329,7 +329,9 @@ def main():
                              f"{jitter_ms:+.4f}",
                              f"{phase_error:+.6f}"])
 
-        global_time_offset += DURATION_CYCLE
+        # Akumulacja czasu globalnego po ZMIERZONYM trwaniu cyklu — spójne z PLL.
+        # Zapobiega rozsynchronizowaniu fazy względem czasu rzeczywistego.
+        global_time_offset += measured_s
         t_prev_cycle = t_cycle_end
 
         # ── Postęp ──
