@@ -222,13 +222,13 @@ serve(async (req) => {
     }
 
     const state = createState(determinedSeed);
-    const result = analyzeSignal(parsedData, state, threshold);
+    const result = analyzeSignal(parsedData, state, threshold, parsedData);
 
     return new Response(
       JSON.stringify({
         ...result,
         price: currentPrice,
-        engine: "GATCA-718 QF v2.1.0",
+        engine: "GATCA-718 QF v2.2.0",
         carrier: CARRIER_FREQ,
         source: (live || !data) ? "BINANCE_LIVE" : "CUSTOM_DATA",
       }),
