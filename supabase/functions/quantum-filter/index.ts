@@ -13,6 +13,7 @@ const CARRIER_FREQ = 718.57012515;
 const SCHUMANN_FREQ = 7.83;
 const MTDNA_LENGTH = 16569;
 const GATCA_POSITIONS = [1,740,951,1227,2996,3424,4166,4832,6393,7756,8415,10059,11200,11336,11915,13703,14784,16179];
+const MIN_TRADE_CONFIDENCE = 0.98;
 
 // === Core PRNG ===
 interface PrngState { seed: number; counter: number; entropy: number[]; }
@@ -52,7 +53,14 @@ async function fetchBinancePrices(limit = 50): Promise<{ prices: number[]; curre
 }
 
 // === 3-Layer Quantum Filter ===
-function analyzeSignal(data: number[], state: PrngState, threshold: number) {
+function normalizeThreshold(value: unknown): number {
+  const numeric = typeof value === "number" ? value : Number(value);
+  const ratio = Number.isFinite(numeric) ? (numeric > 1 ? numeric / 100 : numeric) : MIN_TRADE_CONFIDENCE;
+  return Math.max(MIN_TRADE_CONFIDENCE, Math.min(1, ratio));
+}
+
+function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown) {
+  const threshold = normalizeThreshold(thresholdInput);
   const entropy = getEntropyVector(state, data.length);
 
   // Layer 1: GATCA Correlation (weight: PHI)
@@ -77,7 +85,9 @@ function analyzeSignal(data: number[], state: PrngState, threshold: number) {
   
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
-  const decision = confidence / 100 > threshold ? (compositeSignal > 0 ? 1 : -1) : 0;
+  const thresholdPercent = threshold * 100;
+  const thresholdPassed = confidence > thresholdPercent;
+  const decision = thresholdPassed ? (compositeSignal > 0 ? 1 : -1) : 0;
 
   const gateIdx = state.counter % 18;
 
@@ -86,6 +96,9 @@ function analyzeSignal(data: number[], state: PrngState, threshold: number) {
     decision,
     decisionLabel: decision === 1 ? "BUY" : decision === -1 ? "SELL" : "WAIT",
     confidence,
+    threshold: thresholdPercent,
+    thresholdPassed,
+    blockedByThreshold: !thresholdPassed,
     compositeSignal,
     layers: {
       correlation: layer1,
@@ -112,7 +125,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = 0.98, seed, live = false } = body;
+    const { data, price, threshold = MIN_TRADE_CONFIDENCE, seed, live = false } = body;
 
     let parsedData: number[];
     let currentPrice: number | null = price ?? null;
