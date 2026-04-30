@@ -109,14 +109,15 @@ def aa_filter(signal_left, signal_right):
 
 
 # ──────────────────────────────────────────────────────────────────
-# 3. DITHERING TPDF (Triangular PDF) dla redukcji do 24-bit
+# 3. DITHERING TPDF (Triangular PDF) — wewnątrz WavStreamWriter (po normalizacji,
+#    PRZED kwantyzacją). NIE używać przed clipowaniem — niszczy rozkład trójkątny.
 # ──────────────────────────────────────────────────────────────────
-def tpdf_dither(signal, bit_depth=24):
-    """TPDF dither — suma dwóch jednostajnych szumów = trójkątny rozkład."""
+def _tpdf_noise(shape, bit_depth=24):
+    """Generuje sam szum trójkątny TPDF o amplitudzie ±1 LSB."""
     lsb = 1.0 / (2 ** (bit_depth - 1))
-    n1 = np.random.uniform(-0.5, 0.5, signal.shape)
-    n2 = np.random.uniform(-0.5, 0.5, signal.shape)
-    return signal + (n1 + n2) * lsb
+    n1 = np.random.uniform(-0.5, 0.5, shape)
+    n2 = np.random.uniform(-0.5, 0.5, shape)
+    return (n1 + n2) * lsb
 
 
 # ──────────────────────────────────────────────────────────────────
