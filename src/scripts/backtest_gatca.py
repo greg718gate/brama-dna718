@@ -1,24 +1,35 @@
 # ═══════════════════════════════════════════════════════════════════
 # BACKTEST GATCA-718 — symulacja silnika na danych historycznych
+# Wersja 2.0: parametryzacja (--symbol, --interval, --days)
 #
 # © 2026 Grzegorz | BRAMA-718-UNIFIED
 # Licensed under Creative Commons BY-NC 4.0
 # ═══════════════════════════════════════════════════════════════════
 #
 # Co robi:
-#   1. Pobiera N dni historycznych świec 1-min BTC/USDT z Binance.
+#   1. Pobiera N dni historycznych świec z Binance dla wybranej pary i interwału.
 #   2. Iteruje krok po kroku — każda świeca = nowy "tick" ceny.
 #   3. Dla każdego ticku wysyła ostatnie 32 ceny do Quantum Filter.
 #   4. Symuluje LONG-only z TP/SL i prowizją (te same parametry co bot).
 #   5. Na końcu drukuje raport: liczba transakcji, % wygranych, łączny PnL netto.
 #
 # Użycie:
-#   python backtest_gatca.py            # domyślnie 7 dni
-#   python backtest_gatca.py 30         # 30 dni
+#   python backtest_gatca.py
+#       → domyślnie: SOL/USDC, interwał 5m, 7 dni
+#
+#   python backtest_gatca.py --symbol SOL/USDC --interval 5m --days 7
+#   python backtest_gatca.py --symbol XRP/USDC --interval 15m --days 14
+#   python backtest_gatca.py --symbol XLM/USDC --interval 5m --days 7
+#   python backtest_gatca.py --symbol BTC/USDC --interval 1m --days 7
+#
+# Dla użytkowników z UK: używaj USDC zamiast USDT (restrykcje regulacyjne).
+# Pary dostępne na Binance Spot z USDC: BTC/USDC, ETH/USDC, SOL/USDC,
+#   XRP/USDC, XLM/USDC, ADA/USDC, AVAX/USDC, LINK/USDC, DOGE/USDC, ...
 # ═══════════════════════════════════════════════════════════════════
 
 import sys
 import time
+import argparse
 import requests
 import ccxt
 from datetime import datetime, timedelta
@@ -31,26 +42,44 @@ STOP_LOSS_PCT   = 0.0020
 FEE_PER_SIDE    = 0.001
 WINDOW          = 32  # bufor cen wysyłany do silnika
 
-DAYS = int(sys.argv[1]) if len(sys.argv) > 1 else 7
+# --- CLI ---
+parser = argparse.ArgumentParser(description="Backtest GATCA-718")
+parser.add_argument("--symbol",   default="SOL/USDC", help="Para handlowa (np. SOL/USDC, XRP/USDC, BTC/USDC)")
+parser.add_argument("--interval", default="5m",       help="Interwał świec: 1m, 5m, 15m, 1h")
+parser.add_argument("--days",     type=int, default=7, help="Ile dni historii pobrać")
+args = parser.parse_args()
+
+SYMBOL   = args.symbol
+INTERVAL = args.interval
+DAYS     = args.days
+
+# Ile minut przypada na 1 świecę (do informacji o czasie)
+INTERVAL_MIN = {"1m": 1, "3m": 3, "5m": 5, "15m": 15, "30m": 30, "1h": 60, "2h": 120, "4h": 240}.get(INTERVAL, 1)
 
 
-def pobierz_historie(dni: int):
-    """Pobiera świece 1-min z Binance dla zadanej liczby dni."""
+def pobierz_historie(symbol: str, interval: str, dni: int):
+    """Pobiera świece z Binance dla zadanej pary, interwału i liczby dni."""
     exchange = ccxt.binance()
     since = exchange.parse8601((datetime.utcnow() - timedelta(days=dni)).isoformat() + "Z")
     wszystkie = []
-    print(f"[POBIERANIE] {dni} dni świec 1-min BTC/USDT...")
+    print(f"[POBIERANIE] {dni} dni świec {interval} {symbol}...")
     while True:
-        klines = exchange.fetch_ohlcv("BTC/USDT", timeframe="1m", since=since, limit=1000)
+        try:
+            klines = exchange.fetch_ohlcv(symbol, timeframe=interval, since=since, limit=1000)
+        except Exception as e:
+            print(f"[BŁĄD] {e}")
+            print(f"[!] Sprawdź czy para '{symbol}' istnieje na Binance Spot.")
+            sys.exit(1)
         if not klines:
             break
         wszystkie.extend(klines)
-        since = klines[-1][0] + 60_000
+        since = klines[-1][0] + INTERVAL_MIN * 60_000
         if len(klines) < 1000:
             break
         time.sleep(0.25)  # rate-limit
     closes = [k[4] for k in wszystkie]
-    print(f"[POBRANO] {len(closes)} świec ({len(closes)/60/24:.1f} dni)")
+    przybliżone_dni = len(closes) * INTERVAL_MIN / 60 / 24
+    print(f"[POBRANO] {len(closes)} świec ({przybliżone_dni:.1f} dni)")
     return closes
 
 
@@ -73,7 +102,8 @@ def backtest(ceny):
     pozycja = None
     transakcje = []
     print(f"[START] {len(ceny) - WINDOW} kroków symulacji")
-    print(f"[PARAMS] TP=+{TAKE_PROFIT_PCT*100:.2f}% SL=-{STOP_LOSS_PCT*100:.2f}% "
+    print(f"[PARAMS] symbol={SYMBOL} interval={INTERVAL} | "
+          f"TP=+{TAKE_PROFIT_PCT*100:.2f}% SL=-{STOP_LOSS_PCT*100:.2f}% "
           f"prowizja round-trip={2*FEE_PER_SIDE*100:.2f}%\n")
 
     krok = 0
@@ -96,7 +126,7 @@ def backtest(ceny):
                 pozycja = None
                 continue
 
-        # 2) Pytamy silnik tylko co 2 świece (oszczędność requestów; bufor i tak się zmienia)
+        # 2) Pytamy silnik tylko co 2 świece (oszczędność requestów)
         if krok % 2 != 0:
             continue
 
@@ -123,11 +153,12 @@ def backtest(ceny):
 
 def raport(transakcje):
     print("\n" + "=" * 70)
-    print(" RAPORT BACKTESTU")
+    print(f" RAPORT BACKTESTU — {SYMBOL} {INTERVAL} ({DAYS}d)")
     print("=" * 70)
     if not transakcje:
         print(" Brak transakcji — silnik nie wygenerował żadnego sygnału przekraczającego progi.")
         print(" To DOBRY znak: filtr prowizji działa i blokuje nieopłacalne ruchy.")
+        print(" Sugestia: spróbuj większego interwału (np. --interval 15m) lub bardziej zmiennej pary.")
         return
     n = len(transakcje)
     wygrane = [t for t in transakcje if t["pnl"] > 0]
@@ -139,6 +170,7 @@ def raport(transakcje):
     for t in transakcje:
         powody[t["powod"]] = powody.get(t["powod"], 0) + 1
 
+    print(f" Para / interwał:      {SYMBOL} / {INTERVAL}")
     print(f" Liczba transakcji:    {n}")
     print(f" Wygrane:              {len(wygrane)} ({win_rate:.1f}%)")
     print(f" Przegrane:            {len(przegrane)} ({100-win_rate:.1f}%)")
@@ -154,7 +186,7 @@ def raport(transakcje):
 
 
 if __name__ == "__main__":
-    ceny = pobierz_historie(DAYS)
+    ceny = pobierz_historie(SYMBOL, INTERVAL, DAYS)
     if len(ceny) < WINDOW + 100:
         print("Za mało danych.")
         sys.exit(1)
