@@ -15,6 +15,32 @@ const MTDNA_LENGTH = 16569;
 const GATCA_POSITIONS = [1,740,951,1227,2996,3424,4166,4832,6393,7756,8415,10059,11200,11336,11915,13703,14784,16179];
 const MIN_TRADE_CONFIDENCE = 0.98;
 
+// === Realne koszty handlu na Binance Spot ===
+// Prowizja maker/taker bez BNB: 0.10% (0.001) na każdą stronę → razem 0.20%
+// Spread BTC/USDT (typowy): ~0.01-0.02%
+// Bufor bezpieczeństwa: 0.05%
+// Łączny próg: ruch ceny musi być ≥ 0.27% żeby transakcja miała sens
+const FEE_PER_SIDE = 0.001;        // 0.10%
+const SPREAD_ESTIMATE = 0.0002;    // 0.02%
+const SAFETY_BUFFER = 0.0005;      // 0.05%
+const MIN_PROFITABLE_MOVE = (FEE_PER_SIDE * 2) + SPREAD_ESTIMATE + SAFETY_BUFFER; // 0.27%
+
+// Szacowanie oczekiwanego ruchu z bufora cen: realizowana zmienność (stdev procentowych zmian)
+// pomnożona przez compositeSignal — to jest "spodziewana amplituda ruchu w kierunku sygnału"
+function estimateExpectedMove(prices: number[], compositeSignal: number): number {
+  if (prices.length < 2) return 0;
+  const returns: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0) returns.push((prices[i] - prices[i - 1]) / prices[i - 1]);
+  }
+  if (returns.length === 0) return 0;
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + (b - mean) ** 2, 0) / returns.length;
+  const stdev = Math.sqrt(variance);
+  // Oczekiwany ruch = zmienność × siła sygnału (|composite| ∈ ~[0,1])
+  return stdev * Math.abs(compositeSignal) * PHI; // PHI jako wzmocnienie sygnału kierunkowego
+}
+
 // === Core PRNG ===
 interface PrngState { seed: number; counter: number; entropy: number[]; }
 
@@ -66,7 +92,7 @@ function normalizeThreshold(value: unknown): number {
   return Math.max(MIN_TRADE_CONFIDENCE, Math.min(1, ratio));
 }
 
-function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown) {
+function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown, rawPrices: number[] | null = null) {
   const threshold = normalizeThreshold(thresholdInput);
   const entropy = getEntropyVector(state, data.length);
 
@@ -93,8 +119,21 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const thresholdPercent = threshold * 100;
-  const thresholdPassed = confidence >= thresholdPercent;
-  const decision = thresholdPassed ? (compositeSignal > 0 ? 1 : -1) : 0;
+  const confidencePassed = confidence >= thresholdPercent;
+
+  // === FILTR PROWIZJI ===
+  // Sygnał wykonalny tylko jeśli oczekiwany ruch ceny pokryje prowizję + spread + bufor
+  const pricesForVol = rawPrices ?? data;
+  const expectedMove = estimateExpectedMove(pricesForVol, compositeSignal);
+  const profitablePassed = expectedMove >= MIN_PROFITABLE_MOVE;
+
+  const tradeable = confidencePassed && profitablePassed;
+  const decision = tradeable ? (compositeSignal > 0 ? 1 : -1) : 0;
+
+  let blockReason: string | null = null;
+  if (!confidencePassed && !profitablePassed) blockReason = "LOW_CONFIDENCE_AND_UNPROFITABLE";
+  else if (!confidencePassed) blockReason = "LOW_CONFIDENCE";
+  else if (!profitablePassed) blockReason = "MOVE_BELOW_FEES";
 
   const gateIdx = state.counter % 18;
 
@@ -104,8 +143,16 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
     decisionLabel: decision === 1 ? "BUY" : decision === -1 ? "SELL" : "WAIT",
     confidence,
     threshold: thresholdPercent,
-    thresholdPassed,
-    blockedByThreshold: !thresholdPassed,
+    thresholdPassed: tradeable,
+    blockedByThreshold: !tradeable,
+    blockReason,
+    profitability: {
+      expectedMovePct: expectedMove * 100,
+      requiredMovePct: MIN_PROFITABLE_MOVE * 100,
+      feeTotalPct: FEE_PER_SIDE * 2 * 100,
+      spreadPct: SPREAD_ESTIMATE * 100,
+      profitablePassed,
+    },
     compositeSignal,
     layers: {
       correlation: layer1,
@@ -175,13 +222,13 @@ serve(async (req) => {
     }
 
     const state = createState(determinedSeed);
-    const result = analyzeSignal(parsedData, state, threshold);
+    const result = analyzeSignal(parsedData, state, threshold, parsedData);
 
     return new Response(
       JSON.stringify({
         ...result,
         price: currentPrice,
-        engine: "GATCA-718 QF v2.1.0",
+        engine: "GATCA-718 QF v2.2.0",
         carrier: CARRIER_FREQ,
         source: (live || !data) ? "BINANCE_LIVE" : "CUSTOM_DATA",
       }),
