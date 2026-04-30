@@ -86,7 +86,7 @@ function analyzeSignal(data: number[], state: PrngState, thresholdInput: unknown
   const AMPLIFIER = 30;
   const confidence = Math.tanh(Math.abs(compositeSignal) * AMPLIFIER) * 100;
   const thresholdPercent = threshold * 100;
-  const thresholdPassed = confidence > thresholdPercent;
+  const thresholdPassed = confidence >= thresholdPercent;
   const decision = thresholdPassed ? (compositeSignal > 0 ? 1 : -1) : 0;
 
   const gateIdx = state.counter % 18;
@@ -125,10 +125,22 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { data, price, threshold = MIN_TRADE_CONFIDENCE, seed, live = false } = body;
+    const { data, price, threshold = MIN_TRADE_CONFIDENCE, seed, live = false, priceOnly = false } = body;
 
     let parsedData: number[];
     let currentPrice: number | null = price ?? null;
+
+    if (priceOnly) {
+      const binance = await fetchBinancePrices(2);
+      return new Response(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          price: binance.currentPrice,
+          source: "BINANCE_LIVE",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (live || !data) {
       // Fetch real Binance prices
