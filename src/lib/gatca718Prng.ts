@@ -145,7 +145,7 @@ function multiLayerFilter(
   };
 }
 
-const QF_TRADE_THRESHOLD = 0.998;
+const QF_TRADE_THRESHOLD = 0.98;
 
 /** Decyzja high-confidence (HFT trigger) */
 function executeDecision(predictionValue: number, threshold: number = QF_TRADE_THRESHOLD): -1 | 0 | 1 {

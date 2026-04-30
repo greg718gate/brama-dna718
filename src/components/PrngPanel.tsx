@@ -48,7 +48,7 @@ const PrngPanel = () => {
 
   // --- Quantum Filter state ---
   const [qfInput, setQfInput] = useState("1.2345, 0.9876, 1.0012, 0.8765, 1.1234, 0.9543, 1.0678, 0.9321, 1.0456, 0.8912");
-  const [qfThreshold, setQfThreshold] = useState("0.998");
+  const [qfThreshold, setQfThreshold] = useState("0.98");
   const [qfPrice, setQfPrice] = useState("");
   const [qfResult, setQfResult] = useState<QuantumFilterResult | null>(null);
   const [qfHistory, setQfHistory] = useState<QuantumFilterResult[]>([]);
@@ -138,7 +138,7 @@ const PrngPanel = () => {
       toast.error("Wprowadź min. 2 wartości liczbowe");
       return;
     }
-    const threshold = parseFloat(qfThreshold) || 0.998;
+    const threshold = parseFloat(qfThreshold) || 0.98;
     const price = parseFloat(qfPrice) || 0;
     const result = prng.analyzeSignal(values, threshold);
     setQfResult(result);
