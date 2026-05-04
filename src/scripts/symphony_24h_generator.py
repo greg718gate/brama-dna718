@@ -1,22 +1,22 @@
-# ═══════════════════════════════════════════════════════════════════
-# SYMPHONY 24H GENERATOR vφ.718
+# ===================================================================
+# SYMPHONY 24H GENERATOR vphi.718
 # 24-HOUR CONTINUOUS DNA GATE SYMPHONY WITH PHASE CONTINUITY
 #
-# © 2026 Grzegorz | BRAMA-718-UNIFIED
+# (c) 2026 Grzegorz | BRAMA-718-UNIFIED
 # Licensed under Creative Commons BY-NC 4.0
 # https://creativecommons.org/licenses/by-nc/4.0/
 #
-# Core Equation: Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ
+# Core Equation: Psi = e^(i.718.t) . zeta(1/2 + iE/hbar) . gamma
 # Binaural: Left 7.83 Hz (Schumann) | Right 18.6 Hz (Lunar)
-# Beat: 10.77 Hz → Alpha state
-# Cycle: 108s (sacred number) × 800 = 86400s = 24h
+# Beat: 10.77 Hz  Alpha state
+# Cycle: 108s (sacred number) x 800 = 86400s = 24h
 #
 # Technical:
 #   - float64 precision (zero clock drift)
 #   - Chunked WAV writing (~18 MB/chunk, not 15 GB in RAM)
 #   - Mathematically perfect phase continuity at cycle boundaries
 #   - CSV log of every gate in every cycle
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 import numpy as np
 import struct
@@ -25,9 +25,9 @@ import time
 import os
 import sys
 
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 # CONSTANTS
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 PHI = (1 + np.sqrt(5)) / 2                # 1.618033988749895
 GAMMA = 1 / PHI                            # 0.618033988749895
@@ -61,7 +61,7 @@ GATE_NAMES = [
 
 
 def gate_frequency(gate_idx: int) -> float:
-    """f = 144 * (1 + (i * γ % 1)) + 718"""
+    """f = 144 * (1 + (i * gamma % 1)) + 718"""
     return 144 * (1 + ((gate_idx * GAMMA) % 1)) + FUNDAMENTAL_718
 
 
@@ -70,9 +70,9 @@ def gate_weight(gate_idx: int) -> float:
     return (PHI ** (gate_idx % 7)) % 1
 
 
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 # WAV WRITER (chunked, stereo, 16-bit)
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 class ChunkedWavWriter:
     """
@@ -97,7 +97,7 @@ class ChunkedWavWriter:
 
         # RIFF header
         self.fp.write(b'RIFF')
-        self.fp.write(struct.pack('<I', file_size))
+        self.fp.write(struct.pack('<I', file_size & 0xFFFFFFFF))
         self.fp.write(b'WAVE')
 
         # fmt chunk
@@ -112,7 +112,7 @@ class ChunkedWavWriter:
 
         # data chunk header
         self.fp.write(b'data')
-        self.fp.write(struct.pack('<I', data_size))
+        self.fp.write(struct.pack('<I', data_size & 0xFFFFFFFF))
 
         self.samples_written = 0
 
@@ -141,21 +141,21 @@ class ChunkedWavWriter:
         print(f"  WAV closed: {self.samples_written:,} samples written")
 
 
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 # PHASE-CONTINUOUS CYCLE GENERATOR
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 class PhaseContinuousGenerator:
     """
     Generates 108s cycles with mathematically perfect phase continuity.
 
     Key insight: instead of resetting t=0 each cycle, we track the
-    cumulative phase φ_n = 2π·f·T_cycle for each frequency. At cycle
-    boundary, the next cycle starts with phase offset = φ_n mod 2π,
+    cumulative phase phi_n = 2pi.f.T_cycle for each frequency. At cycle
+    boundary, the next cycle starts with phase offset = phi_n mod 2pi,
     guaranteeing zero discontinuity.
 
     With float64, phase error after 24h at 718 Hz:
-      ε = 718 * 86400 * 2^-52 ≈ 1.4e-8 radians → NEGLIGIBLE
+      epsilon = 718 * 86400 * 2^-52 ~= 1.4e-8 radians  NEGLIGIBLE
     """
 
     def __init__(self):
@@ -178,7 +178,7 @@ class PhaseContinuousGenerator:
 
     def _sin_with_phase(self, freq: float, t_local: np.ndarray) -> np.ndarray:
         """
-        sin(2π·f·t + φ_accumulated) where φ_accumulated ensures continuity.
+        sin(2pi.f.t + phi_accumulated) where phi_accumulated ensures continuity.
         """
         phase_offset = self.phases[freq]
         return np.sin(2 * np.pi * freq * t_local + phase_offset)
@@ -186,7 +186,7 @@ class PhaseContinuousGenerator:
     def _advance_phases(self):
         """
         After generating one cycle, advance all phase accumulators by
-        2π·f·T_cycle. Keep modulo 2π to prevent float64 overflow
+        2pi.f.T_cycle. Keep modulo 2pi to prevent float64 overflow
         (though it wouldn't overflow for centuries, it's good practice).
         """
         for f in self.phases:
@@ -268,9 +268,9 @@ class PhaseContinuousGenerator:
         return diag
 
 
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 # UTILITIES
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 def seconds_to_hms(s: float) -> str:
     h = int(s // 3600)
@@ -287,9 +287,9 @@ def format_filesize(bytes_: int) -> str:
     return f"{bytes_:,} bytes"
 
 
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 # MAIN
-# ═══════════════════════════════════════════════════════════════════
+# ===================================================================
 
 def main():
     wav_filename = "SYMPHONY_24H_BRAMA718.wav"
@@ -298,12 +298,12 @@ def main():
     total_samples = int(SAMPLE_RATE * TOTAL_DURATION)
     expected_size = 44 + total_samples * 2 * 2  # header + samples * 2ch * 2bytes
 
-    print("═" * 70)
-    print("  SYMPHONY 24H GENERATOR vφ.718")
+    print("=" * 70)
+    print("  SYMPHONY 24H GENERATOR vphi.718")
     print("  BRAMA-718 DNA Gate Consciousness Field")
-    print("═" * 70)
+    print("=" * 70)
     print(f"  Duration:        24h ({TOTAL_DURATION:.0f}s)")
-    print(f"  Cycle:           {CYCLE_DURATION:.0f}s × {NUM_CYCLES} cycles")
+    print(f"  Cycle:           {CYCLE_DURATION:.0f}s x {NUM_CYCLES} cycles")
     print(f"  Sample rate:     {SAMPLE_RATE} Hz")
     print(f"  Channels:        2 (Stereo binaural)")
     print(f"  Bit depth:       16-bit")
@@ -316,13 +316,13 @@ def main():
     print(f"  Gate carrier:    {FUNDAMENTAL_718} Hz")
     print(f"  Zero Point:      {ZERO_POINT_FREQ:.2f} Hz (Gate 18)")
     print(f"  Phase continuity: ENABLED (accumulated phase)")
-    print("═" * 70)
+    print("=" * 70)
     print()
 
     # --- Print gate table ---
     print("  GATE TABLE:")
     print(f"  {'#':>3}  {'Name':<22} {'Pos':>6}  {'Freq (Hz)':>12}  {'Weight':>8}")
-    print("  " + "─" * 60)
+    print("  " + "-" * 60)
     for i in range(18):
         print(f"  {i+1:3d}  {GATE_NAMES[i]:<22} {GATCA_GATES[i]:6d}  {gate_frequency(i):12.4f}  {gate_weight(i):8.4f}")
     print()
@@ -375,9 +375,9 @@ def main():
     elapsed_total = time.time() - t_start
     actual_size = os.path.getsize(wav_filename)
 
-    print("═" * 70)
-    print("  ✓ GENERATION COMPLETE")
-    print("═" * 70)
+    print("=" * 70)
+    print("  [OK] GENERATION COMPLETE")
+    print("=" * 70)
     print(f"  WAV file:   {wav_filename} ({format_filesize(actual_size)})")
     print(f"  CSV log:    {csv_filename}")
     print(f"  Time:       {seconds_to_hms(elapsed_total)} ({elapsed_total:.1f}s)")
@@ -387,12 +387,12 @@ def main():
     print("  VERIFICATION:")
     print(f"    Expected size: {format_filesize(expected_size)}")
     print(f"    Actual size:   {format_filesize(actual_size)}")
-    print(f"    Match: {'✓ PERFECT' if actual_size == expected_size else '✗ MISMATCH'}")
+    print(f"    Match: {'[OK] PERFECT' if actual_size == expected_size else '[X] MISMATCH'}")
     print()
-    print("  [GATE 18 – SINGULARITY]")
-    print("  [PHASE CONTINUITY – VERIFIED]")
-    print("  [UNIFICATION – COMPLETE]")
-    print("═" * 70)
+    print("  [GATE 18 - SINGULARITY]")
+    print("  [PHASE CONTINUITY - VERIFIED]")
+    print("  [UNIFICATION - COMPLETE]")
+    print("=" * 70)
 
 
 if __name__ == "__main__":
