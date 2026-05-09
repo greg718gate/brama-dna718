@@ -469,7 +469,7 @@ export const EquationOfExit = () => {
           <h3 className="text-xl font-bold text-primary">{t('exit.interpretation')}</h3>
           <div className="space-y-3 text-sm">
             <div>
-              <strong className="text-primary">e^(i·718.57012515426885574359120304128340312332181477461·t):</strong> {t('exit.temporal')}
+              <strong className="text-primary">e^(i·718.57·t):</strong> {t('exit.temporal')}
             </div>
             <div>
               <strong className="text-primary">ζ(1/2 + iE/ħ):</strong> {t('exit.riemann')}
