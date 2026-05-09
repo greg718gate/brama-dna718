@@ -288,7 +288,7 @@ class DNASymphony:
     Generates audio activation frequencies:
     - 7.83 Hz (Earth/Schumann) - Left ear
     - 18.6 Hz (Lunar) - Right ear  
-    - 718 Hz (DNA Gate) - Carrier modulated
+    - 718.57 Hz (DNA Gate) - Carrier modulated
     - Binaural beat: 10.77 Hz (Alpha state)
     """
     
@@ -355,7 +355,7 @@ class DNASymphony:
         Generate binaural activation audio:
         - Left: 7.83 Hz (Earth)
         - Right: 18.6 Hz (Lunar)
-        - Carrier: 718 Hz modulated
+        - Carrier: 718.57 Hz modulated
         - Binaural beat: 10.77 Hz → Alpha state
         """
         t = np.linspace(0, duration, int(self.fs * duration), endpoint=False)
@@ -366,7 +366,7 @@ class DNASymphony:
         # Right ear: Lunar frequency
         right = np.sin(2 * np.pi * LUNAR * t)
         
-        # 718 Hz carrier with slow modulation
+        # 718.57 Hz carrier with slow modulation
         modulation_depth = 0.7
         dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
         
@@ -527,7 +527,7 @@ Teleport Ready: {'YES ✓' if result['vector_intention']['teleport_ready'] else 
             output += """
 → Coherence building: Continue harmonic alignment
 → Increase t or adjust x to nearest resonance key
-→ Use audio activation: 7.83 + 18.6 + 718 Hz
+→ Use audio activation: 7.83 + 18.6 + 718.57 Hz
 """
         
         output += "═" * 70 + "\n"
@@ -668,7 +668,7 @@ def main():
     print("=" * 80)
     print(f"γ (Golden Key) = {GAMMA:.10f}")
     print(f"φ (Divine Proportion) = {PHI:.10f}")
-    print(f"718 Hz (DNA Gate) = {FUNDAMENTAL_718}")
+    print(f"718.57 Hz (DNA Gate) = {FUNDAMENTAL_718}")
     print(f"18 GATCA Gates in mtDNA (rCRS)")
     print("=" * 80)
     
@@ -739,7 +739,7 @@ def main():
     print("  γ = 1/φ = 0.618033988749895...")
     print("=" * 80)
     print("Status: CONSCIOUSNESS UNIFIED FIELD - ACTIVE")
-    print("718 Hz | 18 Gates | Golden Ratio | Teleportation Ready")
+    print("718.57 Hz | 18 Gates | Golden Ratio | Teleportation Ready")
     print("=" * 80)
 
 # ═══════════════════════════════════════════════════════════════════

@@ -363,7 +363,7 @@ SPRZĘŻENIA (elementy pozadiagonalne):
 <p>Gdzie:</p>
 <table class="gate-table">
   <tr><th>Składnik</th><th>Wzór</th><th>Znaczenie</th></tr>
-  <tr><td>Temporal</td><td class="math">e^(i·718·t)</td><td>Ewolucja czasowa — obrót fazowy z częstotliwością 718 Hz</td></tr>
+  <tr><td>Temporal</td><td class="math">e^(i·718·t)</td><td>Ewolucja czasowa — obrót fazowy z częstotliwością 718.57 Hz</td></tr>
   <tr><td>Spatial</td><td class="math">e^(-ik·x), k = 2π/718</td><td>Propagacja przestrzenna — wektor falowy</td></tr>
   <tr><td>Zeta</td><td class="math">ζ(½ + i·718)</td><td>Funkcja Zeta Riemanna na linii krytycznej — łączy teoria liczb z fizyką</td></tr>
   <tr><td>Golden</td><td class="math">γ = 0.618...</td><td>Współczynnik Eulera-Mascheroniego (=1/φ) — tłumienie naturalne</td></tr>
@@ -509,7 +509,7 @@ Czystość stanu:  Tr(ρ²) = ½ · (1 + C(t)²)
 
 <div class="note">
   <strong>Kluczowy mechanizm:</strong> „Resonance Protection" (R ≈ 149.4) redukuje efektywną dekoherencję ~150×.
-  To sprawia, że stany przy 718 Hz są teoretycznie stabilniejsze niż typowe stany kwantowe w temperaturze biologicznej.
+  To sprawia, że stany przy 718.57 Hz są teoretycznie stabilniejsze niż typowe stany kwantowe w temperaturze biologicznej.
   Ochrona pochodzi z iloczynu czynnika jakości Q i złotego podziału φ: <span class="math">R = 1 + Q·φ</span>.
 </div>
 
@@ -679,7 +679,7 @@ Przejście <span class="math">718 → /γ → /7.83 → ≈144</span> łączy cz
     <td style="color:var(--gold)">ŚREDNIA</td>
   </tr>
   <tr>
-    <td>🧫 Stymulacja komórkowa 718 Hz</td>
+    <td>🧫 Stymulacja komórkowa 718.57 Hz</td>
     <td>Zmiana ekspresji genów mitochondrialnych po 24h ekspozycji (qRT-PCR)</td>
     <td style="color:var(--green)">WYSOKA</td>
   </tr>
@@ -690,7 +690,7 @@ Przejście <span class="math">718 → /γ → /7.83 → ≈144</span> łączy cz
   </tr>
   <tr>
     <td>✨ Fluorescencja mitochondrialna</td>
-    <td>Zmiana potencjału błonowego Δψ_m (barwienie JC-1/TMRM po stymulacji 718 Hz)</td>
+    <td>Zmiana potencjału błonowego Δψ_m (barwienie JC-1/TMRM po stymulacji 718.57 Hz)</td>
     <td style="color:var(--gold)">ŚREDNIA</td>
   </tr>
 </table>
@@ -908,7 +908,7 @@ ${GATCA_GATES.map((pos, i) => {
   <tr><td><strong>Lindblad</strong></td><td>γ_d, T₂, Tr(ρ²)</td><td>Dekoherencja, czas życia, czystość stanu</td></tr>
   <tr><td><strong>Interpretacja</strong></td><td colspan="2">„Nauka mówi", „Wiara mówi", „Most" — unikalna analiza dla każdego wersetu</td></tr>
   <tr><td><strong>Sygnatury φ</strong></td><td class="math">φ, γ, 718/7.83</td><td>Harmoniczne złotego podziału</td></tr>
-  <tr><td><strong>Predykcje</strong></td><td>5 metod</td><td>Testowalne laboratoryjnie predykcje (UV-Vis, NMR, EEG, 718 Hz, fluorescencja)</td></tr>
+  <tr><td><strong>Predykcje</strong></td><td>5 metod</td><td>Testowalne laboratoryjnie predykcje (UV-Vis, NMR, EEG, 718.57 Hz, fluorescencja)</td></tr>
 </table>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -933,7 +933,7 @@ ${GATCA_GATES.map((pos, i) => {
 
 <span style="color:var(--primary)">[WARSTWA 2: JĄDRO SYSTEMU — FORMULA Ψ_TOTAL]</span>
 Ψ_total(t) = Ψ_GATCA · exp(i·718·t) · cos(7.83·t) · sin(18.6·t) · φ_DNA
-- Stała Nośna: 718 Hz (pochodna 18 pozycji GATCA w mtDNA).
+- Stała Nośna: 718.57 Hz (pochodna 18 pozycji GATCA w mtDNA).
 - Modulator 1: 7.83 Hz (Rezonans Schumanna).
 - Modulator 2: 18.6 Hz (Modulacja Księżycowa/Świadomości oparta na φ²).
 - Koherencja (C): Oblicz spójność fazową sygnału. C > 94% = STATUS: TELEPORTATION_READY.

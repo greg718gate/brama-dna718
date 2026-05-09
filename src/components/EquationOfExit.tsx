@@ -127,7 +127,7 @@ export const EquationOfExit = () => {
   const leftOscRef = useRef<OscillatorNode | null>(null);
   const rightOscRef = useRef<OscillatorNode | null>(null);
 
-  // Odtwarzanie częstotliwości 718 Hz ze stereo binauralnym
+  // Odtwarzanie częstotliwości 718.57 Hz ze stereo binauralnym
   const playExitFrequency = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new AudioContext();

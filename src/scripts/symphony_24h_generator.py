@@ -154,7 +154,7 @@ class PhaseContinuousGenerator:
     boundary, the next cycle starts with phase offset = phi_n mod 2pi,
     guaranteeing zero discontinuity.
 
-    With float64, phase error after 24h at 718 Hz:
+    With float64, phase error after 24h at 718.57 Hz:
       epsilon = 718 * 86400 * 2^-52 ~= 1.4e-8 radians  NEGLIGIBLE
     """
 

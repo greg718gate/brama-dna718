@@ -142,7 +142,7 @@ export const CircularTimer = ({
         
         {isActive && (
           <div className="text-[#00f2ff] text-xs mt-2 animate-pulse">
-            718 Hz aktywne
+            718.57 Hz aktywne
           </div>
         )}
         

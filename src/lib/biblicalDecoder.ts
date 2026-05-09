@@ -965,7 +965,7 @@ export function calculateDecoherence(
   const coherenceTime = 1 / decoherenceRate;
 
   // Remaining coherence: ρ_off(t) = ρ_off(0) · e^(-γ_d · t)
-  // At 718 Hz resonance, the system has protection factor from golden ratio coupling
+  // At 718.57 Hz resonance, the system has protection factor from golden ratio coupling
   // This reduces effective decoherence: γ_eff = γ_d / (1 + Q·φ)
   const resonanceProtection = 1 + qualityFactor * PHI;
   const effectiveRate = decoherenceRate / resonanceProtection;
@@ -1034,10 +1034,10 @@ export function generatePredictions(result: {
         testability: "MEDIUM",
       },
       {
-        method: "Cell Stimulation at 718 Hz",
+        method: "Cell Stimulation at 718.57 Hz",
         icon: "🧫",
         prediction: `Exposure to ${FREQ_718} Hz → change in mitochondrial gene expression`,
-        details: "Applying a 718 Hz acoustic wave to cell culture should affect expression of mitochondrial genes encoded near GATCA positions. Measure mRNA via qRT-PCR after 24h exposure.",
+        details: "Applying a 718.57 Hz acoustic wave to cell culture should affect expression of mitochondrial genes encoded near GATCA positions. Measure mRNA via qRT-PCR after 24h exposure.",
         expectedValue: `Expression change: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
         testability: "HIGH",
       },
@@ -1045,7 +1045,7 @@ export function generatePredictions(result: {
         method: "EEG / Brain Coherence",
         icon: "🧠",
         prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → α-θ synchronization`,
-        details: "Exposure to a binaural beat (718 Hz left ear, 725.83 Hz right ear = 7.83 Hz difference) should induce EEG coherence between the frontal and parietal cortex in the theta band.",
+        details: "Exposure to a binaural beat (718.57 Hz left ear, 725.83 Hz right ear = 7.83 Hz difference) should induce EEG coherence between the frontal and parietal cortex in the theta band.",
         expectedValue: `EEG coherence > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
         testability: "HIGH",
       },
@@ -1053,7 +1053,7 @@ export function generatePredictions(result: {
         method: "Mitochondrial Fluorescence",
         icon: "✨",
         prediction: `Membrane potential change Δψ_m at gate ${result.gatePosition} resonance`,
-        details: "JC-1 or TMRM staining of mitochondria after 718 Hz stimulation should show a change in the red/green fluorescence ratio, indicating membrane potential modulation.",
+        details: "JC-1 or TMRM staining of mitochondria after 718.57 Hz stimulation should show a change in the red/green fluorescence ratio, indicating membrane potential modulation.",
         expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
         testability: "MEDIUM",
       },
@@ -1078,10 +1078,10 @@ export function generatePredictions(result: {
       testability: "MEDIUM",
     },
     {
-      method: "Stymulacja komórkowa 718 Hz",
+      method: "Stymulacja komórkowa 718.57 Hz",
       icon: "🧫",
       prediction: `Ekspozycja na ${FREQ_718} Hz → zmiana ekspresji genów mitochondrialnych`,
-      details: "Nałożenie fali akustycznej 718 Hz na hodowlę komórkową powinno wpłynąć na ekspresję genów mitochondrialnych kodowanych w pobliżu pozycji GATCA. Mierz mRNA metodą qRT-PCR po 24h ekspozycji.",
+      details: "Nałożenie fali akustycznej 718.57 Hz na hodowlę komórkową powinno wpłynąć na ekspresję genów mitochondrialnych kodowanych w pobliżu pozycji GATCA. Mierz mRNA metodą qRT-PCR po 24h ekspozycji.",
       expectedValue: `Zmiana ekspresji: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
       testability: "HIGH",
     },
@@ -1089,7 +1089,7 @@ export function generatePredictions(result: {
       method: "EEG / Koherencja mózgowa",
       icon: "🧠",
       prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → synchronizacja α-θ`,
-      details: "Ekspozycja na binauralny beat (718 Hz lewe ucho, 725.83 Hz prawe ucho = różnica 7.83 Hz) powinna indukować koherencję EEG między korą czołową a ciemieniową w paśmie theta.",
+      details: "Ekspozycja na binauralny beat (718.57 Hz lewe ucho, 725.83 Hz prawe ucho = różnica 7.83 Hz) powinna indukować koherencję EEG między korą czołową a ciemieniową w paśmie theta.",
       expectedValue: `Koherencja EEG > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
       testability: "HIGH",
     },
@@ -1097,7 +1097,7 @@ export function generatePredictions(result: {
       method: "Fluorescencja mitochondrialna",
       icon: "✨",
       prediction: `Zmiana potencjału błonowego Δψ_m przy rezonansie bramy ${result.gatePosition}`,
-      details: "Barwienie JC-1 lub TMRM mitochondriów po stymulacji 718 Hz powinno wykazać zmianę stosunku fluorescencji czerwonej/zielonej, wskazując na modulację potencjału błonowego.",
+      details: "Barwienie JC-1 lub TMRM mitochondriów po stymulacji 718.57 Hz powinno wykazać zmianę stosunku fluorescencji czerwonej/zielonej, wskazując na modulację potencjału błonowego.",
       expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
       testability: "MEDIUM",
     },

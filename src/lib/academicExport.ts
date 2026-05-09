@@ -1,6 +1,6 @@
 /**
  * COMPLETE Academic Export for Universities and Scientific Institutions
- * DNA Gate 718 Hz - Transition Theory
+ * DNA Gate 718.57 Hz - Transition Theory
  * 
  * Zawiera:
  * - Pełne obliczenia matematyczne (φ, γ, wektor M, częstotliwości)
@@ -483,7 +483,7 @@ const generateDNAHelixSVG = (lang: 'pl' | 'en') => {
 };
 
 const generateFrequencyWaveSVG = (lang: 'pl' | 'en') => {
-  const label718 = lang === 'pl' ? '718 Hz (Brama DNA)' : '718 Hz (DNA Gate)';
+  const label718 = lang === 'pl' ? '718.57 Hz (Brama DNA)' : '718.57 Hz (DNA Gate)';
   const labelSchumann = lang === 'pl' ? '7.83 Hz (Schumann)' : '7.83 Hz (Schumann)';
 
   return `
@@ -500,7 +500,7 @@ const generateFrequencyWaveSVG = (lang: 'pl' | 'en') => {
   ${Array.from({ length: 13 }, (_, i) => `<line x1="${i * 50}" y1="0" x2="${i * 50}" y2="150" stroke="#eee" stroke-width="1"/>`).join('')}
   ${Array.from({ length: 4 }, (_, i) => `<line x1="0" y1="${i * 50}" x2="600" y2="${i * 50}" stroke="#eee" stroke-width="1"/>`).join('')}
 
-  <!-- 718 Hz wave -->
+  <!-- 718.57 Hz wave -->
   <path d="M 0 75 ${Array.from({ length: 601 }, (_, x) => {
     const y = 75 - Math.sin(x * 0.1) * 40 * Math.exp(-x * 0.002);
     return `L ${x} ${y}`;
@@ -598,7 +598,7 @@ const getPentagramMatrixData = (lang: 'pl' | 'en') => [
   {
     name: { pl: 'GATCA-718', en: 'GATCA-718' },
     domain: { pl: 'Biologia molekularna', en: 'Molecular Biology' },
-    connection: { pl: 'Sekwencje DNA, częstotliwość 718 Hz, rezonans komórkowy', en: 'DNA sequences, 718 Hz frequency, cellular resonance' }
+    connection: { pl: 'Sekwencje DNA, częstotliwość 718.57 Hz, rezonans komórkowy', en: 'DNA sequences, 718.57 Hz frequency, cellular resonance' }
   },
   {
     name: { pl: 'Soul Proof', en: 'Soul Proof' },
@@ -623,7 +623,7 @@ const getUnifiedBridges = (lang: 'pl' | 'en') => [
     bridge: { pl: 'Most I: Genesis ↔ Big Bang', en: 'Bridge I: Genesis ↔ Big Bang' },
     scripture: { pl: '"Na początku było Słowo" (Jan 1:1)', en: '"In the beginning was the Word" (John 1:1)' },
     science: { pl: 'Singularity → ekspansja kwantowych fluktuacji', en: 'Singularity → expansion of quantum fluctuations' },
-    frequency: '718 Hz = 7.83 × 91.7'
+    frequency: '718.57 Hz = 7.83 × 91.7'
   },
   {
     bridge: { pl: 'Most II: Dusza ↔ Funkcja falowa', en: 'Bridge II: Soul ↔ Wave Function' },
@@ -656,7 +656,7 @@ const generatePythonCode = (contactEmail?: string) => {
     : '';
 
   return `# ===============================================
-# DNA GATE 718 Hz - COMPLETE VERIFICATION CODE
+# DNA GATE 718.57 Hz - COMPLETE VERIFICATION CODE
 # Python 3.8+ | NumPy, SciPy, Matplotlib
 # ===============================================
 import numpy as np
@@ -679,7 +679,7 @@ GATCA_POSITIONS = [
 ]
 
 print("="*60)
-print("DNA GATE 718 Hz - Mathematical Verification")
+print("DNA GATE 718.57 Hz - Mathematical Verification")
 print("="*60)
 
 # ============= GOLDEN RATIO VERIFICATION =============
@@ -708,7 +708,7 @@ print(f"    Expected |M| ≈ φ·√2 = {PHI * np.sqrt(2):.6f}")
 # ============= FREQUENCY RELATIONSHIPS =============
 print("\\n[3] FREQUENCY RELATIONSHIPS")
 ratio_schumann = DNA_FREQ / SCHUMANN
-print(f"    718 Hz / 7.83 Hz = {ratio_schumann:.6f}")
+print(f"    718.57 Hz / 7.83 Hz = {ratio_schumann:.6f}")
 print(f"    718 / 91.7 ≈ {718 / 91.7:.6f} (Schumann)")
 print(f"    718 × γ = {718 * GAMMA:.2f} Hz")
 print(f"    718 / φ = {718 / PHI:.2f} Hz")
@@ -778,7 +778,7 @@ print("""
 # ============= SCHRÖDINGER EQUATION =============
 print("\\n[8] SCHRÖDINGER EQUATION APPLICATION")
 print("    iℏ ∂Ψ/∂t = ĤΨ")
-print(f"    For ω = 718 Hz:")
+print(f"    For ω = 718.57 Hz:")
 print(f"    E = ℏω = {HBAR * 718:.6e} J")
 print(f"    E = ℏω = {HBAR * 718 / 1.602e-19:.6e} eV")
 print(f"    λ = c/f = {3e8 / 718:.2f} m")
@@ -838,7 +838,7 @@ ax3.set_title("18 Gates Frequency Spectrum")
 freqs = [144 * (1 + ((i * GAMMA) % 1)) + DNA_FREQ for i in range(18)]
 colors = ['#22c55e']*6 + ['#3b82f6']*6 + ['#f59e0b']*6
 ax3.bar(range(1, 19), freqs, color=colors)
-ax3.axhline(y=718, color='red', linestyle='--', label='718 Hz base')
+ax3.axhline(y=718, color='red', linestyle='--', label='718.57 Hz base')
 ax3.set_xlabel("Gate Number")
 ax3.set_ylabel("Frequency (Hz)")
 ax3.legend()
@@ -1005,13 +1005,13 @@ const getContent = (lang: 'pl' | 'en') => {
   
   return {
     title: isPolish 
-      ? 'DNA Gate 718 Hz — Teoria Przejścia' 
-      : 'DNA Gate 718 Hz — Transition Theory',
+      ? 'DNA Gate 718.57 Hz — Teoria Przejścia' 
+      : 'DNA Gate 718.57 Hz — Transition Theory',
     subtitle: isPolish 
       ? 'Kompletny model matematyczny łączący strukturę DNA, geometrię świętą i stałe uniwersalne'
       : 'Complete Mathematical Model Connecting DNA Structure, Sacred Geometry, and Universal Constants',
     abstract: isPolish
-      ? `Niniejsza praca przedstawia kompletny teoretyczny model łączący częstotliwość 718 Hz ze strukturą 
+      ? `Niniejsza praca przedstawia kompletny teoretyczny model łączący częstotliwość 718.57 Hz ze strukturą 
 mitochondrialnego DNA (mtDNA), złotym podziałem (φ = 1.618...), rezonansem Schumanna (7.83 Hz) oraz 
 funkcją zeta Riemanna. Wprowadzamy model 18 Bram DNA jako system aktywacji komórkowej oparty na 
 18 potwierdzonych pozycjach sekwencji GATCA w ludzkim mtDNA. Każda brama odpowiada konkretnej 
@@ -1028,7 +1028,7 @@ wskazując na głęboką jedność opisów rzeczywistości.
 
 Wszystkie obliczenia zostały zweryfikowane numerycznie i załączone jako kod Python i JavaScript, 
 umożliwiający niezależną replikację wyników oraz generowanie Symfonii 18 Bram.`
-      : `This paper presents a complete theoretical model connecting the 718 Hz frequency with 
+      : `This paper presents a complete theoretical model connecting the 718.57 Hz frequency with 
 mitochondrial DNA (mtDNA) structure, the golden ratio (φ = 1.618...), Schumann resonance (7.83 Hz), 
 and the Riemann zeta function. We introduce the 18 DNA Gates model as a cellular activation system 
 based on 18 confirmed GATCA sequence positions in human mtDNA. Each gate corresponds to a specific 
@@ -1047,9 +1047,9 @@ spirituality, pointing to a deep unity in descriptions of reality.
 All calculations have been numerically verified and attached as Python and JavaScript code, 
 enabling independent replication of results and generation of the 18 Gates Symphony.`,
     keywords: isPolish
-      ? ['DNA', 'mtDNA', '718 Hz', 'złoty podział', 'rezonans Schumanna', 'funkcja zeta', 
+      ? ['DNA', 'mtDNA', '718.57 Hz', 'złoty podział', 'rezonans Schumanna', 'funkcja zeta', 
          'świadomość', 'pentagram', 'GATCA', '18 Bram', 'biofizyka', 'fizyka kwantowa']
-      : ['DNA', 'mtDNA', '718 Hz', 'golden ratio', 'Schumann resonance', 'zeta function',
+      : ['DNA', 'mtDNA', '718.57 Hz', 'golden ratio', 'Schumann resonance', 'zeta function',
          'consciousness', 'pentagram', 'GATCA', '18 Gates', 'biophysics', 'quantum physics'],
     toc: isPolish ? 'Spis Treści' : 'Table of Contents',
     sections: {
@@ -1186,11 +1186,11 @@ export const exportAcademicDocument = (options: AcademicExportOptions) => {
     ${isPolish 
       ? `Ludzkie DNA to nie tylko sekwencja nukleotydów — to system informacyjny operujący na wielu poziomach 
 organizacji. Niniejsza praca eksploruje hipotezę, że struktura DNA może być aktywowana przez specyficzne 
-częstotliwości akustyczne, w szczególności 718 Hz, która wykazuje niezwykłe relacje matematyczne ze 
+częstotliwości akustyczne, w szczególności 718.57 Hz, która wykazuje niezwykłe relacje matematyczne ze 
 stałymi fundamentalnymi.`
       : `Human DNA is not merely a sequence of nucleotides — it is an information system operating at multiple 
 levels of organization. This paper explores the hypothesis that DNA structure can be activated by specific 
-acoustic frequencies, particularly 718 Hz, which exhibits remarkable mathematical relationships with 
+acoustic frequencies, particularly 718.57 Hz, which exhibits remarkable mathematical relationships with 
 fundamental constants.`}
   </p>
   <p>
@@ -1256,16 +1256,16 @@ occurring in DNA, (2) Schumann resonance at 7.83 Hz as Earth's fundamental frequ
   <div class="calculation-box">
     <h4>${isPolish ? 'Kluczowe relacje częstotliwości' : 'Key Frequency Relationships'}</h4>
     <div class="result">
-      718 Hz / 7.83 Hz = ${(718 / 7.83).toFixed(6)} ≈ 91.7
+      718.57 Hz / 7.83 Hz = ${(718 / 7.83).toFixed(6)} ≈ 91.7
     </div>
     <div class="result">
-      718 Hz × γ = ${(718 * GAMMA).toFixed(4)} Hz
+      718.57 Hz × γ = ${(718 * GAMMA).toFixed(4)} Hz
     </div>
     <div class="result">
-      718 Hz / φ = ${(718 / PHI).toFixed(4)} Hz
+      718.57 Hz / φ = ${(718 / PHI).toFixed(4)} Hz
     </div>
     <div class="result">
-      718 Hz / 91.7 = ${(718 / 91.7).toFixed(6)} Hz ≈ Schumann
+      718.57 Hz / 91.7 = ${(718 / 91.7).toFixed(6)} Hz ≈ Schumann
     </div>
   </div>
   
@@ -1273,8 +1273,8 @@ occurring in DNA, (2) Schumann resonance at 7.83 Hz as Earth's fundamental frequ
     ${generateFrequencyWaveSVG(language)}
     <div class="caption">
       ${isPolish
-        ? 'Ryc. 2: Nakładanie się fali 718 Hz (DNA Gate) z modulacją 7.83 Hz (Schumann).'
-        : 'Fig. 2: Superposition of 718 Hz wave (DNA Gate) with 7.83 Hz modulation (Schumann).'}
+        ? 'Ryc. 2: Nakładanie się fali 718.57 Hz (DNA Gate) z modulacją 7.83 Hz (Schumann).'
+        : 'Fig. 2: Superposition of 718.57 Hz wave (DNA Gate) with 7.83 Hz modulation (Schumann).'}
     </div>
   </div>
 </div>
@@ -1292,7 +1292,7 @@ DNA (rCRS - revised Cambridge Reference Sequence). Każda brama generuje unikaln
   </p>
   
   <div class="equation-box">
-    <div class="main">f<sub>n</sub> = 144 × (1 + ((n × γ) mod 1)) + 718 Hz</div>
+    <div class="main">f<sub>n</sub> = 144 × (1 + ((n × γ) mod 1)) + 718.57 Hz</div>
     <div class="description">
       ${isPolish ? 'gdzie n = numer bramy (1-18), γ = 0.618...' : 'where n = gate number (1-18), γ = 0.618...'}
     </div>
@@ -1678,19 +1678,19 @@ contradiction. I am not paradox. I am the reconciliation you've been seeking."`}
   
   <p>
     ${isPolish
-      ? `Aplikacja DNA Gate 718 Hz zawiera trzy interaktywne kalkulatory umożliwiające praktyczne 
+      ? `Aplikacja DNA Gate 718.57 Hz zawiera trzy interaktywne kalkulatory umożliwiające praktyczne 
 zastosowanie teorii. Każdy kalkulator implementuje obliczenia opisane w niniejszej pracy.`
-      : `The DNA Gate 718 Hz application contains three interactive calculators enabling practical 
+      : `The DNA Gate 718.57 Hz application contains three interactive calculators enabling practical 
 application of the theory. Each calculator implements calculations described in this paper.`}
   </p>
   
-  <h3>${isPolish ? '10.1 Generator Bramy DNA 718 Hz' : '10.1 DNA Gate 718 Hz Generator'}</h3>
+  <h3>${isPolish ? '10.1 Generator Bramy DNA 718.57 Hz' : '10.1 DNA Gate 718.57 Hz Generator'}</h3>
   <div class="calculation-box">
     <h4>${isPolish ? 'Funkcje:' : 'Features:'}</h4>
     <ul style="font-size: 10pt;">
       <li>${isPolish 
-        ? 'Generuje dźwięk 718 Hz w czasie rzeczywistym (Web Audio API)' 
-        : 'Generates 718 Hz sound in real-time (Web Audio API)'}</li>
+        ? 'Generuje dźwięk 718.57 Hz w czasie rzeczywistym (Web Audio API)' 
+        : 'Generates 718.57 Hz sound in real-time (Web Audio API)'}</li>
       <li>${isPolish 
         ? 'Nakłada rezonans Schumanna 7.83 Hz (lewy kanał)' 
         : 'Superimposes Schumann resonance 7.83 Hz (left channel)'}</li>
@@ -1705,7 +1705,7 @@ application of the theory. Each calculator implements calculations described in 
         : 'Export to WAV file (60 seconds)'}</li>
     </ul>
     <div class="result">
-      ${isPolish ? 'Stosunek częstotliwości:' : 'Frequency ratio:'} 718 Hz / 7.83 Hz = 91.699 ≈ 89 (Fibonacci)
+      ${isPolish ? 'Stosunek częstotliwości:' : 'Frequency ratio:'} 718.57 Hz / 7.83 Hz = 91.699 ≈ 89 (Fibonacci)
     </div>
   </div>
   
@@ -1723,8 +1723,8 @@ application of the theory. Each calculator implements calculations described in 
         ? 'Wizualizacja pola świadomości na Canvas 2D' 
         : 'Consciousness field visualization on 2D Canvas'}</li>
       <li>${isPolish 
-        ? 'Generator częstotliwości 718 Hz' 
-        : '718 Hz frequency generator'}</li>
+        ? 'Generator częstotliwości 718.57 Hz' 
+        : '718.57 Hz frequency generator'}</li>
     </ul>
     <div class="result">
       ${isPolish ? 'Klucze rezonansowe:' : 'Resonance keys:'}<br>
@@ -1853,9 +1853,9 @@ using Web Audio API. It can be run directly in developer console.`}
   
   <p>
     ${isPolish
-      ? `Przedstawiona teoria DNA Gate 718 Hz stanowi propozycję nowego paradygmatu rozumienia relacji między 
+      ? `Przedstawiona teoria DNA Gate 718.57 Hz stanowi propozycję nowego paradygmatu rozumienia relacji między 
 świadomością, DNA i częstotliwościami akustycznymi. Kluczowe wnioski:`
-      : `The presented DNA Gate 718 Hz theory constitutes a proposal for a new paradigm of understanding 
+      : `The presented DNA Gate 718.57 Hz theory constitutes a proposal for a new paradigm of understanding 
 the relationship between consciousness, DNA, and acoustic frequencies. Key conclusions:`}
   </p>
   

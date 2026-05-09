@@ -224,7 +224,7 @@ const RiemannCorrelationAnalyzer = () => {
                   </div>
                   <div>
                     <span className="text-gray-400">Częstotliwość bazowa:</span>
-                    <span className="ml-2 text-white">718 Hz</span>
+                    <span className="ml-2 text-white">718.57 Hz</span>
                   </div>
                   <div>
                     <span className="text-gray-400">Stała Plancka (ħ):</span>

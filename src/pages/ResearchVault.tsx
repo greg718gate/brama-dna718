@@ -47,7 +47,7 @@ const ResearchVault = () => {
       description:
         "Rezonans Schumanna to naturalna częstotliwość elektromagnetyczna jonosfera-Ziemia wynosząca 7.83 Hz. Ta częstotliwość odpowiada falom alfa ludzkiego mózgu i jest podstawową częstotliwością harmoniczną planety. Generator DNA wykorzystuje 7.83 Hz jako fundament dla wszystkich innych częstotliwości.",
       equations:
-        "f_Schumann = 7.83 Hz (podstawowa)\nHarmoniki: 14.3 Hz, 20.8 Hz, 27.3 Hz, 33.8 Hz\nZwiązek z DNA: 7.83 × 91.7 ≈ 718 Hz\nZwiązek z γ-brainwave: 7.83 × 2.38 ≈ 18.6 Hz",
+        "f_Schumann = 7.83 Hz (podstawowa)\nHarmoniki: 14.3 Hz, 20.8 Hz, 27.3 Hz, 33.8 Hz\nZwiązek z DNA: 7.83 × 91.7 ≈ 718.57 Hz\nZwiązek z γ-brainwave: 7.83 × 2.38 ≈ 18.6 Hz",
       verification:
         "Pomiary pola elektromagnetycznego Ziemi konsekwentnie pokazują rezonans Schumanna w zakresie 7.83 ± 0.5 Hz. Badania EEG potwierdzają synchronizację fal mózgowych alfa z częstotliwością Schumanna podczas medytacji i głębokiego relaksu.",
       author: "DNA Gate Research",
@@ -56,12 +56,12 @@ const ResearchVault = () => {
     },
     {
       id: "RES-FREQUENCY-718",
-      title: "Częstotliwość DNA 718 Hz i Harmoniczny System",
+      title: "Częstotliwość DNA 718.57 Hz i Harmoniczny System",
       category: "frequency",
       description:
-        "Analiza częstotliwościowa ujawnia, że biologiczny rezonans DNA wynosi około 718 Hz. Ta częstotliwość tworzy harmoniczny system z innymi kluczowymi częstotliwościami: 528 Hz (naprawa DNA), 639 Hz (relacje), 741 Hz (intuicja), 852 Hz (powrót do porządku duchowego), oraz częstotliwością OM 136.1 Hz.",
+        "Analiza częstotliwościowa ujawnia, że biologiczny rezonans DNA wynosi około 718.57 Hz. Ta częstotliwość tworzy harmoniczny system z innymi kluczowymi częstotliwościami: 528 Hz (naprawa DNA), 639 Hz (relacje), 741 Hz (intuicja), 852 Hz (powrót do porządku duchowego), oraz częstotliwością OM 136.1 Hz.",
       equations:
-        "f_DNA ≈ 718 Hz\nf_DNA / f_Schumann = 718 / 7.83 ≈ 91.7\nSkala Solfeggio:\n- 528 Hz (naprawa DNA)\n- 639 Hz (harmonizacja)\n- 741 Hz (przebudzenie)\n- 852 Hz (intuicja)\nOM = 136.1 Hz = C# (rok Ziemi)",
+        "f_DNA ≈ 718.57 Hz\nf_DNA / f_Schumann = 718 / 7.83 ≈ 91.7\nSkala Solfeggio:\n- 528 Hz (naprawa DNA)\n- 639 Hz (harmonizacja)\n- 741 Hz (przebudzenie)\n- 852 Hz (intuicja)\nOM = 136.1 Hz = C# (rok Ziemi)",
       verification:
         "Spektroskopia molekularna DNA potwierdza rezonans w zakresie 700-740 Hz. Badania biofizyczne wykazują, że częstotliwości Solfeggio mają wpływ na strukturę DNA i ekspresję genów. Harmoniczny związek 718/7.83 = 91.7 sugeruje fundamentalną relację biologia-planeta.",
       author: "DNA Gate Research",
@@ -143,9 +143,9 @@ const ResearchVault = () => {
       title: "Generator Audio: System 8 Częstotliwości",
       category: "frequency",
       description:
-        "System generatora audio łączący 8 kluczowych częstotliwości w jedną harmoniczną kompozycję: 7.83 Hz (Schumann), 18.6 Hz (gamma), 136.1 Hz (OM), 528 Hz (DNA repair), 639 Hz (harmonia), 718 Hz (DNA resonance), 741 Hz (intuicja), 852 Hz (duchowość). Każda częstotliwość ma specyficzną rolę w aktywacji świadomości.",
+        "System generatora audio łączący 8 kluczowych częstotliwości w jedną harmoniczną kompozycję: 7.83 Hz (Schumann), 18.6 Hz (gamma), 136.1 Hz (OM), 528 Hz (DNA repair), 639 Hz (harmonia), 718.57 Hz (DNA resonance), 741 Hz (intuicja), 852 Hz (duchowość). Każda częstotliwość ma specyficzną rolę w aktywacji świadomości.",
       equations:
-        "f1 = 7.83 Hz (Schumann, podstawa)\nf2 = 18.6 Hz (gamma, świadomość)\nf3 = 136.1 Hz (OM, rok Ziemi)\nf4 = 528 Hz (naprawa DNA)\nf5 = 639 Hz (relacje, harmonia)\nf6 = 718 Hz (rezonans DNA)\nf7 = 741 Hz (intuicja, przebudzenie)\nf8 = 852 Hz (porządek duchowy)\n\nCzas trwania: 60 sekund\nFormat: Stereo (Schumann L, Gamma R)\nGłośność: 0.3-0.5 per częstotliwość",
+        "f1 = 7.83 Hz (Schumann, podstawa)\nf2 = 18.6 Hz (gamma, świadomość)\nf3 = 136.1 Hz (OM, rok Ziemi)\nf4 = 528 Hz (naprawa DNA)\nf5 = 639 Hz (relacje, harmonia)\nf6 = 718.57 Hz (rezonans DNA)\nf7 = 741 Hz (intuicja, przebudzenie)\nf8 = 852 Hz (porządek duchowy)\n\nCzas trwania: 60 sekund\nFormat: Stereo (Schumann L, Gamma R)\nGłośność: 0.3-0.5 per częstotliwość",
       verification:
         "Generator audio wykorzystuje Web Audio API z częstotliwością próbkowania 44100 Hz. Analiza FFT potwierdza dokładność generowanych częstotliwości z błędem < 0.1 Hz. Wizualizacja spektrum pokazuje wszystkie 8 częstotliwości jako wyraźne piki.",
       author: "DNA Gate Research",

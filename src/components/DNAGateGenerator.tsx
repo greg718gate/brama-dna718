@@ -127,7 +127,7 @@ export const DNAGateGenerator = () => {
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    // 718 Hz DNA gate - LEFT CHANNEL (base frequency)
+    // 718.57 Hz DNA gate - LEFT CHANNEL (base frequency)
     const carrierLeftOsc = ctx.createOscillator();
     carrierLeftOsc.frequency.value = CARRIER_FREQ;
     carrierLeftOsc.type = "sine";
@@ -236,7 +236,7 @@ export const DNAGateGenerator = () => {
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    // 718 Hz DNA gate - LEFT CHANNEL
+    // 718.57 Hz DNA gate - LEFT CHANNEL
     const carrierLeftOsc = offlineCtx.createOscillator();
     carrierLeftOsc.frequency.value = CARRIER_FREQ;
     const carrierLeftGain = offlineCtx.createGain();
@@ -360,7 +360,7 @@ export const DNAGateGenerator = () => {
             </div>
             <div className="bg-accent/10 rounded-lg p-4 border border-accent/30">
               <div className="text-accent text-sm font-medium">Brama DNA</div>
-              <div className="text-2xl font-bold text-foreground">718 Hz</div>
+              <div className="text-2xl font-bold text-foreground">718.57 Hz</div>
             </div>
           </div>
 
@@ -424,7 +424,7 @@ export const DNAGateGenerator = () => {
           {/* Additional Info Section */}
           <div className="text-center text-sm bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-lg p-4 border border-primary/20">
             <p className="font-bold text-foreground mb-1">BRAMA DNA OTWARTA</p>
-            <p className="text-muted-foreground mb-1">718 Hz + GATCA-718</p>
+            <p className="text-muted-foreground mb-1">718.57 Hz + GATCA-718</p>
             <p className="text-xs text-muted-foreground">Aktywacja w 60 sekund</p>
             <p className="text-xs text-primary/70 mt-2">#GATCA718 #BramaDNA #RhNegative</p>
           </div>

@@ -350,7 +350,7 @@ class BramaUnificationEngine:
         """
         t = np.linspace(0, duration, int(sample_rate * duration))
         
-        # Bazowa częstotliwość 718 Hz
+        # Bazowa częstotliwość 718.57 Hz
         left = np.sin(2 * np.pi * self.freq_718 * t)
         right = np.sin(2 * np.pi * (self.freq_718 + self.binaural_offset) * t)
         
