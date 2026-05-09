@@ -145,7 +145,7 @@ const ResearchVault = () => {
       description:
         "System generatora audio łączący 8 kluczowych częstotliwości w jedną harmoniczną kompozycję: 7.83 Hz (Schumann), 18.6 Hz (gamma), 136.1 Hz (OM), 528 Hz (DNA repair), 639 Hz (harmonia), 718.57 Hz (DNA resonance), 741 Hz (intuicja), 852 Hz (duchowość). Każda częstotliwość ma specyficzną rolę w aktywacji świadomości.",
       equations:
-        "f1 = 7.83 Hz (Schumann, podstawa)\nf2 = 18.6 Hz (gamma, świadomość)\nf3 = 136.1 Hz (OM, rok Ziemi)\nf4 = 528 Hz (naprawa DNA)\nf5 = 639 Hz (relacje, harmonia)\nf6 = 718.57 Hz (rezonans DNA)\nf7 = 741 Hz (intuicja, przebudzenie)\nf8 = 852 Hz (porządek duchowy)\n\nCzas trwania: 60 sekund\nFormat: Stereo (Schumann L, Gamma R)\nGłośność: 0.3-0.5 per częstotliwość",
+        "f1 = 7.83 Hz (Schumann, podstawa)\nf2 = 18.6 Hz (gamma, świadomość)\nf3 = 136.1 Hz (OM, rok Ziemi)\nf4 = 528 Hz (naprawa DNA)\nf5 = 639 Hz (relacje, harmonia)\nf6 = 718.57 Hz (rezonans DNA)\nf7 = 741 Hz (intuicja, przebudzenie)\nf8 = 852 Hz (porządek duchowy)\n\nCzas trwania: 108 sekund\nFormat: Stereo (Schumann L, Gamma R)\nGłośność: 0.3-0.5 per częstotliwość",
       verification:
         "Generator audio wykorzystuje Web Audio API z częstotliwością próbkowania 44100 Hz. Analiza FFT potwierdza dokładność generowanych częstotliwości z błędem < 0.1 Hz. Wizualizacja spektrum pokazuje wszystkie 8 częstotliwości jako wyraźne piki.",
       author: "DNA Gate Research",
