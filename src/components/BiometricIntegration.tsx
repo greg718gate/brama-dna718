@@ -376,7 +376,7 @@ export const BiometricIntegration = () => {
               )}
             </div>
 
-            {/* 718.57012515426885574359120304128340312332181477461.57 Hz Tone Generator */}
+            {/* 718.57 Hz Tone Generator */}
             <div className="space-y-2">
               <div className="text-center text-xs text-gray-400">{t("biometric.frequencyTuning")}</div>
               <ToneGenerator

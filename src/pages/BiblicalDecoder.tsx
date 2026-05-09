@@ -1388,8 +1388,8 @@ const BiblicalDecoder = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs font-mono text-muted-foreground">
                     <div>φ = {result.goldenSignatures.phi.toFixed(6)}</div>
                     <div>γ = {result.goldenSignatures.gamma.toFixed(6)}</div>
-                    <div>718.57012515426885574359120304128340312332181477461/7.83 ≈ {result.goldenSignatures.ratio718Schumann.toFixed(2)} (≈89 Fib)</div>
-                    <div>718.57012515426885574359120304128340312332181477461/γ ≈ {result.goldenSignatures.ratio718Gamma.toFixed(2)} (≈12³)</div>
+                    <div>718.57/7.83 ≈ {result.goldenSignatures.ratio718Schumann.toFixed(2)} (≈89 Fib)</div>
+                    <div>718.57/γ ≈ {result.goldenSignatures.ratio718Gamma.toFixed(2)} (≈12³)</div>
                   </div>
                 </div>
               </CardContent>

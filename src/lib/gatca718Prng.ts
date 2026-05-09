@@ -89,7 +89,7 @@ function nextRaw(state: PrngState): number {
 
 /**
  * Filtr kwantowy GATCA-718 — krzyżuje dane wejściowe z entropią systemu.
- * Wykrywa korelacje na częstotliwości φ × 718.57012515426885574359120304128340312332181477461.57, niewidoczne dla standardowych PRNG.
+ * Wykrywa korelacje na częstotliwości φ × 718.57, niewidoczne dla standardowych PRNG.
  */
 function quantumFilter(dataVector: number[], entropyVector: number[]): number {
   let sum = 0;
@@ -284,7 +284,7 @@ export class Gatca718Prng {
       (correlation + harmonicStrength + phaseCoherence) /
       (PHI + EULER_MASCHERONI + 1);
 
-    // Confidence: tanh(|composite × 718.57012515426885574359120304128340312332181477461.57|) × 100  — Python-exact
+    // Confidence: tanh(|composite × 718.57|) × 100  — Python-exact
     const confidence = Math.tanh(Math.abs(compositeSignal * CARRIER_FREQ)) * 100;
 
     // Decyzja high-confidence

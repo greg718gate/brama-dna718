@@ -127,7 +127,7 @@ export const DNAGateGenerator = () => {
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    // 718.57012515426885574359120304128340312332181477461.57 Hz DNA gate - LEFT CHANNEL (base frequency)
+    // 718.57 Hz DNA gate - LEFT CHANNEL (base frequency)
     const carrierLeftOsc = ctx.createOscillator();
     carrierLeftOsc.frequency.value = CARRIER_FREQ;
     carrierLeftOsc.type = "sine";
@@ -236,7 +236,7 @@ export const DNAGateGenerator = () => {
     rightOsc.connect(rightGain);
     rightGain.connect(merger, 0, 1);
 
-    // 718.57012515426885574359120304128340312332181477461.57 Hz DNA gate - LEFT CHANNEL
+    // 718.57 Hz DNA gate - LEFT CHANNEL
     const carrierLeftOsc = offlineCtx.createOscillator();
     carrierLeftOsc.frequency.value = CARRIER_FREQ;
     const carrierLeftGain = offlineCtx.createGain();

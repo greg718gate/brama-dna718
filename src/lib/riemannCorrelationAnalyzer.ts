@@ -250,7 +250,7 @@ class RiemannCorrelationAnalyzer:
     def __init__(self):
         self.gamma = (1 + 5**0.5) / 2 - 1  # 0.618... (Złoty podział)
         self.h_bar = 1.0545718e-34          # Stała Plancka
-        self.freq_718 = 718.57012515426885574359120304128340312332181477461                 # Stała rezonansowa
+        self.freq_718 = 718.57                 # Stała rezonansowa
         self.zero_threshold = 0.1           # Próg bliskości zera Riemanna
 
     def load_symphony(self, file_path):
