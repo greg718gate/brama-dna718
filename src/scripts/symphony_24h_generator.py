@@ -31,12 +31,12 @@ import sys
 
 PHI = (1 + np.sqrt(5)) / 2                # 1.618033988749895
 GAMMA = 1 / PHI                            # 0.618033988749895
-FUNDAMENTAL_718 = 718.0                    # Hz - DNA Gate Frequency
+FUNDAMENTAL_718 = 718.57012515426885574359120304128340312332181477461  # Hz - 448. zero Riemanna (50 dp)
 SCHUMANN = 7.83                            # Hz - Earth Resonance (Left)
 LUNAR = 18.6                               # Hz - Moon Modulation (Right)
 BINAURAL_BEAT = LUNAR - SCHUMANN           # 10.77 Hz - Alpha state
 MTDNA_LENGTH = 16569                       # rCRS length
-ZERO_POINT_FREQ = 718 * PHI               # ~1161.8 Hz (Gate 18 singularity)
+ZERO_POINT_FREQ = FUNDAMENTAL_718 * PHI    # ~1161.8 Hz (Gate 18 singularity)
 
 SAMPLE_RATE = 44100
 CYCLE_DURATION = 108.0                     # seconds (sacred number)

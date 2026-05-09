@@ -21,8 +21,10 @@
 // ============================================================================
 
 // === STAŁE MSM (Mitochondrial Synchronization Model) ===
-/** Hz — stała DNA z mtDNA GATCA */
-export const CARRIER_FREQ = 718.57012515;  // Zero Riemanna nr 448
+/** Hz — 448. nieprzewidywalne zero funkcji ζ Riemanna (50 miejsc po przecinku).
+ *  JavaScript Number (IEEE 754) zachowa ~17 cyfr znaczących; pełna precyzja
+ *  pozostaje w kodzie źródłowym dla zgodności z generatorami mpmath (Python). */
+export const CARRIER_FREQ = 718.57012515426885574359120304128340312332181477461;
 /** Hz — rezonans Ziemi (pomiar 1952) */
 export const SCHUMANN_FREQ = 7.83;
 /** Hz — autorska korekta: nutacja Księżyca 18.6 lat (nie φ²×7.83≈20.5) */
@@ -77,8 +79,8 @@ export const H_BAR = 1.0545718e-34;
 // ============================================================================
 /** Numer zera Riemanna */
 export const RIEMANN_ZERO_N = 448;
-/** Hz — Zero nr 448 funkcji Zeta Riemanna */
-export const RIEMANN_ZERO_FREQ = 718.57012515;
+/** Hz — Zero nr 448 funkcji Zeta Riemanna (50 miejsc po przecinku w źródle) */
+export const RIEMANN_ZERO_FREQ = 718.57012515426885574359120304128340312332181477461;
 /** Różnica od CARRIER_FREQ: ~0.57 Hz (0.08%) */
 export const RIEMANN_DIFF = RIEMANN_ZERO_FREQ - CARRIER_FREQ;
 /** Phase shift: arg(ζ(1/2 + i·718.57)) */

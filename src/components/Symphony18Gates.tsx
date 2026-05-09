@@ -529,7 +529,8 @@ gamma = 1 / phi
 fs = 44100
 duration = 108  # 108 sekund (sacred number)
 BINAURAL_OFFSET = 7.83  # Hz - Schumann resonance as binaural difference
-ZERO_POINT_FREQ = 718 * phi  # ~1161.8 Hz - Gate 18 singularity
+CARRIER_FREQ = 718.57012515426885574359120304128340312332181477461  # 448. zero Riemanna (50 dp)
+ZERO_POINT_FREQ = CARRIER_FREQ * phi  # ~1161.8 Hz - Gate 18 singularity
 
 # --- 18 POTWIERDZONYCH POZYCJI GATCA (1-based, rCRS) ---
 gatca_positions = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 
@@ -550,7 +551,7 @@ earth_right = np.sin(2 * np.pi * 7.83 * t + np.pi/4) * 0.05
 
 for i, pos in enumerate(gatca_positions):
     start_time = (pos / mtDNA_length) * duration
-    base_freq = 144 * (1 + (i * gamma % 1)) + 718
+    base_freq = 144 * (1 + (i * gamma % 1)) + CARRIER_FREQ
     envelope = np.exp(-((t - start_time)**2) / (2 * (1.618**2)))
     weight = (phi ** (i % 7)) % 1
     

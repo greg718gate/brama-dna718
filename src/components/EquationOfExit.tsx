@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Play, Pause, Download } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CARRIER_FREQ } from "@/lib/gatca718Constants";
 
 export const EquationOfExit = () => {
   const { t } = useLanguage();
@@ -141,18 +142,18 @@ export const EquationOfExit = () => {
     merger.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    // Left channel: 718 Hz
+    // Left channel: 718.57012515… Hz (448. zero Riemanna)
     const leftOsc = audioContext.createOscillator();
-    leftOsc.frequency.value = 718;
+    leftOsc.frequency.value = CARRIER_FREQ;
     leftOsc.type = "sine";
     const leftGain = audioContext.createGain();
     leftGain.gain.value = 0.5;
     leftOsc.connect(leftGain);
     leftGain.connect(merger, 0, 0);
     
-    // Right channel: 718 Hz + binaural offset (7.83 Hz)
+    // Right channel: CARRIER_FREQ + binaural offset (7.83 Hz)
     const rightOsc = audioContext.createOscillator();
-    rightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    rightOsc.frequency.value = CARRIER_FREQ + BINAURAL_OFFSET;
     rightOsc.type = "sine";
     const rightGain = audioContext.createGain();
     rightGain.gain.value = 0.5;
