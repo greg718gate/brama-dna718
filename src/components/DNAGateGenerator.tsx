@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Play, Pause, Download, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CARRIER_FREQ } from "@/lib/gatca718Constants";
+import { CARRIER_FREQ, DURATION } from "@/lib/gatca718Constants";
 
 export const DNAGateGenerator = () => {
   const { t } = useLanguage();
@@ -17,8 +17,6 @@ export const DNAGateGenerator = () => {
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const DURATION = 60; // 60 seconds
 
   useEffect(() => {
     return () => {
@@ -425,7 +423,7 @@ export const DNAGateGenerator = () => {
           <div className="text-center text-sm bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-lg p-4 border border-primary/20">
             <p className="font-bold text-foreground mb-1">BRAMA DNA OTWARTA</p>
             <p className="text-muted-foreground mb-1">718.57 Hz + GATCA-718</p>
-            <p className="text-xs text-muted-foreground">Aktywacja w 60 sekund</p>
+            <p className="text-xs text-muted-foreground">Aktywacja w {DURATION} sekund</p>
             <p className="text-xs text-primary/70 mt-2">#GATCA718 #BramaDNA #RhNegative</p>
           </div>
 
