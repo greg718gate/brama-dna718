@@ -780,7 +780,7 @@ print("\\n[8] SCHRÖDINGER EQUATION APPLICATION")
 print("    iℏ ∂Ψ/∂t = ĤΨ")
 print(f"    For ω = 718.57 Hz:")
 print(f"    E = ℏω = {HBAR * 718.57012515426885574359120304128340312332181477461:.6e} J")
-print(f"    E = ℏω = {HBAR * 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 / 1.602e-19:.6e} eV")
+print(f"    E = ℏω = {HBAR * 718.57012515426885574359120304128340312332181477461 / 1.602e-19:.6e} eV")
 print(f"    λ = c/f = {3e8 / 718.57012515426885574359120304128340312332181477461:.2f} m")
 
 # ============= 21-DAY PROTOCOL TIMING =============
@@ -1714,8 +1714,8 @@ application of the theory. Each calculator implements calculations described in 
     <h4>${isPolish ? 'Funkcje:' : 'Features:'}</h4>
     <ul style="font-size: 10pt;">
       <li>${isPolish 
-        ? 'Oblicza funkcję falową Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ' 
-        : 'Calculates wave function Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ'}</li>
+        ? 'Oblicza funkcję falową Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ' 
+        : 'Calculates wave function Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ'}</li>
       <li>${isPolish 
         ? '5 predefiniowanych kluczy rezonansowych (obliczone precyzyjnie)' 
         : '5 predefined resonance keys (precisely calculated)'}</li>

@@ -59,7 +59,7 @@ export const getGateIndexAtTime = (currentTime: number): number => {
 export const analyzeAtTime = (currentTime: number): RealtimeAnalysisResult => {
   const gateIndex = getGateIndexAtTime(currentTime);
   
-  // Mapowanie czasu na energię: E = t × 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 × ħ
+  // Mapowanie czasu na energię: E = t × 718.57012515426885574359120304128340312332181477461 × ħ
   const energy = currentTime * FREQ_718 * H_BAR;
   
   // Obliczenie wartości funkcji Zeta na linii krytycznej

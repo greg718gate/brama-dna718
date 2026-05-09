@@ -1,7 +1,7 @@
 /**
  * Biblical Decoder Engine
  * Hebrew Gematria + Fractal Analysis + Hamilton Eigenvalue Correlation
- * Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
+ * Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
  * 
  * © 2026 Grzegorz | BRAMA-718-UNIFIED
  * License: CC BY-NC 4.0
@@ -736,7 +736,7 @@ export interface PsiCalcResult {
 function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
   const k = (2 * Math.PI) / FREQ_718;
 
-  // Temporal: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
+  // Temporal: e^(i·718.57012515426885574359120304128340312332181477461·t)
   const temporal = complexExp(FREQ_718 * t);
   // Spatial: e^(-i·k·x)
   const spatial = complexExp(-k * x);

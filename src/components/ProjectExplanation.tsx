@@ -719,7 +719,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
             <CardContent className="space-y-4">
               <div className="p-4 bg-muted rounded-lg overflow-x-auto">
                 <code className="text-sm">
-                  Ψ_total = Ψ_GATCA × e^(i×718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
+                  Ψ_total = Ψ_GATCA × e^(i×718.57012515426885574359120304128340312332181477461×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>

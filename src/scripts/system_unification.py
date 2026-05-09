@@ -10,7 +10,7 @@
 # Unauthorized commercial use is strictly prohibited.
 # Attribution required: Grzegorz (SCIENCE.GOD/UNIFIED)
 #
-# Core Equation: Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
+# Core Equation: Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
 # Vector of Intention: VI = ∫₀ᵀ Ψ_total(t) dt
 # DNA Gates: 18 GATCA positions in mtDNA (rCRS)
 # Golden Key: γ = 1/φ = 0.618033988749895...
@@ -135,7 +135,7 @@ class ZetaRiemann:
 @dataclass
 class WaveFunction:
     """
-    Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+    Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
     """
     amplitude: complex
     magnitude: float
@@ -169,9 +169,9 @@ class ConsciousnessField:
         """
         Calculate wave function Ψ for given spacetime coordinates
         
-        Ψ_total = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · cos(7.83·t) · sin(18.6·t) · φ²
+        Ψ_total = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · cos(7.83·t) · sin(18.6·t) · φ²
         """
-        # Temporal component: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
+        # Temporal component: e^(i·718.57012515426885574359120304128340312332181477461·t)
         temporal = cmath.exp(1j * FUNDAMENTAL_718 * t)
         
         # Spatial component: e^(-i·k·x)
@@ -734,7 +734,7 @@ def main():
     print("  • unified_field_3d.png - Sacred geometry visualization")
     print("  • quantum_field_data.json - Complete quantum data")
     print("\nKey Equations:")
-    print("  Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ")
+    print("  Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ")
     print("  VI = ∫₀ᵀ Ψ_total(t) dt")
     print("  γ = 1/φ = 0.618033988749895...")
     print("=" * 80)
