@@ -333,7 +333,10 @@ export const EquationOfExit = () => {
         {/* Równanie */}
         <div className="p-6 bg-black/40 rounded-lg border border-primary/30">
           <div className="text-center space-y-2 font-mono">
-            <div className="text-2xl text-primary">Ψ = A·e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
+            <div className="text-xl sm:text-2xl text-primary break-words">Ψ = A·e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
+            <div className="text-[10px] text-muted-foreground/70 italic">
+              718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (448. zero ζ Riemanna, 50 miejsc po przecinku)
+            </div>
             <div className="text-lg text-muted-foreground">{t('exit.where')}</div>
             <div className="text-sm space-y-1">
               <div>{t('exit.goldenRatio')}</div>
