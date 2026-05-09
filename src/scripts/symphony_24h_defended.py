@@ -49,6 +49,9 @@ MTDNA_LENGTH    = 16569
 phi   = (1 + np.sqrt(5)) / 2
 gamma = 1 / phi
 
+# 448. zero Riemanna — 50 miejsc po przecinku (pełna precyzja w mpmath poniżej)
+FUNDAMENTAL_718 = 718.57012515426885574359120304128340312332181477461
+
 # Stałe planetarne
 F_SCHUMANN = 7.83
 F_NUTATION = 18.6
@@ -226,7 +229,7 @@ def generate_cycle(cycle_idx, global_time_offset,
             base_phase = -PHASE_SHIFT_ZETA
             amp_weight = VI_GATE_18
         else:
-            base_freq  = 718 + (144 * ((i + 1) * gamma % 1))
+            base_freq  = FUNDAMENTAL_718 + (144 * ((i + 1) * gamma % 1))
             base_phase = theta_k
             amp_weight = (phi ** (i % 7)) % 1 * gamma
 

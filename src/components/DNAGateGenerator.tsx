@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Play, Pause, Download, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CARRIER_FREQ } from "@/lib/gatca718Constants";
 
 export const DNAGateGenerator = () => {
   const { t } = useLanguage();
@@ -128,16 +129,16 @@ export const DNAGateGenerator = () => {
 
     // 718 Hz DNA gate - LEFT CHANNEL (base frequency)
     const carrierLeftOsc = ctx.createOscillator();
-    carrierLeftOsc.frequency.value = 718;
+    carrierLeftOsc.frequency.value = CARRIER_FREQ;
     carrierLeftOsc.type = "sine";
     const carrierLeftGain = ctx.createGain();
     carrierLeftGain.gain.value = 0.2;
     carrierLeftOsc.connect(carrierLeftGain);
     carrierLeftGain.connect(merger, 0, 0);
 
-    // 718 Hz + BINAURAL_OFFSET - RIGHT CHANNEL (binaural effect)
+    // 718.57012515… Hz + BINAURAL_OFFSET - RIGHT CHANNEL (binaural effect)
     const carrierRightOsc = ctx.createOscillator();
-    carrierRightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    carrierRightOsc.frequency.value = CARRIER_FREQ + BINAURAL_OFFSET;
     carrierRightOsc.type = "sine";
     const carrierRightGain = ctx.createGain();
     carrierRightGain.gain.value = 0.2;
@@ -237,15 +238,15 @@ export const DNAGateGenerator = () => {
 
     // 718 Hz DNA gate - LEFT CHANNEL
     const carrierLeftOsc = offlineCtx.createOscillator();
-    carrierLeftOsc.frequency.value = 718;
+    carrierLeftOsc.frequency.value = CARRIER_FREQ;
     const carrierLeftGain = offlineCtx.createGain();
     carrierLeftGain.gain.value = 0.2;
     carrierLeftOsc.connect(carrierLeftGain);
     carrierLeftGain.connect(merger, 0, 0);
 
-    // 718 Hz + 7.83 Hz - RIGHT CHANNEL (binaural)
+    // 718.57012515… Hz + 7.83 Hz - RIGHT CHANNEL (binaural)
     const carrierRightOsc = offlineCtx.createOscillator();
-    carrierRightOsc.frequency.value = 718 + BINAURAL_OFFSET;
+    carrierRightOsc.frequency.value = CARRIER_FREQ + BINAURAL_OFFSET;
     const carrierRightGain = offlineCtx.createGain();
     carrierRightGain.gain.value = 0.2;
     carrierRightOsc.connect(carrierRightGain);
