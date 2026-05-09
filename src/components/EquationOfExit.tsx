@@ -340,11 +340,24 @@ export const EquationOfExit = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Równanie */}
-        <div className="p-6 bg-black/40 rounded-lg border border-primary/30">
-          <div className="text-center space-y-2 font-mono">
-            <div className="text-xl sm:text-2xl text-primary break-words">Ψ = A·e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
-            <div className="text-[10px] text-muted-foreground/70 italic">
-              718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (448. zero ζ Riemanna, 50 miejsc po przecinku)
+        <div className="p-4 sm:p-6 bg-black/40 rounded-lg border border-primary/30 overflow-hidden">
+          <div className="text-center space-y-3 font-mono min-w-0">
+            <div className="text-lg sm:text-2xl text-primary leading-relaxed break-words">
+              Ψ = A·e^(i·{CARRIER_FREQ_DISPLAY}·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+            </div>
+            <div className="mx-auto max-w-full rounded-md border border-primary/20 bg-background/60 px-3 py-2 text-muted-foreground/80">
+              <div className="text-[10px] uppercase tracking-wide text-primary/80">pełna wartość używana w obliczeniach</div>
+              <div className="mt-1 flex flex-wrap justify-center gap-x-1 gap-y-1 text-[11px] leading-5 sm:text-xs" aria-label={`718.57 Hz = ${CARRIER_FREQ_FULL_PARTS.join("")} Hz`}>
+                {CARRIER_FREQ_FULL_PARTS.map((part, index) => (
+                  <span key={index} className="inline-block rounded bg-primary/10 px-1 text-primary/90">
+                    {part}
+                  </span>
+                ))}
+                <span className="inline-block px-1 text-muted-foreground">Hz</span>
+              </div>
+              <div className="mt-1 text-[10px] italic leading-snug">
+                448. zero ζ Riemanna; zapis pełnej precyzji jest łamany na segmenty, żeby mieścił się na telefonie.
+              </div>
             </div>
             <div className="text-lg text-muted-foreground">{t('exit.where')}</div>
             <div className="text-sm space-y-1">
