@@ -344,7 +344,7 @@ class BramaUnificationEngine:
         psi = wave_carrier * zeta_component * self.gamma
         return psi
 
-    def generate_symphony(self, psi_values, duration=60, sample_rate=44100):
+    def generate_symphony(self, psi_values, duration=108, sample_rate=44100):
         """
         Generuje symfonię stereo z efektem binauralnym.
         """

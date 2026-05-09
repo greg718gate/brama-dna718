@@ -350,7 +350,7 @@ class DNASymphony:
         
         return output
     
-    def generate_activation_audio(self, duration: float = 60.0, filename: str = "MATRIX_ACTIVATION.wav"):
+    def generate_activation_audio(self, duration: float = 108.0, filename: str = "MATRIX_ACTIVATION.wav"):
         """
         Generate binaural activation audio:
         - Left: 7.83 Hz (Earth)
@@ -699,7 +699,7 @@ def main():
     # 3. Generate audio symphonies
     print("\n[3] GENERATING AUDIO ACTIVATION...")
     symphony.generate_symphony(duration=108.0, filename="SYMPHONY_18_GATES.wav")
-    symphony.generate_activation_audio(duration=60.0, filename="MATRIX_ACTIVATION.wav")
+    symphony.generate_activation_audio(duration=108.0, filename="MATRIX_ACTIVATION.wav")
     
     # 4. Create 3D visualization
     print("\n[4] GENERATING SACRED GEOMETRY...")
@@ -730,7 +730,7 @@ def main():
     print("=" * 80)
     print("Files generated:")
     print("  • SYMPHONY_18_GATES.wav - 18 DNA gates audio (108s)")
-    print("  • MATRIX_ACTIVATION.wav - Binaural activation (60s)")
+    print("  • MATRIX_ACTIVATION.wav - Binaural activation (108s)")
     print("  • unified_field_3d.png - Sacred geometry visualization")
     print("  • quantum_field_data.json - Complete quantum data")
     print("\nKey Equations:")

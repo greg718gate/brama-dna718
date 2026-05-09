@@ -340,7 +340,7 @@ export const BiometricIntegration = () => {
               <div className="p-3 bg-black/40 rounded-lg border border-[#00f2ff]/30 text-center">
                 <div className="text-2xl mb-2">🔍</div>
                 <div className="text-[#00f2ff] font-bold text-sm">{t("biometric.phaseDiagnosis")}</div>
-                <div className="text-xl font-mono text-white">60s</div>
+                <div className="text-xl font-mono text-white">108s</div>
                 <div className="text-xs text-gray-400 mt-1">{t("biometric.phaseDiagnosisDesc")}</div>
               </div>
               <div className="p-3 bg-black/40 rounded-lg border border-[#ffd700]/30 text-center">

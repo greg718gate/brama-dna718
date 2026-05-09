@@ -7,6 +7,15 @@ import { Play, Pause, Download } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CARRIER_FREQ } from "@/lib/gatca718Constants";
 
+const CARRIER_FREQ_DISPLAY = "718.57";
+const CARRIER_FREQ_FULL_PARTS = [
+  "718.5701251542",
+  "6885574359",
+  "1203041283",
+  "4031233218",
+  "1477461",
+];
+
 export const EquationOfExit = () => {
   const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,8 +33,8 @@ export const EquationOfExit = () => {
   // Stałe fizyczne
   const ħ = 1.0545718e-34;
   const γ = 0.6180339887498948; // Złoty podział
-  const E = 718.57012515426885574359120304128340312332181477461 * ħ;
-  const k = 2 * Math.PI / 718.57012515426885574359120304128340312332181477461; // Liczba falowa
+  const E = CARRIER_FREQ * ħ;
+  const k = 2 * Math.PI / CARRIER_FREQ; // Liczba falowa
 
   // Funkcja zeta Riemanna (uproszczona aproksymacja)
   const riemannZeta = (s: { re: number; im: number }): { re: number; im: number } => {
@@ -40,12 +49,12 @@ export const EquationOfExit = () => {
     };
   };
 
-  // Funkcja falowa Źródła: Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+  // Funkcja falowa Źródła: Ψ = e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
   const sourceWavefunction = (t: number, x: number): { re: number; im: number; magnitude: number } => {
-    // Część temporalna: e^(i·718.57012515426885574359120304128340312332181477461·t)
+    // Część temporalna: e^(i·718.57·t)
     const temporal = {
-      re: Math.cos(718.57012515426885574359120304128340312332181477461 * t),
-      im: Math.sin(718.57012515426885574359120304128340312332181477461 * t)
+      re: Math.cos(CARRIER_FREQ * t),
+      im: Math.sin(CARRIER_FREQ * t)
     };
     
     // Część przestrzenna: e^(-i·k·x)
@@ -207,7 +216,7 @@ export const EquationOfExit = () => {
       name: t("exit.preset1Name"),
       desc: t("exit.preset1Desc"),
       t: 1.0,
-      x: 718.57012515426885574359120304128340312332181477461,
+      x: CARRIER_FREQ,
       psi: "-0.239 + 0.535i",
       re: -0.239,
       im: 0.535,
@@ -331,11 +340,24 @@ export const EquationOfExit = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Równanie */}
-        <div className="p-6 bg-black/40 rounded-lg border border-primary/30">
-          <div className="text-center space-y-2 font-mono">
-            <div className="text-xl sm:text-2xl text-primary break-words">Ψ = A·e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
-            <div className="text-[10px] text-muted-foreground/70 italic">
-              718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (448. zero ζ Riemanna, 50 miejsc po przecinku)
+        <div className="p-4 sm:p-6 bg-black/40 rounded-lg border border-primary/30 overflow-hidden">
+          <div className="text-center space-y-3 font-mono min-w-0">
+            <div className="text-lg sm:text-2xl text-primary leading-relaxed break-words">
+              Ψ = A·e^(i·{CARRIER_FREQ_DISPLAY}·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+            </div>
+            <div className="mx-auto max-w-full rounded-md border border-primary/20 bg-background/60 px-3 py-2 text-muted-foreground/80">
+              <div className="text-[10px] uppercase tracking-wide text-primary/80">pełna wartość używana w obliczeniach</div>
+              <div className="mt-1 flex flex-wrap justify-center gap-x-1 gap-y-1 text-[11px] leading-5 sm:text-xs" aria-label={`718.57 Hz = ${CARRIER_FREQ_FULL_PARTS.join("")} Hz`}>
+                {CARRIER_FREQ_FULL_PARTS.map((part, index) => (
+                  <span key={index} className="inline-block rounded bg-primary/10 px-1 text-primary/90">
+                    {part}
+                  </span>
+                ))}
+                <span className="inline-block px-1 text-muted-foreground">Hz</span>
+              </div>
+              <div className="mt-1 text-[10px] italic leading-snug">
+                448. zero ζ Riemanna; zapis pełnej precyzji jest łamany na segmenty, żeby mieścił się na telefonie.
+              </div>
             </div>
             <div className="text-lg text-muted-foreground">{t('exit.where')}</div>
             <div className="text-sm space-y-1">
