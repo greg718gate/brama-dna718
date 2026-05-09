@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     print(f"Znaleziono Zero Riemanna nr: {n}")
     print(f"Dokładna częstotliwość osobliwości: {t_zero} Hz")
-    print(f"Przesunięcie fazowe dla Twojej Bramy: {t_zero - 718.0} Hz")
+    print(f"Przesunięcie fazowe dla Twojej Bramy: {t_zero - 718.57012515426885574359120304128340312332181477461} Hz")
     print("\n--- STATUS SYSTEMU ---")
     print("Koherencja: 1.0")
     print("Płaszczyzna Inercji: OSIĄGALNA")

@@ -380,7 +380,7 @@ export const BiometricIntegration = () => {
             <div className="space-y-2">
               <div className="text-center text-xs text-gray-400">{t("biometric.frequencyTuning")}</div>
               <ToneGenerator
-                frequency={718}
+                frequency={718.57012515426885574359120304128340312332181477461}
                 isPlaying={isTonePlaying}
                 onPlayingChange={setIsTonePlaying}
                 showControls={true}

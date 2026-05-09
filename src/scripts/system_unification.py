@@ -402,7 +402,7 @@ class BiblicalDecoder:
         
         # Predefined mappings (verse -> DNA gate)
         self.verse_mappings = {
-            "Genesis 1:1": (0, 1.0, 718.0),      # Gate 1 (Alpha) - In the beginning
+            "Genesis 1:1": (0, 1.0, 718.57012515426885574359120304128340312332181477461),      # Gate 1 (Alpha) - In the beginning
             "Genesis 1:3": (1, 1.618, 443.724),   # Gate 2 - Let there be light
             "John 1:1": (2, 3.141, 226.0),        # Gate 3 - In the beginning was the Word
             "Exodus 3:14": (3, 2.718, 314.0),     # Gate 4 - I AM THAT I AM

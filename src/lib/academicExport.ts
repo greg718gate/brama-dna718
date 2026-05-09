@@ -1447,7 +1447,7 @@ hypothesis. Each zero corresponds to a DNA resonance state where maximum gate ac
     <div class="description">
       <strong>${isPolish ? 'Gdzie:' : 'Where:'}</strong><br>
       • A = ${isPolish ? 'amplituda normalizacji' : 'normalization amplitude'}<br>
-      • ω = 2π × 718 rad/s (${isPolish ? 'częstość kątowa' : 'angular frequency'})<br>
+      • ω = 2π × 718.57012515426885574359120304128340312332181477461 rad/s (${isPolish ? 'częstość kątowa' : 'angular frequency'})<br>
       • k = 2π / 718.57012515426885574359120304128340312332181477461 (${isPolish ? 'liczba falowa' : 'wave number'})<br>
       • ζ(s) = ${isPolish ? 'funkcja zeta Riemanna' : 'Riemann zeta function'}<br>
       • E = ℏω = ${(HBAR * 718.57012515426885574359120304128340312332181477461).toExponential(4)} J<br>
