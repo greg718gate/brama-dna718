@@ -1701,8 +1701,8 @@ application of the theory. Each calculator implements calculations described in 
         ? 'Wizualizacja częstotliwości w czasie rzeczywistym' 
         : 'Real-time frequency visualization'}</li>
       <li>${isPolish 
-        ? 'Eksport do pliku WAV (60 sekund)' 
-        : 'Export to WAV file (60 seconds)'}</li>
+        ? 'Eksport do pliku WAV (108 sekund)' 
+        : 'Export to WAV file (108 seconds)'}</li>
     </ul>
     <div class="result">
       ${isPolish ? 'Stosunek częstotliwości:' : 'Frequency ratio:'} 718.57 Hz / 7.83 Hz = 91.699 ≈ 89 (Fibonacci)
