@@ -609,7 +609,7 @@ def dna_helix(turns=2, points_per_turn=100):
 
 # Frequency resonance calculations
 schumann = 7.83  # Hz
-activation_freq = 718  # Hz
+activation_freq = 718.57012515426885574359120304128340312332181477461  # Hz
 ratio = activation_freq / schumann
 print(f"Frequency ratio: {ratio:.2f}")
 print(f"Expected (6×5×φ): {6*5*phi:.2f}")

@@ -207,7 +207,7 @@ const PrngPanel = () => {
           </h1>
         </div>
         <p className="text-sm text-muted-foreground font-mono">
-          Quantum-Speed Pseudorandom Engine · φ × 718.57 × mtDNA
+          Quantum-Speed Pseudorandom Engine · φ × 718.57012515426885574359120304128340312332181477461.57 × mtDNA
         </p>
         <div className="flex justify-center gap-2 flex-wrap">
           <Badge variant="outline" className="font-mono text-xs">
@@ -258,7 +258,7 @@ const PrngPanel = () => {
                 Quantum Filter GATCA-718
               </CardTitle>
               <p className="text-xs text-muted-foreground">
-                Filtr interferencyjny φ × 718.57 × mtDNA — 3 warstwy analizy
+                Filtr interferencyjny φ × 718.57012515426885574359120304128340312332181477461.57 × mtDNA — 3 warstwy analizy
               </p>
             </CardHeader>
             <CardContent className="space-y-3">

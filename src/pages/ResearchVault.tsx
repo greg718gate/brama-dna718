@@ -61,9 +61,9 @@ const ResearchVault = () => {
       description:
         "Analiza częstotliwościowa ujawnia, że biologiczny rezonans DNA wynosi około 718.57 Hz. Ta częstotliwość tworzy harmoniczny system z innymi kluczowymi częstotliwościami: 528 Hz (naprawa DNA), 639 Hz (relacje), 741 Hz (intuicja), 852 Hz (powrót do porządku duchowego), oraz częstotliwością OM 136.1 Hz.",
       equations:
-        "f_DNA ≈ 718.57 Hz\nf_DNA / f_Schumann = 718 / 7.83 ≈ 91.7\nSkala Solfeggio:\n- 528 Hz (naprawa DNA)\n- 639 Hz (harmonizacja)\n- 741 Hz (przebudzenie)\n- 852 Hz (intuicja)\nOM = 136.1 Hz = C# (rok Ziemi)",
+        "f_DNA ≈ 718.57 Hz\nf_DNA / f_Schumann = 718.57012515426885574359120304128340312332181477461 / 7.83 ≈ 91.7\nSkala Solfeggio:\n- 528 Hz (naprawa DNA)\n- 639 Hz (harmonizacja)\n- 741 Hz (przebudzenie)\n- 852 Hz (intuicja)\nOM = 136.1 Hz = C# (rok Ziemi)",
       verification:
-        "Spektroskopia molekularna DNA potwierdza rezonans w zakresie 700-740 Hz. Badania biofizyczne wykazują, że częstotliwości Solfeggio mają wpływ na strukturę DNA i ekspresję genów. Harmoniczny związek 718/7.83 = 91.7 sugeruje fundamentalną relację biologia-planeta.",
+        "Spektroskopia molekularna DNA potwierdza rezonans w zakresie 700-740 Hz. Badania biofizyczne wykazują, że częstotliwości Solfeggio mają wpływ na strukturę DNA i ekspresję genów. Harmoniczny związek 718.57012515426885574359120304128340312332181477461/7.83 = 91.7 sugeruje fundamentalną relację biologia-planeta.",
       author: "DNA Gate Research",
       timestamp: Date.now() - 86400000 * 7,
       watermark: "© DNA Gate Research | Protected Discovery | ID: FREQ-718-001",

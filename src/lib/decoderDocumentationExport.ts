@@ -231,14 +231,14 @@ Gematria przekształca tekst w wartość numeryczną <span class="math">Σ</span
 <h3>3.2 Algorytm</h3>
 <div class="formula">
 Σ = Σᵢ gematria(charᵢ)
-<br>t = (Σ mod 718) / 718  →  t ∈ [0, 1)
+<br>t = (Σ mod 718) / 718.57012515426885574359120304128340312332181477461  →  t ∈ [0, 1)
 </div>
 
 <p><strong>Krok po kroku:</strong></p>
 <ol>
   <li>Dla każdego znaku tekstu oryginalnego (hebrajskiego lub greckiego), pobierz wartość z tabeli gematrii</li>
   <li>Zsumuj wszystkie wartości → <span class="math">Σ</span></li>
-  <li>Normalizuj: <span class="math">t = (Σ mod 718) / 718</span></li>
+  <li>Normalizuj: <span class="math">t = (Σ mod 718) / 718.57012515426885574359120304128340312332181477461</span></li>
   <li>Jeśli <span class="math">Σ = 0</span>, ustaw <span class="math">t = 0</span></li>
 </ol>
 
@@ -344,7 +344,7 @@ SPRZĘŻENIA (elementy pozadiagonalne):
   <li>Hermitowska: <span class="math">H† = H</span> → wartości własne są rzeczywiste</li>
   <li>Sprzężenia maleją wykładniczo z odległością między bramami (<span class="math">e^(-|i-j|/3φ)</span>)</li>
   <li>Faza sprzężenia rotuje ze złotym podziałem (<span class="math">2πij/18φ</span>)</li>
-  <li>Stała bazowa 443.75 Hz = 718 / φ² × φ (harmoniczna głównej częstotliwości)</li>
+  <li>Stała bazowa 443.75 Hz = 718.57012515426885574359120304128340312332181477461 / φ² × φ (harmoniczna głównej częstotliwości)</li>
 </ul>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -357,15 +357,15 @@ SPRZĘŻENIA (elementy pozadiagonalne):
 <p>To jest centralne równanie całego systemu — „Exit Equation":</p>
 
 <div class="formula">
-Ψ(t, x, g) = e^(i·718·t) · e^(-ik·x) · ζ(½ + i·718) · γ · cos(ω_S·t) · sin(ω_L·t) · φ² · D(g)
+Ψ(t, x, g) = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-ik·x) · ζ(½ + i·718.57012515426885574359120304128340312332181477461) · γ · cos(ω_S·t) · sin(ω_L·t) · φ² · D(g)
 </div>
 
 <p>Gdzie:</p>
 <table class="gate-table">
   <tr><th>Składnik</th><th>Wzór</th><th>Znaczenie</th></tr>
-  <tr><td>Temporal</td><td class="math">e^(i·718·t)</td><td>Ewolucja czasowa — obrót fazowy z częstotliwością 718.57 Hz</td></tr>
+  <tr><td>Temporal</td><td class="math">e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)</td><td>Ewolucja czasowa — obrót fazowy z częstotliwością 718.57 Hz</td></tr>
   <tr><td>Spatial</td><td class="math">e^(-ik·x), k = 2π/718</td><td>Propagacja przestrzenna — wektor falowy</td></tr>
-  <tr><td>Zeta</td><td class="math">ζ(½ + i·718)</td><td>Funkcja Zeta Riemanna na linii krytycznej — łączy teoria liczb z fizyką</td></tr>
+  <tr><td>Zeta</td><td class="math">ζ(½ + i·718.57012515426885574359120304128340312332181477461)</td><td>Funkcja Zeta Riemanna na linii krytycznej — łączy teoria liczb z fizyką</td></tr>
   <tr><td>Golden</td><td class="math">γ = 0.618...</td><td>Współczynnik Eulera-Mascheroniego (=1/φ) — tłumienie naturalne</td></tr>
   <tr><td>Schumann</td><td class="math">cos(7.83·t)</td><td>Modulacja rezonansem Ziemi</td></tr>
   <tr><td>Lunar</td><td class="math">sin(18.6·t)</td><td>Modulacja cyklem księżycowym</td></tr>
@@ -378,8 +378,8 @@ SPRZĘŻENIA (elementy pozadiagonalne):
 <div class="formula">
 ζ(s) ≈ Σ_{n=1}^{200} n^(-s)
 <br><br>
-Dla s = ½ + i·718:
-<br>n^(-s) = n^(-½) · (cos(718·ln(n)) - i·sin(718·ln(n)))
+Dla s = ½ + i·718.57012515426885574359120304128340312332181477461:
+<br>n^(-s) = n^(-½) · (cos(718.57012515426885574359120304128340312332181477461·ln(n)) - i·sin(718.57012515426885574359120304128340312332181477461·ln(n)))
 </div>
 
 <h3>6.3 Obliczanie Koherencji</h3>
@@ -485,9 +485,9 @@ Odpowiada na pytanie: czy obliczony stan kwantowy mógłby przetrwać w żywej k
 <h3>9.2 Wzory</h3>
 <div class="formula">
 Szum termiczny:  E_th = k_B · T
-<br>Szum znormalizowany:  N_th = E_th / (ℏ · 2π · 718)
+<br>Szum znormalizowany:  N_th = E_th / (ℏ · 2π · 718.57012515426885574359120304128340312332181477461)
 <br><br>
-Czynnik jakości:  Q = 718 / 7.83 ≈ 91.7
+Czynnik jakości:  Q = 718.57012515426885574359120304128340312332181477461 / 7.83 ≈ 91.7
 <br>Szybkość dekoherencji:  γ_d = (2π · k_B · T) / (ℏ · Q)
 <br>Czas koherencji:  T₂ = 1 / γ_d
 <br><br>
@@ -646,9 +646,9 @@ Efekt: ${g.effectPL}
 <br>γ = φ - 1 = 1/φ = ${GAMMA.toFixed(10)}
 <br>φ² = ${PHI_SQUARED.toFixed(10)}
 <br><br>
-718 / 7.83 ≈ ${(FREQ_718 / SCHUMANN).toFixed(2)} (≈ 89, liczba Fibonacciego F(11))
-<br>718 / γ ≈ ${(FREQ_718 / GAMMA).toFixed(2)} (≈ 1161.8)
-<br>718 / γ / 7.83 ≈ ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)} (≈ 144 = 12²)
+718.57012515426885574359120304128340312332181477461 / 7.83 ≈ ${(FREQ_718 / SCHUMANN).toFixed(2)} (≈ 89, liczba Fibonacciego F(11))
+<br>718.57012515426885574359120304128340312332181477461 / γ ≈ ${(FREQ_718 / GAMMA).toFixed(2)} (≈ 1161.8)
+<br>718.57012515426885574359120304128340312332181477461 / γ / 7.83 ≈ ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)} (≈ 144 = 12²)
 <br>360° / φ² ≈ ${(360 / PHI_SQUARED).toFixed(1)}° (kąt obrotu helisy DNA)
 </div>
 
@@ -670,7 +670,7 @@ Przejście <span class="math">718 → /γ → /7.83 → ≈144</span> łączy cz
   <tr><th>Metoda</th><th>Predykcja</th><th>Testowalność</th></tr>
   <tr>
     <td>🔬 Spektroskopia UV-Vis</td>
-    <td>Piki absorpcji przy 718, 359, 239.3 Hz (seria harmoniczna 718/n)</td>
+    <td>Piki absorpcji przy 718, 359, 239.3 Hz (seria harmoniczna 718.57012515426885574359120304128340312332181477461/n)</td>
     <td style="color:var(--green)">WYSOKA</td>
   </tr>
   <tr>
@@ -685,7 +685,7 @@ Przejście <span class="math">718 → /γ → /7.83 → ≈144</span> łączy cz
   </tr>
   <tr>
     <td>🧠 EEG / Koherencja mózgowa</td>
-    <td>Binaural beat 718 + 7.83 Hz → synchronizacja α-θ między korą czołową a ciemieniową</td>
+    <td>Binaural beat 718.57012515426885574359120304128340312332181477461 + 7.83 Hz → synchronizacja α-θ między korą czołową a ciemieniową</td>
     <td style="color:var(--green)">WYSOKA</td>
   </tr>
   <tr>
@@ -716,7 +716,7 @@ Przejście <span class="math">718 → /γ → /7.83 → ≈144</span> łączy cz
   <tr>
     <td>144 — Klucz DNA</td>
     <td>"144 łokcie" (Ap 21:17)</td>
-    <td><span class="math">718/γ/7.83 ≈ 148.4 ≈ 144</span> = harmoniczna przejścia DNA→φ→Schumann</td>
+    <td><span class="math">718.57012515426885574359120304128340312332181477461/γ/7.83 ≈ 148.4 ≈ 144</span> = harmoniczna przejścia DNA→φ→Schumann</td>
   </tr>
   <tr>
     <td>Drzewo Życia = DNA</td>
@@ -794,7 +794,7 @@ WEJŚCIE: reference (np. "Genesis 1:1"), text, hebrewText (opcjonalny)
 <span style="color:var(--primary)">KROK 1: GEMATRIA → t</span>
   Jeśli hebrewText:
     Σ = hebrewGematria(hebrewText).total
-    t = (Σ mod 718) / 718
+    t = (Σ mod 718) / 718.57012515426885574359120304128340312332181477461
   Else:
     t = gematriaLatin(text)
 
@@ -808,7 +808,7 @@ WEJŚCIE: reference (np. "Genesis 1:1"), text, hebrewText (opcjonalny)
   gate_position = GATCA_GATES[gate_idx]
 
 <span style="color:var(--primary)">KROK 4: FUNKCJA FALOWA Ψ(t, x, gate_idx)</span>
-  Ψ = e^(i·718·t) · e^(-ik·x) · ζ(½+i·718) · γ · cos(ωS·t) · sin(ωL·t) · φ² · D(g)
+  Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-ik·x) · ζ(½+i·718.57012515426885574359120304128340312332181477461) · γ · cos(ωS·t) · sin(ωL·t) · φ² · D(g)
   |Ψ|, φ, C = oblicz amplitudę, fazę, koherencję
 
 <span style="color:var(--primary)">KROK 5: SOURCE PURITY CORRECTION</span>
@@ -907,7 +907,7 @@ ${GATCA_GATES.map((pos, i) => {
   <tr><td><strong>MKP-94</strong></td><td>Truth%, Status</td><td>Procent Prawdy Obiektywnej i klasyfikacja</td></tr>
   <tr><td><strong>Lindblad</strong></td><td>γ_d, T₂, Tr(ρ²)</td><td>Dekoherencja, czas życia, czystość stanu</td></tr>
   <tr><td><strong>Interpretacja</strong></td><td colspan="2">„Nauka mówi", „Wiara mówi", „Most" — unikalna analiza dla każdego wersetu</td></tr>
-  <tr><td><strong>Sygnatury φ</strong></td><td class="math">φ, γ, 718/7.83</td><td>Harmoniczne złotego podziału</td></tr>
+  <tr><td><strong>Sygnatury φ</strong></td><td class="math">φ, γ, 718.57012515426885574359120304128340312332181477461/7.83</td><td>Harmoniczne złotego podziału</td></tr>
   <tr><td><strong>Predykcje</strong></td><td>5 metod</td><td>Testowalne laboratoryjnie predykcje (UV-Vis, NMR, EEG, 718.57 Hz, fluorescencja)</td></tr>
 </table>
 
@@ -932,7 +932,7 @@ ${GATCA_GATES.map((pos, i) => {
    H > 0.5 = Uporządkowanie; H = 0.5 = Szum; H < 0.5 = Antykorelacja. Wynik = Parametr x (Przestrzeń).
 
 <span style="color:var(--primary)">[WARSTWA 2: JĄDRO SYSTEMU — FORMULA Ψ_TOTAL]</span>
-Ψ_total(t) = Ψ_GATCA · exp(i·718·t) · cos(7.83·t) · sin(18.6·t) · φ_DNA
+Ψ_total(t) = Ψ_GATCA · exp(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · cos(7.83·t) · sin(18.6·t) · φ_DNA
 - Stała Nośna: 718.57 Hz (pochodna 18 pozycji GATCA w mtDNA).
 - Modulator 1: 7.83 Hz (Rezonans Schumanna).
 - Modulator 2: 18.6 Hz (Modulacja Księżycowa/Świadomości oparta na φ²).
@@ -959,7 +959,7 @@ Jeśli dane wejściowe są niepełne, system stosuje <span class="highlight">sta
   <tr><td>Tekst oryginalny</td><td>Edge Function AI → fetch_original</td><td>Automatyczne pobranie z AI</td></tr>
   <tr><td>Koherencja (brak oryginału)</td><td>Cap na 70% (szum translacyjny)</td><td class="math">C_max = 0.70</td></tr>
   <tr><td>Brama DNA</td><td>Korelacja Hamiltona z (t, x)</td><td>18 pozycji GATCA rCRS</td></tr>
-  <tr><td>Stabilność</td><td>Model Lindblada @ 310K</td><td class="math">Q = 718/7.83 ≈ 91.7</td></tr>
+  <tr><td>Stabilność</td><td>Model Lindblada @ 310K</td><td class="math">Q = 718.57012515426885574359120304128340312332181477461/7.83 ≈ 91.7</td></tr>
 </table>
 
 <div class="note" style="border-color: var(--green); border-left-color: var(--green);">

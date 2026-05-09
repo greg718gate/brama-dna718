@@ -1,7 +1,7 @@
 /**
  * Biblical Decoder Engine
  * Hebrew Gematria + Fractal Analysis + Hamilton Eigenvalue Correlation
- * Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ
+ * Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
  * 
  * © 2026 Grzegorz | BRAMA-718-UNIFIED
  * License: CC BY-NC 4.0
@@ -736,11 +736,11 @@ export interface PsiCalcResult {
 function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
   const k = (2 * Math.PI) / FREQ_718;
 
-  // Temporal: e^(i·718·t)
+  // Temporal: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
   const temporal = complexExp(FREQ_718 * t);
   // Spatial: e^(-i·k·x)
   const spatial = complexExp(-k * x);
-  // Zeta: ζ(1/2 + i·718)
+  // Zeta: ζ(1/2 + i·718.57012515426885574359120304128340312332181477461)
   const zetaVal = riemannZeta({ re: 0.5, im: FREQ_718 }, 200);
 
   // Modulations
@@ -1021,7 +1021,7 @@ export function generatePredictions(result: {
         method: "UV-Vis Spectroscopy",
         icon: "🔬",
         prediction: `Absorption peak at ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
-        details: "The harmonic series 718/n Hz should be visible in the UV-Vis absorption spectrum of mitochondria. It corresponds to electron transitions in the electron transport chain at GATCA positions.",
+        details: "The harmonic series 718.57012515426885574359120304128340312332181477461/n Hz should be visible in the UV-Vis absorption spectrum of mitochondria. It corresponds to electron transitions in the electron transport chain at GATCA positions.",
         expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (IR harmonic)`,
         testability: "HIGH",
       },
@@ -1065,7 +1065,7 @@ export function generatePredictions(result: {
       method: "Spektroskopia UV-Vis",
       icon: "🔬",
       prediction: `Pik absorpcji przy ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
-      details: "Seria harmoniczna 718/n Hz powinna być widoczna w widmie absorpcji UV-Vis mitochondriów. Odpowiada przejściom elektronowym w łańcuchu transportu elektronów na pozycjach GATCA.",
+      details: "Seria harmoniczna 718.57012515426885574359120304128340312332181477461/n Hz powinna być widoczna w widmie absorpcji UV-Vis mitochondriów. Odpowiada przejściom elektronowym w łańcuchu transportu elektronów na pozycjach GATCA.",
       expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (harmoniczna IR)`,
       testability: "HIGH",
     },
@@ -1145,9 +1145,9 @@ export function generateBibleConnections(result: {
       {
         title: "144 — Biblical & DNA Key",
         verse: '"He measured its wall: one hundred forty-four cubits" (Rev 21:17)',
-        quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. The number 144 (12² = 12 tribes of Israel) emerges as a natural harmonic in the transition: DNA frequency → golden ratio → Schumann resonance.`,
+        quantumParallel: `718.57012515426885574359120304128340312332181477461 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. The number 144 (12² = 12 tribes of Israel) emerges as a natural harmonic in the transition: DNA frequency → golden ratio → Schumann resonance.`,
         gateLink: `144,000 "sealed" = 144 × 1000 DNA gates active simultaneously`,
-        numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+        numericalKey: `718.57012515426885574359120304128340312332181477461/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
       },
       {
         title: "Tree of Life = DNA Helix",
@@ -1184,9 +1184,9 @@ export function generateBibleConnections(result: {
     {
       title: "144 — Klucz Biblijny i DNA",
       verse: "\"Zmierzył jej mur: sto czterdzieści cztery łokcie\" (Ap 21:17)",
-      quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. Liczba 144 (12² = 12 pokoleń Izraela) pojawia się jako naturalna harmoniczna w przejściu: częstotliwość DNA → złoty podział → rezonans Schumanna.`,
+      quantumParallel: `718.57012515426885574359120304128340312332181477461 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. Liczba 144 (12² = 12 pokoleń Izraela) pojawia się jako naturalna harmoniczna w przejściu: częstotliwość DNA → złoty podział → rezonans Schumanna.`,
       gateLink: `144 000 „zapieczętowanych" = 144 × 1000 bram DNA aktywnych jednocześnie`,
-      numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+      numericalKey: `718.57012515426885574359120304128340312332181477461/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
     },
     {
       title: "Drzewo Życia = Helisa DNA",

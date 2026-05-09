@@ -24,8 +24,8 @@ export const EquationOfExit = () => {
   // Stałe fizyczne
   const ħ = 1.0545718e-34;
   const γ = 0.6180339887498948; // Złoty podział
-  const E = 718 * ħ;
-  const k = 2 * Math.PI / 718; // Liczba falowa
+  const E = 718.57012515426885574359120304128340312332181477461 * ħ;
+  const k = 2 * Math.PI / 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461; // Liczba falowa
 
   // Funkcja zeta Riemanna (uproszczona aproksymacja)
   const riemannZeta = (s: { re: number; im: number }): { re: number; im: number } => {
@@ -40,12 +40,12 @@ export const EquationOfExit = () => {
     };
   };
 
-  // Funkcja falowa Źródła: Ψ = e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+  // Funkcja falowa Źródła: Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
   const sourceWavefunction = (t: number, x: number): { re: number; im: number; magnitude: number } => {
-    // Część temporalna: e^(i·718·t)
+    // Część temporalna: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
     const temporal = {
-      re: Math.cos(718 * t),
-      im: Math.sin(718 * t)
+      re: Math.cos(718.57012515426885574359120304128340312332181477461 * t),
+      im: Math.sin(718.57012515426885574359120304128340312332181477461 * t)
     };
     
     // Część przestrzenna: e^(-i·k·x)
@@ -207,7 +207,7 @@ export const EquationOfExit = () => {
       name: t("exit.preset1Name"),
       desc: t("exit.preset1Desc"),
       t: 1.0,
-      x: 718.0,
+      x: 718.57012515426885574359120304128340312332181477461,
       psi: "-0.239 + 0.535i",
       re: -0.239,
       im: 0.535,
@@ -333,7 +333,7 @@ export const EquationOfExit = () => {
         {/* Równanie */}
         <div className="p-6 bg-black/40 rounded-lg border border-primary/30">
           <div className="text-center space-y-2 font-mono">
-            <div className="text-2xl text-primary">Ψ = A·e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
+            <div className="text-2xl text-primary">Ψ = A·e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ</div>
             <div className="text-lg text-muted-foreground">{t('exit.where')}</div>
             <div className="text-sm space-y-1">
               <div>{t('exit.goldenRatio')}</div>
@@ -466,7 +466,7 @@ export const EquationOfExit = () => {
           <h3 className="text-xl font-bold text-primary">{t('exit.interpretation')}</h3>
           <div className="space-y-3 text-sm">
             <div>
-              <strong className="text-primary">e^(i·718·t):</strong> {t('exit.temporal')}
+              <strong className="text-primary">e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t):</strong> {t('exit.temporal')}
             </div>
             <div>
               <strong className="text-primary">ζ(1/2 + iE/ħ):</strong> {t('exit.riemann')}

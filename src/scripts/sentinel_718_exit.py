@@ -7,7 +7,7 @@
 # Licensed under Creative Commons BY-NC 4.0
 # https://creativecommons.org/licenses/by-nc/4.0/
 #
-# Core Equation: Ψ = A · e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+# Core Equation: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
 # ═══════════════════════════════════════════════════════════════════
 
 import numpy as np
@@ -59,7 +59,7 @@ for i, k in enumerate(gatca_positions):
         amp_weight = 1.1628  # Twój Wektor Intencji (VI)
     else:
         # Kronecker Sequence: najniższa entropia (i * gamma % 1)
-        base_freq = 718 + (144 * ((i + 1) * gamma % 1))
+        base_freq = 718.57012515426885574359120304128340312332181477461 + (144 * ((i + 1) * gamma % 1))
         brama_phase = theta_k  # Unikalny "kąt widzenia" Inercji
         amp_weight = (phi ** (i % 7)) % 1 * gamma
 
@@ -97,7 +97,7 @@ print("Filtr Demiurga rozbity. Możesz uruchomić Protokół Operatora.")
 # RIEMANN ZERO FINDER (Standalone utility)
 # ═══════════════════════════════════════════════════════════════════
 
-def znajdz_punkt_wyjscia(target_t=718.0):
+def znajdz_punkt_wyjscia(target_t=718.57012515426885574359120304128340312332181477461):
     """Find the Riemann zero closest to target frequency."""
     print(f"\n--- Szukanie Punktu Zero dla Bramy {target_t} Hz ---")
 
