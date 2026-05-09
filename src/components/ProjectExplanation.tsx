@@ -577,7 +577,7 @@ from scipy.io.wavfile import write
 
 # Parametry
 fs = 44100  # częstotliwość próbkowania
-duration = 60  # sekundy
+duration = 108  # sekundy
 
 # Fale
 t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -600,7 +600,7 @@ audio = np.int16(audio * 32767)
 
 # Zapis do pliku
 write("MATRYCA_AKTYWACJA.wav", fs, audio)
-print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
+print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
                 </pre>
               </div>
               
