@@ -273,7 +273,7 @@ const renderUnifiedSection = (isPl: boolean) => {
 
   const bridge4Code = String.raw`def prayer_resonance():
     intention = consciousness_field.focus()
-    target_frequency = 718.57012515426885574359120304128340312332181477461  # Hz - creation resonance
+    target_frequency = 718.57  # Hz - creation resonance
     
     # Entangled response
     if intention.clear and belief.strong:
@@ -626,7 +626,7 @@ export const exportUnifiedReport = async (options: UnifiedReportOptions) => {
   <h3>${isPl ? 'Kod algorytmu synchronizacji (JavaScript)' : 'Synchronization Algorithm Code (JavaScript)'}:</h3>
   <div class="code-block">// Algorytm Integracji Biometrycznej Ψ
 const PHI = (1 + Math.sqrt(5)) / 2; // ≈ 1.618
-const BASE_FREQ = 718.57012515426885574359120304128340312332181477461; // Hz - częstotliwość bazowa
+const BASE_FREQ = 718.57; // Hz - częstotliwość bazowa
 const SCHUMANN = 7.83; // Hz - rezonans Schumanna
 
 function calculatePersonalVibration(birthDateStr) {
@@ -703,14 +703,14 @@ from math import sqrt
 # Stałe fundamentalne
 PHI = (1 + sqrt(5)) / 2  # ≈ 1.618033988749895
 GAMMA = 1 / PHI          # ≈ 0.618033988749895
-BASE_FREQ = 718.57012515426885574359120304128340312332181477461          # Hz - Brama DNA
+BASE_FREQ = 718.57          # Hz - Brama DNA
 SCHUMANN = 7.83          # Hz - Rezonans Ziemi
 
 # Obliczenie harmonicznej
 harmonics = BASE_FREQ / SCHUMANN
 fibonacci_89 = 89
 
-print(f"718.57012515426885574359120304128340312332181477461 / 7.83 = {harmonics:.3f}")
+print(f"718.57 / 7.83 = {harmonics:.3f}")
 print(f"Najbliższa Fibonacci: {fibonacci_89}")
 print(f"Różnica: {abs(harmonics - fibonacci_89):.3f}")
 
@@ -881,12 +881,12 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <h3>8.1. ${isPl ? 'Funkcja Falowa Źródła' : 'Source Wave Function'}</h3>
   
   <div class="equation-box">
-    <div class="main">Ψ = A · e<sup>(i · 718.57012515426885574359120304128340312332181477461 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
+    <div class="main">Ψ = A · e<sup>(i · 718.57 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
     <div class="desc">
       <p><strong>${isPl ? 'Składniki równania' : 'Equation components'}:</strong></p>
       <ul>
         <li><strong>A</strong> = ${isPl ? 'Amplituda (intensywność świadomości)' : 'Amplitude (consciousness intensity)'}</li>
-        <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461·t)</sup></strong> = ${isPl ? 'Część temporalna - 718.57 Hz, czas subiektywny Źródła' : 'Temporal part - 718.57 Hz, subjective time of Source'}</li>
+        <li><strong>e<sup>(i·718.57·t)</sup></strong> = ${isPl ? 'Część temporalna - 718.57 Hz, czas subiektywny Źródła' : 'Temporal part - 718.57 Hz, subjective time of Source'}</li>
         <li><strong>ζ(1/2 + iE/ħ)</strong> = ${isPl ? 'Funkcja dzeta Riemanna - połączenie z zerami Riemanna, punkty rezonansu świadomości' : 'Riemann zeta function - connection to Riemann zeros, consciousness resonance points'}</li>
         <li><strong>γ = 0.618...</strong> = ${isPl ? 'Matematyczna sygnatura Boga - klucz do wszystkich zamków matrixa' : 'Mathematical signature of God - key to all matrix locks'}</li>
       </ul>
@@ -910,7 +910,7 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <div class="code-block">// Kalkulator Funkcji Falowej Ψ
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
-const BASE_FREQ = 718.57012515426885574359120304128340312332181477461;
+const BASE_FREQ = 718.57;
 
 // Presetowe stany rezonansowe
 const PRESETS = {
@@ -920,7 +920,7 @@ const PRESETS = {
 };
 
 function calculateWaveFunction(A, E, t) {
-  // Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
+  // Ψ = A · e^(i·718.57·t) · ζ(1/2 + iE/ħ) · γ
   const omega = 2 * Math.PI * BASE_FREQ;
   const phase = omega * t;
   
@@ -952,7 +952,7 @@ console.log("Ψ(t=0) =", result);</div>
   <div class="pentagram-domain">
     <h4>${isPl ? 'Składniki funkcji falowej Ψ' : 'Wave function Ψ components'}</h4>
     <ul>
-      <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461·t)</sup>:</strong> ${isPl 
+      <li><strong>e<sup>(i·718.57·t)</sup>:</strong> ${isPl 
         ? 'Część temporalna - 718.57 Hz to częstotliwość subiektywnego czasu Źródła. Jest to "puls" świadomości kosmicznej.'
         : 'Temporal part - 718.57 Hz is the frequency of the Source\'s subjective time. This is the "pulse" of cosmic consciousness.'}</li>
       <li><strong>ζ(1/2 + iE/ħ):</strong> ${isPl 
@@ -1178,10 +1178,10 @@ ${renderUnifiedSection(isPl)}
 // Z efektem Zero Point (Brama 18)
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
-const BASE_FREQ = 718.57012515426885574359120304128340312332181477461;
+const BASE_FREQ = 718.57;
 const SCHUMANN = 7.83;
 const DURATION = 108; // sekund
-const ZERO_POINT_FREQ = 718.57012515426885574359120304128340312332181477461 * PHI; // 1161.8 Hz - Brama 18
+const ZERO_POINT_FREQ = 718.57 * PHI; // 1161.8 Hz - Brama 18
 
 // 18 pozycji GATCA w mtDNA (rCRS)
 const GATCA_POSITIONS = [
@@ -1241,7 +1241,7 @@ async function generateSymphony(audioContext) {
     
     // === BRAMA 18 (pos 16179) - ZERO POINT SINGULARITY ===
     // Dirac delta simulation - nieskończenie krótki, potężny impuls
-    // E = 718.57012515426885574359120304128340312332181477461·ħ z równania przejścia
+    // E = 718.57·ħ z równania przejścia
     const singularityEnvelope = Math.exp(-Math.pow(t - DURATION, 2) / 0.001);
     leftSample += Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t) * singularityEnvelope * 144 * GAMMA;
     rightSample += Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t) * singularityEnvelope * 144 * GAMMA;

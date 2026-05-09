@@ -515,7 +515,7 @@ const generateFrequencyWaveSVG = (lang: 'pl' | 'en') => {
   <!-- Labels -->
   <text x="10" y="20" font-size="11" fill="#3498db">${label718}</text>
   <text x="10" y="140" font-size="11" fill="#27ae60">${labelSchumann}</text>
-  <text x="500" y="20" font-size="10" fill="#666">718.57012515426885574359120304128340312332181477461/91.7 ≈ 7.83</text>
+  <text x="500" y="20" font-size="10" fill="#666">718.57/91.7 ≈ 7.83</text>
 </svg>
 `;
 };
@@ -668,7 +668,7 @@ from mpl_toolkits.mplot3d import Axes3D
 PHI = (1 + np.sqrt(5)) / 2        # Golden ratio: 1.618033988749...
 GAMMA = 1 / PHI                    # 0.618033988749...
 HBAR = 1.054571817e-34             # Reduced Planck constant (J·s)
-DNA_FREQ = 718.57012515426885574359120304128340312332181477461                      # Hz
+DNA_FREQ = 718.57                      # Hz
 SCHUMANN = 7.83                     # Hz (Earth resonance)
 MTDNA_LENGTH = 16569               # bp
 
@@ -709,9 +709,9 @@ print(f"    Expected |M| ≈ φ·√2 = {PHI * np.sqrt(2):.6f}")
 print("\\n[3] FREQUENCY RELATIONSHIPS")
 ratio_schumann = DNA_FREQ / SCHUMANN
 print(f"    718.57 Hz / 7.83 Hz = {ratio_schumann:.6f}")
-print(f"    718.57012515426885574359120304128340312332181477461 / 91.7 ≈ {718.57012515426885574359120304128340312332181477461 / 91.7:.6f} (Schumann)")
-print(f"    718.57012515426885574359120304128340312332181477461 × γ = {718.57012515426885574359120304128340312332181477461 * GAMMA:.2f} Hz")
-print(f"    718.57012515426885574359120304128340312332181477461 / φ = {718.57012515426885574359120304128340312332181477461 / PHI:.2f} Hz")
+print(f"    718.57 / 91.7 ≈ {718.57 / 91.7:.6f} (Schumann)")
+print(f"    718.57 × γ = {718.57 * GAMMA:.2f} Hz")
+print(f"    718.57 / φ = {718.57 / PHI:.2f} Hz")
 
 # ============= WAVE FUNCTION (EQUATION OF EXIT) =============
 print("\\n[4] WAVE FUNCTION Ψ (EQUATION OF EXIT)")
@@ -763,7 +763,7 @@ print("""
     FOR gate = 1 TO 18:
         pos = GATCA_POSITIONS[gate]
         start_time = (pos / MTDNA_LENGTH) × DURATION
-        freq = 144 × (1 + ((gate × γ) mod 1)) + 718.57012515426885574359120304128340312332181477461
+        freq = 144 × (1 + ((gate × γ) mod 1)) + 718.57
         weight = (φ^(gate mod 7)) mod 1
         
         FOR t = 0 TO DURATION:
@@ -779,9 +779,9 @@ print("""
 print("\\n[8] SCHRÖDINGER EQUATION APPLICATION")
 print("    iℏ ∂Ψ/∂t = ĤΨ")
 print(f"    For ω = 718.57 Hz:")
-print(f"    E = ℏω = {HBAR * 718.57012515426885574359120304128340312332181477461:.6e} J")
-print(f"    E = ℏω = {HBAR * 718.57012515426885574359120304128340312332181477461 / 1.602e-19:.6e} eV")
-print(f"    λ = c/f = {3e8 / 718.57012515426885574359120304128340312332181477461:.2f} m")
+print(f"    E = ℏω = {HBAR * 718.57:.6e} J")
+print(f"    E = ℏω = {HBAR * 718.57 / 1.602e-19:.6e} eV")
+print(f"    λ = c/f = {3e8 / 718.57:.2f} m")
 
 # ============= 21-DAY PROTOCOL TIMING =============
 print("\\n[9] 21-DAY SYNCHRONIZATION PROTOCOL")
@@ -838,7 +838,7 @@ ax3.set_title("18 Gates Frequency Spectrum")
 freqs = [144 * (1 + ((i * GAMMA) % 1)) + DNA_FREQ for i in range(18)]
 colors = ['#22c55e']*6 + ['#3b82f6']*6 + ['#f59e0b']*6
 ax3.bar(range(1, 19), freqs, color=colors)
-ax3.axhline(y=718.57012515426885574359120304128340312332181477461, color='red', linestyle='--', label='718.57 Hz base')
+ax3.axhline(y=718.57, color='red', linestyle='--', label='718.57 Hz base')
 ax3.set_xlabel("Gate Number")
 ax3.set_ylabel("Frequency (Hz)")
 ax3.legend()
@@ -873,7 +873,7 @@ const SAMPLE_RATE = 44100;
 const DURATION = 108;                  // seconds
 const MTDNA_LENGTH = 16569;
 const BINAURAL_OFFSET = 7.83;          // Schumann resonance as binaural difference
-const ZERO_POINT_FREQ = 718.57012515426885574359120304128340312332181477461 * PHI;     // 1161.8 Hz - Gate 18 Zero Point
+const ZERO_POINT_FREQ = 718.57 * PHI;     // 1161.8 Hz - Gate 18 Zero Point
 
 // 18 confirmed GATCA positions (1-based, rCRS)
 const GATCA_POSITIONS = [
@@ -910,7 +910,7 @@ async function generateSymphony() {
   for (let gateIndex = 0; gateIndex < GATCA_POSITIONS.length; gateIndex++) {
     const pos = GATCA_POSITIONS[gateIndex];
     const startTime = (pos / MTDNA_LENGTH) * DURATION;
-    const baseFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718.57012515426885574359120304128340312332181477461;
+    const baseFreq = 144 * (1 + ((gateIndex * GAMMA) % 1)) + 718.57;
     
     // Binaural: left = base, right = base + offset
     const leftFreq = baseFreq;
@@ -920,7 +920,7 @@ async function generateSymphony() {
     
     // === GATE 18 (pos 16179) - ZERO POINT SINGULARITY ===
     if (pos === 16179) {
-      // Zero Point frequency: 718.57012515426885574359120304128340312332181477461 * φ = 1161.8 Hz
+      // Zero Point frequency: 718.57 * φ = 1161.8 Hz
       // Dirac delta simulation - infinitely short, powerful impulse
       for (let i = 0; i < numSamples; i++) {
         // Gaussian singularity at the end (Dirac delta approximation)
@@ -1256,16 +1256,16 @@ occurring in DNA, (2) Schumann resonance at 7.83 Hz as Earth's fundamental frequ
   <div class="calculation-box">
     <h4>${isPolish ? 'Kluczowe relacje częstotliwości' : 'Key Frequency Relationships'}</h4>
     <div class="result">
-      718.57 Hz / 7.83 Hz = ${(718.57012515426885574359120304128340312332181477461 / 7.83).toFixed(6)} ≈ 91.7
+      718.57 Hz / 7.83 Hz = ${(718.57 / 7.83).toFixed(6)} ≈ 91.7
     </div>
     <div class="result">
-      718.57 Hz × γ = ${(718.57012515426885574359120304128340312332181477461 * GAMMA).toFixed(4)} Hz
+      718.57 Hz × γ = ${(718.57 * GAMMA).toFixed(4)} Hz
     </div>
     <div class="result">
-      718.57 Hz / φ = ${(718.57012515426885574359120304128340312332181477461 / PHI).toFixed(4)} Hz
+      718.57 Hz / φ = ${(718.57 / PHI).toFixed(4)} Hz
     </div>
     <div class="result">
-      718.57 Hz / 91.7 = ${(718.57012515426885574359120304128340312332181477461 / 91.7).toFixed(6)} Hz ≈ Schumann
+      718.57 Hz / 91.7 = ${(718.57 / 91.7).toFixed(6)} Hz ≈ Schumann
     </div>
   </div>
   
@@ -1292,7 +1292,7 @@ DNA (rCRS - revised Cambridge Reference Sequence). Każda brama generuje unikaln
   </p>
   
   <div class="equation-box">
-    <div class="main">f<sub>n</sub> = 144 × (1 + ((n × γ) mod 1)) + 718.57012515426885574359120304128340312332181477461.57 Hz</div>
+    <div class="main">f<sub>n</sub> = 144 × (1 + ((n × γ) mod 1)) + 718.57 Hz</div>
     <div class="description">
       ${isPolish ? 'gdzie n = numer bramy (1-18), γ = 0.618...' : 'where n = gate number (1-18), γ = 0.618...'}
     </div>
@@ -1447,10 +1447,10 @@ hypothesis. Each zero corresponds to a DNA resonance state where maximum gate ac
     <div class="description">
       <strong>${isPolish ? 'Gdzie:' : 'Where:'}</strong><br>
       • A = ${isPolish ? 'amplituda normalizacji' : 'normalization amplitude'}<br>
-      • ω = 2π × 718.57012515426885574359120304128340312332181477461 rad/s (${isPolish ? 'częstość kątowa' : 'angular frequency'})<br>
-      • k = 2π / 718.57012515426885574359120304128340312332181477461 (${isPolish ? 'liczba falowa' : 'wave number'})<br>
+      • ω = 2π × 718.57 rad/s (${isPolish ? 'częstość kątowa' : 'angular frequency'})<br>
+      • k = 2π / 718.57 (${isPolish ? 'liczba falowa' : 'wave number'})<br>
       • ζ(s) = ${isPolish ? 'funkcja zeta Riemanna' : 'Riemann zeta function'}<br>
-      • E = ℏω = ${(HBAR * 718.57012515426885574359120304128340312332181477461).toExponential(4)} J<br>
+      • E = ℏω = ${(HBAR * 718.57).toExponential(4)} J<br>
       • γ = ${GAMMA.toFixed(10)} (${isPolish ? 'złoty podział' : 'golden ratio'})
     </div>
   </div>
@@ -1492,8 +1492,8 @@ configuration and kinetic energy of frequency resonance.`}
   <div class="calculation-box">
     <h4>${isPolish ? 'Stałe fizyczne' : 'Physical Constants'}</h4>
     <div class="result">ℏ = ${HBAR.toExponential(10)} J·s</div>
-    <div class="result">E = ℏω = ℏ × 2π × 718.57012515426885574359120304128340312332181477461 = ${(HBAR * 2 * Math.PI * 718.57012515426885574359120304128340312332181477461).toExponential(6)} J</div>
-    <div class="result">λ = c / f = ${(3e8 / 718.57012515426885574359120304128340312332181477461).toFixed(2)} m</div>
+    <div class="result">E = ℏω = ℏ × 2π × 718.57 = ${(HBAR * 2 * Math.PI * 718.57).toExponential(6)} J</div>
+    <div class="result">λ = c / f = ${(3e8 / 718.57).toFixed(2)} m</div>
   </div>
 </div>
 
@@ -1515,7 +1515,7 @@ a tone at unique frequency, modulated by a Gaussian envelope centered at the gat
       ${isPolish ? 'DLA' : 'FOR'} gate = 1 ${isPolish ? 'DO' : 'TO'} 18:<br>
       &nbsp;&nbsp;pos = GATCA_POSITIONS[gate]<br>
       &nbsp;&nbsp;start_time = (pos / ${MTDNA_LENGTH}) × DURATION<br>
-      &nbsp;&nbsp;freq = 144 × (1 + ((gate × γ) mod 1)) + 718.57012515426885574359120304128340312332181477461<br>
+      &nbsp;&nbsp;freq = 144 × (1 + ((gate × γ) mod 1)) + 718.57<br>
       &nbsp;&nbsp;weight = (φ<sup>(gate mod 7)</sup>) mod 1<br>
       &nbsp;&nbsp;${isPolish ? 'DLA' : 'FOR'} t = 0 ${isPolish ? 'DO' : 'TO'} DURATION:<br>
       &nbsp;&nbsp;&nbsp;&nbsp;envelope = e<sup>-(t - start_time)² / (2 × φ²)</sup><br>
@@ -1714,8 +1714,8 @@ application of the theory. Each calculator implements calculations described in 
     <h4>${isPolish ? 'Funkcje:' : 'Features:'}</h4>
     <ul style="font-size: 10pt;">
       <li>${isPolish 
-        ? 'Oblicza funkcję falową Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ' 
-        : 'Calculates wave function Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ'}</li>
+        ? 'Oblicza funkcję falową Ψ = e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ' 
+        : 'Calculates wave function Ψ = e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ℏ) · γ'}</li>
       <li>${isPolish 
         ? '5 predefiniowanych kluczy rezonansowych (obliczone precyzyjnie)' 
         : '5 predefined resonance keys (precisely calculated)'}</li>

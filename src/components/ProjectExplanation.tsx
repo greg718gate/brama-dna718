@@ -382,7 +382,7 @@ print(f"7.83 × φ = {harmonic:.3f}")`}
                 <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
                   <pre className="text-xs overflow-x-auto font-mono text-foreground">
 {`# 718.57 Hz → podziel przez γ
-print(718.57012515426885574359120304128340312332181477461 / gamma)  # = 1161.8 Hz
+print(718.57 / gamma)  # = 1161.8 Hz
 
 # 1161.8 / 7.83 = ?
 print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
@@ -415,7 +415,7 @@ f0 = 7.83
 f_target = 18.6
 modulation = f_target / f0
 
-freq_gate = 718.57012515426885574359120304128340312332181477461 / gamma
+freq_gate = 718.57 / gamma
 harmonics = freq_gate / f0
 print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
                   </pre>
@@ -589,7 +589,7 @@ left = np.sin(2 * np.pi * 7.83 * t)
 right = np.sin(2 * np.pi * 18.6 * t)
 
 # 718.57 Hz – modulacja amplitudy (DNA Gate)
-carrier = 718.57012515426885574359120304128340312332181477461
+carrier = 718.57
 modulation_depth = 0.7
 dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
 audio = (left + right) * 0.3 * dna_gate

@@ -296,7 +296,7 @@ export const exportBramaPythonCode = (sequences: GATCASequence[]): string => {
   
   return `# brama_unification_engine.py
 # BRAMA Unification Engine - DNA-based Quantum Consciousness Framework
-# Implementacja równania wyjścia: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+# Implementacja równania wyjścia: Ψ = A · e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
 
 import numpy as np
 from scipy.special import zeta
@@ -307,7 +307,7 @@ class BramaUnificationEngine:
         self.gamma = (1 + 5**0.5) / 2 - 1  # 0.618... (Złoty podział)
         self.phi = (1 + 5**0.5) / 2        # 1.618... (Złoty podział)
         self.h_bar = 1.0545718e-34          # Stała Plancka
-        self.freq_718 = 718.57012515426885574359120304128340312332181477461                 # Stała rezonansowa
+        self.freq_718 = 718.57                 # Stała rezonansowa
         self.binaural_offset = 7.83         # Rezonans Schumanna
 
     def parse_gatca_data(self, file_path):
@@ -329,7 +329,7 @@ class BramaUnificationEngine:
     def calculate_psi(self, t, x, energy_vector):
         """
         Implementacja Równania Wyjścia:
-        Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+        Ψ = A · e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
         """
         k = (2 * np.pi) / self.freq_718
         

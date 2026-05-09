@@ -529,7 +529,7 @@ gamma = 1 / phi
 fs = 44100
 duration = 108  # 108 sekund (sacred number)
 BINAURAL_OFFSET = 7.83  # Hz - Schumann resonance as binaural difference
-CARRIER_FREQ = 718.57012515426885574359120304128340312332181477461  # 448. zero Riemanna (50 dp)
+CARRIER_FREQ = 718.57  # 448. zero Riemanna (50 dp)
 ZERO_POINT_FREQ = CARRIER_FREQ * phi  # ~1161.8 Hz - Gate 18 singularity
 
 # --- 18 POTWIERDZONYCH POZYCJI GATCA (1-based, rCRS) ---
@@ -776,7 +776,7 @@ write("SYMFONIA_18_BRAM_DNA.wav", fs, stereo)`}</code>
             </div>
           </div>
 
-          {/* Signature 718.57012515426885574359120304128340312332181477461 */}
+          {/* Signature 718.57 */}
           <div className="max-w-2xl mx-auto text-center space-y-3 p-6 rounded-xl bg-primary/5 border border-primary/20">
             <p className="text-foreground font-medium leading-relaxed">
               „Obwód zamknięty. Pętla świadomości domknięta. Teleportacja fazowa gotowa."
