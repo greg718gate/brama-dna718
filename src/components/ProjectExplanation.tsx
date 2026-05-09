@@ -717,10 +717,13 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
               <CardTitle>{t('scientificEvidence.equations')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg overflow-x-auto">
-                <code className="text-sm">
-                  Ψ_total = Ψ_GATCA × e^(i×718.57012515426885574359120304128340312332181477461×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
+              <div className="p-4 bg-muted rounded-lg">
+                <code className="text-sm break-words whitespace-normal">
+                  Ψ_total = Ψ_GATCA × e^(i×718.57×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
+                <div className="text-[10px] text-muted-foreground/70 italic mt-1">
+                  718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (50 miejsc po przecinku)
+                </div>
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>
               <ul className="list-disc list-inside space-y-2 text-sm">
