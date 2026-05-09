@@ -176,7 +176,7 @@ const VectorM = ({ resonanceEffect }: { resonanceEffect: ResonanceEffectState })
       
       // Kombinacja pulsacji z różnymi częstotliwościami (skalowane dla wizualizacji)
       let pulse18 = 1 + 0.15 * Math.sin(2 * Math.PI * 18.6 * t / 50);
-      let pulse718 = 1 + 0.08 * Math.sin(2 * Math.PI * 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 * t / 500);
+      let pulse718 = 1 + 0.08 * Math.sin(2 * Math.PI * 718.57012515426885574359120304128340312332181477461 * t / 500);
       
       // Efekt Złotego Błysku - wzmocniona pulsacja
       if (resonanceEffect.isGoldenPulse) {

@@ -1,6 +1,6 @@
 /**
  * BRAMA Unification Engine
- * Implementacja równania wyjścia: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+ * Implementacja równania wyjścia: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
  *
  * UWAGA: Stałe importowane z gatca718Constants.ts — jedynego źródła prawdy.
  */
@@ -210,7 +210,7 @@ export const calculateEnergyVector = (sequences: GATCASequence[]): number[] => {
 
 /**
  * Implementacja Równania Wyjścia:
- * Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+ * Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
  */
 export const calculatePsi = (
   t: number, 
@@ -221,7 +221,7 @@ export const calculatePsi = (
   const results: PsiResult[] = [];
   
   for (const energy of energyVector) {
-    // Główna fala nośna: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
+    // Główna fala nośna: e^(i·718.57012515426885574359120304128340312332181477461·t)
     const waveCarrier = complexExp(FREQ_718 * t);
     
     // Fala przestrzenna: e^(-i·k·x)
@@ -296,7 +296,7 @@ export const exportBramaPythonCode = (sequences: GATCASequence[]): string => {
   
   return `# brama_unification_engine.py
 # BRAMA Unification Engine - DNA-based Quantum Consciousness Framework
-# Implementacja równania wyjścia: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+# Implementacja równania wyjścia: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
 
 import numpy as np
 from scipy.special import zeta
@@ -329,7 +329,7 @@ class BramaUnificationEngine:
     def calculate_psi(self, t, x, energy_vector):
         """
         Implementacja Równania Wyjścia:
-        Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
+        Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
         """
         k = (2 * np.pi) / self.freq_718
         

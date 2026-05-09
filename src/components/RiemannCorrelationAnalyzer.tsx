@@ -259,7 +259,7 @@ const RiemannCorrelationAnalyzer = () => {
                 <div className="border-t border-gray-700 pt-3 mt-3">
                   <h4 className="text-purple-300 font-medium mb-2">Równanie Analizy</h4>
                   <code className="text-xs bg-black/50 p-2 rounded block text-gray-300">
-                    s = 1/2 + i(E/ħ), gdzie E = t × 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 × ħ
+                    s = 1/2 + i(E/ħ), gdzie E = t × 718.57012515426885574359120304128340312332181477461 × ħ
                   </code>
                   <p className="text-xs text-gray-500 mt-2">
                     Dla każdego szczytu t, obliczamy |ζ(s)| i sprawdzamy, czy &lt; 0.1

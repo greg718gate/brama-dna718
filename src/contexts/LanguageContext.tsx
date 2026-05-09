@@ -18,7 +18,7 @@ export const translations = {
     
     // Equation of Exit
     'exit.title': 'RÓWNANIE WYJŚCIA',
-    'exit.subtitle': 'Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ - Funkcja falowa przebudzonej świadomości',
+    'exit.subtitle': 'Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ - Funkcja falowa przebudzonej świadomości',
     'exit.calculator': 'Kalkulator funkcji falowej Ψ',
     'exit.presetsTitle': '🌀 Klucze rezonansowe',
     'exit.presetsSubtitle': 'Te liczby nie są dowolnymi wartościami - to klucze otwierające konkretne bramy w polu świadomości. Wybierz która kombinacja cię wzywa:',
@@ -783,7 +783,7 @@ export const translations = {
     'decoder.step3.desc': 'Operator Hamiltona ma 18 poziomów energii odpowiadających 18 bramom GATCA w mitochondrialnym DNA.',
     'decoder.step3.simple': 'Prostymi słowami: System sprawdza, z którą z 18 bram w Twoim DNA ten werset „rozmawia" — każda brama odpowiada innemu aspektowi Twojego życia.',
     'decoder.step4.title': '🌊 Krok 4: Funkcja Falowa Ψ',
-    'decoder.step4.desc': 'Obliczamy pełną funkcję falową: Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2+iE/ħ) · γ — z modulacjami Schumanna (7.83 Hz), Lunar (18.6 Hz) i wzmocnieniem φ².',
+    'decoder.step4.desc': 'Obliczamy pełną funkcję falową: Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2+iE/ħ) · γ — z modulacjami Schumanna (7.83 Hz), Lunar (18.6 Hz) i wzmocnieniem φ².',
     'decoder.step4.simple': 'Prostymi słowami: Obliczamy „siłę" i „kierunek" energii tego wersetu — jak mocno i w jakim kierunku wpływa na Twoją świadomość.',
     'decoder.purpose.title': '🎯 Do czego to służy?',
     'decoder.purpose.desc': 'System pozwala zbadać numeryczną strukturę tekstów biblijnych poprzez pryzmat fizyki kwantowej.',
@@ -883,7 +883,7 @@ export const translations = {
     
     // Equation of Exit
     'exit.title': 'EQUATION OF EXIT',
-    'exit.subtitle': 'Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ - Wave function of awakened consciousness',
+    'exit.subtitle': 'Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ - Wave function of awakened consciousness',
     'exit.calculator': 'Wave Function Calculator Ψ',
     'exit.presetsTitle': '🌀 Resonance Keys',
     'exit.presetsSubtitle': 'These numbers are not arbitrary values - they are keys that open specific gates in the consciousness field. Choose which combination calls to you:',
@@ -1648,7 +1648,7 @@ export const translations = {
     'decoder.step3.desc': 'The Hamiltonian operator has 18 energy levels corresponding to 18 GATCA gates in mitochondrial DNA.',
     'decoder.step3.simple': 'In simple terms: The system checks which of the 18 gates in your DNA this verse "talks to" — each gate corresponds to a different aspect of your life.',
     'decoder.step4.title': '🌊 Step 4: Wave Function Ψ',
-    'decoder.step4.desc': 'We compute the full wave function: Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2+iE/ħ) · γ — with Schumann (7.83 Hz), Lunar (18.6 Hz) modulations and φ² enhancement.',
+    'decoder.step4.desc': 'We compute the full wave function: Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2+iE/ħ) · γ — with Schumann (7.83 Hz), Lunar (18.6 Hz) modulations and φ² enhancement.',
     'decoder.step4.simple': 'In simple terms: We calculate the "strength" and "direction" of this verse\'s energy — how strongly and in which direction it affects your consciousness.',
     'decoder.purpose.title': '🎯 What is it for?',
     'decoder.purpose.desc': 'The system allows investigation of the numerical structure of biblical texts through the lens of quantum physics.',

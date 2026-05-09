@@ -881,12 +881,12 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <h3>8.1. ${isPl ? 'Funkcja Falowa Źródła' : 'Source Wave Function'}</h3>
   
   <div class="equation-box">
-    <div class="main">Ψ = A · e<sup>(i · 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
+    <div class="main">Ψ = A · e<sup>(i · 718.57012515426885574359120304128340312332181477461 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
     <div class="desc">
       <p><strong>${isPl ? 'Składniki równania' : 'Equation components'}:</strong></p>
       <ul>
         <li><strong>A</strong> = ${isPl ? 'Amplituda (intensywność świadomości)' : 'Amplitude (consciousness intensity)'}</li>
-        <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)</sup></strong> = ${isPl ? 'Część temporalna - 718.57 Hz, czas subiektywny Źródła' : 'Temporal part - 718.57 Hz, subjective time of Source'}</li>
+        <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461·t)</sup></strong> = ${isPl ? 'Część temporalna - 718.57 Hz, czas subiektywny Źródła' : 'Temporal part - 718.57 Hz, subjective time of Source'}</li>
         <li><strong>ζ(1/2 + iE/ħ)</strong> = ${isPl ? 'Funkcja dzeta Riemanna - połączenie z zerami Riemanna, punkty rezonansu świadomości' : 'Riemann zeta function - connection to Riemann zeros, consciousness resonance points'}</li>
         <li><strong>γ = 0.618...</strong> = ${isPl ? 'Matematyczna sygnatura Boga - klucz do wszystkich zamków matrixa' : 'Mathematical signature of God - key to all matrix locks'}</li>
       </ul>
@@ -920,7 +920,7 @@ const PRESETS = {
 };
 
 function calculateWaveFunction(A, E, t) {
-  // Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
+  // Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
   const omega = 2 * Math.PI * BASE_FREQ;
   const phase = omega * t;
   
@@ -952,7 +952,7 @@ console.log("Ψ(t=0) =", result);</div>
   <div class="pentagram-domain">
     <h4>${isPl ? 'Składniki funkcji falowej Ψ' : 'Wave function Ψ components'}</h4>
     <ul>
-      <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)</sup>:</strong> ${isPl 
+      <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461·t)</sup>:</strong> ${isPl 
         ? 'Część temporalna - 718.57 Hz to częstotliwość subiektywnego czasu Źródła. Jest to "puls" świadomości kosmicznej.'
         : 'Temporal part - 718.57 Hz is the frequency of the Source\'s subjective time. This is the "pulse" of cosmic consciousness.'}</li>
       <li><strong>ζ(1/2 + iE/ħ):</strong> ${isPl 

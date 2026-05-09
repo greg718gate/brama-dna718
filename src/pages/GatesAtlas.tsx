@@ -168,7 +168,7 @@ const GatesAtlas = () => {
 
         {/* Footer note */}
         <div className="text-center py-8 text-xs text-muted-foreground font-mono space-y-1">
-          <p>Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ</p>
+          <p>Ψ = e^(i·718.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ</p>
           <p>© 2026 Grzegorz | BRAMA-718-UNIFIED | CC BY-NC 4.0</p>
         </div>
       </div>
