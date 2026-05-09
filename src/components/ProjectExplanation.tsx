@@ -381,8 +381,8 @@ print(f"7.83 × φ = {harmonic:.3f}")`}
                 <h3 className="text-xl font-bold text-primary">{t('matrix.step3')}</h3>
                 <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
                   <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`# 718 Hz → podziel przez γ
-print(718 / gamma)  # = 1161.8 Hz
+{`# 718.57 Hz → podziel przez γ
+print(718.57012515426885574359120304128340312332181477461 / gamma)  # = 1161.8 Hz
 
 # 1161.8 / 7.83 = ?
 print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
@@ -415,7 +415,7 @@ f0 = 7.83
 f_target = 18.6
 modulation = f_target / f0
 
-freq_gate = 718 / gamma
+freq_gate = 718.57012515426885574359120304128340312332181477461 / gamma
 harmonics = freq_gate / f0
 print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
                   </pre>
@@ -588,8 +588,8 @@ left = np.sin(2 * np.pi * 7.83 * t)
 # 18.6 Hz – prawe ucho (Modulacja)
 right = np.sin(2 * np.pi * 18.6 * t)
 
-# 718 Hz – modulacja amplitudy (DNA Gate)
-carrier = 718
+# 718.57 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718.57012515426885574359120304128340312332181477461
 modulation_depth = 0.7
 dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
 audio = (left + right) * 0.3 * dna_gate
@@ -632,7 +632,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
                         <td className="border border-primary/20 p-2">{t('matrix.audio.diff.effect')}</td>
                       </tr>
                       <tr>
-                        <td className="border border-primary/20 p-2 font-mono">718 Hz</td>
+                        <td className="border border-primary/20 p-2 font-mono">718.57 Hz</td>
                         <td className="border border-primary/20 p-2">{t('matrix.audio.dna')}</td>
                         <td className="border border-primary/20 p-2">{t('matrix.audio.dna.effect')}</td>
                       </tr>
@@ -689,7 +689,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">1. 718 Hz + DNA</h4>
+                  <h4 className="font-semibold mb-2">1. 718.57 Hz + DNA</h4>
                   <p className="text-sm">{t('scientificEvidence.study1')}</p>
                 </div>
 
@@ -719,7 +719,7 @@ print("Plik gotowy – 60 sekund dźwięku matrycy.")`}
             <CardContent className="space-y-4">
               <div className="p-4 bg-muted rounded-lg overflow-x-auto">
                 <code className="text-sm">
-                  Ψ_total = Ψ_GATCA × e^(i×718×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
+                  Ψ_total = Ψ_GATCA × e^(i×718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>

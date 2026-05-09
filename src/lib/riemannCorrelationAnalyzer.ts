@@ -32,7 +32,7 @@ export interface RealtimeAnalysisResult {
   coherence: number;
 }
 
-const FREQ_718 = 718;
+const FREQ_718 = 718.57012515426885574359120304128340312332181477461;
 const ZERO_THRESHOLD = 0.1; // Próg bliskości zera Riemanna
 
 // Pozycje 18 Bram DNA w czasie (w sekundach) - obliczone na podstawie symfonii
@@ -59,7 +59,7 @@ export const getGateIndexAtTime = (currentTime: number): number => {
 export const analyzeAtTime = (currentTime: number): RealtimeAnalysisResult => {
   const gateIndex = getGateIndexAtTime(currentTime);
   
-  // Mapowanie czasu na energię: E = t × 718 × ħ
+  // Mapowanie czasu na energię: E = t × 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 × ħ
   const energy = currentTime * FREQ_718 * H_BAR;
   
   // Obliczenie wartości funkcji Zeta na linii krytycznej
@@ -250,7 +250,7 @@ class RiemannCorrelationAnalyzer:
     def __init__(self):
         self.gamma = (1 + 5**0.5) / 2 - 1  # 0.618... (Złoty podział)
         self.h_bar = 1.0545718e-34          # Stała Plancka
-        self.freq_718 = 718                 # Stała rezonansowa
+        self.freq_718 = 718.57012515426885574359120304128340312332181477461                 # Stała rezonansowa
         self.zero_threshold = 0.1           # Próg bliskości zera Riemanna
 
     def load_symphony(self, file_path):

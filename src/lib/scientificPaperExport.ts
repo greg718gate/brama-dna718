@@ -549,7 +549,7 @@ export const exportScientificPaper = (data: ScientificPaperData) => {
       Our research identifies mathematical relationships:
     </p>
     <div class="equation">
-      718 Hz / 7.83 Hz ≈ 91.7 (close to 6 × 5 × φ)<br>
+      718.57 Hz / 7.83 Hz ≈ 91.7 (close to 6 × 5 × φ)<br>
       18.6 Hz / 7.83 Hz ≈ 2.375 (golden field modulation)
     </div>
   </div>
@@ -609,7 +609,7 @@ def dna_helix(turns=2, points_per_turn=100):
 
 # Frequency resonance calculations
 schumann = 7.83  # Hz
-activation_freq = 718  # Hz
+activation_freq = 718.57012515426885574359120304128340312332181477461  # Hz
 ratio = activation_freq / schumann
 print(f"Frequency ratio: {ratio:.2f}")
 print(f"Expected (6×5×φ): {6*5*phi:.2f}")
@@ -727,7 +727,7 @@ phi = np.linspace(0, 2*np.pi, 100)
       Future research directions include:
     </p>
     <ul>
-      <li>Experimental validation of 718 Hz biological effects</li>
+      <li>Experimental validation of 718.57 Hz biological effects</li>
       <li>Quantum mechanical modeling of DNA-frequency interactions</li>
       <li>Investigation of pentagram geometry in other biomolecules</li>
       <li>Clinical trials for potential therapeutic applications</li>

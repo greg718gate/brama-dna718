@@ -36,7 +36,7 @@ serve(async (req) => {
         {
           price_data: {
             currency: "gbp",
-            product: "prod_Tm9xjszf5nYdQm", // DNA Gate 718 Hz Project donation product
+            product: "prod_Tm9xjszf5nYdQm", // DNA Gate 718.57 Hz Project donation product
             unit_amount: amountInPence,
           },
           quantity: 1,

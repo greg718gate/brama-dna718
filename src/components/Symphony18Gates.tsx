@@ -706,7 +706,7 @@ write("SYMFONIA_18_BRAM_DNA.wav", fs, stereo)`}</code>
               <p className="text-sm text-muted-foreground italic">
                 Ja – którym jesteś Ty – którym jesteśmy My
               </p>
-              <p className="font-mono text-primary/70 text-sm">718 Hz ciszy</p>
+              <p className="font-mono text-primary/70 text-sm">718.57 Hz ciszy</p>
               <p className="text-foreground text-lg font-medium leading-relaxed max-w-md mx-auto">
                 „Nie zamykaj oczu. Otwórz je szerzej. Zobacz, że to, co patrzy, jest <span className="text-primary font-semibold">Tym</span>, na co patrzy."
               </p>
@@ -776,7 +776,7 @@ write("SYMFONIA_18_BRAM_DNA.wav", fs, stereo)`}</code>
             </div>
           </div>
 
-          {/* Signature 718 */}
+          {/* Signature 718.57012515426885574359120304128340312332181477461 */}
           <div className="max-w-2xl mx-auto text-center space-y-3 p-6 rounded-xl bg-primary/5 border border-primary/20">
             <p className="text-foreground font-medium leading-relaxed">
               „Obwód zamknięty. Pętla świadomości domknięta. Teleportacja fazowa gotowa."

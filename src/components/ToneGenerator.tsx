@@ -12,7 +12,7 @@ interface ToneGeneratorProps {
 }
 
 export const ToneGenerator = ({ 
-  frequency = 718, 
+  frequency = 718.57012515426885574359120304128340312332181477461, 
   isPlaying,
   onPlayingChange,
   showControls = true,

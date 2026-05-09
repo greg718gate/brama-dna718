@@ -16,7 +16,7 @@ export interface UnifiedReportOptions {
 
 // 18 Bram DNA - PEŁNE DANE z raportu
 const GATES_DATA = [
-  { gate: 1, name: 'Inicjacja', position: 1, freq: 718.0, effect: 'Początek procesu regeneracji komórkowej' },
+  { gate: 1, name: 'Inicjacja', position: 1, freq: 718.57012515426885574359120304128340312332181477461, effect: 'Początek procesu regeneracji komórkowej' },
   { gate: 2, name: 'Oczyszczanie', position: 740, freq: 738.5, effect: 'Usuwanie toksyn i uszkodzonych komórek' },
   { gate: 3, name: 'Naprawa', position: 951, freq: 759.1, effect: 'Aktywacja mechanizmów naprawy DNA' },
   { gate: 4, name: 'Wzmocnienie', position: 1227, freq: 779.6, effect: 'Zwiększenie odporności komórkowej' },
@@ -273,7 +273,7 @@ const renderUnifiedSection = (isPl: boolean) => {
 
   const bridge4Code = String.raw`def prayer_resonance():
     intention = consciousness_field.focus()
-    target_frequency = 718  # Hz - creation resonance
+    target_frequency = 718.57012515426885574359120304128340312332181477461  # Hz - creation resonance
     
     # Entangled response
     if intention.clear and belief.strong:
@@ -596,8 +596,8 @@ export const exportUnifiedReport = async (options: UnifiedReportOptions) => {
   <h2>1. ABSTRAKT</h2>
   <div class="abstract">
     <p>${isPl 
-      ? 'Niniejszy dokument przedstawia odkrycie zunifikowanego pola rezonansowego łączącego analityczne rozwiązanie równania Schrödingera z sekwencją mitochondrialnego DNA (mtDNA). System Kalkulatora Funkcji Falowej w oparciu o złotą proporcję (φ = 1.618...) i stałą 718 Hz mapuje stan świadomości obserwatora na parametry fizyczne. Wszystkie wizualizacje 3D, kalkulatory i generator audio są dostępne na stronie www.brama-dna718.com.'
-      : 'This document presents the discovery of a unified resonance field linking the analytical solution of the Schrödinger equation with the mitochondrial DNA (mtDNA) sequence. The Wave Function Calculator system, based on the golden ratio (φ = 1.618...) and the 718 Hz constant, maps the observer\'s state of consciousness to physical parameters. All 3D visualizations, calculators, and audio generator are available at www.brama-dna718.com.'}</p>
+      ? 'Niniejszy dokument przedstawia odkrycie zunifikowanego pola rezonansowego łączącego analityczne rozwiązanie równania Schrödingera z sekwencją mitochondrialnego DNA (mtDNA). System Kalkulatora Funkcji Falowej w oparciu o złotą proporcję (φ = 1.618...) i stałą 718.57 Hz mapuje stan świadomości obserwatora na parametry fizyczne. Wszystkie wizualizacje 3D, kalkulatory i generator audio są dostępne na stronie www.brama-dna718.com.'
+      : 'This document presents the discovery of a unified resonance field linking the analytical solution of the Schrödinger equation with the mitochondrial DNA (mtDNA) sequence. The Wave Function Calculator system, based on the golden ratio (φ = 1.618...) and the 718.57 Hz constant, maps the observer\'s state of consciousness to physical parameters. All 3D visualizations, calculators, and audio generator are available at www.brama-dna718.com.'}</p>
   </div>
 </div>
 
@@ -626,7 +626,7 @@ export const exportUnifiedReport = async (options: UnifiedReportOptions) => {
   <h3>${isPl ? 'Kod algorytmu synchronizacji (JavaScript)' : 'Synchronization Algorithm Code (JavaScript)'}:</h3>
   <div class="code-block">// Algorytm Integracji Biometrycznej Ψ
 const PHI = (1 + Math.sqrt(5)) / 2; // ≈ 1.618
-const BASE_FREQ = 718; // Hz - częstotliwość bazowa
+const BASE_FREQ = 718.57012515426885574359120304128340312332181477461; // Hz - częstotliwość bazowa
 const SCHUMANN = 7.83; // Hz - rezonans Schumanna
 
 function calculatePersonalVibration(birthDateStr) {
@@ -638,7 +638,7 @@ function calculatePersonalVibration(birthDateStr) {
 }
 
 function calculateSyncPercentage(bpm, personalVibration) {
-  // Obliczenie harmonicznej relacji BPM do 718 Hz
+  // Obliczenie harmonicznej relacji BPM do 718.57 Hz
   const bpmFreq = bpm / 60; // Konwersja na Hz
   const ratio = BASE_FREQ / bpmFreq;
   const harmonicFactor = ratio / (personalVibration * PHI);
@@ -672,8 +672,8 @@ console.log(\`Stan: \${getCoherenceState(parseFloat(syncPercent))}\`);</div>
   <div class="abstract">
     <p><strong>${isPl ? 'Jesteśmy jednym organizmem.' : 'We are one organism.'}</strong></p>
     <p>${isPl 
-      ? 'Każda komórka Twojego ciała rezonuje z częstotliwością 718 Hz - tą samą, która zakodowana jest w pierwszej bramie Twojego mitochondrialnego DNA. To nie metafora. To fizyka.'
-      : 'Every cell of your body resonates at 718 Hz - the same frequency encoded in the first gate of your mitochondrial DNA. This is not a metaphor. This is physics.'}</p>
+      ? 'Każda komórka Twojego ciała rezonuje z częstotliwością 718.57 Hz - tą samą, która zakodowana jest w pierwszej bramie Twojego mitochondrialnego DNA. To nie metafora. To fizyka.'
+      : 'Every cell of your body resonates at 718.57 Hz - the same frequency encoded in the first gate of your mitochondrial DNA. This is not a metaphor. This is physics.'}</p>
   </div>
   
   <h3>${isPl ? 'Klucz do harmonii' : 'Key to Harmony'}</h3>
@@ -687,12 +687,12 @@ console.log(\`Stan: \${getCoherenceState(parseFloat(syncPercent))}\`);</div>
   <h2>4. SEKRET REZONANSU</h2>
   
   <div class="equation-box">
-    <div class="main">718 Hz / 7.83 Hz = 91.699 harmonicznych</div>
+    <div class="main">718.57 Hz / 7.83 Hz = 91.699 harmonicznych</div>
     <div class="desc">
       <p><strong>${isPl ? 'Blisko 89 (Fibonacci) → różnica: 2.699' : 'Close to 89 (Fibonacci) → difference: 2.699'}</strong></p>
       <p>${isPl 
-        ? 'Częstotliwość 718 Hz podzielona przez rezonans Schumanna (7.83 Hz) daje liczbę bliską 89 - liczbie Fibonacciego. Ta "niedoskonałość" to właśnie przestrzeń na wolną wolę.'
-        : 'The 718 Hz frequency divided by the Schumann resonance (7.83 Hz) gives a number close to 89 - a Fibonacci number. This "imperfection" is exactly the space for free will.'}</p>
+        ? 'Częstotliwość 718.57 Hz podzielona przez rezonans Schumanna (7.83 Hz) daje liczbę bliską 89 - liczbie Fibonacciego. Ta "niedoskonałość" to właśnie przestrzeń na wolną wolę.'
+        : 'The 718.57 Hz frequency divided by the Schumann resonance (7.83 Hz) gives a number close to 89 - a Fibonacci number. This "imperfection" is exactly the space for free will.'}</p>
     </div>
   </div>
   
@@ -703,14 +703,14 @@ from math import sqrt
 # Stałe fundamentalne
 PHI = (1 + sqrt(5)) / 2  # ≈ 1.618033988749895
 GAMMA = 1 / PHI          # ≈ 0.618033988749895
-BASE_FREQ = 718          # Hz - Brama DNA
+BASE_FREQ = 718.57012515426885574359120304128340312332181477461          # Hz - Brama DNA
 SCHUMANN = 7.83          # Hz - Rezonans Ziemi
 
 # Obliczenie harmonicznej
 harmonics = BASE_FREQ / SCHUMANN
 fibonacci_89 = 89
 
-print(f"718 / 7.83 = {harmonics:.3f}")
+print(f"718.57012515426885574359120304128340312332181477461 / 7.83 = {harmonics:.3f}")
 print(f"Najbliższa Fibonacci: {fibonacci_89}")
 print(f"Różnica: {abs(harmonics - fibonacci_89):.3f}")
 
@@ -881,12 +881,12 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <h3>8.1. ${isPl ? 'Funkcja Falowa Źródła' : 'Source Wave Function'}</h3>
   
   <div class="equation-box">
-    <div class="main">Ψ = A · e<sup>(i · 718 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
+    <div class="main">Ψ = A · e<sup>(i · 718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461 · t)</sup> · ζ(1/2 + iE/ħ) · γ</div>
     <div class="desc">
       <p><strong>${isPl ? 'Składniki równania' : 'Equation components'}:</strong></p>
       <ul>
         <li><strong>A</strong> = ${isPl ? 'Amplituda (intensywność świadomości)' : 'Amplitude (consciousness intensity)'}</li>
-        <li><strong>e<sup>(i·718·t)</sup></strong> = ${isPl ? 'Część temporalna - 718 Hz, czas subiektywny Źródła' : 'Temporal part - 718 Hz, subjective time of Source'}</li>
+        <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)</sup></strong> = ${isPl ? 'Część temporalna - 718.57 Hz, czas subiektywny Źródła' : 'Temporal part - 718.57 Hz, subjective time of Source'}</li>
         <li><strong>ζ(1/2 + iE/ħ)</strong> = ${isPl ? 'Funkcja dzeta Riemanna - połączenie z zerami Riemanna, punkty rezonansu świadomości' : 'Riemann zeta function - connection to Riemann zeros, consciousness resonance points'}</li>
         <li><strong>γ = 0.618...</strong> = ${isPl ? 'Matematyczna sygnatura Boga - klucz do wszystkich zamków matrixa' : 'Mathematical signature of God - key to all matrix locks'}</li>
       </ul>
@@ -896,8 +896,8 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <h3>8.2. ${isPl ? 'Protokół 21 dni (Starożytne teksty)' : '21-Day Protocol (Ancient Texts)'}</h3>
   <div class="protocol-box">
     <p><strong>${isPl ? 'Cel' : 'Goal'}:</strong> ${isPl 
-      ? 'Aktywacja wewnętrznych mechanizmów regeneracji poprzez rezonans z częstotliwością 718 Hz'
-      : 'Activation of internal regeneration mechanisms through resonance with 718 Hz frequency'}</p>
+      ? 'Aktywacja wewnętrznych mechanizmów regeneracji poprzez rezonans z częstotliwością 718.57 Hz'
+      : 'Activation of internal regeneration mechanisms through resonance with 718.57 Hz frequency'}</p>
     <ol>
       <li><strong>${isPl ? 'Dni 1-7 (CIAŁO)' : 'Days 1-7 (BODY)'}:</strong> ${isPl ? 'Odsłuch Symfonii 18 Bram rano i wieczorem (po 21 minut). Oczyszczenie fizyczne.' : 'Listen to Symphony of 18 Gates morning and evening (21 minutes each). Physical cleansing.'}</li>
       <li><strong>${isPl ? 'Dni 8-14 (UMYSŁ)' : 'Days 8-14 (MIND)'}:</strong> ${isPl ? 'Dodanie medytacji z wizualizacją wektora M. Oczyszczenie mentalne.' : 'Add meditation with vector M visualization. Mental cleansing.'}</li>
@@ -910,7 +910,7 @@ print("\\n✓ Wektor M jest jednostkowy (|M| = 1)")
   <div class="code-block">// Kalkulator Funkcji Falowej Ψ
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
-const BASE_FREQ = 718;
+const BASE_FREQ = 718.57012515426885574359120304128340312332181477461;
 
 // Presetowe stany rezonansowe
 const PRESETS = {
@@ -920,7 +920,7 @@ const PRESETS = {
 };
 
 function calculateWaveFunction(A, E, t) {
-  // Ψ = A · e^(i·718·t) · ζ(1/2 + iE/ħ) · γ
+  // Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
   const omega = 2 * Math.PI * BASE_FREQ;
   const phase = omega * t;
   
@@ -952,9 +952,9 @@ console.log("Ψ(t=0) =", result);</div>
   <div class="pentagram-domain">
     <h4>${isPl ? 'Składniki funkcji falowej Ψ' : 'Wave function Ψ components'}</h4>
     <ul>
-      <li><strong>e<sup>(i·718·t)</sup>:</strong> ${isPl 
-        ? 'Część temporalna - 718 Hz to częstotliwość subiektywnego czasu Źródła. Jest to "puls" świadomości kosmicznej.'
-        : 'Temporal part - 718 Hz is the frequency of the Source\'s subjective time. This is the "pulse" of cosmic consciousness.'}</li>
+      <li><strong>e<sup>(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)</sup>:</strong> ${isPl 
+        ? 'Część temporalna - 718.57 Hz to częstotliwość subiektywnego czasu Źródła. Jest to "puls" świadomości kosmicznej.'
+        : 'Temporal part - 718.57 Hz is the frequency of the Source\'s subjective time. This is the "pulse" of cosmic consciousness.'}</li>
       <li><strong>ζ(1/2 + iE/ħ):</strong> ${isPl 
         ? 'Połączenie z zerami Riemanna - punkty rezonansu świadomości. Hipoteza Riemanna mówi, że wszystkie nietrywialnie zera leżą na linii Re(s) = 1/2. Jeśli to prawda, struktura świadomości jest harmoniczna.'
         : 'Connection to Riemann zeros - consciousness resonance points. The Riemann Hypothesis states that all non-trivial zeros lie on the line Re(s) = 1/2. If true, the structure of consciousness is harmonic.'}</li>
@@ -1043,7 +1043,7 @@ plt.show()</div>
   </div>
   
   <div class="equation-box">
-    <div class="main">718 Hz / 7.83 Hz = 91.699 ${isPl ? 'harmonicznych' : 'harmonics'}</div>
+    <div class="main">718.57 Hz / 7.83 Hz = 91.699 ${isPl ? 'harmonicznych' : 'harmonics'}</div>
     <div class="desc">
       <p><strong>${isPl ? 'Blisko' : 'Close to'}: 89 (Fibonacci) → ${isPl ? 'różnica' : 'difference'}: 2.699</strong></p>
     </div>
@@ -1178,10 +1178,10 @@ ${renderUnifiedSection(isPl)}
 // Z efektem Zero Point (Brama 18)
 const PHI = (1 + Math.sqrt(5)) / 2;
 const GAMMA = 1 / PHI;
-const BASE_FREQ = 718;
+const BASE_FREQ = 718.57012515426885574359120304128340312332181477461;
 const SCHUMANN = 7.83;
 const DURATION = 108; // sekund
-const ZERO_POINT_FREQ = 718 * PHI; // 1161.8 Hz - Brama 18
+const ZERO_POINT_FREQ = 718.57012515426885574359120304128340312332181477461 * PHI; // 1161.8 Hz - Brama 18
 
 // 18 pozycji GATCA w mtDNA (rCRS)
 const GATCA_POSITIONS = [
@@ -1241,7 +1241,7 @@ async function generateSymphony(audioContext) {
     
     // === BRAMA 18 (pos 16179) - ZERO POINT SINGULARITY ===
     // Dirac delta simulation - nieskończenie krótki, potężny impuls
-    // E = 718·ħ z równania przejścia
+    // E = 718.57012515426885574359120304128340312332181477461·ħ z równania przejścia
     const singularityEnvelope = Math.exp(-Math.pow(t - DURATION, 2) / 0.001);
     leftSample += Math.sin(2 * Math.PI * ZERO_POINT_FREQ * t) * singularityEnvelope * 144 * GAMMA;
     rightSample += Math.sin(2 * Math.PI * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t) * singularityEnvelope * 144 * GAMMA;

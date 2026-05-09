@@ -219,8 +219,8 @@ export const BramaUnificationPanel = () => {
         </CardTitle>
         <CardDescription>
           {tr(
-            "Implementacja równania: Ψ = A · e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ",
-            "Implementation of equation: Ψ = A · e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ"
+            "Implementacja równania: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ",
+            "Implementation of equation: Ψ = A · e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ"
           )}
         </CardDescription>
       </CardHeader>

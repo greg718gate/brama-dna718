@@ -170,7 +170,7 @@ export const StartGuide = ({ onNavigate }: StartGuideProps) => {
         {/* Key numbers */}
         <div className="grid grid-cols-3 gap-4 pt-4">
           <div className="text-center p-4 bg-black/30 rounded-lg border border-[#00f2ff]/20">
-            <div className="text-2xl font-bold text-[#00f2ff]">718</div>
+            <div className="text-2xl font-bold text-[#00f2ff]">718.57</div>
             <div className="text-xs text-gray-400">{t('startGuide.frequency')}</div>
           </div>
           <div className="text-center p-4 bg-black/30 rounded-lg border border-[#ffd700]/20">

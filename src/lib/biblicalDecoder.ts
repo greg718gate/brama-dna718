@@ -1,7 +1,7 @@
 /**
  * Biblical Decoder Engine
  * Hebrew Gematria + Fractal Analysis + Hamilton Eigenvalue Correlation
- * Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ
+ * Ψ = e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t) · ζ(1/2 + iE/ħ) · γ
  * 
  * © 2026 Grzegorz | BRAMA-718-UNIFIED
  * License: CC BY-NC 4.0
@@ -736,11 +736,11 @@ export interface PsiCalcResult {
 function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
   const k = (2 * Math.PI) / FREQ_718;
 
-  // Temporal: e^(i·718·t)
+  // Temporal: e^(i·718.57012515426885574359120304128340312332181477461.57012515426885574359120304128340312332181477461·t)
   const temporal = complexExp(FREQ_718 * t);
   // Spatial: e^(-i·k·x)
   const spatial = complexExp(-k * x);
-  // Zeta: ζ(1/2 + i·718)
+  // Zeta: ζ(1/2 + i·718.57012515426885574359120304128340312332181477461)
   const zetaVal = riemannZeta({ re: 0.5, im: FREQ_718 }, 200);
 
   // Modulations
@@ -965,7 +965,7 @@ export function calculateDecoherence(
   const coherenceTime = 1 / decoherenceRate;
 
   // Remaining coherence: ρ_off(t) = ρ_off(0) · e^(-γ_d · t)
-  // At 718 Hz resonance, the system has protection factor from golden ratio coupling
+  // At 718.57 Hz resonance, the system has protection factor from golden ratio coupling
   // This reduces effective decoherence: γ_eff = γ_d / (1 + Q·φ)
   const resonanceProtection = 1 + qualityFactor * PHI;
   const effectiveRate = decoherenceRate / resonanceProtection;
@@ -1021,7 +1021,7 @@ export function generatePredictions(result: {
         method: "UV-Vis Spectroscopy",
         icon: "🔬",
         prediction: `Absorption peak at ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
-        details: "The harmonic series 718/n Hz should be visible in the UV-Vis absorption spectrum of mitochondria. It corresponds to electron transitions in the electron transport chain at GATCA positions.",
+        details: "The harmonic series 718.57012515426885574359120304128340312332181477461/n Hz should be visible in the UV-Vis absorption spectrum of mitochondria. It corresponds to electron transitions in the electron transport chain at GATCA positions.",
         expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (IR harmonic)`,
         testability: "HIGH",
       },
@@ -1034,10 +1034,10 @@ export function generatePredictions(result: {
         testability: "MEDIUM",
       },
       {
-        method: "Cell Stimulation at 718 Hz",
+        method: "Cell Stimulation at 718.57 Hz",
         icon: "🧫",
         prediction: `Exposure to ${FREQ_718} Hz → change in mitochondrial gene expression`,
-        details: "Applying a 718 Hz acoustic wave to cell culture should affect expression of mitochondrial genes encoded near GATCA positions. Measure mRNA via qRT-PCR after 24h exposure.",
+        details: "Applying a 718.57 Hz acoustic wave to cell culture should affect expression of mitochondrial genes encoded near GATCA positions. Measure mRNA via qRT-PCR after 24h exposure.",
         expectedValue: `Expression change: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
         testability: "HIGH",
       },
@@ -1045,7 +1045,7 @@ export function generatePredictions(result: {
         method: "EEG / Brain Coherence",
         icon: "🧠",
         prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → α-θ synchronization`,
-        details: "Exposure to a binaural beat (718 Hz left ear, 725.83 Hz right ear = 7.83 Hz difference) should induce EEG coherence between the frontal and parietal cortex in the theta band.",
+        details: "Exposure to a binaural beat (718.57 Hz left ear, 725.83 Hz right ear = 7.83 Hz difference) should induce EEG coherence between the frontal and parietal cortex in the theta band.",
         expectedValue: `EEG coherence > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
         testability: "HIGH",
       },
@@ -1053,7 +1053,7 @@ export function generatePredictions(result: {
         method: "Mitochondrial Fluorescence",
         icon: "✨",
         prediction: `Membrane potential change Δψ_m at gate ${result.gatePosition} resonance`,
-        details: "JC-1 or TMRM staining of mitochondria after 718 Hz stimulation should show a change in the red/green fluorescence ratio, indicating membrane potential modulation.",
+        details: "JC-1 or TMRM staining of mitochondria after 718.57 Hz stimulation should show a change in the red/green fluorescence ratio, indicating membrane potential modulation.",
         expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
         testability: "MEDIUM",
       },
@@ -1065,7 +1065,7 @@ export function generatePredictions(result: {
       method: "Spektroskopia UV-Vis",
       icon: "🔬",
       prediction: `Pik absorpcji przy ${(FREQ_718 / 1).toFixed(0)}, ${(FREQ_718 / 2).toFixed(0)}, ${(FREQ_718 / 3).toFixed(0)} Hz`,
-      details: "Seria harmoniczna 718/n Hz powinna być widoczna w widmie absorpcji UV-Vis mitochondriów. Odpowiada przejściom elektronowym w łańcuchu transportu elektronów na pozycjach GATCA.",
+      details: "Seria harmoniczna 718.57012515426885574359120304128340312332181477461/n Hz powinna być widoczna w widmie absorpcji UV-Vis mitochondriów. Odpowiada przejściom elektronowym w łańcuchu transportu elektronów na pozycjach GATCA.",
       expectedValue: `λ ≈ ${(3e8 / (FREQ_718 * 1e9) * 1e9).toFixed(2)} nm (harmoniczna IR)`,
       testability: "HIGH",
     },
@@ -1078,10 +1078,10 @@ export function generatePredictions(result: {
       testability: "MEDIUM",
     },
     {
-      method: "Stymulacja komórkowa 718 Hz",
+      method: "Stymulacja komórkowa 718.57 Hz",
       icon: "🧫",
       prediction: `Ekspozycja na ${FREQ_718} Hz → zmiana ekspresji genów mitochondrialnych`,
-      details: "Nałożenie fali akustycznej 718 Hz na hodowlę komórkową powinno wpłynąć na ekspresję genów mitochondrialnych kodowanych w pobliżu pozycji GATCA. Mierz mRNA metodą qRT-PCR po 24h ekspozycji.",
+      details: "Nałożenie fali akustycznej 718.57 Hz na hodowlę komórkową powinno wpłynąć na ekspresję genów mitochondrialnych kodowanych w pobliżu pozycji GATCA. Mierz mRNA metodą qRT-PCR po 24h ekspozycji.",
       expectedValue: `Zmiana ekspresji: ${(result.psi.coherence * 100).toFixed(0)}% ± 15%`,
       testability: "HIGH",
     },
@@ -1089,7 +1089,7 @@ export function generatePredictions(result: {
       method: "EEG / Koherencja mózgowa",
       icon: "🧠",
       prediction: `Binaural beat ${FREQ_718} + ${SCHUMANN} Hz → synchronizacja α-θ`,
-      details: "Ekspozycja na binauralny beat (718 Hz lewe ucho, 725.83 Hz prawe ucho = różnica 7.83 Hz) powinna indukować koherencję EEG między korą czołową a ciemieniową w paśmie theta.",
+      details: "Ekspozycja na binauralny beat (718.57 Hz lewe ucho, 725.83 Hz prawe ucho = różnica 7.83 Hz) powinna indukować koherencję EEG między korą czołową a ciemieniową w paśmie theta.",
       expectedValue: `Koherencja EEG > ${(result.vi.coherenceAtEnd * 100).toFixed(0)}%`,
       testability: "HIGH",
     },
@@ -1097,7 +1097,7 @@ export function generatePredictions(result: {
       method: "Fluorescencja mitochondrialna",
       icon: "✨",
       prediction: `Zmiana potencjału błonowego Δψ_m przy rezonansie bramy ${result.gatePosition}`,
-      details: "Barwienie JC-1 lub TMRM mitochondriów po stymulacji 718 Hz powinno wykazać zmianę stosunku fluorescencji czerwonej/zielonej, wskazując na modulację potencjału błonowego.",
+      details: "Barwienie JC-1 lub TMRM mitochondriów po stymulacji 718.57 Hz powinno wykazać zmianę stosunku fluorescencji czerwonej/zielonej, wskazując na modulację potencjału błonowego.",
       expectedValue: `ΔΨ_m shift ≈ ${(gateFreq * GAMMA).toFixed(2)} mV`,
       testability: "MEDIUM",
     },
@@ -1145,9 +1145,9 @@ export function generateBibleConnections(result: {
       {
         title: "144 — Biblical & DNA Key",
         verse: '"He measured its wall: one hundred forty-four cubits" (Rev 21:17)',
-        quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. The number 144 (12² = 12 tribes of Israel) emerges as a natural harmonic in the transition: DNA frequency → golden ratio → Schumann resonance.`,
+        quantumParallel: `718.57012515426885574359120304128340312332181477461 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. The number 144 (12² = 12 tribes of Israel) emerges as a natural harmonic in the transition: DNA frequency → golden ratio → Schumann resonance.`,
         gateLink: `144,000 "sealed" = 144 × 1000 DNA gates active simultaneously`,
-        numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+        numericalKey: `718.57012515426885574359120304128340312332181477461/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
       },
       {
         title: "Tree of Life = DNA Helix",
@@ -1184,9 +1184,9 @@ export function generateBibleConnections(result: {
     {
       title: "144 — Klucz Biblijny i DNA",
       verse: "\"Zmierzył jej mur: sto czterdzieści cztery łokcie\" (Ap 21:17)",
-      quantumParallel: `718 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. Liczba 144 (12² = 12 pokoleń Izraela) pojawia się jako naturalna harmoniczna w przejściu: częstotliwość DNA → złoty podział → rezonans Schumanna.`,
+      quantumParallel: `718.57012515426885574359120304128340312332181477461 / γ ≈ 1161.8 → 1161.8 / 7.83 ≈ 148.4 ≈ 144. Liczba 144 (12² = 12 pokoleń Izraela) pojawia się jako naturalna harmoniczna w przejściu: częstotliwość DNA → złoty podział → rezonans Schumanna.`,
       gateLink: `144 000 „zapieczętowanych" = 144 × 1000 bram DNA aktywnych jednocześnie`,
-      numericalKey: `718/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
+      numericalKey: `718.57012515426885574359120304128340312332181477461/γ/7.83 = ${(FREQ_718 / GAMMA / SCHUMANN).toFixed(2)}`,
     },
     {
       title: "Drzewo Życia = Helisa DNA",
