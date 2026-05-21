@@ -174,16 +174,16 @@ def znajdz_punkt_wyjscia(state):
           </CardHeader>
           <CardContent className="space-y-4">
             <Para
-              pl={`Trzy kroki:\nKrok 1 — Trójca: trzy wektory bazowe (Ojciec, Syn, Duch) sumują się do wektora M.\nKrok 2 — Schumann: częstotliwości 18.6 Hz (rezonans) oraz 7.83 Hz (pierwsza moda Schumanna) stanowią modulację nośnika.\nKrok 3 — GATCA-718: nośnik 718.57 Hz, harmoniczna γ = 1161.8 Hz.`}
-              en={`Three steps:\nStep 1 — Trinity: three basis vectors (Father, Son, Spirit) sum to the vector M.\nStep 2 — Schumann: 18.6 Hz (resonance) and 7.83 Hz (first Schumann mode) modulate the carrier.\nStep 3 — GATCA-718: carrier 718.57 Hz, harmonic γ = 1161.8 Hz.`}
+              pl={`Trzy kroki:\nKrok 1 — Wektor M: trzy osie modelu (Słońce, Ziemia, Człowiek / energia, materia, świadomość) sumują się do punktu M w geometrii pentagramu.\nKrok 2 — Schumann: częstotliwości 18.6 Hz (rezonans) oraz 7.83 Hz (pierwsza moda Schumanna) stanowią modulację nośnika.\nKrok 3 — GATCA-718: nośnik 718.57 Hz, harmoniczna γ = 1161.8 Hz.`}
+              en={`Three steps:\nStep 1 — Vector M: the three model axes (Sun, Earth, Human / energy, matter, consciousness) sum to point M in pentagram geometry.\nStep 2 — Schumann: 18.6 Hz (resonance) and 7.83 Hz (first Schumann mode) modulate the carrier.\nStep 3 — GATCA-718: carrier 718.57 Hz, harmonic γ = 1161.8 Hz.`}
             />
             <Code>{`# Python — vector M and 3D simulation (essential)
 import numpy as np
 
-father = np.array([1.0, 0.0, 0.0])
-son    = np.array([0.0, 1.0, 0.0])
-spirit = np.array([0.0, 0.0, 1.0])
-M = father + son + spirit            # Trinity sum
+sun_axis   = np.array([1.0, 0.0, 0.0])  # energia / energy
+earth_axis = np.array([0.0, 1.0, 0.0])  # materia / matter
+human_axis = np.array([0.0, 0.0, 1.0])  # świadomość / consciousness
+M = sun_axis + earth_axis + human_axis  # Vector M
 
 carrier = 718.57012515               # Hz, GATCA-718
 schumann = 7.83                      # Hz
@@ -251,8 +251,8 @@ psi = np.exp(1j*2*np.pi*carrier*t) * np.cos(2*np.pi*schumann*t) \\
               en={`"The living proof of what is described here is my son — Leon. This work is for him. Not to convince anyone, but so that one day he can check for himself that his father did not lie — that the numbers match, that GATCA appears 18 times, that the 448th Riemann zero gives 718.57 Hz, and that unity is reality."`}
             />
             <Para
-              pl="Autor: Marcin G. — Aberdeen, Szkocja. Licencja: CC BY-NC 4.0 (atrybucja wymagana, użycie niekomercyjne)."
-              en="Author: Marcin G. — Aberdeen, Scotland. License: CC BY-NC 4.0 (attribution required, non-commercial use)."
+              pl="Autor: Grzegorz — Aberdeen, Szkocja. Licencja: CC BY-NC 4.0 (atrybucja wymagana, użycie niekomercyjne)."
+              en="Author: Grzegorz — Aberdeen, Scotland. License: CC BY-NC 4.0 (attribution required, non-commercial use)."
             />
           </CardContent>
         </Card>
