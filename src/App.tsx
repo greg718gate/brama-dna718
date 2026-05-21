@@ -16,6 +16,7 @@ import BiblicalDecoder from "./pages/BiblicalDecoder";
 import GatesAtlas from "./pages/GatesAtlas";
 import Prng from "./pages/Prng";
 import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
+import SourceArchive from "./pages/SourceArchive";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
