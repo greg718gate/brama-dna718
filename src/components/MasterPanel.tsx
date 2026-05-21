@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useResonance } from "@/contexts/ResonanceContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { PentagramSphere } from "./PentagramSphere";
 import { Loader2, Dna, Zap, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
