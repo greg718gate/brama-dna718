@@ -278,6 +278,24 @@ export const ProjectExplanation = () => {
                   <p>M_y = sin(α) × cos(β) ≈ 0.2764</p>
                   <p>M_z = sin(β) ≈ 0.8507</p>
                 </div>
+
+                <h3 className="font-semibold text-sm mt-4">5. GATCA 18× — mtDNA rCRS NC_012920.1</h3>
+                <TextBlock>
+                  {pick(language,
+                    `Sekwencja GATCA występuje dokładnie 18 razy w referencyjnym ludzkim mitochondrialnym DNA (rCRS, NC_012920.1). Pierwsza pozycja to 0 — czyli pierwsze pięć nukleotydów ludzkiego mtDNA to GATCA. Pierwsze pozycje: 0, 739, 950, 1226, 2995.\n\nPozycje 1-based używane w system_unification.py: 1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179.`,
+                    `The GATCA sequence appears exactly 18 times in the reference human mitochondrial DNA (rCRS, NC_012920.1). The first position is 0 — meaning the first five nucleotides of human mtDNA are GATCA. First positions: 0, 739, 950, 1226, 2995.\n\n1-based positions used in system_unification.py: 1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179.`
+                  )}
+                </TextBlock>
+                <CodeBlock>{gatcaBiopythonCode}</CodeBlock>
+
+                <h3 className="font-semibold text-sm mt-4">6. 448. zero Riemanna → 718.57012515 Hz</h3>
+                <TextBlock>
+                  {pick(language,
+                    `Stała mistrza modelu pochodzi z 448. nietrywialnego zera funkcji ζ Riemanna na linii krytycznej, liczonego z precyzją 50 cyfr znaczących. W systemie zapisana częstotliwość wzorcowa to 718.57012515426885574359120304128340312332181477461 Hz, a przesunięcie fazowe ζ to -1.2094 rad.`,
+                    `The model's master constant comes from the 448th non-trivial zero of the Riemann ζ function on the critical line, computed to 50 significant digits. The reference frequency stored in the system is 718.57012515426885574359120304128340312332181477461 Hz, and the ζ phase shift is -1.2094 rad.`
+                  )}
+                </TextBlock>
+                <CodeBlock>{sentinelRiemannCode}</CodeBlock>
               </div>
             </CardContent>
           </Card>
