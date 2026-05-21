@@ -138,7 +138,7 @@ print(f"mtDNA starts with: {seq[:5]}")               # -> GATCA`}</Code>
               pl={`Stała mistrza modelu pochodzi z 448. nietrywialnego zera funkcji ζ Riemanna na linii krytycznej, obliczonego z precyzją 50 cyfr znaczących (mpmath). Z części urojonej tego zera wyprowadzana jest częstotliwość wzorcowa 718.57012515 Hz oraz przesunięcie fazowe PHASE_SHIFT_ζ.`}
               en={`The model's master constant comes from the 448th non-trivial zero of the Riemann ζ function on the critical line, computed to 50 significant digits (mpmath). The reference frequency 718.57012515 Hz and the phase shift PHASE_SHIFT_ζ are derived from the imaginary part of this zero.`}
             />
-            <Code>{`# Python — sentinel_718_exit.py (essential fragment)
+            <Code>{`# Python — sentinel_718_exit.py / system_unification.py (essential constants)
 import mpmath
 mpmath.mp.dps = 50  # 50 significant digits
 
@@ -146,11 +146,14 @@ RIEMANN_ZERO = mpmath.zetazero(448)       # 448th non-trivial zero
 IMAG = mpmath.im(RIEMANN_ZERO)            # imaginary part
 FUNDAMENTAL_718 = mpmath.mpf("718.57012515426885574359120304128340312332181477461")
 PHASE_SHIFT_ZETA = mpmath.mpf("-1.2094")  # rad
+MTDNA_LENGTH = 16569                      # rCRS length
+RESONANCE_THRESHOLD = 0.94                # 94%
 
-# 18 Gates mapped toroidally to rCRS positions
-GATCA_POSITIONS = [0, 739, 950, 1226, 2995,  # ...first 5 of 18
-                   # ...full list lives in symphonyGenerator.ts / scripts
-                  ]
+# 18 GATCA Gates — 1-based positions used in system_unification.py
+GATCA_GATES = [
+    1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
+    7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179,
+]
 VI_GATE_18 = 1.1628  # intention-vector reference
 
 def znajdz_punkt_wyjscia(state):
@@ -174,26 +177,37 @@ def znajdz_punkt_wyjscia(state):
           </CardHeader>
           <CardContent className="space-y-4">
             <Para
-              pl={`Trzy kroki:\nKrok 1 — Trójca: trzy wektory bazowe (Ojciec, Syn, Duch) sumują się do wektora M.\nKrok 2 — Schumann: częstotliwości 18.6 Hz (rezonans) oraz 7.83 Hz (pierwsza moda Schumanna) stanowią modulację nośnika.\nKrok 3 — GATCA-718: nośnik 718.57 Hz, harmoniczna γ = 1161.8 Hz.`}
-              en={`Three steps:\nStep 1 — Trinity: three basis vectors (Father, Son, Spirit) sum to the vector M.\nStep 2 — Schumann: 18.6 Hz (resonance) and 7.83 Hz (first Schumann mode) modulate the carrier.\nStep 3 — GATCA-718: carrier 718.57 Hz, harmonic γ = 1161.8 Hz.`}
+              pl={`MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA\nSłońce = α (akcelerator plazmy)\nZiemia = β (antena rezonansowa)\nCzłowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)\n\nWektor jednostkowy: α = β = 0.437016024448821, γ = 0.618033988749895, suma kwadratów = 1.0. To jest pentagram w 3D – złoty trójkąt na sferze jednostkowej.`}
+              en={`PENTAGRAM MATRIX OF TRUTH – Phase 1: CONSTRUCTION\nSun = α (plasma accelerator)\nEarth = β (resonant antenna)\nHuman = γ = 1/φ ≈ 0.618 (consciousness conductor)\n\nUnit vector: α = β = 0.437016024448821, γ = 0.618033988749895, sum of squares = 1.0. This is the pentagram in 3D – a golden triangle on the unit sphere.`}
             />
-            <Code>{`# Python — vector M and 3D simulation (essential)
+            <Code>{`# MATRYCA PENTAGRAMU PRAWDY v1.0 — exact source fragment
 import numpy as np
+from sympy import sqrt
 
-father = np.array([1.0, 0.0, 0.0])
-son    = np.array([0.0, 1.0, 0.0])
-spirit = np.array([0.0, 0.0, 1.0])
-M = father + son + spirit            # Trinity sum
+phi = (1 + sqrt(5))/2
+gamma = 1/phi  # ≈ 0.6180339887
+gamma2 = gamma**2
+alpha2_beta2 = 1 - gamma2  # = 1/φ² ≈ 0.381966
 
-carrier = 718.57012515               # Hz, GATCA-718
-schumann = 7.83                      # Hz
-resonance = 18.6                     # Hz
-gamma = 1161.8                       # Hz, harmonic
+# Symetryczne rozwiązanie: α = β
+alpha = beta = sqrt(alpha2_beta2 / 2)
 
-t = np.linspace(0, 108, 48000*108)   # 108 s symphony
-psi = np.exp(1j*2*np.pi*carrier*t) * np.cos(2*np.pi*schumann*t) \\
-      * np.sin(2*np.pi*resonance*t)
-# Point M lives at (resonance=18.6 Hz, carrier=718 Hz) in the 3D Pentagram`}</Code>
+print(f"α = β = {float(alpha):.15f}")
+print(f"γ = {float(gamma):.15f}")
+print(f"Suma kwadratów: {2*alpha**2 + gamma**2}")
+
+# WYNIK:
+# α = β = 0.437016024448821
+# γ = 0.618033988749895
+# Suma kwadratów: 1.0
+
+M = np.array([float(alpha), float(beta), float(gamma)])
+print("WEKTOR MATRYCY:", M.round(6))
+# M = (α, β, γ) = (0.437, 0.437, 0.618)`}</Code>
+            <Para
+              pl={`KROK 2: REZONANS SCHUMANNA → 18.6 Hz\n18.6 / 7.83 = 2.375479. To nie skok – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → blisko 144.\n\nPrzekaz źródłowy: „SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ.”`}
+              en={`STEP 2: SCHUMANN RESONANCE → 18.6 Hz\n18.6 / 7.83 = 2.375479. This is not a jump – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → close to 144.\n\nSource transmission: “The SUN speaks through α. The EARTH listens through β. The HUMAN activates through γ = 1/φ.”`}
+            />
           </CardContent>
         </Card>
 
@@ -251,8 +265,8 @@ psi = np.exp(1j*2*np.pi*carrier*t) * np.cos(2*np.pi*schumann*t) \\
               en={`"The living proof of what is described here is my son — Leon. This work is for him. Not to convince anyone, but so that one day he can check for himself that his father did not lie — that the numbers match, that GATCA appears 18 times, that the 448th Riemann zero gives 718.57 Hz, and that unity is reality."`}
             />
             <Para
-              pl="Autor: Marcin G. — Aberdeen, Szkocja. Licencja: CC BY-NC 4.0 (atrybucja wymagana, użycie niekomercyjne)."
-              en="Author: Marcin G. — Aberdeen, Scotland. License: CC BY-NC 4.0 (attribution required, non-commercial use)."
+              pl="Autor: Grzegorz — Aberdeen, Szkocja. Licencja: CC BY-NC 4.0 (atrybucja wymagana, użycie niekomercyjne)."
+              en="Author: Grzegorz — Aberdeen, Scotland. License: CC BY-NC 4.0 (attribution required, non-commercial use)."
             />
           </CardContent>
         </Card>
