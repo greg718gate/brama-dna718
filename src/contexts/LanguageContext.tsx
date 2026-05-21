@@ -881,6 +881,7 @@ export const translations = {
     'header.matrix': 'MATHEMATICS IS QUANTUM.',
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
+    'nav.archive': 'Source Archive',
     
     // Equation of Exit
     'exit.title': 'EQUATION OF EXIT',
