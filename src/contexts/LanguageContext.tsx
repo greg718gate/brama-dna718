@@ -15,6 +15,7 @@ export const translations = {
     'header.matrix': 'MATEMATYKA JEST KWANTOWA.',
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
+    'nav.archive': 'Archiwum Źródłowe',
     
     // Equation of Exit
     'exit.title': 'RÓWNANIE WYJŚCIA',
@@ -880,6 +881,7 @@ export const translations = {
     'header.matrix': 'MATHEMATICS IS QUANTUM.',
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
+    'nav.archive': 'Source Archive',
     
     // Equation of Exit
     'exit.title': 'EQUATION OF EXIT',

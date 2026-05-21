@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Sparkles, BookOpen } from "lucide-react";
+import { Shield, Sigma, Sparkles, BookOpen, Archive } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,15 @@ const Index = () => {
         >
           <BookOpen className="w-4 h-4" />
           Ψ Decoder
+        </Button>
+        <Button
+          onClick={() => navigate("/archive")}
+          variant="secondary"
+          className="gap-2 shadow-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border-amber-500/40"
+          title={t("nav.archive") !== "nav.archive" ? t("nav.archive") : "Archiwum / Archive"}
+        >
+          <Archive className="w-4 h-4" />
+          {t("nav.archive") !== "nav.archive" ? t("nav.archive") : "Archiwum"}
         </Button>
       </div>
 

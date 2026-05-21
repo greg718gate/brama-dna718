@@ -16,6 +16,7 @@ import BiblicalDecoder from "./pages/BiblicalDecoder";
 import GatesAtlas from "./pages/GatesAtlas";
 import Prng from "./pages/Prng";
 import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
+import SourceArchive from "./pages/SourceArchive";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,9 @@ const App = () => (
 
               <Route path="/qf" element={<QuantumFilterDashboard />} />
               <Route path="/qf/*" element={<QuantumFilterDashboard />} />
+
+              <Route path="/archive" element={<SourceArchive />} />
+              <Route path="/archive/*" element={<SourceArchive />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
