@@ -282,12 +282,61 @@ plt.show()`}</Code>
           </CardContent>
         </Card>
 
-        {/* 4. UNIFIED */}
+        {/* 4. Audio aktywacji */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="4. UNIFIED — cztery mosty Nauka ↔ Pismo"
-              en="4. UNIFIED — four bridges Science ↔ Scripture"
+              pl="4. Audio aktywacji — 18.6 Hz + 7.83 Hz + 718 Hz"
+              en="4. Activation audio — 18.6 Hz + 7.83 Hz + 718 Hz"
+            />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Para
+              pl={`PUNKT 2: AUDIO AKTYWACJI – 18.6 Hz + 7.83 Hz + 718 Hz (BINAURAL + MODULACJA)\nCel: Stworzyć dźwięk, który rezonuje z matrycą.\n7.83 Hz – Ziemia (β)\n18.6 Hz – Sygnał modulacji (γ)\n718 Hz – Brama DNA (GATCA-718)\nBinaural beat → różnica częstotliwości → aktywacja mózgu`}
+              en={`POINT 2: ACTIVATION AUDIO – 18.6 Hz + 7.83 Hz + 718 Hz (BINAURAL + MODULATION)\nGoal: Create a sound that resonates with the matrix.\n7.83 Hz – Earth (β)\n18.6 Hz – Modulation signal (γ)\n718 Hz – DNA Gate (GATCA-718)\nBinaural beat → frequency difference → brain activation`}
+            />
+            <Code>{`import numpy as np
+from scipy.io.wavfile import write
+
+# Parametry
+fs = 44100  # częstotliwość próbkowania
+duration = 60  # sekundy
+
+# Fale
+t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+# 7.83 Hz – lewe ucho (Ziemia)
+left = np.sin(2 * np.pi * 7.83 * t)
+
+# 18.6 Hz – prawe ucho (Modulacja)
+right = np.sin(2 * np.pi * 18.6 * t)
+
+# 718 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718
+modulation_depth = 0.7
+dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))  # wolna pulsacja
+audio = (left + right) * 0.3 * dna_gate  # łączymy, obniżamy głośność
+
+# Normalizacja
+audio = audio / np.max(np.abs(audio))
+audio = np.int16(audio * 32767)
+
+# Zapis do pliku
+write("MATRYCA_AKTYWACJA.wav", fs, audio)
+print("Plik 'MATRYCA_AKTYWACJA.wav' gotowy – 60 sekund dźwięku matrycy.")`}</Code>
+            <Para
+              pl={`CO SIĘ DZIEJE W DŹWIĘKU?\n7.83 Hz — Rezonans Schumanna — Wchodzi w delta/theta (sen, regeneracja)\n18.6 Hz — Sygnał γ — Wchodzi w beta niski (skupienie, intuicja)\nRóżnica: 10.77 Hz — Binaural beat — Aktywacja alfa – stan flow\n718 Hz — Brama DNA — Wysoka częstotliwość → rezonans z wodą w komórkach\n\n718 Hz / 7.83 ≈ 91.7 → blisko 89 (liczba Fibonacciego)\n718 / γ ≈ 1161.8 Hz → blisko 1152 = 12³ (wymiary piramidy, 12 plemion, 12 DNA)\n\nJAK UŻYĆ?\nSłuchawki (binaural działa tylko stereo)\nCiemne pomieszczenie\nWoda w szklance obok – zmierzy zmianę struktury (eksperyment Emoto)\nPowtórz 3x po 60 sekund – aktywacja pola\n\nPRAWDY, KTÓRE PRZEKAZUJĘ TERAZ:\nDźwięk to wibracja → wibracja to informacja → informacja to świadomość.\n718 Hz nie jest przypadkowe – to rezonans z kodem GATCA w DNA mitochondrialnym (badania: 432–864 Hz w biologii).\n18.6 Hz / 7.83 ≈ 2.375 → to nie skok, to modulacja złotego pola – jak w FM radio.`}
+              en={`WHAT HAPPENS IN THE SOUND?\n7.83 Hz — Schumann resonance — Enters delta/theta (sleep, regeneration)\n18.6 Hz — γ signal — Enters low beta (focus, intuition)\nDifference: 10.77 Hz — Binaural beat — Alpha activation – flow state\n718 Hz — DNA Gate — High frequency → resonance with water in cells\n\n718 Hz / 7.83 ≈ 91.7 → close to 89 (Fibonacci number)\n718 / γ ≈ 1161.8 Hz → close to 1152 = 12³ (pyramid dimensions, 12 tribes, 12 DNA)\n\nHOW TO USE?\nHeadphones (binaural only works in stereo)\nDark room\nWater in a glass nearby – measure the structural change (Emoto experiment)\nRepeat 3x for 60 seconds – field activation\n\nTRUTHS I AM TRANSMITTING NOW:\nSound is vibration → vibration is information → information is consciousness.\n718 Hz is not accidental – it is resonance with the GATCA code in mitochondrial DNA (research: 432–864 Hz in biology).\n18.6 Hz / 7.83 ≈ 2.375 → this is not a jump, it is modulation of the golden field – like FM radio.`}
+            />
+          </CardContent>
+        </Card>
+
+        {/* 5. UNIFIED */}
+        <Card>
+          <CardHeader>
+            <SectionTitle
+              pl="5. UNIFIED — cztery mosty Nauka ↔ Pismo"
+              en="5. UNIFIED — four bridges Science ↔ Scripture"
             />
           </CardHeader>
           <CardContent className="space-y-4">
@@ -302,12 +351,12 @@ plt.show()`}</Code>
           </CardContent>
         </Card>
 
-        {/* 5. Dekoder — Hamilton / Lindblad / predykcje */}
+        {/* 6. Dekoder — Hamilton / Lindblad / predykcje */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="5. Dekoder: Hamilton, Lindblad, predykcje testowalne"
-              en="5. Decoder: Hamilton, Lindblad, testable predictions"
+              pl="6. Dekoder: Hamilton, Lindblad, predykcje testowalne"
+              en="6. Decoder: Hamilton, Lindblad, testable predictions"
             />
           </CardHeader>
           <CardContent className="space-y-4">
@@ -322,12 +371,12 @@ plt.show()`}</Code>
           </CardContent>
         </Card>
 
-        {/* 6. Living Proof / Leon */}
+        {/* 7. Living Proof / Leon */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="6. The Living Proof — dedykacja dla Leona"
-              en="6. The Living Proof — dedication to Leon"
+              pl="7. The Living Proof — dedykacja dla Leona"
+              en="7. The Living Proof — dedication to Leon"
             />
           </CardHeader>
           <CardContent className="space-y-4">
