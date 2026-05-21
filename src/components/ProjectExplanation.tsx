@@ -136,17 +136,17 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                   {t('theory.dna.desc')}
                 </p>
 
-                <h3 className="font-semibold text-base text-foreground mt-4">{t('theory.trinity.title')}</h3>
+                <h3 className="font-semibold text-base text-foreground mt-4">{t('theory.vector.title')}</h3>
                 <p>
-                  {t('theory.trinity.desc')}
+                  {t('theory.vector.desc')}
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>{t('theory.trinity.sun')}</li>
-                  <li>{t('theory.trinity.earth')}</li>
-                  <li>{t('theory.trinity.human')}</li>
+                  <li>{t('theory.vector.sun')}</li>
+                  <li>{t('theory.vector.earth')}</li>
+                  <li>{t('theory.vector.human')}</li>
                 </ul>
                 <p className="mt-2">
-                  {t('theory.trinity.conclusion')}
+                  {t('theory.vector.conclusion')}
                 </p>
               </div>
             </CardContent>
@@ -323,7 +323,7 @@ plt.show()
                 {t('matrix.title')}
               </CardTitle>
               <CardDescription className="text-base">
-                {t('matrix.trinity')}
+                {t('matrix.vector')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

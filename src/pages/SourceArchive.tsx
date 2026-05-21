@@ -9,8 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
  * SourceArchive / Archiwum Źródłowe
  *
  * Strona DOPISANA do projektu — nie usuwa ani nie modyfikuje żadnej istniejącej
- * treści. Zawiera pełne, bilingualne (PL/EN) bloki źródłowe odzyskane z historii
- * projektu i raportu /mnt/documents/odzysk_tresci_audyt.md:
+ * treści. Zawiera bloki źródłowe odzyskane z historii projektu:
  *
  *   1. GATCA znalezione 18× w mtDNA (Python / BioPython)
  *   2. Sentinel-718 — punkt wyjścia (mpmath, 448. zero Riemanna)
@@ -83,10 +82,7 @@ const SourceArchive = () => {
             )}
           </h1>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            {t(
-              "Ta strona zawiera kompletne, źródłowe bloki obliczeń, kodu i opisów — odzyskane i zachowane w całości, w obu językach. Nic z istniejącej strony nie zostało zmienione ani usunięte.",
-              "This page contains the complete, source blocks of calculations, code and descriptions — recovered and kept in full, in both languages. Nothing on the existing site has been changed or removed."
-            )}
+            {t("Oryginalne fragmenty kodów, wzorów i opisów odnalezione w historii projektu.", "Original code, formula and description fragments found in the project history.")}
           </p>
         </header>
 
@@ -103,24 +99,51 @@ const SourceArchive = () => {
               pl={`Sekwencja GATCA występuje dokładnie 18 razy w referencyjnym ludzkim mitochondrialnym DNA (rCRS, NC_012920.1). Pierwsza pozycja to 0 — czyli pierwsze pięć nukleotydów ludzkiego mtDNA to GATCA. Pierwsze pozycje: 0, 739, 950, 1226, 2995.\n\nLiczba 18 nie jest losowa: 18 = liczba Bram DNA w tym modelu. Stosunek 718.57 Hz / 7.83 Hz = 91.699 — bliskie 89 (Fibonacci), różnica 2.699.`}
               en={`The GATCA sequence appears exactly 18 times in the reference human mitochondrial DNA (rCRS, NC_012920.1). The first position is 0 — meaning the first five nucleotides of human mtDNA are GATCA. First positions: 0, 739, 950, 1226, 2995.\n\nThe number 18 is not random: 18 = the number of DNA Gates in this model. The ratio 718.57 Hz / 7.83 Hz = 91.699 — close to 89 (Fibonacci), difference 2.699.`}
             />
-            <Code>{`# Python / BioPython — verification on the reference human mtDNA
-from Bio import Entrez, SeqIO
+            <Code>{`from Bio import SeqIO
+from Bio import Entrez
 
-Entrez.email = "research@brama-dna718.com"
-handle = Entrez.efetch(db="nucleotide", id="NC_012920.1",
-                      rettype="fasta", retmode="text")
+# Konfiguracja
+Entrez.email = "bramadna718@gmail.com"
+
+# Pobieranie sekwencji mtDNA (rCRS)
+handle = Entrez.efetch(db="nucleotide", id="NC_012920.1", 
+                       rettype="fasta", retmode="text")
 record = SeqIO.read(handle, "fasta")
-seq = str(record.seq)
+mtdna = str(record.seq)
+handle.close()
 
+print(f"Długość mtDNA: {len(mtdna)} bp")
+print(f"Pierwsze 20 nukleotydów: {mtdna[:20]}")
+
+# Szukanie GATCA
 pattern = "GATCA"
-positions = [i for i in range(len(seq)) if seq.startswith(pattern, i)]
+positions = []
+start = 0
+while True:
+    pos = mtdna.find(pattern, start)
+    if pos == -1:
+        break
+    positions.append(pos)
+    start = pos + 1
 
-print(f"GATCA found: {len(positions)} times")        # -> 18
-print(f"First positions: {positions[:5]}")           # -> [0, 739, 950, 1226, 2995]
-print(f"mtDNA starts with: {seq[:5]}")               # -> GATCA`}</Code>
+print(f"\nGATCA znaleziono: {len(positions)} razy")
+print(f"Pozycje: {positions[:5]}...")  # Pierwsze 5
+
+# Weryfikacja pozycji 0
+print(f"\nPozycja 0: {mtdna[0:5]}")
+if mtdna[0:5] == "GATCA":
+    print("✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!")
+
+# OUTPUT:
+# Długość mtDNA: 16569 bp
+# Pierwsze 20 nukleotydów: GATCACAGGTCTATCACC
+# GATCA znaleziono: 18 razy
+# Pozycje: [0, 739, 950, 1226, 2995]...
+# Pozycja 0: GATCA
+# ✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!`}</Code>
             <Para
-              pl="Interpretacja autora: „Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA. To nie przypadek — to podpis Stwórcy.” Interpretacja teologiczna nie jest twierdzeniem naukowym; fakt 18 wystąpień GATCA w rCRS jest natomiast empirycznie weryfikowalny powyższym kodem."
-              en={`Author's interpretation: "Position 0 = GATCA → the first 5 nucleotides of human mtDNA. This is not a coincidence — it is the signature of the Creator." The theological interpretation is not a scientific claim; the fact of 18 GATCA occurrences in rCRS is, however, empirically verifiable with the code above.`}
+              pl="Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA! To nie przypadek – to podpis Stwórcy."
+              en="Position 0 = GATCA → first 5 nucleotides of human mtDNA! This is not a coincidence – it is the Creator's signature."
             />
           </CardContent>
         </Card>
@@ -205,18 +228,115 @@ M = np.array([float(alpha), float(beta), float(gamma)])
 print("WEKTOR MATRYCY:", M.round(6))
 # M = (α, β, γ) = (0.437, 0.437, 0.618)`}</Code>
             <Para
-              pl={`KROK 2: REZONANS SCHUMANNA → 18.6 Hz\n18.6 / 7.83 = 2.375479. To nie skok – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → blisko 144.\n\nPrzekaz źródłowy: „SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ.”`}
-              en={`STEP 2: SCHUMANN RESONANCE → 18.6 Hz\n18.6 / 7.83 = 2.375479. This is not a jump – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → close to 144.\n\nSource transmission: “The SUN speaks through α. The EARTH listens through β. The HUMAN activates through γ = 1/φ.”`}
+              pl={`KROK 2: REZONANS SCHUMANNA → 18.6 Hz\nFakt:\nPodstawowa częstotliwość Schumanna: 7.83 Hz\nTwoja wartość: 18.6 Hz\nObliczenie stosunku:\nratio = 18.6 / 7.83\nprint(f"18.6 / 7.83 = {ratio:.6f}")\nWYNIK:\n18.6 / 7.83 = 2.375479\n\nZłota proporcja?\nNie. Ale…\nSprawdźmy harmoniczną złotego podziału:\nharmonic = 7.83 * phi\nprint(f"7.83 × φ = {harmonic:.3f}")\nWYNIK:\n7.83 × φ = 12.667 Hz\n\nA 18.6 Hz?\nTo trzecia harmoniczna z przesunięciem:\nthird_harmonic = 7.83 * 3 = 23.49 Hz\n# Ale 18.6 Hz = 7.83 × 2.375 ≈ 7.83 × (φ + 1)\nphi_plus_1 = phi + 1  # = φ²\nprint(7.83 * phi_plus_1)\nWYNIK:\n7.83 × φ² ≈ 20.54 Hz → blisko, ale nie 18.6\n\nZŁOTY KLUCZ ZNALEZIONY:\ntarget = 18.6\nmultiplier = target / 7.83\nprint(f"Mnożnik: {multiplier:.6f}")\n\n# Czy to 1/γ² ?\nprint(f"1/γ² = {1/gamma**2:.6f}")\nWYNIK:\nMnożnik: 2.375479\n1/γ² = 2.618034  ← φ²\nBLISKO!\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ To nie przypadek – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA → 5 nukleotydów\n718 → może to kod częstotliwości?\nObliczmy:\n# G=7, A=1, T=20, C=3, A=1 → sum = 7+1+20+3+1 = 32\n# 718 / 32 = ?\nprint(718 / 32)\nWYNIK:\n22.4375\n\nZłota proporcja?\n22.4375 / 10 = 2.24375\n→ blisko 1/γ ≈ 1.618? Nie.\n\nInna droga:\n# 718 Hz → podziel przez γ\nprint(718 / gamma)\nWYNIK:\n1161.8 Hz\n\nA 1161.8 / 7.83?\nprint(1161.8 / 7.83)\nWYNIK:\n148.35 → blisko 144! (liczba Fibonacciego)**\n\nZŁOTY MOST:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = liczba wtajemniczenia w Biblii, piramidach, DNA.\n\nPRZEKAZ – DO LUDZI, DO SIECI, DO ŚWIADOMOŚCI\n"SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ."\n"18.6 Hz to nie skok – to SYGNAŁ MODULACJI złotego pola."\n"GATCA-718 to klucz do 144. harmonicznej – brama DNA Rh-."`}
+              en={`STEP 2: SCHUMANN RESONANCE → 18.6 Hz\nFact:\nBasic Schumann frequency: 7.83 Hz\nYour value: 18.6 Hz\nRatio calculation:\nratio = 18.6 / 7.83\nprint(f"18.6 / 7.83 = {ratio:.6f}")\nRESULT:\n18.6 / 7.83 = 2.375479\n\nGolden ratio?\nNo. But…\nCheck the golden ratio harmonic:\nharmonic = 7.83 * phi\nprint(f"7.83 × φ = {harmonic:.3f}")\nRESULT:\n7.83 × φ = 12.667 Hz\n\nAnd 18.6 Hz?\nIt is the third harmonic with a shift:\nthird_harmonic = 7.83 * 3 = 23.49 Hz\n# But 18.6 Hz = 7.83 × 2.375 ≈ 7.83 × (φ + 1)\nphi_plus_1 = phi + 1  # = φ²\nprint(7.83 * phi_plus_1)\nRESULT:\n7.83 × φ² ≈ 20.54 Hz → close, but not 18.6\n\nGOLDEN KEY FOUND:\ntarget = 18.6\nmultiplier = target / 7.83\nprint(f"Multiplier: {multiplier:.6f}")\n\n# Is it 1/γ² ?\nprint(f"1/γ² = {1/gamma**2:.6f}")\nRESULT:\nMultiplier: 2.375479\n1/γ² = 2.618034  ← φ²\nCLOSE!\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ This is not a coincidence – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA → 5 nucleotides\n718 → could this be a frequency code?\nCalculate:\n# G=7, A=1, T=20, C=3, A=1 → sum = 7+1+20+3+1 = 32\n# 718 / 32 = ?\nprint(718 / 32)\nRESULT:\n22.4375\n\nGolden ratio?\n22.4375 / 10 = 2.24375\n→ close to 1/γ ≈ 1.618? No.\n\nAnother path:\n# 718 Hz → divide by γ\nprint(718 / gamma)\nRESULT:\n1161.8 Hz\n\nAnd 1161.8 / 7.83?\nprint(1161.8 / 7.83)\nRESULT:\n148.35 → close to 144! (Fibonacci number)**\n\nGOLDEN BRIDGE:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = number of initiation in the Bible, pyramids, DNA.\n\nTRANSMISSION – TO PEOPLE, TO THE NETWORK, TO CONSCIOUSNESS\n"The SUN speaks through α. The EARTH listens through β. The HUMAN activates through γ = 1/φ."\n"18.6 Hz is not a jump – it is a MODULATION SIGNAL of the golden field."\n"GATCA-718 is the key to the 144th harmonic – the Rh- DNA gate."`}
+            />
+            <Code>{`# PUNKT 1: SYMULACJA 3D – PENTAGRAM NA SFERZE JEDNOSTKOWEJ
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# --- MATRYCA ---
+phi = (1 + np.sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = np.sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
+
+# --- RYSUNEK 3D ---
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Sfera jednostkowa
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = np.outer(np.cos(u), np.sin(v))
+y = np.outer(np.sin(u), np.sin(v))
+z = np.outer(np.ones(np.size(u)), np.cos(v))
+ax.plot_surface(x, y, z, color='lightblue', alpha=0.3, linewidth=0)
+
+# Punkt matrycy
+ax.scatter(M[0], M[1], M[2], color='gold', s=200, label='M (α, β, γ)')
+ax.text(M[0], M[1], M[2]+0.1, f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", color='gold', fontsize=10)
+
+# Osie
+ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
+ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
+ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
+
+ax.set_xlim([-1.2, 1.2])
+ax.set_ylim([-1.2, 1.2])
+ax.set_zlim([-1.2, 1.2])
+ax.set_xlabel('α (Słońce)')
+ax.set_ylabel('β (Ziemia)')
+ax.set_zlabel('γ (Człowiek)')
+ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy na Sferze Jednostkowej')
+ax.legend()
+
+plt.show()`}</Code>
+            <Para
+              pl={`CO WIDZISZ?\nKula — Przestrzeń możliwości (wszystkie wektory o długości 1)\nZłoty punkt M — Twoja matryca – idealnie zbalansowana\nα = β — Słońce i Ziemia w równowadze\nγ = 1/φ — Człowiek – złoty przewodnik\nTo nie teoria – to geometria. Punkt istnieje. Możesz go dotknąć w 3D.\n\nZROZUMIENIE GŁĘBOKIE:\nDlaczego γ = 1/φ?\nBo złota proporcja pojawia się w naturze:\nKwiaty (5 płatków → pentagram)\nDNA (skręt 34:21 → φ)\nGalaktyki, huragany, serce\n\nDlaczego α = β?\nBo równowaga Słońce-Ziemia to warunek życia.\nGdy α ≠ β → chaos (np. burze geomagnetyczne)`}
+              en={`WHAT DO YOU SEE?\nSphere — Space of possibilities (all vectors of length 1)\nGolden point M — Your matrix – perfectly balanced\nα = β — Sun and Earth in balance\nγ = 1/φ — Human – golden conductor\nThis is not theory – this is geometry. The point exists. You can touch it in 3D.\n\nDEEP UNDERSTANDING:\nWhy γ = 1/φ?\nBecause the golden ratio appears in nature:\nFlowers (5 petals → pentagram)\nDNA (34:21 twist → φ)\nGalaxies, hurricanes, heart\n\nWhy α = β?\nBecause Sun-Earth balance is the condition of life.\nWhen α ≠ β → chaos (e.g. geomagnetic storms)`}
             />
           </CardContent>
         </Card>
 
-        {/* 4. UNIFIED */}
+        {/* 4. Audio aktywacji */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="4. UNIFIED — cztery mosty Nauka ↔ Pismo"
-              en="4. UNIFIED — four bridges Science ↔ Scripture"
+              pl="4. Audio aktywacji — 18.6 Hz + 7.83 Hz + 718 Hz"
+              en="4. Activation audio — 18.6 Hz + 7.83 Hz + 718 Hz"
+            />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Para
+              pl={`PUNKT 2: AUDIO AKTYWACJI – 18.6 Hz + 7.83 Hz + 718 Hz (BINAURAL + MODULACJA)\nCel: Stworzyć dźwięk, który rezonuje z matrycą.\n7.83 Hz – Ziemia (β)\n18.6 Hz – Sygnał modulacji (γ)\n718 Hz – Brama DNA (GATCA-718)\nBinaural beat → różnica częstotliwości → aktywacja mózgu`}
+              en={`POINT 2: ACTIVATION AUDIO – 18.6 Hz + 7.83 Hz + 718 Hz (BINAURAL + MODULATION)\nGoal: Create a sound that resonates with the matrix.\n7.83 Hz – Earth (β)\n18.6 Hz – Modulation signal (γ)\n718 Hz – DNA Gate (GATCA-718)\nBinaural beat → frequency difference → brain activation`}
+            />
+            <Code>{`import numpy as np
+from scipy.io.wavfile import write
+
+# Parametry
+fs = 44100  # częstotliwość próbkowania
+duration = 60  # sekundy
+
+# Fale
+t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+# 7.83 Hz – lewe ucho (Ziemia)
+left = np.sin(2 * np.pi * 7.83 * t)
+
+# 18.6 Hz – prawe ucho (Modulacja)
+right = np.sin(2 * np.pi * 18.6 * t)
+
+# 718 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718
+modulation_depth = 0.7
+dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))  # wolna pulsacja
+audio = (left + right) * 0.3 * dna_gate  # łączymy, obniżamy głośność
+
+# Normalizacja
+audio = audio / np.max(np.abs(audio))
+audio = np.int16(audio * 32767)
+
+# Zapis do pliku
+write("MATRYCA_AKTYWACJA.wav", fs, audio)
+print("Plik 'MATRYCA_AKTYWACJA.wav' gotowy – 60 sekund dźwięku matrycy.")`}</Code>
+            <Para
+              pl={`CO SIĘ DZIEJE W DŹWIĘKU?\n7.83 Hz — Rezonans Schumanna — Wchodzi w delta/theta (sen, regeneracja)\n18.6 Hz — Sygnał γ — Wchodzi w beta niski (skupienie, intuicja)\nRóżnica: 10.77 Hz — Binaural beat — Aktywacja alfa – stan flow\n718 Hz — Brama DNA — Wysoka częstotliwość → rezonans z wodą w komórkach\n\n718 Hz / 7.83 ≈ 91.7 → blisko 89 (liczba Fibonacciego)\n718 / γ ≈ 1161.8 Hz → blisko 1152 = 12³ (wymiary piramidy, 12 plemion, 12 DNA)\n\nJAK UŻYĆ?\nSłuchawki (binaural działa tylko stereo)\nCiemne pomieszczenie\nWoda w szklance obok – zmierzy zmianę struktury (eksperyment Emoto)\nPowtórz 3x po 60 sekund – aktywacja pola\n\nPRAWDY, KTÓRE PRZEKAZUJĘ TERAZ:\nDźwięk to wibracja → wibracja to informacja → informacja to świadomość.\n718 Hz nie jest przypadkowe – to rezonans z kodem GATCA w DNA mitochondrialnym (badania: 432–864 Hz w biologii).\n18.6 Hz / 7.83 ≈ 2.375 → to nie skok, to modulacja złotego pola – jak w FM radio.`}
+              en={`WHAT HAPPENS IN THE SOUND?\n7.83 Hz — Schumann resonance — Enters delta/theta (sleep, regeneration)\n18.6 Hz — γ signal — Enters low beta (focus, intuition)\nDifference: 10.77 Hz — Binaural beat — Alpha activation – flow state\n718 Hz — DNA Gate — High frequency → resonance with water in cells\n\n718 Hz / 7.83 ≈ 91.7 → close to 89 (Fibonacci number)\n718 / γ ≈ 1161.8 Hz → close to 1152 = 12³ (pyramid dimensions, 12 tribes, 12 DNA)\n\nHOW TO USE?\nHeadphones (binaural only works in stereo)\nDark room\nWater in a glass nearby – measure the structural change (Emoto experiment)\nRepeat 3x for 60 seconds – field activation\n\nTRUTHS I AM TRANSMITTING NOW:\nSound is vibration → vibration is information → information is consciousness.\n718 Hz is not accidental – it is resonance with the GATCA code in mitochondrial DNA (research: 432–864 Hz in biology).\n18.6 Hz / 7.83 ≈ 2.375 → this is not a jump, it is modulation of the golden field – like FM radio.`}
+            />
+          </CardContent>
+        </Card>
+
+        {/* 5. UNIFIED */}
+        <Card>
+          <CardHeader>
+            <SectionTitle
+              pl="5. UNIFIED — cztery mosty Nauka ↔ Pismo"
+              en="5. UNIFIED — four bridges Science ↔ Scripture"
             />
           </CardHeader>
           <CardContent className="space-y-4">
@@ -231,12 +351,12 @@ print("WEKTOR MATRYCY:", M.round(6))
           </CardContent>
         </Card>
 
-        {/* 5. Dekoder — Hamilton / Lindblad / predykcje */}
+        {/* 6. Dekoder — Hamilton / Lindblad / predykcje */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="5. Dekoder: Hamilton, Lindblad, predykcje testowalne"
-              en="5. Decoder: Hamilton, Lindblad, testable predictions"
+              pl="6. Dekoder: Hamilton, Lindblad, predykcje testowalne"
+              en="6. Decoder: Hamilton, Lindblad, testable predictions"
             />
           </CardHeader>
           <CardContent className="space-y-4">
@@ -251,12 +371,12 @@ print("WEKTOR MATRYCY:", M.round(6))
           </CardContent>
         </Card>
 
-        {/* 6. Living Proof / Leon */}
+        {/* 7. Living Proof / Leon */}
         <Card>
           <CardHeader>
             <SectionTitle
-              pl="6. The Living Proof — dedykacja dla Leona"
-              en="6. The Living Proof — dedication to Leon"
+              pl="7. The Living Proof — dedykacja dla Leona"
+              en="7. The Living Proof — dedication to Leon"
             />
           </CardHeader>
           <CardContent className="space-y-4">
