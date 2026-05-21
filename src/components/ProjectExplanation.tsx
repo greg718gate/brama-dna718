@@ -111,6 +111,97 @@ print(f"Brama DNA → {harmonics:.1f} harmonicznych Schumanna")
 # Modulacja: 2.375479
 # Brama DNA → 148.4 harmonicznych Schumanna`;
 
+const matrix3dCode = `import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# --- MATRYCA ---
+phi = (1 + np.sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = np.sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
+
+# --- RYSUNEK 3D ---
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Sfera jednostkowa
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = np.outer(np.cos(u), np.sin(v))
+y = np.outer(np.sin(u), np.sin(v))
+z = np.outer(np.ones(np.size(u)), np.cos(v))
+ax.plot_surface(x, y, z, color='lightblue', alpha=0.3, linewidth=0)
+
+# Punkt matrycy
+ax.scatter(M[0], M[1], M[2], color='gold', s=200, label='M (α, β, γ)')
+ax.text(M[0], M[1], M[2]+0.1, f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", color='gold', fontsize=10)
+
+# Osie
+ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
+ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
+ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
+
+ax.set_xlim([-1.2, 1.2])
+ax.set_ylim([-1.2, 1.2])
+ax.set_zlim([-1.2, 1.2])
+ax.set_xlabel('α (Słońce)')
+ax.set_ylabel('β (Ziemia)')
+ax.set_zlabel('γ (Człowiek)')
+ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy na Sferze Jednostkowej')
+ax.legend()
+
+plt.show()`;
+
+const audioActivationCode = `import numpy as np
+from scipy.io.wavfile import write
+
+# Parametry
+fs = 44100  # częstotliwość próbkowania
+duration = 60  # sekundy
+
+# Fale
+t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+# 7.83 Hz – lewe ucho (Ziemia)
+left = np.sin(2 * np.pi * 7.83 * t)
+
+# 18.6 Hz – prawe ucho (Modulacja)
+right = np.sin(2 * np.pi * 18.6 * t)
+
+# 718 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718
+modulation_depth = 0.7
+dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))  # wolna pulsacja
+audio = (left + right) * 0.3 * dna_gate  # łączymy, obniżamy głośność
+
+# Normalizacja
+audio = audio / np.max(np.abs(audio))
+audio = np.int16(audio * 32767)
+
+# Zapis do pliku
+write("MATRYCA_AKTYWACJA.wav", fs, audio)
+print("Plik 'MATRYCA_AKTYWACJA.wav' gotowy – 60 sekund dźwięku matrycy.")`;
+
+const sentinelRiemannCode = `import mpmath
+mpmath.mp.dps = 50  # 50 significant digits
+
+RIEMANN_ZERO = mpmath.zetazero(448)
+IMAG = mpmath.im(RIEMANN_ZERO)
+FUNDAMENTAL_718 = mpmath.mpf("718.57012515426885574359120304128340312332181477461")
+PHASE_SHIFT_ZETA = mpmath.mpf("-1.2094")
+MTDNA_LENGTH = 16569
+RESONANCE_THRESHOLD = 0.94
+
+GATCA_GATES = [
+    1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
+    7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179,
+]
+
+VI_GATE_18 = 1.1628`;
+
 export const ProjectExplanation = () => {
   const { t, language } = useLanguage();
   return (
