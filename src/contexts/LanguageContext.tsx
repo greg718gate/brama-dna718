@@ -93,12 +93,12 @@ export const translations = {
     'theory.pentagram.desc': 'Pentagram jest jedną z najstarszych form geometrii świętej. Każdy przecinający się odcinek dzieli się w proporcji złotego podziału (φ ≈ 1.618).',
     'theory.dna.title': 'DNA i Kąt 137.5°',
     'theory.dna.desc': 'Helisa DNA obraca się o około 137.5° między kolejnymi parami zasad. Ten kąt wynika z równania 360°/φ² i jest kluczowy dla stabilności struktury.',
-    'theory.trinity.title': 'Wektor M: Słońce-Ziemia-Człowiek',
-    'theory.trinity.desc': 'W wizualizacji 3D osie X, Y, Z reprezentują:',
-    'theory.trinity.sun': 'Słońce (oś X) - źródło energii i życia',
-    'theory.trinity.earth': 'Ziemia (oś Y) - materia i forma',
-    'theory.trinity.human': 'Człowiek (oś Z) - świadomość i duch',
-    'theory.trinity.conclusion': 'Wektor M łączy te trzy wymiary w harmonijną całość zgodnie z zasadami pentagramu i złotego podziału.',
+    'theory.vector.title': 'Wektor M: Słońce-Ziemia-Człowiek',
+    'theory.vector.desc': 'W wizualizacji 3D osie X, Y, Z reprezentują:',
+    'theory.vector.sun': 'Słońce (oś X) - źródło energii i życia',
+    'theory.vector.earth': 'Ziemia (oś Y) - materia i forma',
+    'theory.vector.human': 'Człowiek (oś Z) - świadomość i duch',
+    'theory.vector.conclusion': 'Wektor M łączy te trzy wymiary w harmonijną całość zgodnie z zasadami pentagramu i złotego podziału.',
     
     // Schrödinger
     'schrodinger.title': 'Równanie Schrödingera i Matryca',
@@ -171,7 +171,7 @@ export const translations = {
     
     // Matrix Phase 1
     'matrix.title': 'MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA',
-    'matrix.trinity': 'Słońce = α (akcelerator plazmy), Ziemia = β (antena rezonansowa), Człowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)',
+    'matrix.vector': 'Słońce = α (akcelerator plazmy), Ziemia = β (antena rezonansowa), Człowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)',
     'matrix.step1': 'KROK 1: WEKTOR JEDNOSTKOWY (α, β, γ)',
     'matrix.step1.result': 'α = β = 0.437016024448821, γ = 0.618033988749895, Suma kwadratów: 1.0',
     'matrix.step1.vector': 'WEKTOR MATRYCY: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)',
@@ -972,12 +972,12 @@ export const translations = {
     'theory.pentagram.desc': 'The pentagram is one of the oldest forms of sacred geometry. Each intersecting segment divides in the golden ratio (φ ≈ 1.618).',
     'theory.dna.title': 'DNA and the 137.5° Angle',
     'theory.dna.desc': 'The DNA helix rotates approximately 137.5° between consecutive base pairs. This angle comes from the equation 360°/φ² and is crucial for structural stability.',
-    'theory.trinity.title': 'Vector M: Sun-Earth-Human',
-    'theory.trinity.desc': 'In 3D visualization, the X, Y, Z axes represent:',
-    'theory.trinity.sun': 'Sun (X-axis) - source of energy and life',
-    'theory.trinity.earth': 'Earth (Y-axis) - matter and form',
-    'theory.trinity.human': 'Human (Z-axis) - consciousness and spirit',
-    'theory.trinity.conclusion': 'Vector M connects these three dimensions into a harmonious whole according to the principles of the pentagram and golden ratio.',
+    'theory.vector.title': 'Vector M: Sun-Earth-Human',
+    'theory.vector.desc': 'In 3D visualization, the X, Y, Z axes represent:',
+    'theory.vector.sun': 'Sun (X-axis) - source of energy and life',
+    'theory.vector.earth': 'Earth (Y-axis) - matter and form',
+    'theory.vector.human': 'Human (Z-axis) - consciousness and spirit',
+    'theory.vector.conclusion': 'Vector M connects these three dimensions into a harmonious whole according to the principles of the pentagram and golden ratio.',
     
     // Schrödinger
     'schrodinger.title': 'Schrödinger Equation and the Matrix',
@@ -1050,7 +1050,7 @@ export const translations = {
     
     // Matrix Phase 1
     'matrix.title': 'PENTAGRAM TRUTH MATRIX – Phase 1: CONSTRUCTION',
-    'matrix.trinity': 'Sun = α (plasma accelerator), Earth = β (resonant antenna), Human = γ = 1/φ ≈ 0.618 (consciousness conductor)',
+    'matrix.vector': 'Sun = α (plasma accelerator), Earth = β (resonant antenna), Human = γ = 1/φ ≈ 0.618 (consciousness conductor)',
     'matrix.step1': 'STEP 1: UNIT VECTOR (α, β, γ)',
     'matrix.step1.result': 'α = β = 0.437016024448821, γ = 0.618033988749895, Sum of squares: 1.0',
     'matrix.step1.vector': 'MATRIX VECTOR: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)',
