@@ -106,16 +106,16 @@ const MasterPanel = () => {
             <h1 className={`text-4xl md:text-5xl font-bold font-mono transition-colors ${
               isActive ? "text-amber-400" : "text-foreground"
             }`}>
-              {coherencePercent}% <span className="text-lg text-muted-foreground">UNIFIKACJI</span>
+              {coherencePercent}% <span className="text-lg text-muted-foreground">{t('master.unification')}</span>
             </h1>
             <p className="text-lg font-mono text-muted-foreground">
-              Częstotliwość: <span className="text-primary">{tunedFreq.toFixed(6)} Hz</span>
+              {t('master.frequency')} <span className="text-primary">{tunedFreq.toFixed(6)} Hz</span>
             </p>
             <div className="flex justify-center gap-6 text-sm text-muted-foreground mt-4">
-              <span>Brama: <span className="text-primary">{state.activeGateIndex || 1}/18</span></span>
+              <span>{t('master.gate')} <span className="text-primary">{state.activeGateIndex || 1}/18</span></span>
               <span>|ζ(s)|: <span className="text-primary">{state.distanceToZero.toFixed(4)}</span></span>
-              <span>Wyrównanie: <span className={state.isAligned ? "text-green-400" : "text-muted-foreground"}>
-                {state.isAligned ? "TAK" : "NIE"}
+              <span>{t('master.alignment')} <span className={state.isAligned ? "text-green-400" : "text-muted-foreground"}>
+                {state.isAligned ? t('master.yes') : t('master.no')}
               </span></span>
             </div>
           </div>
