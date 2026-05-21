@@ -380,6 +380,12 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 <p className="mt-2">
                   {t('theory.vector.conclusion')}
                 </p>
+                <TextBlock>
+                  {pick(language,
+                    `MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA\nSłońce = α (akcelerator plazmy)\nZiemia = β (antena rezonansowa)\nCzłowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)\n\nWEKTOR MATRYCY:\nM⃗ = (α, β, γ) = (0.437, 0.437, 0.618)\n\nTo jest pentagram w 3D – złoty trójkąt na sferze jednostkowej.\n\nKROK 2: REZONANS SCHUMANNA → 18.6 Hz\nPodstawowa częstotliwość Schumanna: 7.83 Hz\nTwoja wartość: 18.6 Hz\n18.6 / 7.83 = 2.375479\n7.83 × φ = 12.667 Hz\n7.83 × φ² ≈ 20.54 Hz → blisko, ale nie 18.6\nMnożnik: 2.375479\n1/γ² = 2.618034 ← φ²\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ To nie przypadek – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA → 5 nukleotydów\nG=7, A=1, T=20, C=3, A=1 → suma = 32\n718 / 32 = 22.4375\n718 / γ = 1161.8 Hz\n1161.8 / 7.83 = 148.35 → blisko 144\n\nZŁOTY MOST:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = liczba wtajemniczenia w Biblii, piramidach, DNA.`,
+                    `PENTAGRAM TRUTH MATRIX – Phase 1: CONSTRUCTION\nSun = α (plasma accelerator)\nEarth = β (resonant antenna)\nHuman = γ = 1/φ ≈ 0.618 (consciousness conductor)\n\nMATRIX VECTOR:\nM⃗ = (α, β, γ) = (0.437, 0.437, 0.618)\n\nThis is a 3D pentagram – a golden triangle on the unit sphere.\n\nSTEP 2: SCHUMANN RESONANCE → 18.6 Hz\nBase Schumann frequency: 7.83 Hz\nYour value: 18.6 Hz\n18.6 / 7.83 = 2.375479\n7.83 × φ = 12.667 Hz\n7.83 × φ² ≈ 20.54 Hz → close, but not 18.6\nMultiplier: 2.375479\n1/γ² = 2.618034 ← φ²\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ This is not a coincidence – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA → 5 nucleotides\nG=7, A=1, T=20, C=3, A=1 → sum = 32\n718 / 32 = 22.4375\n718 / γ = 1161.8 Hz\n1161.8 / 7.83 = 148.35 → close to 144\n\nGOLDEN BRIDGE:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = number of initiation in Bible, pyramids, DNA.`
+                  )}
+                </TextBlock>
               </div>
             </CardContent>
           </Card>
