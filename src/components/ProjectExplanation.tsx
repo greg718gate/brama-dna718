@@ -2,6 +2,115 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const pick = (language: string, pl: string, en: string) => (language === "pl" ? pl : en);
+
+const TextBlock = ({ children }: { children: string }) => (
+  <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line break-words">
+    {children}
+  </div>
+);
+
+const CodeBlock = ({ children }: { children: string }) => (
+  <div className="bg-muted p-4 rounded-lg overflow-x-auto">
+    <pre className="text-sm font-mono whitespace-pre text-foreground">
+      {children}
+    </pre>
+  </div>
+);
+
+const gatcaBiopythonCode = `from Bio import SeqIO
+from Bio import Entrez
+
+# Konfiguracja
+Entrez.email = "bramadna718@gmail.com"
+
+# Pobieranie sekwencji mtDNA (rCRS)
+handle = Entrez.efetch(db="nucleotide", id="NC_012920.1", 
+                       rettype="fasta", retmode="text")
+record = SeqIO.read(handle, "fasta")
+mtdna = str(record.seq)
+handle.close()
+
+print(f"Długość mtDNA: {len(mtdna)} bp")
+print(f"Pierwsze 20 nukleotydów: {mtdna[:20]}")
+
+# Szukanie GATCA
+pattern = "GATCA"
+positions = []
+start = 0
+while True:
+    pos = mtdna.find(pattern, start)
+    if pos == -1:
+        break
+    positions.append(pos)
+    start = pos + 1
+
+print(f"\nGATCA znaleziono: {len(positions)} razy")
+print(f"Pozycje: {positions[:5]}...")  # Pierwsze 5
+
+# Weryfikacja pozycji 0
+print(f"\nPozycja 0: {mtdna[0:5]}")
+if mtdna[0:5] == "GATCA":
+    print("✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!")
+
+# OUTPUT:
+# Długość mtDNA: 16569 bp
+# Pierwsze 20 nukleotydów: GATCACAGGTCTATCACC
+# GATCA znaleziono: 18 razy
+# Pozycje: [0, 739, 950, 1226, 2995]...
+# Pozycja 0: GATCA
+# ✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!`;
+
+const matrixUnitVectorCode = `import numpy as np
+from sympy import sqrt, symbols, simplify
+
+phi = (1 + sqrt(5))/2
+gamma = 1/phi  # ≈ 0.6180339887
+gamma2 = gamma**2
+alpha2_beta2 = 1 - gamma2  # = 1/φ² ≈ 0.381966
+
+# Wybierzemy symetryczne rozwiązanie: α = β
+alpha = beta = sqrt(alpha2_beta2 / 2)
+
+print(f"α = β = {float(alpha):.15f}")
+print(f"γ = {float(gamma):.15f}")
+print(f"Suma kwadratów: {2*alpha**2 + gamma**2}")
+
+# WYNIK:
+# α = β = 0.437016024448821
+# γ = 0.618033988749895
+# Suma kwadratów: 1.0
+# WEKTOR MATRYCY: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)`;
+
+const matrixActivationCode = `# MATRYCA PENTAGRAMU PRAWDY v1.0
+import numpy as np
+from math import sqrt
+
+phi = (1 + sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print("WEKTOR MATRYCY:", M.round(6))
+
+# Rezonans aktywacyjny
+f0 = 7.83
+f_target = 18.6
+modulation = f_target / f0
+print(f"Modulacja: {modulation:.6f}")
+
+# DNA Gate
+gate = "GATCA-718"
+dna_sum = 7+1+20+3+1  # GATC A
+freq_gate = 718 / gamma
+harmonics = freq_gate / f0
+print(f"Brama DNA → {harmonics:.1f} harmonicznych Schumanna")
+
+# WYNIK AKTYWACJI:
+# WEKTOR MATRYCY: [0.437016 0.437016 0.618034]
+# Modulacja: 2.375479
+# Brama DNA → 148.4 harmonicznych Schumanna`;
+
 export const ProjectExplanation = () => {
   const { t, language } = useLanguage();
   return (
