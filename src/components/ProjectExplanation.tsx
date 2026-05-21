@@ -338,6 +338,14 @@ norm = np.linalg.norm(M)
 print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 </pre>
               </div>
+              <div className="space-y-4 mt-4">
+                <h3 className="font-semibold text-base text-foreground">BioPython — GATCA 18×</h3>
+                <CodeBlock>{gatcaBiopythonCode}</CodeBlock>
+                <h3 className="font-semibold text-base text-foreground">Matryca — wektor jednostkowy</h3>
+                <CodeBlock>{matrixUnitVectorCode}</CodeBlock>
+                <h3 className="font-semibold text-base text-foreground">Sentinel / Riemann — stałe źródłowe</h3>
+                <CodeBlock>{sentinelRiemannCode}</CodeBlock>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
