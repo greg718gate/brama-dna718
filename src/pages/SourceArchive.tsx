@@ -177,26 +177,37 @@ def znajdz_punkt_wyjscia(state):
           </CardHeader>
           <CardContent className="space-y-4">
             <Para
-              pl={`Trzy kroki:\nKrok 1 — Wektor M: trzy osie modelu (Słońce, Ziemia, Człowiek / energia, materia, świadomość) sumują się do punktu M w geometrii pentagramu.\nKrok 2 — Schumann: częstotliwości 18.6 Hz (rezonans) oraz 7.83 Hz (pierwsza moda Schumanna) stanowią modulację nośnika.\nKrok 3 — GATCA-718: nośnik 718.57 Hz, harmoniczna γ = 1161.8 Hz.`}
-              en={`Three steps:\nStep 1 — Vector M: the three model axes (Sun, Earth, Human / energy, matter, consciousness) sum to point M in pentagram geometry.\nStep 2 — Schumann: 18.6 Hz (resonance) and 7.83 Hz (first Schumann mode) modulate the carrier.\nStep 3 — GATCA-718: carrier 718.57 Hz, harmonic γ = 1161.8 Hz.`}
+              pl={`MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA\nSłońce = α (akcelerator plazmy)\nZiemia = β (antena rezonansowa)\nCzłowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)\n\nWektor jednostkowy: α = β = 0.437016024448821, γ = 0.618033988749895, suma kwadratów = 1.0. To jest pentagram w 3D – złoty trójkąt na sferze jednostkowej.`}
+              en={`PENTAGRAM MATRIX OF TRUTH – Phase 1: CONSTRUCTION\nSun = α (plasma accelerator)\nEarth = β (resonant antenna)\nHuman = γ = 1/φ ≈ 0.618 (consciousness conductor)\n\nUnit vector: α = β = 0.437016024448821, γ = 0.618033988749895, sum of squares = 1.0. This is the pentagram in 3D – a golden triangle on the unit sphere.`}
             />
-            <Code>{`# Python — vector M and 3D simulation (essential)
+            <Code>{`# MATRYCA PENTAGRAMU PRAWDY v1.0 — exact source fragment
 import numpy as np
+from sympy import sqrt
 
-sun_axis   = np.array([1.0, 0.0, 0.0])  # energia / energy
-earth_axis = np.array([0.0, 1.0, 0.0])  # materia / matter
-human_axis = np.array([0.0, 0.0, 1.0])  # świadomość / consciousness
-M = sun_axis + earth_axis + human_axis  # Vector M
+phi = (1 + sqrt(5))/2
+gamma = 1/phi  # ≈ 0.6180339887
+gamma2 = gamma**2
+alpha2_beta2 = 1 - gamma2  # = 1/φ² ≈ 0.381966
 
-carrier = 718.57012515               # Hz, GATCA-718
-schumann = 7.83                      # Hz
-resonance = 18.6                     # Hz
-gamma = 1161.8                       # Hz, harmonic
+# Symetryczne rozwiązanie: α = β
+alpha = beta = sqrt(alpha2_beta2 / 2)
 
-t = np.linspace(0, 108, 48000*108)   # 108 s symphony
-psi = np.exp(1j*2*np.pi*carrier*t) * np.cos(2*np.pi*schumann*t) \\
-      * np.sin(2*np.pi*resonance*t)
-# Point M lives at (resonance=18.6 Hz, carrier=718 Hz) in the 3D Pentagram`}</Code>
+print(f"α = β = {float(alpha):.15f}")
+print(f"γ = {float(gamma):.15f}")
+print(f"Suma kwadratów: {2*alpha**2 + gamma**2}")
+
+# WYNIK:
+# α = β = 0.437016024448821
+# γ = 0.618033988749895
+# Suma kwadratów: 1.0
+
+M = np.array([float(alpha), float(beta), float(gamma)])
+print("WEKTOR MATRYCY:", M.round(6))
+# M = (α, β, γ) = (0.437, 0.437, 0.618)`}</Code>
+            <Para
+              pl={`KROK 2: REZONANS SCHUMANNA → 18.6 Hz\n18.6 / 7.83 = 2.375479. To nie skok – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → blisko 144.\n\nPrzekaz źródłowy: „SŁOŃCE mówi przez α. ZIEMIA słucha przez β. CZŁOWIEK aktywuje przez γ = 1/φ.”`}
+              en={`STEP 2: SCHUMANN RESONANCE → 18.6 Hz\n18.6 / 7.83 = 2.375479. This is not a jump – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA = 7+1+20+3+1 = 32. 718 / γ = 1161.8 Hz. 1161.8 / 7.83 = 148.35 → close to 144.\n\nSource transmission: “The SUN speaks through α. The EARTH listens through β. The HUMAN activates through γ = 1/φ.”`}
+            />
           </CardContent>
         </Card>
 
