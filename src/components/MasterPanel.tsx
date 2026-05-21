@@ -135,7 +135,7 @@ const MasterPanel = () => {
             variant="outline" 
             className="w-full justify-between font-mono"
           >
-            <span>Parametry Techniczne (Kalkulatory)</span>
+            <span>{t('master.debugPanel')}</span>
             <ChevronDown className={`w-4 h-4 transition-transform ${isDebugOpen ? "rotate-180" : ""}`} />
           </Button>
         </CollapsibleTrigger>
