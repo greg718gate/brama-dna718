@@ -771,7 +771,7 @@ function calculatePsi(t: number, x: number, gateIdx: number): PsiCalcResult {
   // Use modular distance to nearest γ-multiple, normalized to [0,1]
   // NO φ multiplication — this preserves the full [0,1] range for variation
   const modDist = Math.abs((magnitude % GAMMA) - GAMMA / 2) / (GAMMA / 2);
-  let coherence = 1 - modDist; // 0..1 with proper distribution
+  const coherence = 1 - modDist; // 0..1 with proper distribution
 
   let quantumState: string;
   if (coherence > 0.94) quantumState = "TELEPORTATION_READY";
