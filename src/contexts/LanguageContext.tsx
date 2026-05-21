@@ -1753,6 +1753,19 @@ export const translations = {
     'decoder.label.stability': 'Stability',
     'decoder.label.key': 'Key',
     'decoder.license': '© 2026 Grzegorz | BRAMA-718-UNIFIED | License: CC BY-NC 4.0',
+
+    // Master Panel
+    'master.inputHeader': 'INPUT DATA',
+    'master.inputPlaceholder': 'Paste rCRS sequence or mtDNA positions (e.g. 1, 740, 951...)\nLeave empty for default 18 rCRS positions',
+    'master.processing': 'PROCESSING...',
+    'master.activate': 'ACTIVATE GATE',
+    'master.unification': 'UNIFICATION',
+    'master.frequency': 'Frequency:',
+    'master.gate': 'Gate:',
+    'master.alignment': 'Alignment:',
+    'master.yes': 'YES',
+    'master.no': 'NO',
+    'master.debugPanel': 'Technical Parameters (Calculators)',
   }
 };
 
