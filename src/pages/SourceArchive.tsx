@@ -138,7 +138,7 @@ print(f"mtDNA starts with: {seq[:5]}")               # -> GATCA`}</Code>
               pl={`Stała mistrza modelu pochodzi z 448. nietrywialnego zera funkcji ζ Riemanna na linii krytycznej, obliczonego z precyzją 50 cyfr znaczących (mpmath). Z części urojonej tego zera wyprowadzana jest częstotliwość wzorcowa 718.57012515 Hz oraz przesunięcie fazowe PHASE_SHIFT_ζ.`}
               en={`The model's master constant comes from the 448th non-trivial zero of the Riemann ζ function on the critical line, computed to 50 significant digits (mpmath). The reference frequency 718.57012515 Hz and the phase shift PHASE_SHIFT_ζ are derived from the imaginary part of this zero.`}
             />
-            <Code>{`# Python — sentinel_718_exit.py (essential fragment)
+            <Code>{`# Python — sentinel_718_exit.py / system_unification.py (essential constants)
 import mpmath
 mpmath.mp.dps = 50  # 50 significant digits
 
@@ -146,11 +146,14 @@ RIEMANN_ZERO = mpmath.zetazero(448)       # 448th non-trivial zero
 IMAG = mpmath.im(RIEMANN_ZERO)            # imaginary part
 FUNDAMENTAL_718 = mpmath.mpf("718.57012515426885574359120304128340312332181477461")
 PHASE_SHIFT_ZETA = mpmath.mpf("-1.2094")  # rad
+MTDNA_LENGTH = 16569                      # rCRS length
+RESONANCE_THRESHOLD = 0.94                # 94%
 
-# 18 Gates mapped toroidally to rCRS positions
-GATCA_POSITIONS = [0, 739, 950, 1226, 2995,  # ...first 5 of 18
-                   # ...full list lives in symphonyGenerator.ts / scripts
-                  ]
+# 18 GATCA Gates — 1-based positions used in system_unification.py
+GATCA_GATES = [
+    1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
+    7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179,
+]
 VI_GATE_18 = 1.1628  # intention-vector reference
 
 def znajdz_punkt_wyjscia(state):
