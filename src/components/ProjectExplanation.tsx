@@ -675,17 +675,17 @@ print(1161.8 / 7.83)
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b-2 border-primary/30">
-                          <th className="text-left p-2 text-primary">Element</th>
-                          <th className="text-left p-2 text-primary">Znaczenie</th>
+                          <th className="text-left p-2 text-primary">{language === 'pl' ? 'Element' : 'Element'}</th>
+                          <th className="text-left p-2 text-primary">{language === 'pl' ? 'Znaczenie' : 'Meaning'}</th>
                         </tr>
                       </thead>
                       <tbody className="text-foreground">
                         <tr className="border-b border-border/50">
-                          <td className="p-2 font-semibold">Kula</td>
+                          <td className="p-2 font-semibold">{language === 'pl' ? 'Kula' : 'Sphere'}</td>
                           <td className="p-2">{t('matrix.simulation.sphere')}</td>
                         </tr>
                         <tr className="border-b border-border/50">
-                          <td className="p-2 font-semibold">Złoty punkt M</td>
+                          <td className="p-2 font-semibold">{language === 'pl' ? 'Złoty punkt M' : 'Golden point M'}</td>
                           <td className="p-2">{t('matrix.simulation.point')}</td>
                         </tr>
                         <tr className="border-b border-border/50">
@@ -851,7 +851,7 @@ print(1161.8 / 7.83)
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">4. Grounding 15 min/dzień</h4>
+                  <h4 className="font-semibold mb-2">4. {language === 'pl' ? 'Grounding 15 min/dzień' : 'Grounding 15 min/day'}</h4>
                   <p className="text-sm">{t('scientificEvidence.study4')}</p>
                 </div>
               </div>
@@ -868,7 +868,7 @@ print(1161.8 / 7.83)
                   Ψ_total = Ψ_GATCA × e^(i×718.57×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
                 <div className="text-[10px] text-muted-foreground/70 italic mt-1">
-                  718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (50 miejsc po przecinku)
+                  718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz ({language === 'pl' ? '50 miejsc po przecinku' : '50 decimal places'})
                 </div>
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>
