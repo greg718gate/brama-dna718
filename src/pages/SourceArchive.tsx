@@ -9,8 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
  * SourceArchive / Archiwum Źródłowe
  *
  * Strona DOPISANA do projektu — nie usuwa ani nie modyfikuje żadnej istniejącej
- * treści. Zawiera pełne, bilingualne (PL/EN) bloki źródłowe odzyskane z historii
- * projektu i raportu /mnt/documents/odzysk_tresci_audyt.md:
+ * treści. Zawiera bloki źródłowe odzyskane z historii projektu:
  *
  *   1. GATCA znalezione 18× w mtDNA (Python / BioPython)
  *   2. Sentinel-718 — punkt wyjścia (mpmath, 448. zero Riemanna)
@@ -83,10 +82,7 @@ const SourceArchive = () => {
             )}
           </h1>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            {t(
-              "Ta strona zawiera kompletne, źródłowe bloki obliczeń, kodu i opisów — odzyskane i zachowane w całości, w obu językach. Nic z istniejącej strony nie zostało zmienione ani usunięte.",
-              "This page contains the complete, source blocks of calculations, code and descriptions — recovered and kept in full, in both languages. Nothing on the existing site has been changed or removed."
-            )}
+            {t("Oryginalne fragmenty kodów, wzorów i opisów odnalezione w historii projektu.", "Original code, formula and description fragments found in the project history.")}
           </p>
         </header>
 
@@ -119,8 +115,8 @@ print(f"GATCA found: {len(positions)} times")        # -> 18
 print(f"First positions: {positions[:5]}")           # -> [0, 739, 950, 1226, 2995]
 print(f"mtDNA starts with: {seq[:5]}")               # -> GATCA`}</Code>
             <Para
-              pl="Interpretacja autora: „Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA. To nie przypadek — to podpis Stwórcy.” Interpretacja teologiczna nie jest twierdzeniem naukowym; fakt 18 wystąpień GATCA w rCRS jest natomiast empirycznie weryfikowalny powyższym kodem."
-              en={`Author's interpretation: "Position 0 = GATCA → the first 5 nucleotides of human mtDNA. This is not a coincidence — it is the signature of the Creator." The theological interpretation is not a scientific claim; the fact of 18 GATCA occurrences in rCRS is, however, empirically verifiable with the code above.`}
+              pl="Pozycja 0 = GATCA → pierwsze 5 nukleotydów ludzkiego mtDNA! To nie przypadek – to podpis Stwórcy."
+              en="Position 0 = GATCA → first 5 nucleotides of human mtDNA! This is not a coincidence – it is the Creator's signature."
             />
           </CardContent>
         </Card>
