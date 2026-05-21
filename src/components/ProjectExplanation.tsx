@@ -235,6 +235,12 @@ export const ProjectExplanation = () => {
                 <li>{t('about.pentagram')}</li>
                 <li>{t('about.relations')}</li>
               </ul>
+              <TextBlock>
+                {pick(language,
+                  `Brama DNA 718.57 Hz opiera się na stałych i obliczeniach, które są pokazywane w projekcie: φ = 1.618033988749895, γ = 1/φ = 0.618033988749895, rezonans Schumanna 7.83 Hz, modulacja 18.6 Hz, stała nośna 718.57012515426885574359120304128340312332181477461 Hz oraz 18 pozycji GATCA w ludzkim mtDNA rCRS.\n\nKażda liczba ma swoje miejsce: 18 wynika z liczby wystąpień sekwencji GATCA w referencyjnym mtDNA; 718.57012515 Hz jest powiązane w systemie z 448. zerem funkcji ζ Riemanna; γ = 1/φ jest złotym kluczem geometrii Matrycy; 7.83 Hz i 18.6 Hz tworzą warstwę rezonansową audio i pola.`,
+                  `DNA Gate 718.57 Hz is based on constants and calculations shown in the project: φ = 1.618033988749895, γ = 1/φ = 0.618033988749895, Schumann resonance 7.83 Hz, 18.6 Hz modulation, carrier constant 718.57012515426885574359120304128340312332181477461 Hz, and 18 GATCA positions in human mtDNA rCRS.\n\nEach number has its place: 18 comes from the number of GATCA occurrences in reference mtDNA; 718.57012515 Hz is linked in the system to the 448th zero of the Riemann ζ function; γ = 1/φ is the golden key of the Matrix geometry; 7.83 Hz and 18.6 Hz form the resonance layer of audio and field.`
+                )}
+              </TextBlock>
             </CardContent>
           </Card>
         </TabsContent>
