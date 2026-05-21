@@ -70,12 +70,12 @@ const MasterPanel = () => {
             {isProcessing ? (
               <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                PRZETWARZANIE...
+                {t('master.processing')}
               </>
             ) : (
               <>
                 <Zap className="w-5 h-5 mr-2" />
-                AKTYWUJ BRAMĘ
+                {t('master.activate')}
               </>
             )}
           </Button>
