@@ -874,6 +874,19 @@ export const translations = {
     'decoder.label.stability': 'Stabilność',
     'decoder.label.key': 'Klucz',
     'decoder.license': '© 2026 Grzegorz | BRAMA-718-UNIFIED | Licencja: CC BY-NC 4.0',
+
+    // Master Panel
+    'master.inputHeader': 'DANE WEJŚCIOWE',
+    'master.inputPlaceholder': 'Wklej sekwencję rCRS lub pozycje mtDNA (np. 1, 740, 951...)\nPozostaw puste dla domyślnych 18 pozycji rCRS',
+    'master.processing': 'PRZETWARZANIE...',
+    'master.activate': 'AKTYWUJ BRAMĘ',
+    'master.unification': 'UNIFIKACJI',
+    'master.frequency': 'Częstotliwość:',
+    'master.gate': 'Brama:',
+    'master.alignment': 'Wyrównanie:',
+    'master.yes': 'TAK',
+    'master.no': 'NIE',
+    'master.debugPanel': 'Parametry Techniczne (Kalkulatory)',
   },
   en: {
     // Header
