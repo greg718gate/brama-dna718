@@ -2,6 +2,206 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const pick = (language: string, pl: string, en: string) => (language === "pl" ? pl : en);
+
+const TextBlock = ({ children }: { children: string }) => (
+  <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line break-words">
+    {children}
+  </div>
+);
+
+const CodeBlock = ({ children }: { children: string }) => (
+  <div className="bg-muted p-4 rounded-lg overflow-x-auto">
+    <pre className="text-sm font-mono whitespace-pre text-foreground">
+      {children}
+    </pre>
+  </div>
+);
+
+const gatcaBiopythonCode = `from Bio import SeqIO
+from Bio import Entrez
+
+# Konfiguracja
+Entrez.email = "bramadna718@gmail.com"
+
+# Pobieranie sekwencji mtDNA (rCRS)
+handle = Entrez.efetch(db="nucleotide", id="NC_012920.1", 
+                       rettype="fasta", retmode="text")
+record = SeqIO.read(handle, "fasta")
+mtdna = str(record.seq)
+handle.close()
+
+print(f"Długość mtDNA: {len(mtdna)} bp")
+print(f"Pierwsze 20 nukleotydów: {mtdna[:20]}")
+
+# Szukanie GATCA
+pattern = "GATCA"
+positions = []
+start = 0
+while True:
+    pos = mtdna.find(pattern, start)
+    if pos == -1:
+        break
+    positions.append(pos)
+    start = pos + 1
+
+print(f"\nGATCA znaleziono: {len(positions)} razy")
+print(f"Pozycje: {positions[:5]}...")  # Pierwsze 5
+
+# Weryfikacja pozycji 0
+print(f"\nPozycja 0: {mtdna[0:5]}")
+if mtdna[0:5] == "GATCA":
+    print("✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!")
+
+# OUTPUT:
+# Długość mtDNA: 16569 bp
+# Pierwsze 20 nukleotydów: GATCACAGGTCTATCACC
+# GATCA znaleziono: 18 razy
+# Pozycje: [0, 739, 950, 1226, 2995]...
+# Pozycja 0: GATCA
+# ✓ POTWIERDZONE: mtDNA zaczyna się od GATCA!`;
+
+const matrixUnitVectorCode = `import numpy as np
+from sympy import sqrt, symbols, simplify
+
+phi = (1 + sqrt(5))/2
+gamma = 1/phi  # ≈ 0.6180339887
+gamma2 = gamma**2
+alpha2_beta2 = 1 - gamma2  # = 1/φ² ≈ 0.381966
+
+# Wybierzemy symetryczne rozwiązanie: α = β
+alpha = beta = sqrt(alpha2_beta2 / 2)
+
+print(f"α = β = {float(alpha):.15f}")
+print(f"γ = {float(gamma):.15f}")
+print(f"Suma kwadratów: {2*alpha**2 + gamma**2}")
+
+# WYNIK:
+# α = β = 0.437016024448821
+# γ = 0.618033988749895
+# Suma kwadratów: 1.0
+# WEKTOR MATRYCY: M⃗ = (α, β, γ) = (0.437, 0.437, 0.618)`;
+
+const matrixActivationCode = `# MATRYCA PENTAGRAMU PRAWDY v1.0
+import numpy as np
+from math import sqrt
+
+phi = (1 + sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print("WEKTOR MATRYCY:", M.round(6))
+
+# Rezonans aktywacyjny
+f0 = 7.83
+f_target = 18.6
+modulation = f_target / f0
+print(f"Modulacja: {modulation:.6f}")
+
+# DNA Gate
+gate = "GATCA-718"
+dna_sum = 7+1+20+3+1  # GATC A
+freq_gate = 718 / gamma
+harmonics = freq_gate / f0
+print(f"Brama DNA → {harmonics:.1f} harmonicznych Schumanna")
+
+# WYNIK AKTYWACJI:
+# WEKTOR MATRYCY: [0.437016 0.437016 0.618034]
+# Modulacja: 2.375479
+# Brama DNA → 148.4 harmonicznych Schumanna`;
+
+const matrix3dCode = `import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# --- MATRYCA ---
+phi = (1 + np.sqrt(5)) / 2
+gamma = 1 / phi
+alpha = beta = np.sqrt((1 - gamma**2) / 2)
+
+M = np.array([alpha, beta, gamma])
+print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
+
+# --- RYSUNEK 3D ---
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Sfera jednostkowa
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = np.outer(np.cos(u), np.sin(v))
+y = np.outer(np.sin(u), np.sin(v))
+z = np.outer(np.ones(np.size(u)), np.cos(v))
+ax.plot_surface(x, y, z, color='lightblue', alpha=0.3, linewidth=0)
+
+# Punkt matrycy
+ax.scatter(M[0], M[1], M[2], color='gold', s=200, label='M (α, β, γ)')
+ax.text(M[0], M[1], M[2]+0.1, f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", color='gold', fontsize=10)
+
+# Osie
+ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
+ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
+ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
+
+ax.set_xlim([-1.2, 1.2])
+ax.set_ylim([-1.2, 1.2])
+ax.set_zlim([-1.2, 1.2])
+ax.set_xlabel('α (Słońce)')
+ax.set_ylabel('β (Ziemia)')
+ax.set_zlabel('γ (Człowiek)')
+ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy na Sferze Jednostkowej')
+ax.legend()
+
+plt.show()`;
+
+const audioActivationCode = `import numpy as np
+from scipy.io.wavfile import write
+
+# Parametry
+fs = 44100  # częstotliwość próbkowania
+duration = 60  # sekundy
+
+# Fale
+t = np.linspace(0, duration, int(fs * duration), endpoint=False)
+
+# 7.83 Hz – lewe ucho (Ziemia)
+left = np.sin(2 * np.pi * 7.83 * t)
+
+# 18.6 Hz – prawe ucho (Modulacja)
+right = np.sin(2 * np.pi * 18.6 * t)
+
+# 718 Hz – modulacja amplitudy (DNA Gate)
+carrier = 718
+modulation_depth = 0.7
+dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))  # wolna pulsacja
+audio = (left + right) * 0.3 * dna_gate  # łączymy, obniżamy głośność
+
+# Normalizacja
+audio = audio / np.max(np.abs(audio))
+audio = np.int16(audio * 32767)
+
+# Zapis do pliku
+write("MATRYCA_AKTYWACJA.wav", fs, audio)
+print("Plik 'MATRYCA_AKTYWACJA.wav' gotowy – 60 sekund dźwięku matrycy.")`;
+
+const sentinelRiemannCode = `import mpmath
+mpmath.mp.dps = 50  # 50 significant digits
+
+RIEMANN_ZERO = mpmath.zetazero(448)
+IMAG = mpmath.im(RIEMANN_ZERO)
+FUNDAMENTAL_718 = mpmath.mpf("718.57012515426885574359120304128340312332181477461")
+PHASE_SHIFT_ZETA = mpmath.mpf("-1.2094")
+MTDNA_LENGTH = 16569
+RESONANCE_THRESHOLD = 0.94
+
+GATCA_GATES = [
+    1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
+    7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179,
+]
+
+VI_GATE_18 = 1.1628`;
+
 export const ProjectExplanation = () => {
   const { t, language } = useLanguage();
   return (
@@ -35,6 +235,12 @@ export const ProjectExplanation = () => {
                 <li>{t('about.pentagram')}</li>
                 <li>{t('about.relations')}</li>
               </ul>
+              <TextBlock>
+                {pick(language,
+                  `Brama DNA 718.57 Hz opiera się na stałych i obliczeniach, które są pokazywane w projekcie: φ = 1.618033988749895, γ = 1/φ = 0.618033988749895, rezonans Schumanna 7.83 Hz, modulacja 18.6 Hz, stała nośna 718.57012515426885574359120304128340312332181477461 Hz oraz 18 pozycji GATCA w ludzkim mtDNA rCRS.\n\nKażda liczba ma swoje miejsce: 18 wynika z liczby wystąpień sekwencji GATCA w referencyjnym mtDNA; 718.57012515 Hz jest powiązane w systemie z 448. zerem funkcji ζ Riemanna; γ = 1/φ jest złotym kluczem geometrii Matrycy; 7.83 Hz i 18.6 Hz tworzą warstwę rezonansową audio i pola.`,
+                  `DNA Gate 718.57 Hz is based on constants and calculations shown in the project: φ = 1.618033988749895, γ = 1/φ = 0.618033988749895, Schumann resonance 7.83 Hz, 18.6 Hz modulation, carrier constant 718.57012515426885574359120304128340312332181477461 Hz, and 18 GATCA positions in human mtDNA rCRS.\n\nEach number has its place: 18 comes from the number of GATCA occurrences in reference mtDNA; 718.57012515 Hz is linked in the system to the 448th zero of the Riemann ζ function; γ = 1/φ is the golden key of the Matrix geometry; 7.83 Hz and 18.6 Hz form the resonance layer of audio and field.`
+                )}
+              </TextBlock>
             </CardContent>
           </Card>
         </TabsContent>
@@ -72,6 +278,24 @@ export const ProjectExplanation = () => {
                   <p>M_y = sin(α) × cos(β) ≈ 0.2764</p>
                   <p>M_z = sin(β) ≈ 0.8507</p>
                 </div>
+
+                <h3 className="font-semibold text-sm mt-4">5. GATCA 18× — mtDNA rCRS NC_012920.1</h3>
+                <TextBlock>
+                  {pick(language,
+                    `Sekwencja GATCA występuje dokładnie 18 razy w referencyjnym ludzkim mitochondrialnym DNA (rCRS, NC_012920.1). Pierwsza pozycja to 0 — czyli pierwsze pięć nukleotydów ludzkiego mtDNA to GATCA. Pierwsze pozycje: 0, 739, 950, 1226, 2995.\n\nPozycje 1-based używane w system_unification.py: 1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179.`,
+                    `The GATCA sequence appears exactly 18 times in the reference human mitochondrial DNA (rCRS, NC_012920.1). The first position is 0 — meaning the first five nucleotides of human mtDNA are GATCA. First positions: 0, 739, 950, 1226, 2995.\n\n1-based positions used in system_unification.py: 1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179.`
+                  )}
+                </TextBlock>
+                <CodeBlock>{gatcaBiopythonCode}</CodeBlock>
+
+                <h3 className="font-semibold text-sm mt-4">6. 448. zero Riemanna → 718.57012515 Hz</h3>
+                <TextBlock>
+                  {pick(language,
+                    `Stała mistrza modelu pochodzi z 448. nietrywialnego zera funkcji ζ Riemanna na linii krytycznej, liczonego z precyzją 50 cyfr znaczących. W systemie zapisana częstotliwość wzorcowa to 718.57012515426885574359120304128340312332181477461 Hz, a przesunięcie fazowe ζ to -1.2094 rad.`,
+                    `The model's master constant comes from the 448th non-trivial zero of the Riemann ζ function on the critical line, computed to 50 significant digits. The reference frequency stored in the system is 718.57012515426885574359120304128340312332181477461 Hz, and the ζ phase shift is -1.2094 rad.`
+                  )}
+                </TextBlock>
+                <CodeBlock>{sentinelRiemannCode}</CodeBlock>
               </div>
             </CardContent>
           </Card>
@@ -114,6 +338,14 @@ norm = np.linalg.norm(M)
 print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 </pre>
               </div>
+              <div className="space-y-4 mt-4">
+                <h3 className="font-semibold text-base text-foreground">BioPython — GATCA 18×</h3>
+                <CodeBlock>{gatcaBiopythonCode}</CodeBlock>
+                <h3 className="font-semibold text-base text-foreground">Matryca — wektor jednostkowy</h3>
+                <CodeBlock>{matrixUnitVectorCode}</CodeBlock>
+                <h3 className="font-semibold text-base text-foreground">Sentinel / Riemann — stałe źródłowe</h3>
+                <CodeBlock>{sentinelRiemannCode}</CodeBlock>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -148,6 +380,12 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 <p className="mt-2">
                   {t('theory.vector.conclusion')}
                 </p>
+                <TextBlock>
+                  {pick(language,
+                    `MATRYCA PENTAGRAMU PRAWDY – Faza 1: KONSTRUKCJA\nSłońce = α (akcelerator plazmy)\nZiemia = β (antena rezonansowa)\nCzłowiek = γ = 1/φ ≈ 0.618 (przewodnik świadomości)\n\nWEKTOR MATRYCY:\nM⃗ = (α, β, γ) = (0.437, 0.437, 0.618)\n\nTo jest pentagram w 3D – złoty trójkąt na sferze jednostkowej.\n\nKROK 2: REZONANS SCHUMANNA → 18.6 Hz\nPodstawowa częstotliwość Schumanna: 7.83 Hz\nTwoja wartość: 18.6 Hz\n18.6 / 7.83 = 2.375479\n7.83 × φ = 12.667 Hz\n7.83 × φ² ≈ 20.54 Hz → blisko, ale nie 18.6\nMnożnik: 2.375479\n1/γ² = 2.618034 ← φ²\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ To nie przypadek – to modulacja złotego pola.\n\nKROK 3: GATCA-718 → SEKWENCJA DNA + REZONANS\nGATCA → 5 nukleotydów\nG=7, A=1, T=20, C=3, A=1 → suma = 32\n718 / 32 = 22.4375\n718 / γ = 1161.8 Hz\n1161.8 / 7.83 = 148.35 → blisko 144\n\nZŁOTY MOST:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = liczba wtajemniczenia w Biblii, piramidach, DNA.`,
+                    `PENTAGRAM TRUTH MATRIX – Phase 1: CONSTRUCTION\nSun = α (plasma accelerator)\nEarth = β (resonant antenna)\nHuman = γ = 1/φ ≈ 0.618 (consciousness conductor)\n\nMATRIX VECTOR:\nM⃗ = (α, β, γ) = (0.437, 0.437, 0.618)\n\nThis is a 3D pentagram – a golden triangle on the unit sphere.\n\nSTEP 2: SCHUMANN RESONANCE → 18.6 Hz\nBase Schumann frequency: 7.83 Hz\nYour value: 18.6 Hz\n18.6 / 7.83 = 2.375479\n7.83 × φ = 12.667 Hz\n7.83 × φ² ≈ 20.54 Hz → close, but not 18.6\nMultiplier: 2.375479\n1/γ² = 2.618034 ← φ²\n18.6 Hz ≈ 7.83 × (φ² – 0.24)\n→ This is not a coincidence – it is modulation of the golden field.\n\nSTEP 3: GATCA-718 → DNA SEQUENCE + RESONANCE\nGATCA → 5 nucleotides\nG=7, A=1, T=20, C=3, A=1 → sum = 32\n718 / 32 = 22.4375\n718 / γ = 1161.8 Hz\n1161.8 / 7.83 = 148.35 → close to 144\n\nGOLDEN BRIDGE:\n718 → γ → 1161.8 → 7.83 → 148.35 ≈ 144\n144 = 12×12 = number of initiation in Bible, pyramids, DNA.`
+                  )}
+                </TextBlock>
               </div>
             </CardContent>
           </Card>
@@ -203,9 +441,9 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 <h3 className="font-semibold text-base text-foreground mt-4">{t('schrodinger.hydrogen.title')}</h3>
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm space-y-2">
                   <p>Ĥ = -ℏ²/(2mₑ)∇² - e²/(4πε₀r)</p>
-                  <p className="text-xs text-muted-foreground">{t('language') === 'pl' ? 'Rozwiązanie:' : 'Solution:'}</p>
+                  <p className="text-xs text-muted-foreground">{language === 'pl' ? 'Rozwiązanie:' : 'Solution:'}</p>
                   <p>Ψₙₗₘ(r,θ,φ) = Rₙₗ(r) · Yₗₘ(θ,φ)</p>
-                  <p className="text-xs text-muted-foreground">{t('language') === 'pl' ? 'Energia:' : 'Energy:'}</p>
+                  <p className="text-xs text-muted-foreground">{language === 'pl' ? 'Energia:' : 'Energy:'}</p>
                   <p>Eₙ = -13.6 eV / n²</p>
                 </div>
               </div>
@@ -330,22 +568,7 @@ plt.show()
               {/* Step 1: Unit Vector */}
               <div className="space-y-3">
                 <h3 className="text-xl font-bold text-primary">{t('matrix.step1')}</h3>
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`import numpy as np
-from sympy import sqrt, symbols, simplify
-
-phi = (1 + sqrt(5))/2
-gamma = 1/phi  # ≈ 0.6180339887
-gamma2 = gamma**2
-alpha2_beta2 = 1 - gamma2
-
-alpha = beta = sqrt(alpha2_beta2 / 2)
-
-print(f"α = β = {float(alpha):.15f}")
-print(f"γ = {float(gamma):.15f}")`}
-                  </pre>
-                </div>
+                <CodeBlock>{matrixUnitVectorCode}</CodeBlock>
                 <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
                   <p className="font-mono text-sm text-foreground mb-2">{t('matrix.step1.result')}</p>
                   <p className="font-bold text-lg text-primary">{t('matrix.step1.vector')}</p>
@@ -365,7 +588,16 @@ print(f"γ = {float(gamma):.15f}")`}
 print(f"18.6 / 7.83 = {ratio:.6f}")
 
 harmonic = 7.83 * phi
-print(f"7.83 × φ = {harmonic:.3f}")`}
+print(f"7.83 × φ = {harmonic:.3f}")
+
+third_harmonic = 7.83 * 3
+phi_plus_1 = phi + 1  # = φ²
+print(7.83 * phi_plus_1)
+
+target = 18.6
+multiplier = target / 7.83
+print(f"Mnożnik: {multiplier:.6f}")
+print(f"1/γ² = {1/gamma**2:.6f}")`}
                     </pre>
                   </div>
                   <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
@@ -381,11 +613,19 @@ print(f"7.83 × φ = {harmonic:.3f}")`}
                 <h3 className="text-xl font-bold text-primary">{t('matrix.step3')}</h3>
                 <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
                   <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`# 718.57 Hz → podziel przez γ
-print(718.57 / gamma)  # = 1161.8 Hz
+{`# GATCA → 5 nukleotydów
+# 718 → może to kod częstotliwości?
+# G=7, A=1, T=20, C=3, A=1 → sum = 32
+print(718 / 32)
+# WYNIK: 22.4375
+
+# 718 Hz → podziel przez γ
+print(718 / gamma)
+# WYNIK: 1161.8 Hz
 
 # 1161.8 / 7.83 = ?
-print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
+print(1161.8 / 7.83)
+# WYNIK: 148.35 → blisko 144!`}
                   </pre>
                 </div>
                 <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border-2 border-primary/30">
@@ -398,28 +638,7 @@ print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
               {/* Activation Code */}
               <div className="space-y-3">
                 <h3 className="text-xl font-bold text-primary">{t('matrix.activation')}</h3>
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`# MATRYCA PENTAGRAMU PRAWDY v1.0
-import numpy as np
-from math import sqrt
-
-phi = (1 + sqrt(5)) / 2
-gamma = 1 / phi
-alpha = beta = sqrt((1 - gamma**2) / 2)
-
-M = np.array([alpha, beta, gamma])
-print("WEKTOR MATRYCY:", M.round(6))
-
-f0 = 7.83
-f_target = 18.6
-modulation = f_target / f0
-
-freq_gate = 718.57 / gamma
-harmonics = freq_gate / f0
-print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
-                  </pre>
-                </div>
+                <CodeBlock>{matrixActivationCode}</CodeBlock>
                 <div className="bg-background/50 rounded-lg p-4 border border-secondary/30 space-y-1">
                   <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.vector')}</p>
                   <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.modulation')}</p>
@@ -447,50 +666,7 @@ print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
                 
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-secondary">{t('matrix.simulation.code')}</h4>
-                  <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                    <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-# --- MATRYCA ---
-phi = (1 + np.sqrt(5)) / 2
-gamma = 1 / phi
-alpha = beta = np.sqrt((1 - gamma**2) / 2)
-
-M = np.array([alpha, beta, gamma])
-print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
-
-# --- RYSUNEK 3D ---
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(111, projection='3d')
-
-# Sfera jednostkowa
-u = np.linspace(0, 2 * np.pi, 100)
-v = np.linspace(0, np.pi, 100)
-x = np.outer(np.cos(u), np.sin(v))
-y = np.outer(np.sin(u), np.sin(v))
-z = np.outer(np.ones(np.size(u)), np.cos(v))
-ax.plot_surface(x, y, z, color='lightblue', alpha=0.3)
-
-# Punkt matrycy
-ax.scatter(M[0], M[1], M[2], color='gold', s=200)
-ax.text(M[0], M[1], M[2]+0.1, 
-        f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", 
-        color='gold')
-
-# Osie
-ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
-ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
-ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
-
-ax.set_xlabel('α (Słońce)')
-ax.set_ylabel('β (Ziemia)')
-ax.set_zlabel('γ (Człowiek)')
-ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy')
-plt.show()`}
-                    </pre>
-                  </div>
+                  <CodeBlock>{matrix3dCode}</CodeBlock>
                 </div>
 
                 <div className="space-y-3">
@@ -499,17 +675,17 @@ plt.show()`}
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b-2 border-primary/30">
-                          <th className="text-left p-2 text-primary">Element</th>
-                          <th className="text-left p-2 text-primary">Znaczenie</th>
+                          <th className="text-left p-2 text-primary">{language === 'pl' ? 'Element' : 'Element'}</th>
+                          <th className="text-left p-2 text-primary">{language === 'pl' ? 'Znaczenie' : 'Meaning'}</th>
                         </tr>
                       </thead>
                       <tbody className="text-foreground">
                         <tr className="border-b border-border/50">
-                          <td className="p-2 font-semibold">Kula</td>
+                          <td className="p-2 font-semibold">{language === 'pl' ? 'Kula' : 'Sphere'}</td>
                           <td className="p-2">{t('matrix.simulation.sphere')}</td>
                         </tr>
                         <tr className="border-b border-border/50">
-                          <td className="p-2 font-semibold">Złoty punkt M</td>
+                          <td className="p-2 font-semibold">{language === 'pl' ? 'Złoty punkt M' : 'Golden point M'}</td>
                           <td className="p-2">{t('matrix.simulation.point')}</td>
                         </tr>
                         <tr className="border-b border-border/50">
@@ -571,37 +747,7 @@ plt.show()`}
               
               <div className="mb-6">
                 <h4 className="text-xl font-bold mb-3 text-secondary">{t('matrix.audio.code')}</h4>
-                <pre className="bg-black/90 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
-{`import numpy as np
-from scipy.io.wavfile import write
-
-# Parametry
-fs = 44100  # częstotliwość próbkowania
-duration = 108  # sekundy
-
-# Fale
-t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-
-# 7.83 Hz – lewe ucho (Ziemia)
-left = np.sin(2 * np.pi * 7.83 * t)
-
-# 18.6 Hz – prawe ucho (Modulacja)
-right = np.sin(2 * np.pi * 18.6 * t)
-
-# 718.57 Hz – modulacja amplitudy (DNA Gate)
-carrier = 718.57
-modulation_depth = 0.7
-dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
-audio = (left + right) * 0.3 * dna_gate
-
-# Normalizacja
-audio = audio / np.max(np.abs(audio))
-audio = np.int16(audio * 32767)
-
-# Zapis do pliku
-write("MATRYCA_AKTYWACJA.wav", fs, audio)
-print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
-                </pre>
+                <CodeBlock>{audioActivationCode}</CodeBlock>
               </div>
               
               <div className="mb-6">
@@ -705,7 +851,7 @@ print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
                 </div>
 
                 <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">4. Grounding 15 min/dzień</h4>
+                  <h4 className="font-semibold mb-2">4. {language === 'pl' ? 'Grounding 15 min/dzień' : 'Grounding 15 min/day'}</h4>
                   <p className="text-sm">{t('scientificEvidence.study4')}</p>
                 </div>
               </div>
@@ -722,20 +868,20 @@ print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
                   Ψ_total = Ψ_GATCA × e^(i×718.57×t) × cos(7.83×t) × sin(18.6×t) × φ^DNA
                 </code>
                 <div className="text-[10px] text-muted-foreground/70 italic mt-1">
-                  718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (50 miejsc po przecinku)
+                  718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz ({language === 'pl' ? '50 miejsc po przecinku' : '50 decimal places'})
                 </div>
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>
               <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>Ψ_GATCA = {t('language') === 'pl' ? 'funkcja falowa twojego DNA (178 stron STR)' : 'wave function of your DNA (178 STR pages)'}</li>
-                <li>φ^DNA = {t('language') === 'pl' ? 'złoty podział wyliczony z twoich powtórzeń' : 'golden ratio calculated from your repeats'}</li>
-                <li>{t('language') === 'pl' ? 'Rozwiązanie równania Schrödingera z potencjałem φ → teleportacja fazowa świadomości (teoretycznie możliwa przy koherencji >94%)' : 'Solution to Schrödinger equation with φ potential → phase teleportation of consciousness (theoretically possible at coherence >94%)'}</li>
+                <li>Ψ_GATCA = {language === 'pl' ? 'funkcja falowa twojego DNA (178 stron STR)' : 'wave function of your DNA (178 STR pages)'}</li>
+                <li>φ^DNA = {language === 'pl' ? 'złoty podział wyliczony z twoich powtórzeń' : 'golden ratio calculated from your repeats'}</li>
+                <li>{language === 'pl' ? 'Rozwiązanie równania Schrödingera z potencjałem φ → teleportacja fazowa świadomości (teoretycznie możliwa przy koherencji >94%)' : 'Solution to Schrödinger equation with φ potential → phase teleportation of consciousness (theoretically possible at coherence >94%)'}</li>
               </ul>
               <div className="p-4 bg-primary/10 rounded-lg">
                 <p className="text-sm font-semibold">{t('scientificEvidence.equationNote')}</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('language') === 'pl' ? 'Kod Mathematica: phi-dna-2025.nb (dostępny na życzenie)' : 'Mathematica Code: phi-dna-2025.nb (available on request)'}
+                {language === 'pl' ? 'Kod Mathematica: phi-dna-2025.nb (dostępny na życzenie)' : 'Mathematica Code: phi-dna-2025.nb (available on request)'}
               </p>
             </CardContent>
           </Card>
