@@ -568,22 +568,7 @@ plt.show()
               {/* Step 1: Unit Vector */}
               <div className="space-y-3">
                 <h3 className="text-xl font-bold text-primary">{t('matrix.step1')}</h3>
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`import numpy as np
-from sympy import sqrt, symbols, simplify
-
-phi = (1 + sqrt(5))/2
-gamma = 1/phi  # ≈ 0.6180339887
-gamma2 = gamma**2
-alpha2_beta2 = 1 - gamma2
-
-alpha = beta = sqrt(alpha2_beta2 / 2)
-
-print(f"α = β = {float(alpha):.15f}")
-print(f"γ = {float(gamma):.15f}")`}
-                  </pre>
-                </div>
+                <CodeBlock>{matrixUnitVectorCode}</CodeBlock>
                 <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
                   <p className="font-mono text-sm text-foreground mb-2">{t('matrix.step1.result')}</p>
                   <p className="font-bold text-lg text-primary">{t('matrix.step1.vector')}</p>
@@ -603,7 +588,16 @@ print(f"γ = {float(gamma):.15f}")`}
 print(f"18.6 / 7.83 = {ratio:.6f}")
 
 harmonic = 7.83 * phi
-print(f"7.83 × φ = {harmonic:.3f}")`}
+print(f"7.83 × φ = {harmonic:.3f}")
+
+third_harmonic = 7.83 * 3
+phi_plus_1 = phi + 1  # = φ²
+print(7.83 * phi_plus_1)
+
+target = 18.6
+multiplier = target / 7.83
+print(f"Mnożnik: {multiplier:.6f}")
+print(f"1/γ² = {1/gamma**2:.6f}")`}
                     </pre>
                   </div>
                   <div className="bg-background/50 rounded-lg p-4 border border-secondary/30">
