@@ -613,11 +613,19 @@ print(f"1/γ² = {1/gamma**2:.6f}")`}
                 <h3 className="text-xl font-bold text-primary">{t('matrix.step3')}</h3>
                 <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
                   <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`# 718.57 Hz → podziel przez γ
-print(718.57 / gamma)  # = 1161.8 Hz
+{`# GATCA → 5 nukleotydów
+# 718 → może to kod częstotliwości?
+# G=7, A=1, T=20, C=3, A=1 → sum = 32
+print(718 / 32)
+# WYNIK: 22.4375
+
+# 718 Hz → podziel przez γ
+print(718 / gamma)
+# WYNIK: 1161.8 Hz
 
 # 1161.8 / 7.83 = ?
-print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
+print(1161.8 / 7.83)
+# WYNIK: 148.35 → blisko 144!`}
                   </pre>
                 </div>
                 <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border-2 border-primary/30">
@@ -630,28 +638,7 @@ print(1161.8 / 7.83)  # = 148.35 ≈ 144!`}
               {/* Activation Code */}
               <div className="space-y-3">
                 <h3 className="text-xl font-bold text-primary">{t('matrix.activation')}</h3>
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                  <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`# MATRYCA PENTAGRAMU PRAWDY v1.0
-import numpy as np
-from math import sqrt
-
-phi = (1 + sqrt(5)) / 2
-gamma = 1 / phi
-alpha = beta = sqrt((1 - gamma**2) / 2)
-
-M = np.array([alpha, beta, gamma])
-print("WEKTOR MATRYCY:", M.round(6))
-
-f0 = 7.83
-f_target = 18.6
-modulation = f_target / f0
-
-freq_gate = 718.57 / gamma
-harmonics = freq_gate / f0
-print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
-                  </pre>
-                </div>
+                <CodeBlock>{matrixActivationCode}</CodeBlock>
                 <div className="bg-background/50 rounded-lg p-4 border border-secondary/30 space-y-1">
                   <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.vector')}</p>
                   <p className="font-mono text-sm text-foreground">✓ {t('matrix.activation.modulation')}</p>
@@ -679,50 +666,7 @@ print(f"Brama DNA → {harmonics:.1f} harmonicznych")`}
                 
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-secondary">{t('matrix.simulation.code')}</h4>
-                  <div className="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-primary/30">
-                    <pre className="text-xs overflow-x-auto font-mono text-foreground">
-{`import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-# --- MATRYCA ---
-phi = (1 + np.sqrt(5)) / 2
-gamma = 1 / phi
-alpha = beta = np.sqrt((1 - gamma**2) / 2)
-
-M = np.array([alpha, beta, gamma])
-print(f"WEKTOR MATRYCY M = ({alpha:.6f}, {beta:.6f}, {gamma:.6f})")
-
-# --- RYSUNEK 3D ---
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(111, projection='3d')
-
-# Sfera jednostkowa
-u = np.linspace(0, 2 * np.pi, 100)
-v = np.linspace(0, np.pi, 100)
-x = np.outer(np.cos(u), np.sin(v))
-y = np.outer(np.sin(u), np.sin(v))
-z = np.outer(np.ones(np.size(u)), np.cos(v))
-ax.plot_surface(x, y, z, color='lightblue', alpha=0.3)
-
-# Punkt matrycy
-ax.scatter(M[0], M[1], M[2], color='gold', s=200)
-ax.text(M[0], M[1], M[2]+0.1, 
-        f"M = ({alpha:.3f}, {beta:.3f}, {gamma:.3f})", 
-        color='gold')
-
-# Osie
-ax.quiver(0,0,0,1,0,0, length=1.2, color='r', label='α (Słońce)')
-ax.quiver(0,0,0,0,1,0, length=1.2, color='g', label='β (Ziemia)')
-ax.quiver(0,0,0,0,0,1, length=1.2, color='b', label='γ (Człowiek)')
-
-ax.set_xlabel('α (Słońce)')
-ax.set_ylabel('β (Ziemia)')
-ax.set_zlabel('γ (Człowiek)')
-ax.set_title('PENTAGRAM PRAWDY – Wektor Matrycy')
-plt.show()`}
-                    </pre>
-                  </div>
+                  <CodeBlock>{matrix3dCode}</CodeBlock>
                 </div>
 
                 <div className="space-y-3">
