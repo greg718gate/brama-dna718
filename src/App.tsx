@@ -61,6 +61,9 @@ const App = () => (
               <Route path="/qf" element={<QuantumFilterDashboard />} />
               <Route path="/qf/*" element={<QuantumFilterDashboard />} />
 
+              <Route path="/archive" element={<SourceArchive />} />
+              <Route path="/archive/*" element={<SourceArchive />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
