@@ -15,6 +15,7 @@ export const translations = {
     'header.matrix': 'MATEMATYKA JEST KWANTOWA.',
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
+    'nav.archive': 'Archiwum Źródłowe',
     
     // Equation of Exit
     'exit.title': 'RÓWNANIE WYJŚCIA',
