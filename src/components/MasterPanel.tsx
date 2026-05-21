@@ -27,6 +27,7 @@ const MasterPanel = () => {
     processingStatus,
     state,
   } = useResonance();
+  const { t } = useLanguage();
   
   const [inputValue, setInputValue] = useState("");
   const [isDebugOpen, setIsDebugOpen] = useState(false);
