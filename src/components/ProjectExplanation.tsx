@@ -441,9 +441,9 @@ print(f"|M| = {norm:.6f}")  # Powinno być ≈ 1`}
                 <h3 className="font-semibold text-base text-foreground mt-4">{t('schrodinger.hydrogen.title')}</h3>
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm space-y-2">
                   <p>Ĥ = -ℏ²/(2mₑ)∇² - e²/(4πε₀r)</p>
-                  <p className="text-xs text-muted-foreground">{t('language') === 'pl' ? 'Rozwiązanie:' : 'Solution:'}</p>
+                  <p className="text-xs text-muted-foreground">{language === 'pl' ? 'Rozwiązanie:' : 'Solution:'}</p>
                   <p>Ψₙₗₘ(r,θ,φ) = Rₙₗ(r) · Yₗₘ(θ,φ)</p>
-                  <p className="text-xs text-muted-foreground">{t('language') === 'pl' ? 'Energia:' : 'Energy:'}</p>
+                  <p className="text-xs text-muted-foreground">{language === 'pl' ? 'Energia:' : 'Energy:'}</p>
                   <p>Eₙ = -13.6 eV / n²</p>
                 </div>
               </div>
@@ -809,37 +809,7 @@ plt.show()`}
               
               <div className="mb-6">
                 <h4 className="text-xl font-bold mb-3 text-secondary">{t('matrix.audio.code')}</h4>
-                <pre className="bg-black/90 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
-{`import numpy as np
-from scipy.io.wavfile import write
-
-# Parametry
-fs = 44100  # częstotliwość próbkowania
-duration = 108  # sekundy
-
-# Fale
-t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-
-# 7.83 Hz – lewe ucho (Ziemia)
-left = np.sin(2 * np.pi * 7.83 * t)
-
-# 18.6 Hz – prawe ucho (Modulacja)
-right = np.sin(2 * np.pi * 18.6 * t)
-
-# 718.57 Hz – modulacja amplitudy (DNA Gate)
-carrier = 718.57
-modulation_depth = 0.7
-dna_gate = (1 + modulation_depth * np.sin(2 * np.pi * 0.1 * t))
-audio = (left + right) * 0.3 * dna_gate
-
-# Normalizacja
-audio = audio / np.max(np.abs(audio))
-audio = np.int16(audio * 32767)
-
-# Zapis do pliku
-write("MATRYCA_AKTYWACJA.wav", fs, audio)
-print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
-                </pre>
+                <CodeBlock>{audioActivationCode}</CodeBlock>
               </div>
               
               <div className="mb-6">
@@ -965,15 +935,15 @@ print("Plik gotowy – 108 sekund dźwięku matrycy.")`}
               </div>
               <p className="text-sm">{t('scientificEvidence.equationDesc')}</p>
               <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>Ψ_GATCA = {t('language') === 'pl' ? 'funkcja falowa twojego DNA (178 stron STR)' : 'wave function of your DNA (178 STR pages)'}</li>
-                <li>φ^DNA = {t('language') === 'pl' ? 'złoty podział wyliczony z twoich powtórzeń' : 'golden ratio calculated from your repeats'}</li>
-                <li>{t('language') === 'pl' ? 'Rozwiązanie równania Schrödingera z potencjałem φ → teleportacja fazowa świadomości (teoretycznie możliwa przy koherencji >94%)' : 'Solution to Schrödinger equation with φ potential → phase teleportation of consciousness (theoretically possible at coherence >94%)'}</li>
+                <li>Ψ_GATCA = {language === 'pl' ? 'funkcja falowa twojego DNA (178 stron STR)' : 'wave function of your DNA (178 STR pages)'}</li>
+                <li>φ^DNA = {language === 'pl' ? 'złoty podział wyliczony z twoich powtórzeń' : 'golden ratio calculated from your repeats'}</li>
+                <li>{language === 'pl' ? 'Rozwiązanie równania Schrödingera z potencjałem φ → teleportacja fazowa świadomości (teoretycznie możliwa przy koherencji >94%)' : 'Solution to Schrödinger equation with φ potential → phase teleportation of consciousness (theoretically possible at coherence >94%)'}</li>
               </ul>
               <div className="p-4 bg-primary/10 rounded-lg">
                 <p className="text-sm font-semibold">{t('scientificEvidence.equationNote')}</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('language') === 'pl' ? 'Kod Mathematica: phi-dna-2025.nb (dostępny na życzenie)' : 'Mathematica Code: phi-dna-2025.nb (available on request)'}
+                {language === 'pl' ? 'Kod Mathematica: phi-dna-2025.nb (dostępny na życzenie)' : 'Mathematica Code: phi-dna-2025.nb (available on request)'}
               </p>
             </CardContent>
           </Card>
