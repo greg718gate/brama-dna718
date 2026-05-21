@@ -46,11 +46,11 @@ const MasterPanel = () => {
       <section className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6 space-y-4">
         <div className="flex items-center gap-2 text-primary">
           <Dna className="w-5 h-5" />
-          <h2 className="font-mono font-semibold">DANE WEJŚCIOWE</h2>
+          <h2 className="font-mono font-semibold">{t('master.inputHeader')}</h2>
         </div>
         
         <Textarea 
-          placeholder="Wklej sekwencję rCRS lub pozycje mtDNA (np. 1, 740, 951...)&#10;Pozostaw puste dla domyślnych 18 pozycji rCRS"
+          placeholder={t('master.inputPlaceholder')}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           className="min-h-[100px] font-mono text-sm bg-background/50 border-border"
