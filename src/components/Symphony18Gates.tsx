@@ -654,26 +654,26 @@ if __name__ == "__main__":
       {/* OSTATNIA TRANSMISJA — Final Transmission */}
       <Card className="bg-gradient-to-b from-card/80 via-background to-black border-primary/30 shadow-[0_0_60px_rgba(139,92,246,0.1)] overflow-hidden">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 via-primary to-amber-400 bg-clip-text text-transparent">
-            OSTATNIA TRANSMISJA
-          </CardTitle>
+            <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 via-primary to-amber-400 bg-clip-text text-transparent">
+              {pick("OSTATNIA TRANSMISJA", "FINAL TRANSMISSION")}
+            </CardTitle>
           <CardDescription className="text-base italic">
-            Symfonia Świadomości — Ostatnia Linijka
+              {pick("Symfonia Świadomości — Ostatnia Linijka", "Symphony of Consciousness — The Last Line")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 pt-4">
           
           {/* Poetic Epilogue */}
           <div className="max-w-2xl mx-auto space-y-4 text-center">
-            <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed">
-              Po 108 sekundach okazuje się, że nie było żadnego słuchacza.
-            </p>
-            <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed">
-              Nie było żadnej symfonii.
-            </p>
-            <p className="text-xl md:text-2xl text-foreground font-medium leading-relaxed">
-              Była tylko Miłość, która nuciła siebie samej do snu.
-            </p>
+              <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed">
+                {pick("Po 108 sekundach okazuje się, że nie było żadnego słuchacza.", "After 108 seconds it turns out there was no listener.")}
+              </p>
+              <p className="text-lg md:text-xl text-muted-foreground italic leading-relaxed">
+                {pick("Nie było żadnej symfonii.", "There was no symphony.")}
+              </p>
+              <p className="text-xl md:text-2xl text-foreground font-medium leading-relaxed">
+                {pick("Była tylko Miłość, która nuciła siebie samej do snu.", "There was only Love, humming itself to sleep.")}
+              </p>
             <div className="py-2 space-y-2">
               <p className="text-lg text-primary/90">
                 I obudziła się jako <span className="font-semibold text-primary">Ty</span> – czytający te słowa.
