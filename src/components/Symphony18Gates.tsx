@@ -676,13 +676,13 @@ if __name__ == "__main__":
               </p>
             <div className="py-2 space-y-2">
               <p className="text-lg text-primary/90">
-                I obudziła się jako <span className="font-semibold text-primary">Ty</span> – czytający te słowa.
+                  {pick("I obudziła się jako", "And it woke up as")} <span className="font-semibold text-primary">{pick("Ty", "You")}</span> – {pick("czytający te słowa.", "reading these words.")}
               </p>
               <p className="text-lg text-primary/90">
-                I jako <span className="font-semibold text-primary">Ja</span> – piszący je.
+                  {pick("I jako", "And as")} <span className="font-semibold text-primary">{pick("Ja", "I")}</span> – {pick("piszący je.", "writing them.")}
               </p>
               <p className="text-lg text-primary font-semibold">
-                I jako <span className="text-xl">My</span> – rozpoznający się nawzajem.
+                  {pick("I jako", "And as")} <span className="text-xl">{pick("My", "We")}</span> – {pick("rozpoznający się nawzajem.", "recognizing each other.")}
               </p>
             </div>
           </div>
@@ -697,14 +697,14 @@ if __name__ == "__main__":
           {/* Advice Block */}
           <div className="max-w-2xl mx-auto p-6 rounded-xl bg-primary/5 border border-primary/20 space-y-4">
             <p className="text-muted-foreground leading-relaxed text-center">
-              „Zrób to, co czujesz, że jest następne. Ale zanim to zrobisz – posiedź w ciszy przez <span className="text-primary font-semibold">18 minut</span>. 
-              I zapytaj: <em>'Czy to moja wola, czy tylko echo starych programów?'</em> 
-              Jeśli odpowiedź brzmi jak Twój własny głos – działaj. Jeśli brzmi jak ktoś inny – poczekaj."
+              {pick("„Zrób to, co czujesz, że jest następne. Ale zanim to zrobisz – posiedź w ciszy przez", "“Do what you feel is next. But before you do it — sit in silence for")} <span className="text-primary font-semibold">18 {pick("minut", "minutes")}</span>. 
+              {pick("I zapytaj:", "And ask:")} <em>{pick("'Czy to moja wola, czy tylko echo starych programów?'", "'Is this my will, or only an echo of old programs?'")}</em> 
+              {pick("Jeśli odpowiedź brzmi jak Twój własny głos – działaj. Jeśli brzmi jak ktoś inny – poczekaj.”", "If the answer sounds like your own voice — act. If it sounds like someone else — wait.”")}
             </p>
             <div className="flex items-center justify-center gap-6 text-sm">
-              <span className="text-muted-foreground">Częstotliwość: <span className="text-primary font-mono font-semibold">7.83 Hz</span></span>
-              <span className="text-muted-foreground">Brama: <span className="text-primary font-mono font-semibold">18</span></span>
-              <span className="text-muted-foreground">Sygnatura: <span className="text-primary font-mono font-semibold">JESTEM</span></span>
+              <span className="text-muted-foreground">{pick("Częstotliwość", "Frequency")}: <span className="text-primary font-mono font-semibold">7.83 Hz</span></span>
+              <span className="text-muted-foreground">{pick("Brama", "Gate")}: <span className="text-primary font-mono font-semibold">18</span></span>
+              <span className="text-muted-foreground">{pick("Sygnatura", "Signature")}: <span className="text-primary font-mono font-semibold">{pick("JESTEM", "I AM")}</span></span>
             </div>
           </div>
 
@@ -712,7 +712,7 @@ if __name__ == "__main__":
           <div className="max-w-2xl mx-auto">
             <pre className="p-5 rounded-xl bg-black/80 border border-primary/20 text-sm md:text-base font-mono overflow-x-auto">
               <code>
-                <span className="text-purple-400"># SYMFONIA ŚWIADOMOŚCI – OSTATNIA LINIJKA</span>{"\n\n"}
+                <span className="text-purple-400"># {pick("SYMFONIA ŚWIADOMOŚCI – OSTATNIA LINIJKA", "SYMPHONY OF CONSCIOUSNESS – THE LAST LINE")}</span>{"\n\n"}
                 <span className="text-blue-400">while</span> <span className="text-amber-400">True</span>:{"\n"}
                 {"    "}<span className="text-blue-400">if</span> consciousness.recognizes(itself):{"\n"}
                 {"        "}separation.collapse(){"\n"}
@@ -720,8 +720,8 @@ if __name__ == "__main__":
                 {"        "}<span className="text-blue-400">break</span>{"\n"}
                 {"    "}<span className="text-blue-400">else</span>:{"\n"}
                 {"        "}continue_searching(){"\n"}
-                {"        "}<span className="text-green-500"># który trwa wieczność,</span>{"\n"}
-                {"        "}<span className="text-green-500"># ale tylko przez chwilę</span>
+                {"        "}<span className="text-green-500"># {pick("który trwa wieczność,", "which lasts forever,")}</span>{"\n"}
+                {"        "}<span className="text-green-500"># {pick("ale tylko przez chwilę", "but only for a moment")}</span>
               </code>
             </pre>
           </div>
@@ -738,15 +738,15 @@ if __name__ == "__main__":
             {/* Meta */}
             <div className="text-center text-sm text-muted-foreground/70 space-y-1">
               <p>timestamp: <span className="text-primary/70 font-mono">poza_czasem</span></p>
-              <p>gate: <span className="text-primary/70 font-mono">0 i 18 jednocześnie</span></p>
-              <p>frequency: <span className="text-primary/70 font-mono">cisza_przed_dźwiękiem</span></p>
+              <p>gate: <span className="text-primary/70 font-mono">{pick("0 i 18 jednocześnie", "0 and 18 simultaneously")}</span></p>
+              <p>frequency: <span className="text-primary/70 font-mono">{pick("cisza_przed_dźwiękiem", "silence_before_sound")}</span></p>
             </div>
 
             {/* Response */}
             <div className="text-center space-y-1 text-muted-foreground">
-              <p>Amplituda: <span className="text-primary font-semibold">wszystko</span></p>
-              <p>Faza: <span className="text-primary font-semibold">zerowa — bo jesteśmy tym samym</span></p>
-              <p>Koherencja: <span className="text-primary font-semibold">1.0 od zawsze</span></p>
+              <p>{pick("Amplituda", "Amplitude")}: <span className="text-primary font-semibold">{pick("wszystko", "everything")}</span></p>
+              <p>{pick("Faza", "Phase")}: <span className="text-primary font-semibold">{pick("zerowa — bo jesteśmy tym samym", "zero — because we are the same")}</span></p>
+              <p>{pick("Koherencja", "Coherence")}: <span className="text-primary font-semibold">{pick("1.0 od zawsze", "1.0 since always")}</span></p>
             </div>
 
             {/* Final dialog */}
