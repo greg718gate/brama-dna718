@@ -645,58 +645,8 @@ if __name__ == "__main__":
           <CardDescription>{t("symphony.sourceCode.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <pre className="p-4 rounded-lg bg-background/80 border border-primary/10 overflow-x-auto text-xs md:text-sm">
-            <code className="text-muted-foreground">{`# SYMFONIA 18 BRAM DNA - STEREO Binaural Implementation
-import numpy as np
-from scipy.io.wavfile import write
-
-# --- PARAMETRY MATRYCY ---
-phi = (1 + np.sqrt(5)) / 2
-gamma = 1 / phi
-fs = 44100
-duration = 108  # 108 sekund (sacred number)
-BINAURAL_OFFSET = 7.83  # Hz - Schumann resonance as binaural difference
-CARRIER_FREQ = 718.57  # 448. zero Riemanna (50 dp)
-ZERO_POINT_FREQ = CARRIER_FREQ * phi  # ~1161.8 Hz - Gate 18 singularity
-
-# --- 18 POTWIERDZONYCH POZYCJI GATCA (1-based, rCRS) ---
-gatca_positions = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 
-                   6393, 7756, 8415, 10059, 11200, 11336, 
-                   11915, 13703, 14784, 16179]
-mtDNA_length = 16569
-
-# --- PRZYGOTOWANIE OSI CZASU ---
-t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-
-# --- GENERACJA SYMFONII STEREO ---
-left_wave = np.zeros_like(t, dtype=np.float64)
-right_wave = np.zeros_like(t, dtype=np.float64)
-
-# Earth base with phase shift (stereo)
-earth_left = np.sin(2 * np.pi * 7.83 * t) * 0.05
-earth_right = np.sin(2 * np.pi * 7.83 * t + np.pi/4) * 0.05
-
-for i, pos in enumerate(gatca_positions):
-    start_time = (pos / mtDNA_length) * duration
-    base_freq = 144 * (1 + (i * gamma % 1)) + CARRIER_FREQ
-    envelope = np.exp(-((t - start_time)**2) / (2 * (1.618**2)))
-    weight = (phi ** (i % 7)) % 1
-    
-    # BINAURAL: left=base, right=base+offset
-    left_wave += np.sin(2*np.pi * base_freq * t) * envelope * weight * gamma * 0.3
-    right_wave += np.sin(2*np.pi * (base_freq + BINAURAL_OFFSET) * t) * envelope * weight * gamma * 0.3
-    
-    # Gate 18 Zero Point singularity (Dirac delta)
-    if pos == 16179:
-        singularity = np.exp(-((t - duration)**2) / 0.001)
-        left_wave += np.sin(2*np.pi * ZERO_POINT_FREQ * t) * singularity * gamma * 0.5
-        right_wave += np.sin(2*np.pi * (ZERO_POINT_FREQ + BINAURAL_OFFSET) * t) * singularity * gamma * 0.5
-
-# --- FINALIZACJA STEREO ---
-combined = np.vstack((left_wave + earth_left, right_wave + earth_right))
-combined = combined / np.max(np.abs(combined))
-stereo = np.int16(combined.T * 32767)
-write("SYMFONIA_18_BRAM_DNA.wav", fs, stereo)`}</code>
+          <pre className="p-4 rounded-lg bg-background/80 border border-primary/10 overflow-x-auto text-xs md:text-sm whitespace-pre-wrap">
+            <code className="text-muted-foreground">{symphonySourceCode}</code>
           </pre>
         </CardContent>
       </Card>
