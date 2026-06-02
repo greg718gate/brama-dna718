@@ -18,6 +18,7 @@ import { EquationOfExit } from "@/components/EquationOfExit";
 import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
 import { ProjectExplanation } from "@/components/ProjectExplanation";
 import PentagramMatrix from "@/components/PentagramMatrix";
+import RiemannMatrixReport from "@/components/RiemannMatrixReport";
 import { EditorialNote } from "@/components/EditorialNote";
 
 // Footer components
@@ -212,6 +213,7 @@ const Index = () => {
                 <TabsContent value="explanation" className="space-y-8">
                   <ProjectExplanation />
                   <PentagramMatrix />
+                  <RiemannMatrixReport />
                 </TabsContent>
 
                 <TabsContent value="tools" className="space-y-8">
