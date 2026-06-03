@@ -1062,6 +1062,47 @@ const BiblicalDecoder = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* ⚠ NAME SUBSTITUTION ALERT — PAN / LORD / Adonai / Ba'al */}
+                    {result.manipulationReport.nameSubstitution.detected && (
+                      <div className="rounded-lg border-2 border-red-500/60 bg-red-500/10 p-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-red-400 font-bold font-mono text-sm">
+                            ⚠ {language === 'pl' ? 'MANIPULACJA TŁUMACZENIOWA — SUBSTYTUCJA IMIENIA' : 'TRANSLATION MANIPULATION — NAME SUBSTITUTION'}
+                          </span>
+                          <Badge variant="outline" className="border-red-500/60 text-red-400 text-[10px] font-mono ml-auto">
+                            {result.manipulationReport.nameSubstitution.severity} · {result.manipulationReport.nameSubstitution.count}×
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-foreground/90 leading-relaxed">
+                          {language === 'pl'
+                            ? result.manipulationReport.nameSubstitution.explanation.pl
+                            : result.manipulationReport.nameSubstitution.explanation.en}
+                        </p>
+                        {result.manipulationReport.nameSubstitution.examples.length > 0 && (
+                          <div className="space-y-1">
+                            <p className="text-[10px] uppercase tracking-wider text-red-400/70 font-mono">
+                              {language === 'pl' ? 'Wystąpienia w tekście:' : 'Occurrences in text:'}
+                            </p>
+                            {result.manipulationReport.nameSubstitution.examples.map((ex, i) => (
+                              <p key={i} className="text-xs font-mono text-foreground/70 italic pl-2 border-l-2 border-red-500/40">
+                                {ex}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                        <p className="text-[10px] text-muted-foreground font-mono leading-relaxed pt-1 border-t border-red-500/20">
+                          {language === 'pl'
+                            ? result.manipulationReport.nameSubstitution.citation.pl
+                            : result.manipulationReport.nameSubstitution.citation.en}
+                        </p>
+                        <p className="text-[10px] text-amber-400/90 font-mono leading-relaxed">
+                          {language === 'pl'
+                            ? 'UWAGA: Niski wskaźnik IM (statystyczny) NIE wyklucza tej manipulacji semantycznej. IM mierzy ślady redakcji tekstu, nie zamianę imienia osobowego na tytuł władzy.'
+                            : 'NOTE: A low statistical MI does NOT exclude this semantic manipulation. MI measures redaction traces, not the substitution of a personal name with a title of authority.'}
+                        </p>
+                      </div>
+                    )}
+
                     {/* IM Score - big display */}
                     <div className="flex items-center gap-6">
                       <div className="relative w-28 h-28">
