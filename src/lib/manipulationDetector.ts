@@ -569,6 +569,79 @@ function getRecommendation(IM: number): ManipulationRecommendation {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// NAME SUBSTITUTION DETECTOR — PAN / LORD / Adonai / Ba'al
+// Translation manipulation: YHWH (tetragrammaton) replaced by title of authority
+// ═══════════════════════════════════════════════════════════════════
+
+export interface NameSubstitutionResult {
+  detected: boolean;
+  count: number;
+  terms: string[];
+  examples: string[];
+  severity: "NONE" | "OBECNA" | "SYSTEMOWA";
+  explanation: { pl: string; en: string };
+  citation: { pl: string; en: string };
+}
+
+const SUBSTITUTION_PATTERNS: { term: string; regex: RegExp }[] = [
+  { term: "PAN",      regex: /\bPAN\b/g },
+  { term: "Pan",      regex: /\bPan(?:em|ie|a|u|ów|owie|owi)?\b/g },
+  { term: "LORD",     regex: /\bLORD\b/g },
+  { term: "Lord",     regex: /\bLord\b/g },
+  { term: "the LORD", regex: /\bthe LORD\b/g },
+  { term: "Adonai",   regex: /\bAdonai\b/gi },
+  { term: "Ba'al",    regex: /\bBa['ʻ`]?al\b/gi },
+];
+
+export function detectNameSubstitution(text: string): NameSubstitutionResult {
+  const found = new Map<string, number>();
+  const examples: string[] = [];
+  let total = 0;
+
+  for (const { term, regex } of SUBSTITUTION_PATTERNS) {
+    const matches = text.match(regex);
+    if (matches && matches.length > 0) {
+      found.set(term, (found.get(term) ?? 0) + matches.length);
+      total += matches.length;
+      if (examples.length < 3) {
+        const idx = text.search(regex);
+        if (idx >= 0) {
+          const start = Math.max(0, idx - 25);
+          const end = Math.min(text.length, idx + 40);
+          examples.push((start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : ""));
+        }
+      }
+    }
+  }
+
+  const detected = total > 0;
+  const severity: NameSubstitutionResult["severity"] =
+    !detected ? "NONE" : total >= 3 ? "SYSTEMOWA" : "OBECNA";
+
+  const termsList = Array.from(found.keys()).join(", ");
+
+  return {
+    detected,
+    count: total,
+    terms: Array.from(found.keys()),
+    examples,
+    severity,
+    explanation: {
+      pl: detected
+        ? `Wykryto ${total} wystąpień tytułu zastępczego (${termsList}). W tekście oryginalnym (TaNaCh) w tych miejscach występuje tetragrammaton JHWH (יהוה) — imię własne. Tłumacze zastąpili je generycznym tytułem władzy ("PAN" / "LORD" / "Adonai"), co semantycznie zmienia relację: imię osobowe → tytuł właściciela.`
+        : "Brak substytucji imienia własnego (JHWH → PAN/LORD) w analizowanym fragmencie.",
+      en: detected
+        ? `Detected ${total} occurrences of substitute titles (${termsList}). In the original (TaNaCh) text the tetragrammaton YHWH (יהוה) — a proper name — appears at these positions. Translators replaced it with a generic title of authority ("LORD" / "Adonai"), semantically shifting the relation: personal name → title of ownership.`
+        : "No name substitution (YHWH → LORD) detected in this fragment.",
+    },
+    citation: {
+      pl: "Łańcuch substytucji: tradycja masorecka (zakaz wymawiania imienia) → Septuaginta (Κύριος) → Wulgata (Dominus) → przekłady nowożytne (PAN / LORD). Por.: E. Tov, Textual Criticism of the Hebrew Bible, 2012.",
+      en: "Substitution chain: Masoretic tradition (prohibition of pronunciation) → Septuagint (Κύριος) → Vulgate (Dominus) → modern translations (LORD / PAN). Cf.: E. Tov, Textual Criticism of the Hebrew Bible, 2012.",
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // TASK 12 — FULL MANIPULATION REPORT (integrated result)
 // ═══════════════════════════════════════════════════════════════════
 
@@ -586,6 +659,7 @@ export interface ManipulationReport {
   im: IMResult;
   topSignatures: TopSignature[];
   recommendation: ManipulationRecommendation;
+  nameSubstitution: NameSubstitutionResult;
 }
 
 const SIGNATURE_LABELS: Record<string, { pl: string; en: string }> = {
@@ -670,6 +744,7 @@ export function generateManipulationReport(
   }));
 
   const recommendation = getRecommendation(im.IM);
+  const nameSubstitution = detectNameSubstitution(text);
 
   return {
     segments,
@@ -685,5 +760,6 @@ export function generateManipulationReport(
     im,
     topSignatures,
     recommendation,
+    nameSubstitution,
   };
 }
