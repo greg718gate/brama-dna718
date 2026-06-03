@@ -569,74 +569,179 @@ function getRecommendation(IM: number): ManipulationRecommendation {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// NAME SUBSTITUTION DETECTOR — PAN / LORD / Adonai / Ba'al
-// Translation manipulation: YHWH (tetragrammaton) replaced by title of authority
+// SEMANTIC CONTROL MARKER DETECTOR
+// Separates lexical / semantic manipulation markers from statistical IM (F1-F8)
 // ═══════════════════════════════════════════════════════════════════
+
+export interface SemanticMarkerCategory {
+  id: string;
+  label: { pl: string; en: string };
+  count: number;
+  terms: string[];
+  interpretation: { pl: string; en: string };
+}
 
 export interface NameSubstitutionResult {
   detected: boolean;
   count: number;
+  weightedScore: number;
   terms: string[];
   examples: string[];
+  categories: SemanticMarkerCategory[];
   severity: "NONE" | "OBECNA" | "SYSTEMOWA";
   explanation: { pl: string; en: string };
   citation: { pl: string; en: string };
 }
 
-const SUBSTITUTION_PATTERNS: { term: string; regex: RegExp }[] = [
-  { term: "PAN",      regex: /\bPAN\b/g },
-  { term: "Pan",      regex: /\bPan(?:em|ie|a|u|ów|owie|owi)?\b/g },
-  { term: "LORD",     regex: /\bLORD\b/g },
-  { term: "Lord",     regex: /\bLord\b/g },
-  { term: "the LORD", regex: /\bthe LORD\b/g },
-  { term: "Adonai",   regex: /\bAdonai\b/gi },
-  { term: "Ba'al",    regex: /\bBa['ʻ`]?al\b/gi },
+interface SemanticMarkerRule {
+  term: string;
+  category: string;
+  weight: number;
+  regex: RegExp;
+}
+
+const semanticBoundary = (pattern: string) => new RegExp(`(^|[^\\p{L}\\p{N}_])(${pattern})(?=$|[^\\p{L}\\p{N}_])`, "giu");
+
+const SEMANTIC_CATEGORY_META: Record<string, Omit<SemanticMarkerCategory, "count" | "terms">> = {
+  authority_title: {
+    id: "authority_title",
+    label: { pl: "Tytuł władzy zamiast Źródła", en: "Authority title instead of Source" },
+    interpretation: {
+      pl: "Słowa typu PAN/LORD/Adonai/Ba'al przesuwają sens z imienia/Źródła na tytuł właściciela, władcy lub zarządcy.",
+      en: "Words such as LORD/Adonai/Ba'al shift meaning from name/Source to a title of owner, ruler, or master.",
+    },
+  },
+  ritual_seal: {
+    id: "ritual_seal",
+    label: { pl: "Pieczęć rytualna", en: "Ritual seal" },
+    interpretation: {
+      pl: "Słowa domykające typu amen/so be it działają jak zgoda rytualna: zamykają komunikat i wzmacniają akceptację odbiorcy.",
+      en: "Closing words such as amen/so be it act as ritual consent: they seal the message and reinforce acceptance.",
+    },
+  },
+  submission_obedience: {
+    id: "submission_obedience",
+    label: { pl: "Podporządkowanie", en: "Submission" },
+    interpretation: {
+      pl: "Markery posłuszeństwa, klękania, służby lub lęku wskazują wektor kontroli zachowania.",
+      en: "Markers of obedience, kneeling, service, or fear indicate a behavioral control vector.",
+    },
+  },
+  reward_punishment: {
+    id: "reward_punishment",
+    label: { pl: "Nagroda / kara", en: "Reward / punishment" },
+    interpretation: {
+      pl: "Błogosławieństwo, curse/przekleństwo, gniew, kara i zazdrość budują system warunkowej nagrody i strachu.",
+      en: "Blessing, curse, wrath, punishment, and jealousy build a system of conditional reward and fear.",
+    },
+  },
+  guilt_sacrifice: {
+    id: "guilt_sacrifice",
+    label: { pl: "Wina / ofiara / krew", en: "Guilt / sacrifice / blood" },
+    interpretation: {
+      pl: "Słowa ofiary, krwi, grzechu, winy i ołtarza wskazują na rytualizację długu oraz podporządkowanie energii życiowej.",
+      en: "Words of sacrifice, blood, sin, guilt, and altar indicate ritualized debt and submission of life force.",
+    },
+  },
+  separation_identity: {
+    id: "separation_identity",
+    label: { pl: "Separacja / wybranie", en: "Separation / election" },
+    interpretation: {
+      pl: "Wybranie, królestwo i rozdzielenie grup tworzą semantykę hierarchii: jedni są uprzywilejowani, inni podporządkowani.",
+      en: "Election, kingdom, and group separation create hierarchy semantics: some are privileged, others subordinated.",
+    },
+  },
+};
+
+const SEMANTIC_MARKER_RULES: SemanticMarkerRule[] = [
+  { term: "PAN / Pan", category: "authority_title", weight: 4, regex: semanticBoundary("pan(?:em|ie|a|u|ów|owie|owi)?") },
+  { term: "LORD / Lord", category: "authority_title", weight: 4, regex: semanticBoundary("(?:the\\s+)?lord") },
+  { term: "Adonai", category: "authority_title", weight: 4, regex: semanticBoundary("adonai") },
+  { term: "Ba'al", category: "authority_title", weight: 5, regex: semanticBoundary("ba['ʻ`]?al") },
+  { term: "master / władca", category: "authority_title", weight: 3, regex: semanticBoundary("master|władc\\p{L}*|wladc\\p{L}*|król\\p{L}*|krol\\p{L}*") },
+
+  { term: "amen", category: "ritual_seal", weight: 3, regex: semanticBoundary("amen|אָמֵן|ἀμήν|so\\s+be\\s+it") },
+
+  { term: "obey / posłuszeństwo", category: "submission_obedience", weight: 4, regex: semanticBoundary("obey\\p{L}*|obedien\\p{L}*|posłusz\\p{L}*|poslusz\\p{L}*") },
+  { term: "worship / cześć", category: "submission_obedience", weight: 4, regex: semanticBoundary("worship\\p{L}*|ador\\p{L}*|czci\\p{L}*|cześć|czesc") },
+  { term: "kneel / klękać", category: "submission_obedience", weight: 4, regex: semanticBoundary("kneel\\p{L}*|klęk\\p{L}*|klek\\p{L}*") },
+  { term: "serve / servant / slave", category: "submission_obedience", weight: 3, regex: semanticBoundary("serv\\p{L}*|sług\\p{L}*|slug\\p{L}*|niewol\\p{L}*|slave\\p{L}*") },
+  { term: "fear / bojaźń", category: "submission_obedience", weight: 3, regex: semanticBoundary("fear\\p{L}*|bojaź\\p{L}*|bojaz\\p{L}*|strach\\p{L}*|lęk\\p{L}*|lek\\p{L}*") },
+
+  { term: "bless / blessing", category: "reward_punishment", weight: 4, regex: semanticBoundary("bless\\p{L}*|be[-\\s]?less|błogosław\\p{L}*|blogoslaw\\p{L}*") },
+  { term: "curse / przekleństwo", category: "reward_punishment", weight: 4, regex: semanticBoundary("curse\\p{L}*|przekl\\p{L}*") },
+  { term: "wrath / gniew / kara", category: "reward_punishment", weight: 4, regex: semanticBoundary("wrath\\p{L}*|anger|gniew\\p{L}*|kar\\p{L}*|punish\\p{L}*") },
+  { term: "jealous / zazdrosny", category: "reward_punishment", weight: 5, regex: semanticBoundary("jealous\\p{L}*|zazdro\\p{L}*") },
+
+  { term: "sin / grzech", category: "guilt_sacrifice", weight: 4, regex: semanticBoundary("sin\\p{L}*|grzech\\p{L}*") },
+  { term: "guilt / shame", category: "guilt_sacrifice", weight: 3, regex: semanticBoundary("guilt\\p{L}*|shame\\p{L}*|win\\p{L}*|wstyd\\p{L}*") },
+  { term: "sacrifice / ofiara", category: "guilt_sacrifice", weight: 4, regex: semanticBoundary("sacrific\\p{L}*|ofiar\\p{L}*") },
+  { term: "blood / krew", category: "guilt_sacrifice", weight: 3, regex: semanticBoundary("blood\\p{L}*|krwi\\p{L}*|krew") },
+  { term: "altar / ołtarz", category: "guilt_sacrifice", weight: 3, regex: semanticBoundary("altar\\p{L}*|ołtarz\\p{L}*|oltarz\\p{L}*") },
+  { term: "covenant / przymierze", category: "guilt_sacrifice", weight: 3, regex: semanticBoundary("covenant\\p{L}*|przymierz\\p{L}*") },
+
+  { term: "chosen / wybrany", category: "separation_identity", weight: 3, regex: semanticBoundary("chosen|elect\\p{L}*|wybran\\p{L}*") },
+  { term: "kingdom / królestwo", category: "separation_identity", weight: 2, regex: semanticBoundary("kingdom\\p{L}*|królestw\\p{L}*|krolestw\\p{L}*") },
 ];
 
 export function detectNameSubstitution(text: string): NameSubstitutionResult {
   const found = new Map<string, number>();
+  const categoryHits = new Map<string, { count: number; terms: Set<string> }>();
   const examples: string[] = [];
   let total = 0;
+  let weightedScore = 0;
 
-  for (const { term, regex } of SUBSTITUTION_PATTERNS) {
-    const matches = text.match(regex);
-    if (matches && matches.length > 0) {
+  for (const { term, category, weight, regex } of SEMANTIC_MARKER_RULES) {
+    const matches = Array.from(text.matchAll(regex));
+    if (matches.length > 0) {
       found.set(term, (found.get(term) ?? 0) + matches.length);
       total += matches.length;
-      if (examples.length < 3) {
-        const idx = text.search(regex);
+      weightedScore += matches.length * weight;
+      const categoryEntry = categoryHits.get(category) ?? { count: 0, terms: new Set<string>() };
+      categoryEntry.count += matches.length;
+      categoryEntry.terms.add(term);
+      categoryHits.set(category, categoryEntry);
+      if (examples.length < 5) {
+        const idx = matches[0].index ?? -1;
         if (idx >= 0) {
           const start = Math.max(0, idx - 25);
           const end = Math.min(text.length, idx + 40);
-          examples.push((start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : ""));
+          examples.push(`${term}: ${(start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : "")}`);
         }
       }
     }
   }
 
   const detected = total > 0;
+  const categories = Array.from(categoryHits.entries()).map(([id, hit]) => ({
+    ...SEMANTIC_CATEGORY_META[id],
+    count: hit.count,
+    terms: Array.from(hit.terms),
+  }));
   const severity: NameSubstitutionResult["severity"] =
-    !detected ? "NONE" : total >= 3 ? "SYSTEMOWA" : "OBECNA";
+    !detected ? "NONE" : weightedScore >= 16 || categories.length >= 3 || total >= 6 ? "SYSTEMOWA" : "OBECNA";
 
   const termsList = Array.from(found.keys()).join(", ");
 
   return {
     detected,
     count: total,
+    weightedScore,
     terms: Array.from(found.keys()),
     examples,
+    categories,
     severity,
     explanation: {
       pl: detected
-        ? `Wykryto ${total} wystąpień tytułu zastępczego (${termsList}). W tekście oryginalnym (TaNaCh) w tych miejscach występuje tetragrammaton JHWH (יהוה) — imię własne. Tłumacze zastąpili je generycznym tytułem władzy ("PAN" / "LORD" / "Adonai"), co semantycznie zmienia relację: imię osobowe → tytuł właściciela.`
-        : "Brak substytucji imienia własnego (JHWH → PAN/LORD) w analizowanym fragmencie.",
+        ? `Wykryto ${total} semantycznych markerów kontroli (${termsList}). To nie jest klasyczny IM redakcyjny, tylko oddzielny skaner języka: tytuły władzy, pieczęcie rytualne, nagroda/kara, posłuszeństwo, wina, ofiara i separacja grup. Wynik pokazuje czarno na białym, że niski IM statystyczny nie oznacza braku manipulacji semantycznej.`
+        : "Brak rozpoznanych markerów semantycznej kontroli w analizowanym fragmencie.",
       en: detected
-        ? `Detected ${total} occurrences of substitute titles (${termsList}). In the original (TaNaCh) text the tetragrammaton YHWH (יהוה) — a proper name — appears at these positions. Translators replaced it with a generic title of authority ("LORD" / "Adonai"), semantically shifting the relation: personal name → title of ownership.`
-        : "No name substitution (YHWH → LORD) detected in this fragment.",
+        ? `Detected ${total} semantic control markers (${termsList}). This is not the classic redaction MI; it is a separate language scanner: authority titles, ritual seals, reward/punishment, obedience, guilt, sacrifice, and group separation. It makes explicit that a low statistical MI does not mean absence of semantic manipulation.`
+        : "No recognized semantic control markers detected in this fragment.",
     },
     citation: {
-      pl: "Łańcuch substytucji: tradycja masorecka (zakaz wymawiania imienia) → Septuaginta (Κύριος) → Wulgata (Dominus) → przekłady nowożytne (PAN / LORD). Por.: E. Tov, Textual Criticism of the Hebrew Bible, 2012.",
-      en: "Substitution chain: Masoretic tradition (prohibition of pronunciation) → Septuagint (Κύριος) → Vulgate (Dominus) → modern translations (LORD / PAN). Cf.: E. Tov, Textual Criticism of the Hebrew Bible, 2012.",
+      pl: "Metodologia: twardo weryfikowalne są substytucje typu JHWH → Kyrios/Dominus/PAN/LORD; pozostałe hasła są oznaczane jako semantyczne markery kontroli i interpretowane w systemie GATCA-718, bez przedstawiania hipotez fonosemantycznych jako faktu filologicznego.",
+      en: "Method: substitutions such as YHWH → Kyrios/Dominus/LORD are directly verifiable; other terms are marked as semantic control markers and interpreted within the GATCA-718 system, without presenting phonosemantic hypotheses as philological fact.",
     },
   };
 }
