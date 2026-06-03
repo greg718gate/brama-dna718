@@ -1064,12 +1064,12 @@ const BiblicalDecoder = () => {
                   <CardContent className="space-y-4">
                     {/* ⚠ SEMANTIC CONTROL MARKERS — lexical manipulation layer */}
                     {result.manipulationReport.nameSubstitution.detected && (
-                      <div className="rounded-lg border-2 border-red-500/60 bg-red-500/10 p-4 space-y-2">
+                      <div className="rounded-lg border-2 border-destructive/60 bg-destructive/10 p-4 space-y-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-red-400 font-bold font-mono text-sm">
+                          <span className="text-destructive font-bold font-mono text-sm">
                             ⚠ {language === 'pl' ? 'MANIPULACJA SEMANTYCZNA — MARKERY KONTROLI' : 'SEMANTIC MANIPULATION — CONTROL MARKERS'}
                           </span>
-                          <Badge variant="outline" className="border-red-500/60 text-red-400 text-[10px] font-mono ml-auto">
+                          <Badge variant="outline" className="border-destructive/60 text-destructive text-[10px] font-mono ml-auto">
                             {result.manipulationReport.nameSubstitution.severity} · {result.manipulationReport.nameSubstitution.count}× · Σ{result.manipulationReport.nameSubstitution.weightedScore}
                           </Badge>
                         </div>
@@ -1080,11 +1080,11 @@ const BiblicalDecoder = () => {
                         </p>
                         {result.manipulationReport.nameSubstitution.examples.length > 0 && (
                           <div className="space-y-1">
-                            <p className="text-[10px] uppercase tracking-wider text-red-400/70 font-mono">
+                            <p className="text-[10px] uppercase tracking-wider text-destructive/70 font-mono">
                               {language === 'pl' ? 'Wystąpienia w tekście:' : 'Occurrences in text:'}
                             </p>
                             {result.manipulationReport.nameSubstitution.examples.map((ex, i) => (
-                              <p key={i} className="text-xs font-mono text-foreground/70 italic pl-2 border-l-2 border-red-500/40">
+                              <p key={i} className="text-xs font-mono text-foreground/70 italic pl-2 border-l-2 border-destructive/40">
                                 {ex}
                               </p>
                             ))}
@@ -1093,12 +1093,12 @@ const BiblicalDecoder = () => {
                         {result.manipulationReport.nameSubstitution.categories.length > 0 && (
                           <div className="grid gap-2 sm:grid-cols-2">
                             {result.manipulationReport.nameSubstitution.categories.map((category) => (
-                              <div key={category.id} className="rounded-md border border-red-500/30 bg-background/40 p-2">
+                              <div key={category.id} className="rounded-md border border-destructive/30 bg-background/40 p-2">
                                 <div className="flex items-center justify-between gap-2">
-                                  <p className="text-[10px] uppercase text-red-400 font-mono">
+                                  <p className="text-[10px] uppercase text-destructive font-mono">
                                     {language === 'pl' ? category.label.pl : category.label.en}
                                   </p>
-                                  <Badge variant="outline" className="border-red-500/40 text-red-400 text-[10px]">
+                                  <Badge variant="outline" className="border-destructive/40 text-destructive text-[10px]">
                                     {category.count}×
                                   </Badge>
                                 </div>
@@ -1112,12 +1112,12 @@ const BiblicalDecoder = () => {
                             ))}
                           </div>
                         )}
-                        <p className="text-[10px] text-muted-foreground font-mono leading-relaxed pt-1 border-t border-red-500/20">
+                        <p className="text-[10px] text-muted-foreground font-mono leading-relaxed pt-1 border-t border-destructive/20">
                           {language === 'pl'
                             ? result.manipulationReport.nameSubstitution.citation.pl
                             : result.manipulationReport.nameSubstitution.citation.en}
                         </p>
-                        <p className="text-[10px] text-amber-400/90 font-mono leading-relaxed">
+                        <p className="text-[10px] text-primary/90 font-mono leading-relaxed">
                           {language === 'pl'
                             ? 'UWAGA: IM pozostaje wskaźnikiem statystyczno-redakcyjnym. Ten czerwony blok jest oddzielną warstwą semantyczną i ma pierwszeństwo interpretacyjne, gdy tekst niesie język kontroli.'
                             : 'NOTE: MI remains a statistical/redaction index. This red block is a separate semantic layer and takes interpretive priority when the text carries control language.'}
