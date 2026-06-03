@@ -744,6 +744,7 @@ export function generateManipulationReport(
   }));
 
   const recommendation = getRecommendation(im.IM);
+  const nameSubstitution = detectNameSubstitution(text);
 
   return {
     segments,
@@ -759,5 +760,6 @@ export function generateManipulationReport(
     im,
     topSignatures,
     recommendation,
+    nameSubstitution,
   };
 }
