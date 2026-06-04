@@ -19,6 +19,7 @@ import { PersonalKeyCalculator } from "@/components/PersonalKeyCalculator";
 import { ProjectExplanation } from "@/components/ProjectExplanation";
 import PentagramMatrix from "@/components/PentagramMatrix";
 import RiemannMatrixReport from "@/components/RiemannMatrixReport";
+import DnaIntervalAnalysisReport from "@/components/DnaIntervalAnalysisReport";
 import { EditorialNote } from "@/components/EditorialNote";
 
 // Footer components
@@ -214,6 +215,7 @@ const Index = () => {
                   <ProjectExplanation />
                   <PentagramMatrix />
                   <RiemannMatrixReport />
+                  <DnaIntervalAnalysisReport />
                 </TabsContent>
 
                 <TabsContent value="tools" className="space-y-8">
