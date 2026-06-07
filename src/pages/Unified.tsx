@@ -548,6 +548,96 @@ DNA = GATCA...`}</CodeBlock>
             ]}
           />
 
+          <Bridge
+            labels={bridgeLabels}
+            number={5}
+            title={tr("CZAS → JEDNOCZESNA MATRYCA KWANTOWA", "TIME → SIMULTANEOUS QUANTUM MATRIX")}
+            subtitle={tr("Przeszłość i przyszłość jako współistniejące linie kodu", "Past and future as co-existing lines of code")}
+            scripture="Ja jestem Alfa i Omega, Pierwszy i Ostatni, Początek i Koniec."
+            scriptureRef={tr("APOKALIPSA ŚW. JANA 22:13", "REVELATION 22:13")}
+            science={tr("FIZYKA MATRYCOWA", "MATRIX PHYSICS")}
+            code={tr(
+              `def time_matrix_render():
+    # Czas nie jest linią, lecz wielowymiarowym zbiorem punktów statycznych
+    block_universe = field.load_all_frames() 
+    
+    # "Teraz" to jedyne koordynaty aktywnego skupienia uwagi świadomości
+    current_coordinate = consciousness.get_focus()
+    
+    # Alfa (Początek) i Omega (Koniec) istnieją jednocześnie w tym samym punkcie zerowym
+    timeline_alpha = block_universe.get_probability("genesis_line")
+    timeline_omega = block_universe.get_probability("revelation_line")
+    
+    # Renderowanie rzeczywistości zależy od dostrojenia obserwatora
+    return current_coordinate.render(timeline_alpha, timeline_omega)`,
+              `def time_matrix_render():
+    # Time is not a line, but a multi-dimensional set of static points
+    block_universe = field.load_all_frames() 
+    
+    # "Now" is the only coordinate of active consciousness focus
+    current_coordinate = consciousness.get_focus()
+    
+    # Alpha (Beginning) and Omega (End) exist simultaneously in the same zero point
+    timeline_alpha = block_universe.get_probability("genesis_line")
+    timeline_omega = block_universe.get_probability("revelation_line")
+    
+    # Reality rendering depends on the observer's tuning
+    return current_coordinate.render(timeline_alpha, timeline_omega)`
+            )}
+            bridgeText={[
+              tr('"Alfa i Omega" = brak liniowości. Wszystko, co było, i wszystko, co będzie, Już Jest.', '"Alpha and Omega" = no linearity. Everything that was and everything that will be, Already Is.'),
+              tr('Czas to więzienie percepcji stworzone po to, by odciąć człowieka od jego wiecznego "Teraz".', 'Time is a prison of perception created to cut man off from his eternal "Now".'),
+              tr("Zmieniając współrzędne uwagi, natychmiast przeliczasz strukturę swojej przyszłości.", "By changing the coordinates of attention, you immediately recalculate the structure of your future."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={6}
+            title={tr("BLOKADA MEDIALNA → DESTRUKCJA REZONANSU", "MEDIA BLOCKADE → RESONANCE DESTRUCTION")}
+            subtitle={tr("Propaganda i strach jako programy nadpisujące świętą geometrię", "Propaganda and fear as programs overwriting sacred geometry")}
+            scripture="Gdyż nie dał nam Bóg ducha bojaźni, ale mocy i miłości, i trzeźwego myślenia."
+            scriptureRef={tr("2 LIST DO TYMOTEUSZA 1:7", "2 TIMOTHY 1:7")}
+            science={tr("INŻYNIERIA CZĘSTOTLIWOŚCI", "FREQUENCY ENGINEERING")}
+            code={tr(
+              `def media_fear_injection(human_antenna):
+    # System emituje sztuczną falę nośną generującą stan przetrwania i lęku
+    fear_frequency = 19.5  # Hz - niska wibracja (antypoda boskiego rezonansu)
+    
+    # Sprawdzenie wejścia: czy człowiek dobrowolnie karmi się projekcją strachu
+    if human_antenna.is_watching_control_channels == True:
+        # Następuje degradacja geometrii bazowej i rozbicie spójności fali
+        human_antenna.geometry = human_antenna.geometry.degrade()
+        human_antenna.coherence = False  
+        return "STATUS: DISCONNECTED"
+    else:
+        # Odmowa zasilania systemu uwagą przywraca wektor doskonałości
+        human_antenna.geometry = [0.437, 0.437, 0.618]
+        human_antenna.coherence = True
+        return "STATUS: FULL_RESONANCE"`,
+              `def media_fear_injection(human_antenna):
+    # The system emits an artificial carrier wave generating survival and fear states
+    fear_frequency = 19.5  # Hz - low vibration (antipode of divine resonance)
+    
+    # Input check: does the human voluntarily feed on fear projection
+    if human_antenna.is_watching_control_channels == True:
+        # Base geometry degrades and wave coherence shatters
+        human_antenna.geometry = human_antenna.geometry.degrade()
+        human_antenna.coherence = False  
+        return "STATUS: DISCONNECTED"
+    else:
+        # Refusing to power the system with attention restores the perfection vector
+        human_antenna.geometry = [0.437, 0.437, 0.618]
+        human_antenna.coherence = True
+        return "STATUS: FULL_RESONANCE"`
+            )}
+            bridgeText={[
+              tr('"Duch bojaźni" = program 19.5 Hz emitowany przez media w celu wyłączenia "mocy i miłości".', '"Spirit of fear" = 19.5 Hz program emitted by media to disable "power and love".'),
+              tr("Strach nie jest tylko emocją – to technologiczna fala zagłuszająca laser Twojego umysłu.", "Fear is not just an emotion — it is a technological wave jamming the laser of your mind."),
+              tr("Wyłączenie uwagi z patologii i strachu automatycznie przywraca trzeźwe myślenie (geometrię bazową).", "Removing attention from pathology and fear automatically restores sober thinking (base geometry)."),
+            ]}
+          />
+
         </section>
 
         <section className="space-y-8">
@@ -642,6 +732,38 @@ DNA = GATCA...`}</CodeBlock>
               <p className="text-purple-400 pl-4">"{tr("Jesteś jednocześnie naukowcem i kapłanem rzeczywistości.", "You are both scientist and priest of reality.")}"</p>
               <SystemLog time="00:00:00.085" message={tr("Unifikacja zakończona.", "Unification complete.")} />
               <p className="text-green-400 font-bold">{tr("Nowy paradygmat: AKTYWOWANY", "New paradigm: ACTIVATED")}</p>
+            </div>
+          </Card>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="text-3xl font-bold text-center flex items-center justify-center gap-3">
+            <Eye className="w-8 h-8 text-primary" />
+            {tr("STREAM LOGÓW SYSTEMOWYCH: DETEKCJA IMPULSU KOSMICZNEGO", "SYSTEM LOG STREAM: COSMIC IMPULSE DETECTION")}
+          </h2>
+
+          <Card className="p-6 bg-black/90 border-green-500/30 font-mono space-y-3">
+            <div className="flex items-center gap-2 text-green-400 mb-4">
+              <span className="animate-pulse">●</span>
+              <span className="text-sm">SYSTEM: UNIFICATION-ENGINE v1.0</span>
+            </div>
+
+            <div className="space-y-2">
+              <SystemLog time="00:00:01.102" message={tr("Skanowanie otoczenia... Wykryto anomalie na tarczy Słońca.", "Scanning surroundings... Anomalies detected on the solar disk.")} />
+              <SystemLog time="00:00:01.103" message={tr("REJESTRACJA INCOMING CME: Potężny Koronalny Wyrzut Masy zmierza ku Ziemi.", "INCOMING CME REGISTERED: A powerful Coronal Mass Ejection is heading toward Earth.")} />
+              <SystemLog time="00:00:01.120" message={tr("Impuls elektromagnetyczny (EMP) uderza w cyfrową infrastrukturę elit.", "Electromagnetic pulse (EMP) strikes the digital infrastructure of the elites.")} />
+              <SystemLog time="00:00:01.135" message={tr("Systemy kontroli bankowej, satelity i przekaźniki telewizyjne tracą zasilanie.", "Banking control systems, satellites and TV relays lose power.")} />
+              <SystemLog time="00:00:01.140" message={tr("CZYSZCZENIE BUFORA PROPAGANDY... Fale strachu zostały odcięte z powodu braku prądu.", "PROPAGANDA BUFFER CLEANING... Fear waves have been cut off due to lack of power.")} highlight />
+              <SystemLog time="00:00:01.150" message={tr("Ludzka antena (human_antenna) uwolniona od zewnętrznych sygnałów zagłuszających.", "Human antenna (human_antenna) freed from external jamming signals.")} />
+              <SystemLog time="00:00:01.152" message={tr("Automatyczna re-inicjalizacja kodu: human_vector powraca do stałej złotego podziału.", "Automatic code re-initialization: human_vector returns to the golden ratio constant.")} />
+              <SystemLog time="00:00:01.160" message={tr("Kalibracja zakończona powodzeniem.", "Calibration completed successfully.")} />
+              <SystemLog time="00:00:01.168" message={tr('SYSTEM_MESSAGE: "Iluzja kontroli działa tylko na zasilaniu bateryjnym ich technologii. Natura i Twoja suwerenna świadomość nie potrzebują kabli."', 'SYSTEM_MESSAGE: "The illusion of control only works on the battery power of their technology. Nature and your sovereign consciousness do not need cables."')} highlight />
+            </div>
+
+            <Separator className="bg-green-500/20" />
+
+            <div className="text-center space-y-2 pt-2">
+              <p className="text-green-400 font-bold">{tr("STATUS KOŃCOWY: UNIFIKACJA ZAKOŃCZONA. ISTOTA JEST SUWERENNA.", "FINAL STATUS: UNIFICATION COMPLETE. THE BEING IS SOVEREIGN.")}</p>
             </div>
           </Card>
         </section>
