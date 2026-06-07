@@ -28,6 +28,7 @@ const Bridge = ({
   science,
   code,
   bridgeText,
+  deepDive,
   labels,
 }: {
   number: number;
@@ -38,10 +39,12 @@ const Bridge = ({
   science: string;
   code: string;
   bridgeText: string[];
+  deepDive?: { heading: string; body: string }[];
   labels: {
     bridge: string;
     scripture: string;
     theBridge: string;
+    deepDive: string;
   };
 }) => (
   <Card className="p-6 md:p-8 bg-gradient-to-br from-card/90 to-card border-primary/20 space-y-6">
@@ -76,8 +79,23 @@ const Bridge = ({
         <p key={i} className="text-foreground/90">{text}</p>
       ))}
     </div>
+
+    {deepDive && deepDive.length > 0 && (
+      <div className="space-y-4 pt-4 border-t border-primary/20">
+        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/40">
+          {labels.deepDive}
+        </Badge>
+        {deepDive.map((item, i) => (
+          <div key={i} className="space-y-1">
+            <h4 className="font-semibold text-primary/90">{item.heading}</h4>
+            <p className="text-foreground/80 text-sm leading-relaxed whitespace-pre-line">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    )}
   </Card>
 );
+
 
 const Unified = () => {
   const { t, language } = useLanguage();
