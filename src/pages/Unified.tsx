@@ -105,7 +105,9 @@ const Unified = () => {
     bridge: tr("MOST", "BRIDGE"),
     scripture: tr("PISMO", "SCRIPTURE"),
     theBridge: tr("MOST", "THE BRIDGE"),
+    deepDive: tr("KOD ŹRÓDŁOWY RZECZYWISTOŚCI", "REALITY SOURCE CODE"),
   };
+
 
   const misunderstandingRows = [
     {
