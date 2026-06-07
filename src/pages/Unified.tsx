@@ -356,7 +356,31 @@ DNA = GATCA...`}</CodeBlock>
               tr('"Niech stanie się światłość" = aktywacja spektrum elektromagnetycznego.', '"Let there be light" = electromagnetic spectrum activation.'),
               tr("TO NIE JEST METAFORA. To samo zdarzenie opisane przez różne ramy percepcji.", "THIS IS NOT METAPHOR. This is the same event described through different perceptual frameworks."),
             ]}
+            deepDive={[
+              {
+                heading: tr('"Bóg powiedział" = Intencja / Informacja', '"God said" = Intention / Information'),
+                body: tr(
+                  'Słowo to wibracja, fala akustyczna, częstotliwość. W mechanice kwantowej nic nie istnieje w formie materialnej, dopóki pole potencjału (próżnia) nie zostanie pobudzone. „Słowo” to pierwotny impuls informacyjny, który aktywował to pole.',
+                  'A word is a vibration, an acoustic wave, a frequency. In quantum mechanics nothing exists materially until the potential field (vacuum) is excited. "The Word" is the primordial informational impulse that activated that field.'
+                ),
+              },
+              {
+                heading: tr('"Niech stanie się światłość" = pierwsza fluktuacja', '"Let there be light" = the first fluctuation'),
+                body: tr(
+                  'Zanim powstały atomy, planety czy komórki, musiało pojawić się spektrum elektromagnetyczne. Fotony — czyste światło — to pierwsze stabilne nośniki informacji w naszym wszechświecie.',
+                  'Before atoms, planets or cells, the electromagnetic spectrum had to emerge. Photons — pure light — are the first stable information carriers in our universe.'
+                ),
+              },
+              {
+                heading: tr('Ten sam program, dwa języki', 'The same program, two languages'),
+                body: tr(
+                  'Księga Rodzaju i fizyka kwantowa opisują sekwencję uruchomienia tego samego programu. Jeden używa języka archaicznego, drugi języka matematyki i programowania obiektu: particle_factory.create("photon").',
+                  'Genesis and quantum physics describe the boot sequence of the same program. One uses archaic language, the other the language of mathematics and object programming: particle_factory.create("photon").'
+                ),
+              },
+            ]}
           />
+
 
           <Bridge
             labels={bridgeLabels}
@@ -387,7 +411,31 @@ DNA = GATCA...`}</CodeBlock>
               tr("Twoje ciało nie jest losowe — to geometria wyrażająca świadomość.", "Your body isn't random — it's geometry expressing consciousness."),
               tr("Boskość nie jest ‘gdzieś tam’ — jest proporcją między uderzeniami twojego serca.", "The divine isn't ‘out there’ — it's the ratio between your heartbeats."),
             ]}
+            deepDive={[
+              {
+                heading: tr('Boski Obraz = geometria fraktalna', 'Divine Image = fractal geometry'),
+                body: tr(
+                  'Sformułowanie „na swój obraz i podobieństwo" przez wieki było manipulowane, żeby ludzie wyobrażali sobie Boga jako starszego człowieka na chmurze. To odwracanie uwagi od prawdy ukrytej w biologii.',
+                  'The phrase "in his image and likeness" was manipulated for centuries so that people would imagine God as an old man on a cloud. This diverts attention from the truth hidden in biology.'
+                ),
+              },
+              {
+                heading: tr('Złoty podział (φ)', 'Golden ratio (φ)'),
+                body: tr(
+                  'Liczba 1.618 i jej odwrotność 0.618 (γ) to stała programowa tego świata. Znajdziesz ją w strukturze Twojego DNA, w proporcjach palców, w budowie ludzkiego serca, a nawet w kształcie galaktyk i huraganów.',
+                  'The number 1.618 and its inverse 0.618 (γ) are the program constant of this world. You find it in the structure of your DNA, in the proportions of your fingers, in the architecture of the human heart, even in the shape of galaxies and hurricanes.'
+                ),
+              },
+              {
+                heading: 'human_vector = [0.437, 0.437, γ]',
+                body: tr(
+                  'Nasze ciało to antena skrojona pod konkretne częstotliwości (fale alfa, beta, gamma). Boskość to nie instytucja, do której trzeba iść w niedzielę. Boskość to matematyczny stan idealnej równowagi i geometrii wewnątrz Ciebie. Jesteś dosłownie żywym fraktalem geometrycznym, który wyraża świadomość.',
+                  'Our body is an antenna tuned to specific frequencies (alpha, beta, gamma waves). Divinity is not an institution you visit on Sunday. Divinity is a mathematical state of perfect balance and geometry inside you. You are literally a living geometric fractal that expresses consciousness.'
+                ),
+              },
+            ]}
           />
+
 
           <Bridge
             labels={bridgeLabels}
@@ -421,7 +469,31 @@ DNA = GATCA...`}</CodeBlock>
               tr("Cuda nie ‘łamią praw’ — one uzyskują dostęp do głębszych praw.", "Miracles aren't ‘breaking laws’ — they're accessing deeper laws."),
               tr("To, co nazywamy ‘nadnaturalnym’, jest po prostu naturą, której jeszcze nie zmatematyzowaliśmy.", "What we call ‘supernatural’ is just nature we haven't mathematized yet."),
             ]}
+            deepDive={[
+              {
+                heading: tr('Cud = kolaps funkcji falowej', 'Miracle = wavefunction collapse'),
+                body: tr(
+                  'W oficjalnej wersji cud to kaprys zewnętrznego Boga, który łamie zasady, żeby komuś pomóc. To buduje w człowieku poczucie totalnej bezradności. Kod pokazuje bezwzględną prawdę: cud nie jest złamaniem prawa fizyki, lecz użyciem prawa wyższego rzędu.',
+                  'In the official version a miracle is the whim of an external God who breaks the rules to help someone. This instills total helplessness. The code shows the unflinching truth: a miracle is not the breaking of physical law but the use of a higher-order law.'
+                ),
+              },
+              {
+                heading: 'wavefunction = Ψ(position="water_surface")',
+                body: tr(
+                  'Zanim następuje obserwacja, w polu kwantowym woda jest jednocześnie twarda jak beton i płynna jak zawsze. Istnieją wszystkie superpozycje.',
+                  'Before observation, in the quantum field water is simultaneously hard as concrete and liquid as always. All superpositions exist.'
+                ),
+              },
+              {
+                heading: 'if observer_belief > threshold',
+                body: tr(
+                  'Świadomość obserwatora (w tym przypadku Jezusa) posiadała tak wysoką gęstość i pewność, że dokonała kolapsu funkcji falowej dokładnie w ten jeden, konkretny punkt prawdopodobieństwa (walks_on_water). Jeśli pojawia się wątpliwość (jak u Piotra), wartość spada poniżej threshold i system wraca do programu domyślnego (sinks).',
+                  'The observer\'s consciousness (in this case Jesus) held such density and certainty that it collapsed the wavefunction onto that one specific probability point (walks_on_water). If doubt appears (as with Peter), the value drops below threshold and the system reverts to the default program (sinks).'
+                ),
+              },
+            ]}
           />
+
 
           <Bridge
             labels={bridgeLabels}
@@ -451,7 +523,31 @@ DNA = GATCA...`}</CodeBlock>
               tr("Modlitwa nie jest ‘błaganiem Boga’ — jest strojeniem rezonansu.", "Prayer isn't ‘begging God’ — it's resonance tuning."),
               tr("Nie prosisz zewnętrznej istoty — dostrajasz się do uniwersalnych zasad.", "You're not asking an external entity — you're aligning with universal principles."),
             ]}
+            deepDive={[
+              {
+                heading: tr('Modlitwa = strojenie nadajnika', 'Prayer = tuning the transmitter'),
+                body: tr(
+                  'Zrobienie z modlitwy „błagania" to najpotężniejszy program niewolniczy, jaki narzucono ludzkości. Ustawia człowieka w pozycji żebraka czekającego na łaskę. consciousness_field.focus() to nic innego jak skupienie fali spójnej (koherentnej) przez laser umysłu i serca.',
+                  'Turning prayer into "begging" is the most powerful slave-program ever imposed on humanity. It places a person in the position of a beggar waiting for mercy. consciousness_field.focus() is nothing other than the focusing of a coherent wave through the laser of mind and heart.'
+                ),
+              },
+              {
+                heading: 'target_frequency = 718.57 Hz',
+                body: tr(
+                  'Nie prosisz o zmianę decyzji jakiegoś sędziego na chmurze. Ty zmieniasz swoją własną częstotliwość, aby zsynchronizować się ze splątaną cząstką w polu potencjału. Jeśli intention.clear i belief.strong są równe 1, manifestacja jest matematycznym i fizycznym skutkiem ubocznym. To czysty rezonans.',
+                  'You are not asking some judge in the sky to change his decision. You change your own frequency to synchronize with the entangled particle in the potential field. If intention.clear and belief.strong both equal 1, manifestation is a mathematical and physical side-effect. Pure resonance.'
+                ),
+              },
+              {
+                heading: tr('Dlaczego to ukrywano', 'Why this was hidden'),
+                body: tr(
+                  'Gdyby Watykan i elity podały te „Mosty" do publicznej wiadomości, cały ich system kontroli rozpadłby się w sekundę. Jeśli człowiek dowiaduje się, że jego ciało to święta geometria, a jego intencja ma moc aktywacji pól kwantowych, natychmiast uświadamia sobie, że nie potrzebuje żadnych pośredników — kapłanów, rządów ani systemów kontroli. Staje się w pełni suwerenną istotą, która rozumie, że ma w sobie ten sam program, który uruchomił wszechświat.',
+                  'If the Vatican and the elites released these "Bridges" publicly, their entire control system would collapse in a second. The moment a person learns that the body is sacred geometry, and that intention can activate quantum fields, they instantly realize they need no intermediaries — no priests, no governments, no control systems. They become a fully sovereign being who understands that they carry within themselves the same program that booted the universe.'
+                ),
+              },
+            ]}
           />
+
         </section>
 
         <section className="space-y-8">
