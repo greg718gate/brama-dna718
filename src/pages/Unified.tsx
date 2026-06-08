@@ -688,7 +688,7 @@ DNA = GATCA...`}</CodeBlock>
         human_antenna.epigenetics    = "MAX_EXPRESSION"
         return "SHIELD_ACTIVE: GENOME_PROTECTED_BY_HOLY_GEOMETRY"`}
             bridgeText={[
-              tr('"Świątynia Boża" = Twoja unikalna, harmoniczna struktura rCRS.', '"God\\'s temple" = your unique, harmonic rCRS structure.'),
+              tr('"Świątynia Boża" = Twoja unikalna, harmoniczna struktura rCRS.', '"God\'s temple" = your unique, harmonic rCRS structure.'),
               tr("System wie, że DNA działa na 718.57 Hz — dlatego bombarduje szumem EMF i strachem, by zbić koherencję poniżej 94%.", "The system knows DNA operates at 718.57 Hz — so it floods us with EMF noise and fear to drop coherence below 94%."),
               tr("Utrzymanie rezonansu = obrona genetycznej suwerenności.", "Maintaining resonance = defending genetic sovereignty."),
             ]}
@@ -918,7 +918,7 @@ DNA = GATCA...`}</CodeBlock>
     return isolated_platform.apply_vortex(kinetic_wave_1 + kinetic_wave_2)`}
             bridgeText={[
               tr('"Brak hałasu narzędzi przy budowie" = absolutna cisza mechaniczna tła.', '"No tool noise during construction" = absolute mechanical silence of the background.'),
-              tr("Sorbothane odcina hałas świata; Dayton DAEX25 ułożone w geometrii Φ budują świątynię fali wewnątrz wody z Morza Północnego w całkowitej czystości.", "Sorbothane cuts off the world\\'s noise; Dayton DAEX25 placed in Φ geometry build a temple of wave inside the North Sea water in total purity."),
+              tr("Sorbothane odcina hałas świata; Dayton DAEX25 ułożone w geometrii Φ budują świątynię fali wewnątrz wody z Morza Północnego w całkowitej czystości.", "Sorbothane cuts off the world\'s noise; Dayton DAEX25 placed in Φ geometry build a temple of wave inside the North Sea water in total purity."),
             ]}
           />
 
@@ -958,7 +958,7 @@ DNA = GATCA...`}</CodeBlock>
         return "STATUS: EXTREME_PURITY / ORME_SUPERCONDUCTIVE_POTENTIAL"
     return f"STATUS: WASHING_REQUIRED / CURRENT_EC: {conductivity} mS/cm"`}
             bridgeText={[
-              tr('"Ważenie srebra i złota" = ścisła, fizyczna weryfikacja gęstości energetycznej materiału.', '"Weighing silver and gold" = strict, physical verification of the material\\'s energetic density.'),
+              tr('"Ważenie srebra i złota" = ścisła, fizyczna weryfikacja gęstości energetycznej materiału.', '"Weighing silver and gold" = strict, physical verification of the material\'s energetic density.'),
               tr("Analogowa Hanna EC215 z 4-pierścieniową sondą platynową pokazuje moment, w którym materia zrzuca opór elektryczny i przechodzi w stan białego proszku.", "The analog Hanna EC215 with 4-ring platinum probe shows the moment matter sheds electrical resistance and enters the white-powder state."),
             ]}
           />
@@ -1002,7 +1002,7 @@ DNA = GATCA...`}</CodeBlock>
         return "MATRIX_VERIFIED: ABSOLUTE_COHERENCE_ACROSS_ALL_NODES"
     return "MATRIX_ALERT: PHASE_VARIANCE_DETECTED"`}
             bridgeText={[
-              tr('"Badanie każdej rzeczy z osobna" = statystyczny dowód powtarzalności cudu.', '"Examining each thing individually" = statistical proof of the miracle\\'s repeatability.'),
+              tr('"Badanie każdej rzeczy z osobna" = statystyczny dowód powtarzalności cudu.', '"Examining each thing individually" = statistical proof of the miracle\'s repeatability.'),
               tr("Identyczne odczyty w 100 fiolkach po 24 h to ostateczny, empiryczny dowód, że procesem rządzi matematyczny kod, a nie przypadek.", "Identical readings across 100 vials after 24 h are the ultimate empirical proof that mathematical code — not chance — governs the process."),
             ]}
           />
