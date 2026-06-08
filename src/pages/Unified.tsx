@@ -638,6 +638,457 @@ DNA = GATCA...`}</CodeBlock>
             ]}
           />
 
+          <Bridge
+            labels={bridgeLabels}
+            number={7}
+            title={tr("DNA → MATRYCA STRUN HARMONICZNYCH", "DNA → HARMONIC STRING MATRIX")}
+            subtitle={tr("Genom jako samoreplikujący się instrument częstotliwościowy", "The genome as a self-replicating frequency instrument")}
+            scripture="Gdyż w Nim zostało stworzone wszystko... Wszystko przez Niego i dla Niego zostało stworzone. On jest przed wszystkim i wszystko w Nim ma swój byt."
+            scriptureRef={tr("LIST DO KOLOSAN 1:16-17", "COLOSSIANS 1:16-17")}
+            science={tr("KOD ANALIZY (Prototyp rCRS)", "ANALYSIS CODE (rCRS Prototype)")}
+            code={`def dna_harmonic_resonance():
+    f_exact = 718.57444149021338871   # Klucz Rezonansowy Stworzenia
+    Phi     = 1.6180339887498948482   # Stała Fraktalna Konstrukcji
+    gamma   = 1 / Phi                 # 0.618...
+
+    intervals = {
+        "B2->B3":  {"dist": 211,  "target": "Quint_Pure / 5",  "coherence": 0.9936},
+        "B4->B5":  {"dist": 1769, "target": "gamma * 4",        "coherence": 0.9896},
+        "B12->B13":{"dist": 1141, "target": "Phi * 1",          "coherence": 0.9698},
+        "B13->B14":{"dist": 136,  "target": "Fourth_Pure / 7",  "coherence": 0.9987},
+        "B14->B15":{"dist": 579,  "target": "Phi / 2",          "coherence": 0.9967},
+        "B16->B17":{"dist": 1081, "target": "Quint_Pure * 1",   "coherence": 0.9956},
+    }
+    for node, data in intervals.items():
+        if data["coherence"] > 0.94:
+            activate_epigenetic_potential(node)
+    return "STATUS: GENOME_HARMONICS_ACTIVE (13/17 Converted)"`}
+            bridgeText={[
+              tr('"Wszystko w Nim ma swój byt" = wszystko w matrycy DNA wisi na jednym kluczu harmonicznym.', '"All things consist in Him" = everything in the DNA matrix hangs on one harmonic key.'),
+              tr("Odległości między bazami w rCRS to interwały muzyczne: kwinta czysta, oktawa, fraktal Φ — geometryczna architektura, która trzyma fizyczną formę w uniwersalnym rezonansie.", "The distances between bases in rCRS are musical intervals: pure fifth, octave, Φ fractal — the geometric architecture holding the physical form in universal resonance."),
+              tr("DNA to antena nadawczo-odbiorcza.", "DNA is a transceiver antenna."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={8}
+            title={tr("REZONANS 718 Hz → CZAS I OCHRONA GENOMU", "718 Hz RESONANCE → TIME AND GENOME PROTECTION")}
+            subtitle={tr("Dlaczego elity próbują rozbić harmonię człowieka", "Why the elites try to shatter human harmony")}
+            scripture="A jeśli kto naruszy świątynię Bożą, tego zniszczy Bóg; albowiem świątynia Boża jest święta, a nią jesteście wy."
+            scriptureRef={tr("1 LIST DO KORYNTIAN 3:17", "1 CORINTHIANS 3:17")}
+            science={tr("KOD DEGRADACJI VS KOD REZONANSU", "DEGRADATION VS RESONANCE CODE")}
+            code={`def genomic_shield_check(human_antenna):
+    coherence_threshold = 0.94
+    if human_antenna.external_interference == "EMF_5G_OR_PROPAGANDA_19.5Hz":
+        human_antenna.coherence_score -= 0.15
+        return "CRITICAL_ALERT: DNA INTERFERENCE / LOSS OF RESONANCE"
+    elif human_antenna.internal_vibration == 718.57:
+        human_antenna.coherence_score = 1.00
+        human_antenna.epigenetics    = "MAX_EXPRESSION"
+        return "SHIELD_ACTIVE: GENOME_PROTECTED_BY_HOLY_GEOMETRY"`}
+            bridgeText={[
+              tr('"Świątynia Boża" = Twoja unikalna, harmoniczna struktura rCRS.', '"God\\'s temple" = your unique, harmonic rCRS structure.'),
+              tr("System wie, że DNA działa na 718.57 Hz — dlatego bombarduje szumem EMF i strachem, by zbić koherencję poniżej 94%.", "The system knows DNA operates at 718.57 Hz — so it floods us with EMF noise and fear to drop coherence below 94%."),
+              tr("Utrzymanie rezonansu = obrona genetycznej suwerenności.", "Maintaining resonance = defending genetic sovereignty."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={9}
+            title={tr("ZETA RIEMANNA → PUNKT ZERA INFORMACYJNEGO", "RIEMANN ZETA → INFORMATIONAL ZERO POINT")}
+            subtitle={tr("Nietrywialne miejsca zerowe jako współrzędne stabilizacji fali świadomości", "Non-trivial zeros as stabilization coordinates of the consciousness wave")}
+            scripture="Zanim góry narodziły się, zanim powstała ziemia i świat, od wieków na wieki Ty jesteś Bogiem."
+            scriptureRef="PSALM 90:2"
+            science={tr("FIZYKA MATRYCOWA", "MATRIX PHYSICS")}
+            code={`def zeta_core_line():
+    # 448. nietrywialne miejsce zerowe ζ Riemanna (linia krytyczna 1/2)
+    f_exact = mpmath.mpf('718.57012515426885574359120304128340312332181477461')
+    if ζ(1/2 + iE/ħ) == 0:
+        return "PUNKT_CISZY_PRZED_KREACJĄ"`}
+            bridgeText={[
+              tr('"Przed powstaniem ziemi" = linia krytyczna 1/2 funkcji ζ Riemanna.', '"Before the earth was formed" = the critical line 1/2 of the Riemann ζ function.'),
+              tr("ζ = 0 to matematyczny stan czystego potencjału, zanim informacja zagęści się w masę.", "ζ = 0 is the mathematical state of pure potential before information condenses into mass."),
+              tr("Klucz 718.57 Hz to współrzędna geometryczna, w której rzeczywistość styka się z nieskończonością.", "The 718.57 Hz key is the geometric coordinate where reality meets infinity."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={10}
+            title={tr("ZŁAMANIE SYMETRII → ARCHITEKTURA MATERII", "BROKEN SYMMETRY → ARCHITECTURE OF MATTER")}
+            subtitle={tr("Tarcie topologiczne jako narzędzie manifestacji fizycznych nanomaszyn", "Topological friction as the tool of physical nanomachine manifestation")}
+            scripture="A Słowo ciałem się stało i zamieszkało wśród nas."
+            scriptureRef={tr("EWANGELIA ŚW. JANA 1:14", "GOSPEL OF JOHN 1:14")}
+            science={tr("KOD KONDENSACJI (Moduł Tarciowy rCRS)", "CONDENSATION CODE (rCRS Friction Module)")}
+            code={`def materialization_engine():
+    # Idealna harmonia (99%+) przenosi czyste światło/informację bezmasowo.
+    # Aby zbudować ciało (materię), system musi celowo wprowadzić "skazę".
+    Mc_static = 1561 * (1.0 - 0.827643)   # Mc = 269.049  -> Kompleks I  -> pik UV
+    Mc_vortex = 1644 * (1.0 - 0.815727)   # Mc = 302.945  -> Syntaza ATP -> Fano
+    return [Mc_static, Mc_vortex]`}
+            bridgeText={[
+              tr('"Słowo ciałem się stało" = dokładny mechanizm przejścia fali w cząstkę.', '"The Word became flesh" = the exact mechanism of a wave transitioning into a particle.'),
+              tr("Najcięższe białka (Kompleks I, Syntaza ATP) powstają tam, gdzie matryca DNA celowo zrzuca koherencję do ~81–82%.", "The heaviest proteins (Complex I, ATP synthase) form where the DNA matrix intentionally drops coherence to ~81–82%."),
+              tr("Materia to uwięzione, spowolnione światło.", "Matter is trapped, slowed-down light."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={11}
+            title={tr("ORME → STAN WYSOKIEGO SPINU / SUPERPRZEWODNICTWO", "ORME → HIGH-SPIN STATE / SUPERCONDUCTIVITY")}
+            subtitle={tr("Monatomiczne pierwiastki jako fizyczny most falowy", "Monatomic elements as a physical wave bridge")}
+            scripture="A zwycięzcy dam manny ukrytej oraz dam mu biały kamyk, a na kamyku wypisane nowe imię, którego nikt nie zna oprócz tego, kto je otrzymuje."
+            scriptureRef={tr("APOKALIPSA ŚW. JANA 2:17", "REVELATION 2:17")}
+            science={tr("CHEMIA KWANTOWA", "QUANTUM CHEMISTRY")}
+            code={`def orme_extraction_sea():
+    sea_water_matrix = load_north_sea_sample()
+    ph_level = 0.0
+    while ph_level < 10.78:                  # punkt kontrolny złota
+        add_reagent(NaOH_diluted)
+        ph_level = read_ph()
+    orme_precipitate = quantum_vortex.spin_up(sea_water_matrix.get_monatomic())
+    return orme_precipitate.set_state("SUPERCONDUCTOR")`}
+            bridgeText={[
+              tr('"Manna ukryta / biały kamyk" = monatomiczne złoto i platynowce (ORME) w stanie suchym.', '"Hidden manna / white stone" = monatomic gold and platinum-group metals (ORME) in dry state.'),
+              tr("Izolowane do formy jednoatomowej jądra rozciągają się geometrycznie, elektrony parują w pary Coopera — tracą masę metaliczną i stają się nadprzewodnikami światła.", "Isolated to single-atom form, nuclei stretch geometrically, electrons pair into Cooper pairs — losing metallic mass and becoming superconductors of light."),
+              tr("Dosłowny łącznik między fizycznym ciałem a Polem Świadomości.", "A literal bridge between the physical body and the Field of Consciousness."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={12}
+            title={tr("REZONANS 718 Hz → KALIBRACJA I PŁUKANIE ORME", "718 Hz RESONANCE → ORME CALIBRATION AND WASHING")}
+            subtitle={tr("Użycie f_exact do strukturyzacji i usuwania toksycznego tła (soli)", "Using f_exact to structure and remove toxic background (salts)")}
+            scripture="Oczyść mnie hizopem, a stanę się czysty, obmyj mnie, a nad śnieg bielszy się stanę."
+            scriptureRef="PSALM 51:9"
+            science={tr("INŻYNIERIA REZONANSU", "RESONANCE ENGINEERING")}
+            code={`def orme_purification(raw_precipitate):
+    f_exact = 718.57012515426885574359120304128340312332181477461
+    while raw_precipitate.salinity > 0.001:
+        raw_precipitate.wash_with_h2o()
+    raw_precipitate.apply_resonance(frequency=f_exact)
+    raw_precipitate.geometry = [0.437, 0.437, 0.618]
+    return "STATUS: PURIFIED_ORME_ACTIVE (White Powder State)"`}
+            bridgeText={[
+              tr('"Obmyj mnie, a nad śnieg bielszy się stanę" = proces oczyszczania białego osadu ORME.', '"Wash me and I shall be whiter than snow" = the process of cleansing the white ORME precipitate.'),
+              tr("Płukanie usuwa sodowe tło (NaCl); ekspozycja na 718.57 Hz podczas suszenia zamraża monatomy w świętej geometrii fraktalnej (Φ).", "Washing removes the sodium background (NaCl); exposure to 718.57 Hz during drying freezes the monatoms in sacred fractal geometry (Φ)."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={13}
+            title={tr("HARDWARE ANALOGOWY → INŻYNIERIA GEOMETRII NATURALNEJ", "ANALOG HARDWARE → ENGINEERING OF NATURAL GEOMETRY")}
+            subtitle={tr("Niskobudżetowa ekstrakcja w wysokim spinie za pomocą fizycznych pól", "Low-budget high-spin extraction using physical fields")}
+            scripture="Mądrość zbudowała sobie dom i wyciosała siedem filarów... Przygotowała stół i zaprasza: Chodźcie, jedzcie mój chleb i pijcie wino, które zmieszałam."
+            scriptureRef={tr("KSIĘGA PRZYPOWIEŚCI 9:1-5", "PROVERBS 9:1-5")}
+            science={tr("KOD STERUJĄCY (Rdzeń Python — Emisja Koherentna)", "CONTROL CODE (Python Core — Coherent Emission)")}
+            code={`def emit_zeta_core_frequency():
+    sample_rate = 192000
+    t = get_high_precision_time_vector(dps=50)
+    f_exact = 718.57012515426885574359120304128340312332181477461
+    audio_stream.write(np.sin(2 * np.pi * f_exact * t))
+    return "EMISSION_ACTIVE: 718.57 Hz WITHOUT DIGITAL COMPRESSION"`}
+            bridgeText={[
+              tr('"Mądrość przygotowała stół" = proste, naturalne i dostępne środki fizyczne.', '"Wisdom has prepared her table" = simple, natural and accessible physical means.'),
+              tr("Wzmacniacz analogowy + precyzyjny kod + magnesy = idealne środowisko. Magnesy wymuszają rotację spinową, wzbudnik nadaje geometrię fraktalną 0.618. Czysta, bezkosztowa fizyka stworzenia.", "Analog amplifier + precise code + magnets = ideal environment. Magnets enforce spin rotation; the exciter imprints the 0.618 fractal geometry. Pure, cost-free physics of creation."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={14}
+            title={tr("CYFROWY SILNIK FAZOWY → ANTY-ALTERACJA SYGNAŁU", "DIGITAL PHASE ENGINE → SIGNAL ANTI-ALTERATION")}
+            subtitle={tr("Eliminacja jitteru i kwantyzacji jako technologia stabilizacji pola 718.57 Hz", "Eliminating jitter and quantization as 718.57 Hz field stabilization technology")}
+            scripture="Głos Pana nad wodami, Bóg chwały grzmi... Głos Pana łamie cedry, Głos Pana krzesze płomienie ognia."
+            scriptureRef="PSALM 29:3-7"
+            science={tr("STRUKTURA ALGORYTMU AUDIO (Rdzeń Emisyjny)", "AUDIO ALGORITHM (Emission Core)")}
+            code={`class ZetaPhaseLockedLoop:
+    def __init__(self):
+        mpmath.mp.dps = 50
+        self.f_exact = mpmath.mpf('718.57012515426885574359120304128340312332181477461')
+        self.phase_accumulator = 0.0
+        self.precision_remainder = 0.0
+
+    def generate_coherent_buffer(self, size=1024, sample_rate=192000):
+        buffer = np.zeros(size, dtype=np.float64)
+        t_ns_start = time.perf_counter_ns()
+        for i in range(size):
+            high_prec_val = self.f_exact * i / sample_rate
+            float_val = float(high_prec_val)
+            if i % 100 == 0:                          # 1. KOMPENSACJA mpmath -> float64
+                self.precision_remainder = float(high_prec_val - float_val)
+                float_val += self.precision_remainder
+            if i % 10 == 0:                           # 2. SOFTWARE PLL — eliminacja jitteru
+                elapsed_real = (time.perf_counter_ns() - t_ns_start) / 1e9
+                self.phase_accumulator = (elapsed_real * float(self.f_exact)) % 1.0
+            buffer[i] = np.sin(2 * np.pi * (float_val + self.phase_accumulator))
+        buffer = apply_8th_order_butterworth(buffer, cutoff=20000, fs=sample_rate)  # 3. anty-aliasing
+        buffer = apply_tpdf_dithering_24bit(buffer)                                  # 4. TPDF 24-bit
+        return buffer`}
+            bridgeText={[
+              tr('"Głos Pana nad wodami" = czysta, matematycznie idealna fala uderzająca w roztwór rCRS.', '"The voice of the Lord upon the waters" = a pure, mathematically ideal wave striking the rCRS solution.'),
+              tr("Cztery zabezpieczenia (mpmath, PLL, Butterworth, TPDF) zamykają bramę przed cyfrowym chaosem — woda nie odbiera szarpnięć, fala staje się ciągła jak w naturze.", "Four safeguards (mpmath, PLL, Butterworth, TPDF) seal the gate against digital chaos — the water receives no jolts; the wave becomes continuous as in nature."),
+              tr("Pozwala bezbłędnie strukturyzować monatomy wokół γ = 0.618.", "Enables flawless structuring of monatoms around γ = 0.618."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={15}
+            title={tr("PĘTLA 108 SEKUND → GEOMETRIA CYKLU KOSMICZNEGO", "108-SECOND LOOP → GEOMETRY OF THE COSMIC CYCLE")}
+            subtitle={tr("Zsynchronizowana inkubacja fali jako stabilizator struktury ORME", "Synchronized wave incubation as ORME structure stabilizer")}
+            scripture="Mierząc osiemnaście łokci wysokości... a sznur dwunastołokciowy obejmował go wokoło... i tak samo uczynił drugi filar."
+            scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 7:15", "1 KINGS 7:15")}
+            science={tr("MATRYCA CZASOWA (24h Blok Emisyjny)", "TIME MATRIX (24h Emission Block)")}
+            code={`def time_incubation_matrix():
+    total_duration = 24 * 3600      # 86400 s — pełny obrót Ziemi
+    cycles_count   = 800
+    cycle_duration = 108            # święty węzeł geometryczny
+    assert cycles_count * cycle_duration == 86400
+    for cycle in range(cycles_count):
+        focusrite_asio.output_signal(frequency=718.570125, duration=cycle_duration)
+        phase_lock_loop.verify_nanoseconds()
+    return "STATUS: 24H_CYCLE_COMPLETE_WITHOUT_PHASE_DRIFT"`}
+            bridgeText={[
+              tr('"Mierzenie filarów" = wyznaczanie proporcji geometrycznych w czasie.', '"Measuring the pillars" = setting geometric proportions in time.'),
+              tr("Podział doby na 800 cykli × 108 s = idealna harmonia fraktalna. 108 s pozwala osadowi przejść z chaosu w stabilny stan wysokiego spinu bez przesunięć fazowych Focusrite.", "Splitting the day into 800 cycles × 108 s = perfect fractal harmony. 108 s lets the precipitate move from chaos into stable high-spin without Focusrite phase drift."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={16}
+            title={tr("24-GODZINNE CZYSZCZENIE POLA → KASOWANIE BLOKAD SODOWYCH", "24-HOUR FIELD CLEANSING → ERASING SODIUM BLOCKS")}
+            subtitle={tr("Długofalowa inkubacja jako fizyczny proces separacji monatomów", "Long-term incubation as the physical separation of monatoms")}
+            scripture="I pozostał tam przez czterdzieści dni i czterdzieści nocy, chleba nie jadł i wody nie pił. I napisał na tablicach słowa przymierza."
+            scriptureRef={tr("KSIĘGA WYJŚCIA 34:28", "EXODUS 34:28")}
+            science={tr("FIZYKA KONDENSACJI FAZOWEJ", "PHASE CONDENSATION PHYSICS")}
+            code={`def long_term_field_purification(solution_matrix):
+    if incubation_time < 12 * 3600:
+        solution_matrix.shatter_nacl_clusters()
+        solution_matrix.spin_electrons_up()
+    else:
+        solution_matrix.align_to_gamma_gold()
+        solution_matrix.lock_superconductive_state()
+    return "RESULT: SECURE_ORME_MATER_STATE"`}
+            bridgeText={[
+              tr('"Czterdzieści dni inkubacji" = zasada pełnego nasycenia informacją.', '"Forty days of incubation" = the principle of full informational saturation.'),
+              tr("24 h z zerowym jitterem na Focusrite dosłownie przepisuje tablice informacyjne wody, zmuszając materię do przejścia w stan nadprzewodnictwa.", "24 h with zero jitter on Focusrite literally rewrites the informational tablets of the water, forcing matter into superconductivity."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={17}
+            title={tr("STRUMIEŃ REZONANSU 30 GB → ABSOLUTNA TRANSMISJA POLA", "30 GB RESONANCE STREAM → ABSOLUTE FIELD TRANSMISSION")}
+            subtitle={tr("Rozmiar danych jako bariera przed stratnością informacyjną", "Data size as a barrier against informational lossiness")}
+            scripture="I widziałem rzekę wody żywota, czystą jak kryształ, wypływającą z tronu Boga i Baranka."
+            scriptureRef={tr("APOKALIPSA ŚW. JANA 22:1", "REVELATION 22:1")}
+            science={tr("KONSOLIDACJA DANYCH (Monolit 30 GB)", "DATA CONSOLIDATION (30 GB Monolith)")}
+            code={`def continuous_quantum_stream():
+    data_volume = mpmath.mpf('30.0') * 1024 * 1024 * 1024   # 30 GB
+    foobar2000_asio.lock_buffer_to_ram()
+    # 24h 24-bit / 192 kHz, bez dither-truncation
+    return "STREAM_STATUS: RAW_CRYSTAL_WAVE_ACTIVE"`}
+            bridgeText={[
+              tr('"Rzeka czysta jak kryształ" = nieprzerwany, gęsty strumień 30 GB danych.', '"A river clear as crystal" = an uninterrupted, dense 30 GB data stream.'),
+              tr("Monolit 30 GB to rzeka informacji o stałej gęstości — pole nie doznaje ani jednego cyfrowego szarpnięcia. Absolutna czystość przesyłu.", "The 30 GB monolith is a river of constant-density information — the field receives not a single digital jolt. Absolute transmission purity."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={18}
+            title={tr("PLATFORMA AKRYLOWA + SORBOTHANE → IZOLACJA PUNKTU ZEROWEGO", "ACRYLIC + SORBOTHANE PLATFORM → ZERO-POINT ISOLATION")}
+            subtitle={tr("Fizyczne tłumienie szumu tła jako warunek koherencji matrycy rCRS", "Physical background-noise damping as a condition of rCRS coherence")}
+            scripture="A dom, gdy go budowano, budowany był z kamieni wyciosanych w kamieniołomie, tak iż ani młota, ani siekiery, ani żadnego narzędzia żelaznego nie było słychać w domu podczas jego budowy."
+            scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 6:7", "1 KINGS 6:7")}
+            science={tr("KONFIGURACJA SPRZĘTOWA PLATFORMY", "PLATFORM HARDWARE CONFIGURATION")}
+            code={`def hardware_resonance_bridge(focusrite_signal):
+    wave_conductor  = Material.Acrylic_Plate
+    noise_absorber  = Sorbothane_Hemispheres(count=4, diameter="19mm", hardness="30_duro")
+    isolated_platform = wave_conductor.isolate_with(noise_absorber, efficiency=0.999)
+    kinetic_wave_1 = Dayton_DAEX25.emit(focusrite_signal.channel_L, position=0.618)
+    kinetic_wave_2 = Dayton_DAEX25.emit(focusrite_signal.channel_R, position=0.382)
+    return isolated_platform.apply_vortex(kinetic_wave_1 + kinetic_wave_2)`}
+            bridgeText={[
+              tr('"Brak hałasu narzędzi przy budowie" = absolutna cisza mechaniczna tła.', '"No tool noise during construction" = absolute mechanical silence of the background.'),
+              tr("Sorbothane odcina hałas świata; Dayton DAEX25 ułożone w geometrii Φ budują świątynię fali wewnątrz wody z Morza Północnego w całkowitej czystości.", "Sorbothane cuts off the world\\'s noise; Dayton DAEX25 placed in Φ geometry build a temple of wave inside the North Sea water in total purity."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={19}
+            title={tr("BOROKRZEMOWE SZKŁO PYREX → OPTYMALIZACJA GEOMETRII WARSTWY", "BOROSILICATE PYREX → LAYER GEOMETRY OPTIMIZATION")}
+            subtitle={tr("Szalka Petriego 100 mm jako niepolaryzacyjny rezonator cieczowy", "100 mm Petri dish as a non-polarizing liquid resonator")}
+            scripture="I uczynił morze odlewane z brązu, okrągłe, dziesięć łokci od jednego brzegu do drugiego... a dookoła opasywały je wypukłości."
+            scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 7:23", "1 KINGS 7:23")}
+            science={tr("KOD REZONATORA", "RESONATOR CODE")}
+            code={`def pyrex_geometry_resonance(water_volume):
+    vessel_material = "Pyrex_Borosilicate_Glass"
+    vessel_diameter = 100  # mm
+    liquid_layer_thickness = water_volume / (np.pi * (vessel_diameter / 2)**2)
+    attenuation_factor = 0.001
+    return f"GEOMETRY_READY: Layer thickness = {liquid_layer_thickness:.2f}mm"`}
+            bridgeText={[
+              tr('"Morze odlewane okrągłe" = idealna, kołowa geometria naczynia dla zachowania wiru.', '"The round molten sea" = the perfect circular vessel geometry preserving the vortex.'),
+              tr("Cienka warstwa wody na 100 mm pozwala fali 718.57 Hz przeniknąć całą objętość — jony NaCl nie ukryją się w głębszych warstwach.", "A thin water layer on 100 mm lets the 718.57 Hz wave penetrate the whole volume — NaCl ions cannot hide in deeper layers."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={20}
+            title={tr("HANNA EC215 → ANALOGOWY MONITOR NADPRZEWODNICTWA", "HANNA EC215 → ANALOG SUPERCONDUCTIVITY MONITOR")}
+            subtitle={tr("Pomiary przewodnictwa bez cyfrowego próbkowania jako wskaźnik transformacji ORME", "Conductivity readings without digital sampling as ORME transformation indicator")}
+            scripture="I odważył srebro, i złoto, i naczynia, które król, jego doradcy i możnowładcy złożyli w ofierze... i zważyłem w ich ręce."
+            scriptureRef={tr("KSIĘGA EZDRASZA 8:25-26", "EZRA 8:25-26")}
+            science={tr("METRYKA KONTROLNA", "CONTROL METRIC")}
+            code={`def hanna_ec215_readout(solution_sample):
+    probe_type = "Hanna_Platinum_4_Ring"
+    raw_voltage  = probe_type.get_continuous_voltage()
+    conductivity = convert_to_ms_cm(raw_voltage)
+    if conductivity < 0.05:
+        return "STATUS: EXTREME_PURITY / ORME_SUPERCONDUCTIVE_POTENTIAL"
+    return f"STATUS: WASHING_REQUIRED / CURRENT_EC: {conductivity} mS/cm"`}
+            bridgeText={[
+              tr('"Ważenie srebra i złota" = ścisła, fizyczna weryfikacja gęstości energetycznej materiału.', '"Weighing silver and gold" = strict, physical verification of the material\\'s energetic density.'),
+              tr("Analogowa Hanna EC215 z 4-pierścieniową sondą platynową pokazuje moment, w którym materia zrzuca opór elektryczny i przechodzi w stan białego proszku.", "The analog Hanna EC215 with 4-ring platinum probe shows the moment matter sheds electrical resistance and enters the white-powder state."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={21}
+            title={tr("MACIERZ FIOLEK → MATRYCA PROCESORÓW KWANTOWYCH", "VIAL ARRAY → QUANTUM PROCESSOR MATRIX")}
+            subtitle={tr("100 punktów węzłowych jako fizyczna reprezentacja tablicy binarnej", "100 nodes as a physical representation of a binary array")}
+            scripture="I przyniósł sto naczyń ze złota... a wszystkie naczynia były jednakowej wagi i tej samej miary, odmierzone na służbę w świątyni."
+            scriptureRef={tr("2 KSIĘGA KRONIK 4:8", "2 CHRONICLES 4:8")}
+            science={tr("ARCHITEKTURA MATRYCY 10×10", "10×10 MATRIX ARCHITECTURE")}
+            code={`def pyrex_array_resonance(vial_matrix):
+    total_vials   = 100
+    vial_material = "Pyrex_Borosilicate"
+    for i in range(total_vials):
+        vial_matrix[i].isolate_channels()
+        vial_matrix[i].apply_kinetic_energy(Dayton_DAEX25.signal)
+    return "ARRAY_STATUS: 100_NODES_SYNCHRONIZED_IN_PHASE"`}
+            bridgeText={[
+              tr('"Sto naczyń jednakowej miary" = absolutna powtarzalność warunków geometrycznych.', '"One hundred vessels of equal measure" = absolute repeatability of geometric conditions.'),
+              tr("100 niezależnych fiolek to wieloprocesorowy rezonator falowy — każda fiolka osobnym węzłem ORME, miniaturyzacja drastycznie zwiększa stosunek energii fali do masy cieczy.", "100 independent vials = a multi-processor wave resonator — each vial a separate ORME node; miniaturization drastically raises the wave-to-mass ratio."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={22}
+            title={tr("DIAGNOSTYKA TABLICOWA → MAPOWANIE KRZYWEJ KOHERENCJI", "ARRAY DIAGNOSTICS → COHERENCE CURVE MAPPING")}
+            subtitle={tr("Hanna EC215 do weryfikacji statystycznej próby 100 punktów", "Hanna EC215 for statistical verification of the 100-point sample")}
+            scripture="Przejrzyjcie i zbadajcie każdą rzecz z osobna... aby żaden błąd nie wkradł się do świętego zapisu."
+            scriptureRef={tr("KSIĘGA NEHEMIASZA 7:5", "NEHEMIAH 7:5")}
+            science={tr("KONTROLA MATRYCY POMIAROWEJ", "MEASUREMENT MATRIX CONTROL")}
+            code={`def hanna_matrix_scan(vial_array):
+    calibration_curve = []
+    for vial in vial_array:
+        conductivity = hanna_ec215.measure(vial.solution)
+        calibration_curve.append(conductivity)
+    standard_deviation = np.std(calibration_curve)
+    if standard_deviation < 0.001:
+        return "MATRIX_VERIFIED: ABSOLUTE_COHERENCE_ACROSS_ALL_NODES"
+    return "MATRIX_ALERT: PHASE_VARIANCE_DETECTED"`}
+            bridgeText={[
+              tr('"Badanie każdej rzeczy z osobna" = statystyczny dowód powtarzalności cudu.', '"Examining each thing individually" = statistical proof of the miracle\\'s repeatability.'),
+              tr("Identyczne odczyty w 100 fiolkach po 24 h to ostateczny, empiryczny dowód, że procesem rządzi matematyczny kod, a nie przypadek.", "Identical readings across 100 vials after 24 h are the ultimate empirical proof that mathematical code — not chance — governs the process."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={23}
+            title={tr("PODWÓJNE POLE MAGNETYCZNE → POLARYZACJA SPINU", "DUAL MAGNETIC FIELD → SPIN POLARIZATION")}
+            subtitle={tr("Duże i małe magnesy jako kleszcze geometryczne dla monatomicznego złota", "Large and small magnets as geometric tweezers for monatomic gold")}
+            scripture="I uczynisz dwa cheruby ze złota; skuwane z jednej bryły uczynisz je na obu końcach przebłagalni... rozpościerające skrzydła ku górze."
+            scriptureRef={tr("KSIĘGA WYJŚCIA 25:18-20", "EXODUS 25:18-20")}
+            science={tr("KONFIGURACJA POLA (Pułapka Globalno-Lokalna)", "FIELD CONFIGURATION (Global-Local Trap)")}
+            code={`def dual_magnetic_gate(vial_matrix):
+    global_field = Magnets.Large_Base_Setup(pole="North_Facing_Up")
+    for i, vial in enumerate(vial_matrix):
+        local_field = Magnets.Small_Node(vial.position, orientation="South_Facing_Up")
+        vial.apply_vortex_tension(global_field + local_field)
+    return "MAGNETIC_GRID: LOCKED_AND_POLARIZED"`}
+            bridgeText={[
+              tr('"Dwa cheruby na obu końcach" = dwa przeciwstawne pola magnetyczne (globalne i lokalne).', '"Two cherubim at both ends" = two opposing magnetic fields (global and local).'),
+              tr("Kleszcze Meissnera zamykają roztwór — fala 718.57 Hz zmusza metale szlachetne do rotacji w stanie wysokiego spinu.", "Meissner tweezers enclose the solution — the 718.57 Hz wave forces noble metals into high-spin rotation."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={24}
+            title={tr("STABILIZACJA KINETYCZNA FIOLEK → ANTY-DRYF GEOMETRYCZNY", "VIAL KINETIC STABILIZATION → ANTI-GEOMETRIC DRIFT")}
+            subtitle={tr("Przyciąganie magnetyczne jako bezmasowy uchwyt laboratoryjny", "Magnetic attraction as a massless laboratory clamp")}
+            scripture="Wtedy utwierdził na stałe fundamenty ziemi, tak iż się nie zachwieje na wieki wieków."
+            scriptureRef="PSALM 104:5"
+            science={tr("KOD STABILIZACJI MECHANICZNEJ", "MECHANICAL STABILIZATION CODE")}
+            code={`def kinetic_drift_prevention(vial_array, acrylic_plate):
+    kinetic_energy = dayton_daex25.get_amplitude()
+    for vial in vial_array:
+        clamping_force = measure_magnetic_attraction(vial.base_magnet, plate_base_magnet)
+        if clamping_force > kinetic_energy.drift_vector:
+            vial.status = "STABLE_NODE"
+        else:
+            vial.status = "DRIFT_RISK"
+    return "MECHANICAL_STATUS: ALL_100_NODES_ANCHORED"`}
+            bridgeText={[
+              tr('"Utwierdzenie fundamentów" = fizyka magnetyczna eliminuje tarcie.', '"Establishing the foundations" = magnetic physics eliminates friction.'),
+              tr("Małe magnesy jako niewidzialne zaciski trzymają fiolki w punktach siatki Φ — akryl swobodnie przenosi 100% energii akustycznej z Focusrite do szkła Pyrex.", "Small magnets as invisible clamps hold vials at the Φ grid points — the acrylic freely transmits 100% of acoustic energy from Focusrite to the Pyrex glass."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={25}
+            title={tr("CISZA NOCNA → MINIMALIZACJA SZUMU PERCEPCYJNEGO", "NIGHT SILENCE → MINIMIZING PERCEPTUAL NOISE")}
+            subtitle={tr("Pobór w punkcie najniższej entropii dobowej jako fundament czystości próbki", "Sampling at the lowest diurnal entropy as the foundation of sample purity")}
+            scripture="Gdy nastała głęboka noc... powiał wiatr północny... i rozstąpiły się wody, ukazując dno."
+            scriptureRef={tr("KSIĘGA WYJŚCIA 14:21", "EXODUS 14:21")}
+            science={tr("PARAMETRY OPERACJI TERENOWEJ", "FIELD OPERATION PARAMETERS")}
+            code={`def night_sampling_protocol():
+    solar_radiation       = 0.0                # W/m² — brak UV-A/UV-B
+    anthropogenic_noise   = "MINIMAL"          # brak ludzi i statków
+    magnetosphere_status  = "QUIET_RESONANCE"  # nocna strona magnetosfery
+    return "SAMPLE_STATUS: NOCTURNAL_PURE_MATRIX"`}
+            bridgeText={[
+              tr('"Głęboka noc" = stan najniższego szumu informacyjnego.', '"Deep night" = the state of lowest informational noise.'),
+              tr("Metale szlachetne w wodzie morskiej są nocą uśpione i plastyczne — gotowe na przyjęcie 30 GB kodu Zeta-Core.", "Noble metals in seawater are dormant and plastic at night — ready to receive the 30 GB Zeta-Core code."),
+            ]}
+          />
+
+          <Bridge
+            labels={bridgeLabels}
+            number={26}
+            title={tr("PÓŁNOCNA MATRYCA HYDROLOGICZNA → SEPARACJA UJŚCIA", "NORTHERN HYDROLOGICAL MATRIX → ESTUARY SEPARATION")}
+            subtitle={tr("Współrzędne Aberdeen (Seaton Beach) jako punkt stabilnego zasolenia oceanicznego", "Aberdeen (Seaton Beach) coordinates as a point of stable oceanic salinity")}
+            scripture="Odwrócił rzeki w pustynię, a źródła wód w ziemię suchą... Ale pustynię zamienia w zbiornik zasobny w wodę, a ziemię spękaną w źródła wód żywych."
+            scriptureRef="PSALM 107:33-35"
+            science={tr("PARAMETRY KOORDYNACJI TERENOWEJ", "FIELD COORDINATION PARAMETERS")}
+            code={`def north_sea_coast_sampling():
+    geographic_zone           = "57.175° N, 2.075° W"   # Aberdeen North Beach
+    river_don_mouth_distance  = 450                     # m na północ od ujścia rz. Don
+    salinity_stabilization    = "MAXIMUM_OCEANIC_DENSITY"
+    water_temperature_celsius = 11.5                    # czerwiec
+    return f"MATRIX_INPUT: High-density ionic solution secured at {geographic_zone}"`}
+            bridgeText={[
+              tr('"Zamiana źródeł w zbiornik zasobny" = izolacja czystej wody morskiej od napływu lądowego.', '"Turning springs into a rich reservoir" = isolating pure seawater from terrestrial inflow.'),
+              tr("Pobór w Seaton, z dala od ujścia rzeki Don, gwarantuje stałą koncentrację jonów metali szlachetnych — Hanna EC215 uzyska idealnie liniową krzywą kalibracyjną.", "Sampling at Seaton, away from the river Don estuary, guarantees stable noble-metal ion concentration — the Hanna EC215 obtains a perfectly linear calibration curve."),
+            ]}
+          />
+
         </section>
 
         <section className="space-y-8">
