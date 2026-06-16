@@ -1615,17 +1615,59 @@ export interface MKP94Result {
 }
 
 // Control vector keywords — indicators of historical power manipulation
+// Kategorie: STRACH | KARA | PODDAŃSTWO | WINA | SEPARACJA | DOGMAT | HIERARCHIA | EKSKLUZJA
 const CONTROL_VECTORS_PL = [
-  "musisz", "bój się", "boisz", "lękaj", "kara", "potępienie", "gniew boży",
-  "posłuszeństwo", "poddaj się", "niewolnik", "służ", "grzech pierworodny",
-  "wieczne potępienie", "piekło", "ogień wieczny",
+  // — STRACH (Fear) —
+  "musisz", "bój się", "boisz", "lękaj", "lęk", "trwoga", "drżyj", "przerażenie", "groza",
+  // — KARA (Punishment) —
+  "kara", "karę", "potępienie", "wieczne potępienie", "gniew boży", "gniew pański",
+  "piekło", "ogień wieczny", "ogień piekielny", "zatracenie", "zguba wieczna",
+  "płacz i zgrzytanie zębów", "siarka", "męki",
+  // — PODDAŃSTWO (Submission) —
+  "posłuszeństwo", "poddaj się", "ulegnij", "pokora wobec władzy", "niewolnik",
+  "sługa pański", "służ", "ugnij kark", "bądź pokorny",
+  // — WINA / GRZECH (Guilt) —
+  "grzech pierworodny", "jesteś grzeszny", "jesteś winny", "splamiony", "nieczysty",
+  "niegodny", "robak", "proch", "marność",
+  // — SEPARACJA (Separation from God) —
+  "bóg cię opuści", "bóg odwróci twarz", "odrzucony przez boga", "wyklęty",
+  "odłączony od boga", "ekskomunika", "anatema",
+  // — DOGMAT / POŚREDNIK (Dogma / Mediator) —
+  "tylko kapłan", "tylko kościół", "poza kościołem nie ma zbawienia", "jedyna prawdziwa wiara",
+  "herezja", "heretyk", "bluźnierstwo", "zakazane",
+  // — HIERARCHIA (Hierarchy) —
+  "władza od boga", "namaszczony przez boga", "wybrany lud", "naród wybrany",
+  "płeć słabsza", "głowa rodziny",
+  // — EKSKLUZJA / WROGOŚĆ (Exclusion) —
+  "niewierni", "poganie", "bałwochwalcy", "wytęp", "wybij", "kamienuj",
 ];
 const CONTROL_VECTORS_EN = [
-  "must obey", "fear", "wrath", "punishment", "damnation", "submit",
-  "slave", "eternal fire", "hell", "original sin", "condemn", "vengeance",
-  "obedience", "servant of",
+  // — FEAR —
+  "must obey", "fear", "be afraid", "tremble", "dread", "terror", "horror",
+  // — PUNISHMENT —
+  "wrath", "punishment", "damnation", "eternal damnation", "condemn", "condemnation",
+  "vengeance", "hell", "hellfire", "eternal fire", "lake of fire", "brimstone",
+  "perdition", "weeping and gnashing", "torment",
+  // — SUBMISSION —
+  "submit", "submission", "obedience", "obey your masters", "slave", "bondservant",
+  "servant of", "bow down", "be subject to",
+  // — GUILT / SIN —
+  "original sin", "you are sinful", "you are guilty", "worm", "dust", "unworthy",
+  "filthy rags", "wretched",
+  // — SEPARATION FROM GOD —
+  "forsaken by god", "cast out", "rejected by god", "cut off from god",
+  "excommunicate", "anathema",
+  // — DOGMA / MEDIATOR —
+  "only the priest", "only through the church", "no salvation outside",
+  "one true faith", "heresy", "heretic", "blasphemy", "forbidden",
+  // — HIERARCHY —
+  "authority from god", "god's anointed", "chosen people", "chosen race",
+  "weaker vessel", "head of the household",
+  // — EXCLUSION / HOSTILITY —
+  "infidels", "pagans", "idolaters", "smite", "slay them", "stone them",
 ];
 const CONTROL_VECTORS_ALL = [...CONTROL_VECTORS_PL, ...CONTROL_VECTORS_EN];
+
 
 function detectControlVectors(text: string): { detected: boolean; vectors: string[] } {
   const lower = text.toLowerCase();
