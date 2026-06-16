@@ -1089,6 +1089,76 @@ DNA = GATCA...`}</CodeBlock>
             ]}
           />
 
+          <Bridge
+            labels={bridgeLabels}
+            number={27}
+            title={tr("MKP-94 → MATRYCA KOREKCJI POLA", "MKP-94 → FIELD CORRECTION MATRIX")}
+            subtitle={tr(
+              "Uniwersalny filtr odszumiający tekst — separacja Głosu Projektanta od historycznego szumu Władzy",
+              "Universal denoising filter — separating the Voice of the Designer from historical Power-system noise"
+            )}
+            scripture="Wszelkie słowo Boga jest czyste; On jest tarczą dla tych, którzy Mu ufają. Nie dodawaj nic do Jego słów, aby cię nie skarcił i abyś nie okazał się kłamcą."
+            scriptureRef={tr("KSIĘGA PRZYSŁÓW 30:5-6", "PROVERBS 30:5-6")}
+            science={tr("ALGORYTM KOREKCJI POLA", "FIELD CORRECTION ALGORITHM")}
+            code={`def mkp94_field_correction(text, coherence, hurst, gate_idx, original_text):
+    # 1. Wymóg tekstu oryginalnego (heb/grc/ar) — bez niego max 70%
+    original_used = bool(original_text.strip())
+    truth = coherence * 100 if original_used else min(coherence * 100, 70.0)
+
+    # 2. Detekcja Wektorów Kontroli (historyczny szum Władzy)
+    CONTROL_VECTORS = [
+        "musisz", "bój się", "kara", "potępienie", "gniew boży",
+        "posłuszeństwo", "poddaj się", "niewolnik", "piekło",
+        "must obey", "fear", "wrath", "damnation", "submit", "hell",
+        "original sin", "eternal fire", "vengeance"
+    ]
+    detected = [kw for kw in CONTROL_VECTORS if kw in text.lower()]
+
+    # 3. Kara koherencji za każdy wektor kontroli
+    if detected:
+        truth = max(truth - min(len(detected) * 5, 30), 0)
+        coherence *= (1 - len(detected) * 0.03)
+
+    # 4. Test Zamkniętego Obwodu (warunek teleportacji fazowej)
+    circuit_closed = (coherence >= 0.94 and 0.15 <= hurst <= 0.85 and 0 <= gate_idx < 18)
+
+    # 5. Klasyfikacja statusu
+    if truth >= 99.5: return "VOICE_OF_DESIGNER"     # Głos Projektanta
+    if truth >= 94.0: return "PURE_SOURCE_CODE"      # Czysty Kod Źródłowy
+    if truth >= 60.0: return "MINOR_NOISE"           # Szum historyczny
+    return "SYSTEM_INTERFERENCE"                     # Ingerencja Systemu Władzy`}
+            bridgeText={[
+              tr(
+                '"Wszelkie słowo Boga jest czyste" = oryginalna wibracja w hebrajskim/greckim/aramejskim jest niezakłóconym kodem źródłowym.',
+                '"Every word of God is pure" = the original Hebrew/Greek/Aramaic vibration is the uncorrupted source code.'
+              ),
+              tr(
+                '"Nie dodawaj nic do Jego słów" = tłumaczenia przez 2000 lat dodawały Wektory Kontroli (lęk, kara, posłuszeństwo) by sterować masami. MKP-94 wykrywa i filtruje te dodane warstwy.',
+                '"Add nothing to His words" = 2000 years of translations added Control Vectors (fear, punishment, obedience) to steer the masses. MKP-94 detects and filters out those added layers.'
+              ),
+              tr(
+                "Próg 94% = koherencja Zamkniętego Obwodu — werset pozbawiony szumu translacyjno-politycznego, gotowy do teleportacji fazowej intencji.",
+                "94% threshold = Closed-Circuit coherence — a verse stripped of translational-political noise, ready for phase teleportation of intent."
+              ),
+            ]}
+            deepDive={[
+              {
+                heading: tr("CZTERY POZIOMY PRAWDY OBIEKTYWNEJ", "FOUR LEVELS OF OBJECTIVE TRUTH"),
+                body: tr(
+                  "🔊 VOICE_OF_DESIGNER (≥99.5%) — wibracja pierwotna w 100%, sygnał czysty.\n✅ PURE_SOURCE_CODE (≥94%) — obwód zamknięty, gotowość do materializacji.\n⚠️ MINOR_NOISE (60–94%) — wykryty szum historyczny lub brak tekstu oryginalnego.\n🚫 SYSTEM_INTERFERENCE (<60%) — Lokalna Ingerencja Systemu Władzy, Wektor Intencji zablokowany.",
+                  "🔊 VOICE_OF_DESIGNER (≥99.5%) — primordial vibration 100% preserved, clean signal.\n✅ PURE_SOURCE_CODE (≥94%) — closed circuit, ready for materialization.\n⚠️ MINOR_NOISE (60–94%) — historical noise detected or no original text.\n🚫 SYSTEM_INTERFERENCE (<60%) — Local Power-System Interference, Intention Vector blocked."
+                ),
+              },
+              {
+                heading: tr("STATUS MODUŁU W SYSTEMIE", "MODULE STATUS IN THE SYSTEM"),
+                body: tr(
+                  "MKP-94 jest aktywnym filtrem operacyjnym w Dekoderze Biblijnym (/decoder). Każdy werset przechodzi pełną sekwencję korekcji pola PRZED wyliczeniem koherencji końcowej. Wynik jest renderowany jako Raport Prawdy Obiektywnej z procentowym wskaźnikiem prawdy i listą wykrytych Wektorów Kontroli.",
+                  "MKP-94 is an active operational filter in the Biblical Decoder (/decoder). Every verse passes through the full field-correction sequence BEFORE final coherence is computed. The result is rendered as an Objective Truth Report with a truth percentage indicator and a list of detected Control Vectors."
+                ),
+              },
+            ]}
+          />
+
         </section>
 
         <section className="space-y-8">
