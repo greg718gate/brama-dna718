@@ -655,27 +655,46 @@ const BiblicalDecoder = () => {
                       </div>
                     </div>
 
-                    {/* Control vectors detail (if any) */}
-                    {result.mkp94.controlVectorsDetected && (
-                      <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/5">
-                        <h4 className="text-xs font-bold text-red-400 mb-2 flex items-center gap-1">
-                          <ShieldX className="w-3 h-3" />
-                          {language === 'pl' ? 'HISTORYCZNY SZUM POLITYCZNY — Wektory Kontroli:' : 'HISTORICAL POLITICAL NOISE — Control Vectors:'}
-                        </h4>
-                        <div className="flex flex-wrap gap-1">
-                          {result.mkp94.controlVectors.map((v, i) => (
-                            <Badge key={i} variant="outline" className="border-red-500/40 text-red-400 text-[10px]">
-                              {v}
-                            </Badge>
-                          ))}
-                        </div>
-                        <p className="text-[11px] text-red-400/80 mt-2">
-                          {language === 'pl'
-                            ? 'Wpływ na pole świadomości zredukowany do 0.00%. Tekst zawiera narzucone nakazy/lęk nieobecne w wibracji pierwotnej.'
-                            : 'Influence on consciousness field reduced to 0.00%. Text contains imposed commands/fear absent from original vibration.'}
-                        </p>
-                      </div>
-                    )}
+                    {/* Text scan preview — always visible to show MKP-94 actively scanning */}
+                    <div className={`p-3 rounded-lg border ${result.mkp94.controlVectorsDetected ? 'border-red-500/30 bg-red-500/5' : 'border-green-500/20 bg-green-500/5'}`}>
+                      <h4 className={`text-xs font-bold mb-2 flex items-center gap-1 ${result.mkp94.controlVectorsDetected ? 'text-red-400' : 'text-green-400'}`}>
+                        {result.mkp94.controlVectorsDetected ? <ShieldX className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
+                        {language === 'pl'
+                          ? `SKAN MKP-94 (${MKP94_SIGNATURE_COUNT} sygnatur) — ${result.mkp94.controlVectorsDetected ? 'Wykryto Wektory Kontroli' : 'Tekst Czysty'}`
+                          : `MKP-94 SCAN (${MKP94_SIGNATURE_COUNT} signatures) — ${result.mkp94.controlVectorsDetected ? 'Control Vectors Detected' : 'Text Clean'}`}
+                      </h4>
+                      {(() => {
+                        const txt = result.text;
+                        const vecs = result.mkp94.controlVectors;
+                        if (!vecs.length) {
+                          return <p className="text-[11px] text-green-300/80 italic">{language === 'pl' ? '✓ Żadna z sygnatur historycznego szumu politycznego nie została wykryta w tym wersecie.' : '✓ None of the historical political-noise signatures were detected in this verse.'}</p>;
+                        }
+                        const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const pattern = new RegExp(`(${vecs.map(escape).join('|')})`, 'gi');
+                        const parts = txt.split(pattern);
+                        return (
+                          <>
+                            <p className="text-xs leading-relaxed mb-2 text-foreground/90">
+                              {parts.map((p, i) =>
+                                pattern.test(p)
+                                  ? <mark key={i} className="bg-red-500/30 text-red-200 px-1 rounded">{p}</mark>
+                                  : <span key={i}>{p}</span>
+                              )}
+                            </p>
+                            <div className="flex flex-wrap gap-1 mb-2">
+                              {vecs.map((v, i) => (
+                                <Badge key={i} variant="outline" className="border-red-500/40 text-red-400 text-[10px]">{v}</Badge>
+                              ))}
+                            </div>
+                            <p className="text-[11px] text-red-400/80">
+                              {language === 'pl'
+                                ? `Wpływ na pole świadomości zredukowany. Kara: -${Math.min(vecs.length * 5, 30)}% prawdy obiektywnej.`
+                                : `Influence on consciousness field reduced. Penalty: -${Math.min(vecs.length * 5, 30)}% objective truth.`}
+                            </p>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </CardContent>
                 </Card>
 
