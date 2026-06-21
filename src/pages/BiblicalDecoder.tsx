@@ -32,6 +32,7 @@ import {
   GATE_NAMES,
   type DecoderResult,
   type MKP94Result,
+  MKP94_SIGNATURE_COUNT,
 } from "@/lib/biblicalDecoder";
 import { generateDecoderDocumentation } from "@/lib/decoderDocumentationExport";
 import { CalibrationPanel } from "@/components/CalibrationPanel";
@@ -551,8 +552,11 @@ const BiblicalDecoder = () => {
                       {result.mkp94.status === "SYSTEM_INTERFERENCE" && <ShieldX className="w-6 h-6 text-red-400" />}
                       {language === 'pl' ? 'MKP-94 — Raport Prawdy Obiektywnej' : 'MKP-94 — Objective Truth Report'}
                     </CardTitle>
-                    <CardDescription className="text-xs font-mono">
-                      {language === 'pl' ? 'Moduł Korekcji Pola — Uniwersalny Weryfikator Źródła Ψ-718' : 'Field Correction Module — Universal Source Verifier Ψ-718'}
+                    <CardDescription className="text-xs font-mono flex items-center gap-2 flex-wrap">
+                      <span>{language === 'pl' ? 'Moduł Korekcji Pola — Uniwersalny Weryfikator Źródła Ψ-718' : 'Field Correction Module — Universal Source Verifier Ψ-718'}</span>
+                      <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 text-[10px]">
+                        {language === 'pl' ? `Baza: ${MKP94_SIGNATURE_COUNT} sygnatur` : `DB: ${MKP94_SIGNATURE_COUNT} signatures`}
+                      </Badge>
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
