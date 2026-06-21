@@ -1667,6 +1667,9 @@ const CONTROL_VECTORS_EN = [
   "infidels", "pagans", "idolaters", "smite", "slay them", "stone them",
 ];
 const CONTROL_VECTORS_ALL = [...CONTROL_VECTORS_PL, ...CONTROL_VECTORS_EN];
+export const MKP94_SIGNATURE_COUNT = CONTROL_VECTORS_ALL.length;
+export const MKP94_SIGNATURES_PL = CONTROL_VECTORS_PL;
+export const MKP94_SIGNATURES_EN = CONTROL_VECTORS_EN;
 
 
 function detectControlVectors(text: string): { detected: boolean; vectors: string[] } {
