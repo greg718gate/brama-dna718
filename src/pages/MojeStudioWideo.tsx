@@ -237,27 +237,36 @@ function TranscriptionSection() {
 }
 
 // ============================================================================
-// VIDEO GENERATOR (canvas + MediaRecorder + Web Speech API)
+// ELEGANT TEXT-VIDEO GENERATOR
+// OCR (tesseract.js) → kinetic typography slides (canvas + MediaRecorder)
 // ============================================================================
+type Duration = 60 | 120 | 300;
+
 function VideoGenSection() {
   const { toast } = useToast();
   const [images, setImages] = useState<File[]>([]);
-  const [command, setCommand] = useState("");
+  const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
-  const [listening, setListening] = useState(false);
+  const [includeImages, setIncludeImages] = useState(false);
+  const [duration, setDuration] = useState<Duration>(60);
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrStatus, setOcrStatus] = useState("");
   const [rendering, setRendering] = useState(false);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [renderProgress, setRenderProgress] = useState(0);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [command, setCommand] = useState("");
+  const [listening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  // ----- voice input -----
+  // ---------- VOICE COMMAND ----------
   const toggleMic = () => {
     const SR: any =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
       toast({
         title: "Brak Web Speech API",
-        description: "Twoja przeglądarka nie obsługuje rozpoznawania mowy. Użyj Chrome/Edge.",
+        description: "Użyj Chrome/Edge dla komend głosowych.",
         variant: "destructive",
       });
       return;
@@ -269,8 +278,6 @@ function VideoGenSection() {
     }
     const r = new SR();
     r.lang = "pl-PL";
-    r.continuous = false;
-    r.interimResults = false;
     r.onresult = (e: any) => {
       const txt = e.results[0][0].transcript;
       setCommand(txt);
@@ -283,36 +290,92 @@ function VideoGenSection() {
     setListening(true);
   };
 
-  // ----- command parser -----
   const handleCommand = (raw: string) => {
-    const cmd = raw.toLowerCase().trim();
-    if (/(film|scal|montaż|zrób|stwórz|wygeneruj)/.test(cmd)) {
-      const min = /1.*min|jedn.*min|minut/.test(cmd) ? 60 : 30;
-      renderVideo(min);
-    } else if (/(przeczytaj|lektor|powiedz)/.test(cmd)) {
-      speak(narration || command);
-    } else {
-      toast({
-        title: "Nie rozpoznano komendy",
-        description: 'Spróbuj: "Zrób film 1-minutowy" lub "Przeczytaj tekst".',
-      });
-    }
+    const cmd = raw.toLowerCase();
+    if (/(5|pięć).*min/.test(cmd)) setDuration(300);
+    else if (/(2|dwa|dwie).*min/.test(cmd)) setDuration(120);
+    else if (/(1|jedn|minut)/.test(cmd)) setDuration(60);
+    if (/(film|zrób|stwórz|wygeneruj|montaż)/.test(cmd)) renderVideo();
+    else if (/(przeczytaj|lektor|powiedz)/.test(cmd)) speak(narration || extractedText);
   };
 
   const speak = (txt: string) => {
     if (!txt.trim()) {
-      toast({ title: "Brak tekstu do przeczytania", variant: "destructive" });
+      toast({ title: "Brak tekstu", variant: "destructive" });
       return;
     }
     const u = new SpeechSynthesisUtterance(txt);
     u.lang = "pl-PL";
-    const voices = speechSynthesis.getVoices();
-    const pl = voices.find((v) => v.lang.startsWith("pl"));
+    const pl = speechSynthesis.getVoices().find((v) => v.lang.startsWith("pl"));
     if (pl) u.voice = pl;
     speechSynthesis.speak(u);
   };
 
-  // ----- render video from images + narration -----
+  // ---------- OCR ----------
+  const runOCR = async () => {
+    if (images.length === 0) {
+      toast({ title: "Najpierw dodaj zrzuty ekranu", variant: "destructive" });
+      return;
+    }
+    setOcrBusy(true);
+    setOcrProgress(0);
+    setExtractedText("");
+    try {
+      const Tesseract = (await import("tesseract.js")).default;
+      setOcrStatus("Inicjalizacja silnika OCR (pol+eng)…");
+      const worker = await Tesseract.createWorker(["pol", "eng"], 1, {
+        logger: (m: any) => {
+          if (m.status) setOcrStatus(m.status);
+          if (typeof m.progress === "number")
+            setOcrProgress(Math.round(m.progress * 100));
+        },
+      });
+      const all: string[] = [];
+      for (let i = 0; i < images.length; i++) {
+        setOcrStatus(`Analiza obrazu ${i + 1}/${images.length}…`);
+        const { data } = await worker.recognize(images[i]);
+        const clean = data.text.replace(/\s+\n/g, "\n").replace(/[ \t]+/g, " ").trim();
+        if (clean) all.push(clean);
+      }
+      await worker.terminate();
+      const joined = all.join("\n\n");
+      setExtractedText(joined);
+      if (!narration.trim()) setNarration(joined);
+      toast({ title: "Tekst odczytany", description: `${joined.length} znaków` });
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Błąd OCR", description: e?.message, variant: "destructive" });
+    } finally {
+      setOcrBusy(false);
+      setOcrStatus("");
+    }
+  };
+
+  // ---------- SLIDE BUILDER ----------
+  const buildSlides = (text: string): { title?: string; body: string }[] => {
+    const clean = text.replace(/\s+/g, " ").trim();
+    if (!clean) return [{ body: "Brak tekstu" }];
+    // split into sentences
+    const sentences = clean
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 2);
+    // group into chunks of ~120 chars
+    const slides: { title?: string; body: string }[] = [];
+    let buf = "";
+    for (const s of sentences) {
+      if ((buf + " " + s).length > 140 && buf) {
+        slides.push({ body: buf.trim() });
+        buf = s;
+      } else {
+        buf = buf ? buf + " " + s : s;
+      }
+    }
+    if (buf) slides.push({ body: buf.trim() });
+    return slides.length ? slides : [{ body: clean.slice(0, 140) }];
+  };
+
+  // ---------- RENDER ----------
   const loadImage = (file: File): Promise<HTMLImageElement> =>
     new Promise((res, rej) => {
       const img = new Image();
@@ -321,9 +384,29 @@ function VideoGenSection() {
       img.src = URL.createObjectURL(file);
     });
 
-  const renderVideo = async (totalSeconds: number) => {
-    if (images.length === 0) {
-      toast({ title: "Dodaj zdjęcia", variant: "destructive" });
+  const wrapText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    maxWidth: number,
+  ): string[] => {
+    const words = text.split(/\s+/);
+    const lines: string[] = [];
+    let line = "";
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = w;
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    return lines;
+  };
+
+  const renderVideo = async () => {
+    const source = (narration.trim() || extractedText).trim();
+    if (!source) {
+      toast({ title: "Brak tekstu", description: "Najpierw zrób OCR lub wpisz tekst.", variant: "destructive" });
       return;
     }
     setRendering(true);
@@ -331,83 +414,137 @@ function VideoGenSection() {
     setRenderProgress(0);
 
     try {
-      const W = 1280;
-      const H = 720;
+      const W = 1920;
+      const H = 1080;
       const canvas = document.createElement("canvas");
       canvas.width = W;
       canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const imgs = await Promise.all(images.map(loadImage));
-      const perSlide = totalSeconds / imgs.length;
+      const slides = buildSlides(source);
+      const refImgs = includeImages ? await Promise.all(images.map(loadImage)) : [];
+      const totalSec = duration;
+      const perSlide = totalSec / slides.length;
       const FPS = 30;
 
       const stream = canvas.captureStream(FPS);
-
-      // narration audio mix
-      let audioDest: MediaStreamAudioDestinationNode | null = null;
-      let audioCtx: AudioContext | null = null;
-      if (narration.trim() && "speechSynthesis" in window) {
-        try {
-          audioCtx = new AudioContext();
-          audioDest = audioCtx.createMediaStreamDestination();
-          // SpeechSynthesis can't be captured directly; we route via getUserMedia of speech is impossible.
-          // Fallback: just play the utterance live during recording (audible to user) and try to capture via
-          // microphone-less route by piping through an oscillator silent track to keep audio channel.
-          const silent = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          gain.gain.value = 0;
-          silent.connect(gain).connect(audioDest);
-          silent.start();
-          audioDest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
-        } catch {
-          /* ignore */
-        }
-      }
-
       const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
         ? "video/webm;codecs=vp9,opus"
         : "video/webm";
-      const recorder = new MediaRecorder(stream, { mimeType: mime });
+      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 6_000_000 });
       const chunks: Blob[] = [];
       recorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-
       const done = new Promise<Blob>((resolve) => {
         recorder.onstop = () => resolve(new Blob(chunks, { type: "video/webm" }));
       });
-
       recorder.start();
 
-      // start narration in parallel (audible, not captured into stream reliably across browsers)
+      // narration plays live (audible during render)
       if (narration.trim()) speak(narration);
 
-      const drawFitted = (img: HTMLImageElement, scale: number, alpha: number) => {
-        ctx.fillStyle = "#000";
+      const drawBg = (t: number, slideIdx: number) => {
+        // animated gradient
+        const a = (slideIdx * 47 + t * 30) % 360;
+        const g = ctx.createLinearGradient(0, 0, W, H);
+        g.addColorStop(0, `hsl(${a}, 55%, 8%)`);
+        g.addColorStop(0.5, `hsl(${(a + 40) % 360}, 60%, 6%)`);
+        g.addColorStop(1, `hsl(${(a + 80) % 360}, 65%, 10%)`);
+        ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
+        // soft glow orbs
+        for (let i = 0; i < 3; i++) {
+          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.6 + i) * 60;
+          const cy = H * (0.3 + 0.2 * Math.sin(i)) + Math.cos(t * 0.5 + i) * 40;
+          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 600);
+          rad.addColorStop(0, `hsla(${(a + i * 60) % 360}, 80%, 60%, 0.18)`);
+          rad.addColorStop(1, "transparent");
+          ctx.fillStyle = rad;
+          ctx.fillRect(0, 0, W, H);
+        }
+        // grain / vignette
+        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75);
+        vg.addColorStop(0, "transparent");
+        vg.addColorStop(1, "rgba(0,0,0,0.55)");
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, W, H);
+      };
+
+      const drawSlide = (slide: { body: string }, localT: number, slideIdx: number, globalT: number) => {
+        drawBg(globalT, slideIdx);
+
+        // optional faded reference image
+        if (refImgs.length) {
+          const img = refImgs[slideIdx % refImgs.length];
+          const r = Math.min(W / img.width, H / img.height) * 0.9;
+          const iw = img.width * r;
+          const ih = img.height * r;
+          ctx.globalAlpha = 0.12;
+          ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
+          ctx.globalAlpha = 1;
+        }
+
+        // animation timings (localT = 0..1)
+        const fadeIn = Math.min(1, localT / 0.18);
+        const fadeOut = Math.min(1, (1 - localT) / 0.18);
+        const alpha = Math.max(0, Math.min(1, Math.min(fadeIn, fadeOut)));
+        const slide_y = (1 - fadeIn) * 30; // slide up
+
+        // counter
+        ctx.globalAlpha = 0.55 * alpha;
+        ctx.fillStyle = "#f0abfc";
+        ctx.font = "500 24px 'Inter', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`${String(slideIdx + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`, 80, 80);
+
+        // accent line
         ctx.globalAlpha = alpha;
-        const r = Math.min(W / img.width, H / img.height) * scale;
-        const w = img.width * r;
-        const h = img.height * r;
-        ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+        const lineW = 120 + 200 * fadeIn;
+        const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
+        grad.addColorStop(0, "#d946ef");
+        grad.addColorStop(1, "#8b5cf6");
+        ctx.fillStyle = grad;
+        ctx.fillRect(80, H / 2 - 180 + slide_y, lineW, 4);
+
+        // body text
+        ctx.fillStyle = "#ffffff";
+        const baseSize = slide.body.length > 100 ? 56 : slide.body.length > 60 ? 72 : 92;
+        ctx.font = `700 ${baseSize}px 'Inter', 'Helvetica Neue', sans-serif`;
+        const maxW = W - 160;
+        const lines = wrapText(ctx, slide.body, maxW);
+        const lh = baseSize * 1.2;
+        const totalH = lines.length * lh;
+        let y = H / 2 - totalH / 2 + lh + slide_y;
+        ctx.shadowColor = "rgba(217,70,239,0.35)";
+        ctx.shadowBlur = 30;
+        for (let i = 0; i < lines.length; i++) {
+          const lineAlpha = Math.max(0, Math.min(1, fadeIn * 3 - i * 0.3)) * fadeOut;
+          ctx.globalAlpha = lineAlpha;
+          ctx.fillText(lines[i], 80, y);
+          y += lh;
+        }
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+
+        // footer mark
+        ctx.globalAlpha = 0.4 * alpha;
+        ctx.fillStyle = "#f0abfc";
+        ctx.font = "400 20px 'Inter', sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText("MOJE STUDIO · 2026", W - 80, H - 60);
+        ctx.textAlign = "left";
         ctx.globalAlpha = 1;
       };
 
       const start = performance.now();
-      const totalMs = totalSeconds * 1000;
-
+      const totalMs = totalSec * 1000;
       await new Promise<void>((resolve) => {
         const tick = () => {
           const elapsed = performance.now() - start;
           if (elapsed >= totalMs) return resolve();
-          const idx = Math.min(imgs.length - 1, Math.floor(elapsed / 1000 / perSlide));
-          const within = (elapsed / 1000) % perSlide; // 0..perSlide
-          const t = within / perSlide;
-          const zoom = 1.0 + 0.08 * t; // gentle ken-burns
-          // fade-in first 0.4s, fade-out last 0.4s
-          let alpha = 1;
-          if (within < 0.4) alpha = within / 0.4;
-          else if (within > perSlide - 0.4) alpha = (perSlide - within) / 0.4;
-          drawFitted(imgs[idx], zoom, Math.max(0, Math.min(1, alpha)));
+          const sec = elapsed / 1000;
+          const idx = Math.min(slides.length - 1, Math.floor(sec / perSlide));
+          const localT = (sec % perSlide) / perSlide;
+          drawSlide(slides[idx], localT, idx, sec);
           setRenderProgress(Math.round((elapsed / totalMs) * 100));
           requestAnimationFrame(tick);
         };
@@ -416,10 +553,9 @@ function VideoGenSection() {
 
       recorder.stop();
       const blob = await done;
-      audioCtx?.close();
       setVideoUrl(URL.createObjectURL(blob));
       setRenderProgress(100);
-      toast({ title: "Film gotowy", description: "Możesz go pobrać poniżej." });
+      toast({ title: "Film gotowy", description: `${slides.length} ujęć · ${totalSec}s` });
     } catch (e: any) {
       console.error(e);
       toast({ title: "Błąd renderowania", description: e?.message, variant: "destructive" });
@@ -432,10 +568,10 @@ function VideoGenSection() {
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-6 backdrop-blur">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
-        <h2 className="text-lg font-semibold text-white">Sekcja 2 · Generator filmów ze zdjęć</h2>
+        <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Lokalny render canvas + MediaRecorder. Wszystko w przeglądarce, bez wysyłania danych.
+        Wrzuć zrzuty ekranu — odczytam z nich tekst (OCR pol+eng) i zmontuję kinetyczny film typograficzny.
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -448,7 +584,7 @@ function VideoGenSection() {
         />
         <Images className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {images.length > 0 ? `Wybrano ${images.length} zdjęć` : "Upuść lub kliknij — zdjęcia"}
+          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — zrzuty ekranu"}
         </p>
       </label>
 
@@ -465,24 +601,72 @@ function VideoGenSection() {
         </div>
       )}
 
+      <Button
+        onClick={runOCR}
+        disabled={ocrBusy || images.length === 0}
+        className="w-full mt-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0"
+      >
+        {ocrBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+        {ocrBusy ? "Czytam tekst…" : "Odczytaj tekst ze zrzutów (OCR)"}
+      </Button>
+
+      {(ocrBusy || ocrProgress > 0) && (
+        <div className="mt-3">
+          <Progress value={ocrProgress} className="h-2 bg-fuchsia-950" />
+          <p className="text-xs text-fuchsia-200/60 mt-1">{ocrStatus}</p>
+        </div>
+      )}
+
       <div className="mt-4">
         <label className="text-xs text-fuchsia-200/60 mb-1 block">
-          Tekst lektora (czytany jako voiceover)
+          Tekst do filmu / lektora (edytowalny — pochodzi z OCR lub wpisz własny)
         </label>
         <Textarea
           value={narration}
           onChange={(e) => setNarration(e.target.value)}
-          placeholder="Wpisz lub wklej tekst do przeczytania przez lektora…"
-          className="bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30 min-h-[80px]"
+          placeholder="Tu pojawi się odczytany tekst albo wpisz własny…"
+          className="bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30 min-h-[120px]"
         />
       </div>
+
+      {/* duration selector */}
+      <div className="mt-4">
+        <label className="text-xs text-fuchsia-200/60 mb-2 block">Długość filmu</label>
+        <div className="grid grid-cols-3 gap-2">
+          {([60, 120, 300] as Duration[]).map((d) => (
+            <Button
+              key={d}
+              type="button"
+              onClick={() => setDuration(d)}
+              variant={duration === d ? "default" : "outline"}
+              className={
+                duration === d
+                  ? "bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white border-0"
+                  : "border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white"
+              }
+            >
+              {d === 60 ? "1 min" : d === 120 ? "2 min" : "5 min"}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <label className="mt-4 flex items-center gap-2 text-xs text-fuchsia-200/70 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={includeImages}
+          onChange={(e) => setIncludeImages(e.target.checked)}
+          className="accent-fuchsia-500"
+        />
+        Pokaż oryginalne zrzuty w tle (delikatnie, 12% krycia)
+      </label>
 
       <div className="mt-4 flex gap-2">
         <Input
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCommand(command)}
-          placeholder='Komenda: „Zrób film 1-minutowy" lub „Przeczytaj tekst"'
+          placeholder='Komenda: „Zrób film 2 min" / „Przeczytaj tekst"'
           className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500"
         />
         <Button
@@ -499,15 +683,15 @@ function VideoGenSection() {
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Button
-          onClick={() => renderVideo(60)}
-          disabled={rendering || images.length === 0}
+          onClick={renderVideo}
+          disabled={rendering || !(narration.trim() || extractedText.trim())}
           className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0"
         >
           {rendering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />}
-          Zrób film 1-min
+          Wygeneruj film ({duration === 60 ? "1 min" : duration === 120 ? "2 min" : "5 min"})
         </Button>
         <Button
-          onClick={() => speak(narration)}
+          onClick={() => speak(narration || extractedText)}
           variant="outline"
           className="border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white"
         >
@@ -518,7 +702,7 @@ function VideoGenSection() {
       {rendering && (
         <div className="mt-4">
           <Progress value={renderProgress} className="h-2 bg-fuchsia-950" />
-          <p className="text-xs text-fuchsia-200/60 mt-2">Renderowanie: {renderProgress}%</p>
+          <p className="text-xs text-fuchsia-200/60 mt-2">Renderowanie: {renderProgress}% (potrwa tyle, ile długość filmu)</p>
         </div>
       )}
 
