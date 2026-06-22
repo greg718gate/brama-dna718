@@ -294,7 +294,7 @@ function VideoGenSection() {
     } else {
       toast({
         title: "Nie rozpoznano komendy",
-        description: "Spróbuj: „Zrób film 1-minutowy" lub „Przeczytaj tekst".",
+        description: 'Spróbuj: "Zrób film 1-minutowy" lub "Przeczytaj tekst".',
       });
     }
   };
