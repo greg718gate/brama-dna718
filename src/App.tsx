@@ -17,6 +17,7 @@ import GatesAtlas from "./pages/GatesAtlas";
 import Prng from "./pages/Prng";
 import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
 import SourceArchive from "./pages/SourceArchive";
+import MojeStudioWideo from "./pages/MojeStudioWideo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
