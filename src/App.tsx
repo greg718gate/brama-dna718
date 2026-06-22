@@ -17,6 +17,7 @@ import GatesAtlas from "./pages/GatesAtlas";
 import Prng from "./pages/Prng";
 import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
 import SourceArchive from "./pages/SourceArchive";
+import MojeStudioWideo from "./pages/MojeStudioWideo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,10 @@ const App = () => (
 
               <Route path="/archive" element={<SourceArchive />} />
               <Route path="/archive/*" element={<SourceArchive />} />
+
+              <Route path="/moje-studio-wideo" element={<MojeStudioWideo />} />
+              <Route path="/moje-studio-wideo/*" element={<MojeStudioWideo />} />
+
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
