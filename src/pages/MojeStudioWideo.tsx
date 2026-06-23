@@ -188,7 +188,7 @@ function TranscriptionSection() {
   };
 
   return (
-    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-6 backdrop-blur">
+    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <FileAudio className="w-5 h-5 text-fuchsia-400" />
         <h2 className="text-lg font-semibold text-white">Sekcja 1 · Wideo/Audio → Tekst</h2>
@@ -579,7 +579,7 @@ function VideoGenSection() {
   };
 
   return (
-    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-6 backdrop-blur">
+    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
         <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
@@ -603,13 +603,13 @@ function VideoGenSection() {
       </label>
 
       {images.length > 0 && (
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2 mt-3 pb-1">
           {images.map((f, i) => (
             <img
               key={i}
               src={URL.createObjectURL(f)}
               alt=""
-              className="h-16 w-16 object-cover rounded border border-fuchsia-500/30"
+              className="h-14 w-14 object-cover rounded border border-fuchsia-500/30 shrink-0"
             />
           ))}
         </div>
@@ -675,19 +675,19 @@ function VideoGenSection() {
         Pokaż oryginalne zrzuty w tle (delikatnie, 12% krycia)
       </label>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex flex-col sm:flex-row gap-2">
         <Input
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCommand(command)}
           placeholder='Komenda: „Zrób film 2 min" / „Przeczytaj tekst"'
-          className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500"
+          className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500 min-w-0 flex-1"
         />
         <Button
           type="button"
           onClick={toggleMic}
           variant="outline"
-          className={`border-fuchsia-500/40 hover:bg-fuchsia-500/10 ${
+          className={`border-fuchsia-500/40 hover:bg-fuchsia-500/10 shrink-0 ${
             listening ? "bg-fuchsia-500/20 text-fuchsia-200" : "text-fuchsia-200"
           }`}
         >
@@ -695,21 +695,27 @@ function VideoGenSection() {
         </Button>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      {images.length > 0 && !extractedText.trim() && !narration.trim() && (
+        <p className="mt-3 text-xs text-amber-300/80">
+          Wskazówka: najpierw kliknij „Odczytaj tekst ze zrzutów (OCR)", potem przycisk generowania filmu się odblokuje.
+        </p>
+      )}
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
         <Button
           onClick={renderVideo}
           disabled={rendering || !(narration.trim() || extractedText.trim())}
-          className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0"
+          className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0 whitespace-normal h-auto py-3"
         >
           {rendering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />}
-          Wygeneruj film ({duration === 60 ? "1 min" : duration === 120 ? "2 min" : "5 min"})
+          <span className="ml-2">Wygeneruj film ({duration === 60 ? "1 min" : duration === 120 ? "2 min" : "5 min"})</span>
         </Button>
         <Button
           onClick={() => speak(narration || extractedText)}
           variant="outline"
-          className="border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white"
+          className="border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white whitespace-normal h-auto py-3"
         >
-          <Volume2 className="w-4 h-4" /> Przeczytaj tekst
+          <Volume2 className="w-4 h-4" /> <span className="ml-2">Przeczytaj tekst</span>
         </Button>
       </div>
 
