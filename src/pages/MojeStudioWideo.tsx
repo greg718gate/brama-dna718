@@ -450,7 +450,8 @@ function VideoGenSection() {
       canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const slides = buildSlides(source);
+      const sc: Script = script ?? buildFallbackScript(source);
+      const slides = sc.slides;
       const refImgs = includeImages ? await Promise.all(images.map(loadImage)) : [];
       const totalSec = duration;
       const perSlide = totalSec / slides.length;
@@ -468,100 +469,167 @@ function VideoGenSection() {
       });
       recorder.start();
 
-      // narration plays live (audible during render)
       if (narration.trim()) speak(narration);
 
-      const drawBg = (t: number, slideIdx: number) => {
-        // animated gradient
-        const a = (slideIdx * 47 + t * 30) % 360;
+      const drawBg = (t: number, slideIdx: number, kind: Slide["kind"]) => {
+        const palettes: Record<Slide["kind"], [number, number, number]> = {
+          title: [285, 270, 250],
+          point: [275, 250, 230],
+          quote: [220, 260, 290],
+          stat:  [310, 285, 260],
+          outro: [260, 240, 220],
+        };
+        const [h1, h2, h3] = palettes[kind];
+        const wob = Math.sin(t * 0.4 + slideIdx) * 8;
         const g = ctx.createLinearGradient(0, 0, W, H);
-        g.addColorStop(0, `hsl(${a}, 55%, 8%)`);
-        g.addColorStop(0.5, `hsl(${(a + 40) % 360}, 60%, 6%)`);
-        g.addColorStop(1, `hsl(${(a + 80) % 360}, 65%, 10%)`);
+        g.addColorStop(0, `hsl(${h1 + wob}, 60%, 7%)`);
+        g.addColorStop(0.5, `hsl(${h2}, 55%, 5%)`);
+        g.addColorStop(1, `hsl(${h3 - wob}, 65%, 9%)`);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
-        // soft glow orbs
         for (let i = 0; i < 3; i++) {
-          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.6 + i) * 60;
-          const cy = H * (0.3 + 0.2 * Math.sin(i)) + Math.cos(t * 0.5 + i) * 40;
-          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 600);
-          rad.addColorStop(0, `hsla(${(a + i * 60) % 360}, 80%, 60%, 0.18)`);
+          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.5 + i) * 80;
+          const cy = H * (0.3 + 0.25 * Math.sin(i)) + Math.cos(t * 0.4 + i) * 60;
+          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 700);
+          rad.addColorStop(0, `hsla(${h1 + i * 30}, 80%, 60%, 0.20)`);
           rad.addColorStop(1, "transparent");
           ctx.fillStyle = rad;
           ctx.fillRect(0, 0, W, H);
         }
-        // grain / vignette
-        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75);
+        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.78);
         vg.addColorStop(0, "transparent");
-        vg.addColorStop(1, "rgba(0,0,0,0.55)");
+        vg.addColorStop(1, "rgba(0,0,0,0.6)");
         ctx.fillStyle = vg;
         ctx.fillRect(0, 0, W, H);
       };
 
-      const drawSlide = (slide: { body: string }, localT: number, slideIdx: number, globalT: number) => {
-        drawBg(globalT, slideIdx);
-
-        // optional faded reference image
-        if (refImgs.length) {
-          const img = refImgs[slideIdx % refImgs.length];
-          const r = Math.min(W / img.width, H / img.height) * 0.9;
-          const iw = img.width * r;
-          const ih = img.height * r;
-          ctx.globalAlpha = 0.12;
-          ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
-          ctx.globalAlpha = 1;
-        }
-
-        // animation timings (localT = 0..1)
-        const fadeIn = Math.min(1, localT / 0.18);
-        const fadeOut = Math.min(1, (1 - localT) / 0.18);
-        const alpha = Math.max(0, Math.min(1, Math.min(fadeIn, fadeOut)));
-        const slide_y = (1 - fadeIn) * 30; // slide up
-
-        // counter
-        ctx.globalAlpha = 0.55 * alpha;
+      const drawChrome = (slideIdx: number, alpha: number) => {
+        ctx.globalAlpha = 0.5 * alpha;
         ctx.fillStyle = "#f0abfc";
         ctx.font = "500 24px 'Inter', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText(`${String(slideIdx + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`, 80, 80);
-
-        // accent line
-        ctx.globalAlpha = alpha;
-        const lineW = 120 + 200 * fadeIn;
-        const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
-        grad.addColorStop(0, "#d946ef");
-        grad.addColorStop(1, "#8b5cf6");
-        ctx.fillStyle = grad;
-        ctx.fillRect(80, H / 2 - 180 + slide_y, lineW, 4);
-
-        // body text
-        ctx.fillStyle = "#ffffff";
-        const baseSize = slide.body.length > 100 ? 56 : slide.body.length > 60 ? 72 : 92;
-        ctx.font = `700 ${baseSize}px 'Inter', 'Helvetica Neue', sans-serif`;
-        const maxW = W - 160;
-        const lines = wrapText(ctx, slide.body, maxW);
-        const lh = baseSize * 1.2;
-        const totalH = lines.length * lh;
-        let y = H / 2 - totalH / 2 + lh + slide_y;
-        ctx.shadowColor = "rgba(217,70,239,0.35)";
-        ctx.shadowBlur = 30;
-        for (let i = 0; i < lines.length; i++) {
-          const lineAlpha = Math.max(0, Math.min(1, fadeIn * 3 - i * 0.3)) * fadeOut;
-          ctx.globalAlpha = lineAlpha;
-          ctx.fillText(lines[i], 80, y);
-          y += lh;
-        }
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1;
-
-        // footer mark
-        ctx.globalAlpha = 0.4 * alpha;
-        ctx.fillStyle = "#f0abfc";
+        ctx.fillText(
+          `${String(slideIdx + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`,
+          80, 80,
+        );
+        ctx.globalAlpha = 0.35 * alpha;
         ctx.font = "400 20px 'Inter', sans-serif";
         ctx.textAlign = "right";
         ctx.fillText("MOJE STUDIO · 2026", W - 80, H - 60);
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
+      };
+
+      const drawAccentLine = (y: number, fadeIn: number, alpha: number) => {
+        const lineW = 120 + 260 * fadeIn;
+        const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
+        grad.addColorStop(0, "#d946ef");
+        grad.addColorStop(1, "#8b5cf6");
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = grad;
+        ctx.fillRect(80, y, lineW, 4);
+        ctx.globalAlpha = 1;
+      };
+
+      const drawCenteredText = (
+        text: string,
+        size: number,
+        weight: number,
+        cy: number,
+        alpha: number,
+        color = "#ffffff",
+        offY = 0,
+      ) => {
+        ctx.fillStyle = color;
+        ctx.font = `${weight} ${size}px 'Inter', 'Helvetica Neue', sans-serif`;
+        ctx.textAlign = "center";
+        const lines = wrapText(ctx, text, W - 200);
+        const lh = size * 1.18;
+        let y = cy - (lines.length - 1) * lh / 2 + offY;
+        ctx.shadowColor = "rgba(217,70,239,0.4)";
+        ctx.shadowBlur = 40;
+        for (let i = 0; i < lines.length; i++) {
+          const a = Math.max(0, Math.min(1, alpha * 3 - i * 0.25));
+          ctx.globalAlpha = a;
+          ctx.fillText(lines[i], W / 2, y);
+          y += lh;
+        }
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+        ctx.textAlign = "left";
+      };
+
+      const drawSlide = (slide: Slide, localT: number, slideIdx: number, globalT: number) => {
+        drawBg(globalT, slideIdx, slide.kind);
+
+        if (refImgs.length) {
+          const img = refImgs[slideIdx % refImgs.length];
+          const r = Math.min(W / img.width, H / img.height) * 0.95;
+          const iw = img.width * r;
+          const ih = img.height * r;
+          const zoom = 1 + 0.08 * localT;
+          ctx.globalAlpha = 0.1;
+          ctx.drawImage(img, (W - iw * zoom) / 2, (H - ih * zoom) / 2, iw * zoom, ih * zoom);
+          ctx.globalAlpha = 1;
+        }
+
+        const fadeIn = Math.min(1, localT / 0.18);
+        const fadeOut = Math.min(1, (1 - localT) / 0.18);
+        const alpha = Math.min(fadeIn, fadeOut);
+        const offY = (1 - fadeIn) * 30;
+
+        drawChrome(slideIdx, alpha);
+
+        switch (slide.kind) {
+          case "title": {
+            drawAccentLine(H / 2 - 60, fadeIn, alpha);
+            drawCenteredText(slide.text, 120, 800, H / 2 + 30, alpha, "#ffffff", offY);
+            if (slide.sub) {
+              drawCenteredText(slide.sub, 36, 400, H / 2 + 160, alpha, "#f0abfc", offY);
+            }
+            break;
+          }
+          case "point": {
+            drawAccentLine(H / 2 - 140, fadeIn, alpha);
+            const t = slide.text;
+            const size = t.length > 90 ? 56 : t.length > 50 ? 72 : 88;
+            drawCenteredText(t, size, 700, H / 2 + 20, alpha, "#ffffff", offY);
+            if (slide.accent) {
+              drawCenteredText(slide.accent.toUpperCase(), 26, 600, H - 200, alpha, "#f0abfc", 0);
+            }
+            break;
+          }
+          case "quote": {
+            // huge quotes mark
+            ctx.globalAlpha = 0.25 * alpha;
+            ctx.fillStyle = "#d946ef";
+            ctx.font = `900 320px 'Georgia', serif`;
+            ctx.textAlign = "center";
+            ctx.fillText("\u201C", W / 2, H / 2 - 80);
+            ctx.globalAlpha = 1;
+            ctx.textAlign = "left";
+            const t = slide.text;
+            const size = t.length > 90 ? 52 : 68;
+            drawCenteredText(t, size, 500, H / 2 + 80, alpha, "#ffffff", offY);
+            break;
+          }
+          case "stat": {
+            drawCenteredText(slide.value, 200, 900, H / 2 - 20, alpha, "#ffffff", offY);
+            drawAccentLine(H / 2 + 100, fadeIn, alpha);
+            drawCenteredText(slide.label, 38, 400, H / 2 + 180, alpha, "#f0abfc", offY);
+            break;
+          }
+          case "outro": {
+            const pulse = 1 + 0.04 * Math.sin(globalT * 2);
+            ctx.save();
+            ctx.translate(W / 2, H / 2);
+            ctx.scale(pulse, pulse);
+            ctx.translate(-W / 2, -H / 2);
+            drawCenteredText(slide.text, 96, 700, H / 2, alpha, "#ffffff", offY);
+            ctx.restore();
+            break;
+          }
+        }
       };
 
       const start = performance.now();
@@ -592,6 +660,7 @@ function VideoGenSection() {
       setRendering(false);
     }
   };
+
 
   return (
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
