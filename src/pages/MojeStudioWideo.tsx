@@ -885,7 +885,7 @@ export default function MojeStudioWideo() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-fuchsia-200/40">
-          Whisper przez @xenova/transformers · Web Speech API · canvas + MediaRecorder
+          Whisper (lokalnie) · Gemini Vision (Lovable Cloud) · canvas + MediaRecorder
         </footer>
       </div>
     </div>
