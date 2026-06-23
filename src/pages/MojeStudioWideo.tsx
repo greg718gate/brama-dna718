@@ -31,6 +31,7 @@ const STORAGE_KEY = "moje-studio-wideo-auth";
 // ============================================================================
 function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   const [pwd, setPwd] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState(false);
 
   const submit = (e: React.FormEvent) => {
@@ -40,7 +41,6 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
       onUnlock();
     } else {
       setError(true);
-      setPwd("");
     }
   };
 
@@ -59,17 +59,27 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
             Strefa prywatna. Wpisz hasło, aby kontynuować.
           </p>
         </div>
-        <Input
-          type="password"
-          autoFocus
-          value={pwd}
-          onChange={(e) => {
-            setPwd(e.target.value);
-            setError(false);
-          }}
-          placeholder="••••••••••"
-          className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500"
-        />
+        <div className="relative">
+          <Input
+            type={showPwd ? "text" : "password"}
+            autoFocus
+            value={pwd}
+            onChange={(e) => {
+              setPwd(e.target.value);
+              setError(false);
+            }}
+            placeholder="••••••••••"
+            className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500 pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPwd((v) => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-fuchsia-200/60 hover:text-white focus:outline-none"
+            aria-label={showPwd ? "Ukryj hasło" : "Pokaż hasło"}
+          >
+            {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+        </div>
         {error && (
           <p className="text-xs text-red-400 mt-2">Nieprawidłowe hasło.</p>
         )}
@@ -83,6 +93,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
     </div>
   );
 }
+
 
 // ============================================================================
 // TRANSCRIPTION (Whisper via @xenova/transformers)
