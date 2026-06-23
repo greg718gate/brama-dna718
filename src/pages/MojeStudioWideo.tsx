@@ -252,19 +252,31 @@ function TranscriptionSection() {
 
 // ============================================================================
 // ELEGANT TEXT-VIDEO GENERATOR
-// OCR (tesseract.js) → kinetic typography slides (canvas + MediaRecorder)
+// Vision OCR (Gemini 2.5 Flash via Lovable Cloud) → typed kinetic slides
 // ============================================================================
 type Duration = 60 | 120 | 300;
+type Slide =
+  | { kind: "title"; text: string; sub?: string }
+  | { kind: "point"; text: string; accent?: string }
+  | { kind: "quote"; text: string }
+  | { kind: "stat"; value: string; label: string }
+  | { kind: "outro"; text: string };
+
+type Script = {
+  title?: string;
+  subtitle?: string;
+  slides: Slide[];
+};
 
 function VideoGenSection() {
   const { toast } = useToast();
   const [images, setImages] = useState<File[]>([]);
   const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
+  const [script, setScript] = useState<Script | null>(null);
   const [includeImages, setIncludeImages] = useState(false);
   const [duration, setDuration] = useState<Duration>(60);
   const [ocrBusy, setOcrBusy] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState(0);
   const [ocrStatus, setOcrStatus] = useState("");
   const [rendering, setRendering] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
@@ -318,76 +330,78 @@ function VideoGenSection() {
       toast({ title: "Brak tekstu", variant: "destructive" });
       return;
     }
+    speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(txt);
     u.lang = "pl-PL";
+    u.rate = 0.95;
     const pl = speechSynthesis.getVoices().find((v) => v.lang.startsWith("pl"));
     if (pl) u.voice = pl;
     speechSynthesis.speak(u);
   };
 
-  // ---------- OCR ----------
+  // ---------- AI VISION: OCR + SCRIPT ----------
+  const fileToBase64 = (f: File): Promise<string> =>
+    new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+
   const runOCR = async () => {
     if (images.length === 0) {
       toast({ title: "Najpierw dodaj zrzuty ekranu", variant: "destructive" });
       return;
     }
     setOcrBusy(true);
-    setOcrProgress(0);
-    setExtractedText("");
+    setOcrStatus("Wysyłam obrazy do Gemini Vision…");
     try {
-      const Tesseract = (await import("tesseract.js")).default;
-      setOcrStatus("Inicjalizacja silnika OCR (pol+eng)…");
-      const worker = await Tesseract.createWorker(["pol", "eng"], 1, {
-        logger: (m: any) => {
-          if (m.status) setOcrStatus(m.status);
-          if (typeof m.progress === "number")
-            setOcrProgress(Math.round(m.progress * 100));
-        },
+      const b64s = await Promise.all(images.map(fileToBase64));
+      setOcrStatus("Gemini czyta tekst i pisze scenariusz filmu…");
+      const { data, error } = await supabase.functions.invoke("video-script-from-images", {
+        body: { images: b64s, duration },
       });
-      const all: string[] = [];
-      for (let i = 0; i < images.length; i++) {
-        setOcrStatus(`Analiza obrazu ${i + 1}/${images.length}…`);
-        const { data } = await worker.recognize(images[i]);
-        const clean = data.text.replace(/\s+\n/g, "\n").replace(/[ \t]+/g, " ").trim();
-        if (clean) all.push(clean);
-      }
-      await worker.terminate();
-      const joined = all.join("\n\n");
-      setExtractedText(joined);
-      if (!narration.trim()) setNarration(joined);
-      toast({ title: "Tekst odczytany", description: `${joined.length} znaków` });
+      if (error) throw new Error(error.message);
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      const raw = (data as any).rawText || "";
+      const narr = (data as any).narration || raw;
+      const sc = (data as any).script as Script | undefined;
+
+      setExtractedText(raw);
+      setNarration(narr);
+      if (sc?.slides?.length) setScript(sc);
+
+      toast({
+        title: "Tekst i scenariusz gotowe",
+        description: `${raw.length} znaków · ${sc?.slides?.length ?? 0} ujęć`,
+      });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Błąd OCR", description: e?.message, variant: "destructive" });
+      toast({
+        title: "Błąd analizy",
+        description: e?.message || "Spróbuj ponownie.",
+        variant: "destructive",
+      });
     } finally {
       setOcrBusy(false);
       setOcrStatus("");
     }
   };
 
-  // ---------- SLIDE BUILDER ----------
-  const buildSlides = (text: string): { title?: string; body: string }[] => {
+  // ---------- FALLBACK: build slides from raw text if no script ----------
+  const buildFallbackScript = (text: string): Script => {
     const clean = text.replace(/\s+/g, " ").trim();
-    if (!clean) return [{ body: "Brak tekstu" }];
-    // split into sentences
     const sentences = clean
-      .split(/(?<=[.!?])\s+|\n+/)
+      .split(/(?<=[.!?])\s+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 2);
-    // group into chunks of ~120 chars
-    const slides: { title?: string; body: string }[] = [];
-    let buf = "";
-    for (const s of sentences) {
-      if ((buf + " " + s).length > 140 && buf) {
-        slides.push({ body: buf.trim() });
-        buf = s;
-      } else {
-        buf = buf ? buf + " " + s : s;
-      }
-    }
-    if (buf) slides.push({ body: buf.trim() });
-    return slides.length ? slides : [{ body: clean.slice(0, 140) }];
+    const slides: Slide[] = [{ kind: "title", text: "Manifest" }];
+    for (const s of sentences) slides.push({ kind: "point", text: s.slice(0, 140) });
+    slides.push({ kind: "outro", text: "·" });
+    return { title: "Manifest", slides };
   };
+
 
   // ---------- RENDER ----------
   const loadImage = (file: File): Promise<HTMLImageElement> =>
