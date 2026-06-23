@@ -708,9 +708,9 @@ function VideoGenSection() {
         {ocrBusy ? "Czytam tekst…" : "Odczytaj tekst ze zrzutów (OCR)"}
       </Button>
 
-      {(ocrBusy || ocrProgress > 0) && (
+      {ocrBusy && (
         <div className="mt-3">
-          <Progress value={ocrProgress} className="h-2 bg-fuchsia-950" />
+          <Progress value={undefined} className="h-2 bg-fuchsia-950 animate-pulse" />
           <p className="text-xs text-fuchsia-200/60 mt-1">{ocrStatus}</p>
         </div>
       )}
