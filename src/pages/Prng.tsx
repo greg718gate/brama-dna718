@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Lock } from "lucide-react";
+import { Lock, Eye, EyeOff } from "lucide-react";
 import PrngPanel from "@/components/PrngPanel";
 
 const PRNG_PASSWORD = "2912";
+
 
 const Prng = () => {
   const [password, setPassword] = useState("");

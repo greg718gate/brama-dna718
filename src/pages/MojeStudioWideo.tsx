@@ -18,7 +18,10 @@ import {
   Loader2,
   FileAudio,
   Images,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+
 
 const PASSWORD = "MojeStudio2026";
 const STORAGE_KEY = "moje-studio-wideo-auth";
