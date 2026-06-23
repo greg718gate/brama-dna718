@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Lock,
   Upload,
@@ -252,19 +253,31 @@ function TranscriptionSection() {
 
 // ============================================================================
 // ELEGANT TEXT-VIDEO GENERATOR
-// OCR (tesseract.js) → kinetic typography slides (canvas + MediaRecorder)
+// Vision OCR (Gemini 2.5 Flash via Lovable Cloud) → typed kinetic slides
 // ============================================================================
 type Duration = 60 | 120 | 300;
+type Slide =
+  | { kind: "title"; text: string; sub?: string }
+  | { kind: "point"; text: string; accent?: string }
+  | { kind: "quote"; text: string }
+  | { kind: "stat"; value: string; label: string }
+  | { kind: "outro"; text: string };
+
+type Script = {
+  title?: string;
+  subtitle?: string;
+  slides: Slide[];
+};
 
 function VideoGenSection() {
   const { toast } = useToast();
   const [images, setImages] = useState<File[]>([]);
   const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
+  const [script, setScript] = useState<Script | null>(null);
   const [includeImages, setIncludeImages] = useState(false);
   const [duration, setDuration] = useState<Duration>(60);
   const [ocrBusy, setOcrBusy] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState(0);
   const [ocrStatus, setOcrStatus] = useState("");
   const [rendering, setRendering] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
@@ -318,76 +331,78 @@ function VideoGenSection() {
       toast({ title: "Brak tekstu", variant: "destructive" });
       return;
     }
+    speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(txt);
     u.lang = "pl-PL";
+    u.rate = 0.95;
     const pl = speechSynthesis.getVoices().find((v) => v.lang.startsWith("pl"));
     if (pl) u.voice = pl;
     speechSynthesis.speak(u);
   };
 
-  // ---------- OCR ----------
+  // ---------- AI VISION: OCR + SCRIPT ----------
+  const fileToBase64 = (f: File): Promise<string> =>
+    new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+
   const runOCR = async () => {
     if (images.length === 0) {
       toast({ title: "Najpierw dodaj zrzuty ekranu", variant: "destructive" });
       return;
     }
     setOcrBusy(true);
-    setOcrProgress(0);
-    setExtractedText("");
+    setOcrStatus("Wysyłam obrazy do Gemini Vision…");
     try {
-      const Tesseract = (await import("tesseract.js")).default;
-      setOcrStatus("Inicjalizacja silnika OCR (pol+eng)…");
-      const worker = await Tesseract.createWorker(["pol", "eng"], 1, {
-        logger: (m: any) => {
-          if (m.status) setOcrStatus(m.status);
-          if (typeof m.progress === "number")
-            setOcrProgress(Math.round(m.progress * 100));
-        },
+      const b64s = await Promise.all(images.map(fileToBase64));
+      setOcrStatus("Gemini czyta tekst i pisze scenariusz filmu…");
+      const { data, error } = await supabase.functions.invoke("video-script-from-images", {
+        body: { images: b64s, duration },
       });
-      const all: string[] = [];
-      for (let i = 0; i < images.length; i++) {
-        setOcrStatus(`Analiza obrazu ${i + 1}/${images.length}…`);
-        const { data } = await worker.recognize(images[i]);
-        const clean = data.text.replace(/\s+\n/g, "\n").replace(/[ \t]+/g, " ").trim();
-        if (clean) all.push(clean);
-      }
-      await worker.terminate();
-      const joined = all.join("\n\n");
-      setExtractedText(joined);
-      if (!narration.trim()) setNarration(joined);
-      toast({ title: "Tekst odczytany", description: `${joined.length} znaków` });
+      if (error) throw new Error(error.message);
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      const raw = (data as any).rawText || "";
+      const narr = (data as any).narration || raw;
+      const sc = (data as any).script as Script | undefined;
+
+      setExtractedText(raw);
+      setNarration(narr);
+      if (sc?.slides?.length) setScript(sc);
+
+      toast({
+        title: "Tekst i scenariusz gotowe",
+        description: `${raw.length} znaków · ${sc?.slides?.length ?? 0} ujęć`,
+      });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Błąd OCR", description: e?.message, variant: "destructive" });
+      toast({
+        title: "Błąd analizy",
+        description: e?.message || "Spróbuj ponownie.",
+        variant: "destructive",
+      });
     } finally {
       setOcrBusy(false);
       setOcrStatus("");
     }
   };
 
-  // ---------- SLIDE BUILDER ----------
-  const buildSlides = (text: string): { title?: string; body: string }[] => {
+  // ---------- FALLBACK: build slides from raw text if no script ----------
+  const buildFallbackScript = (text: string): Script => {
     const clean = text.replace(/\s+/g, " ").trim();
-    if (!clean) return [{ body: "Brak tekstu" }];
-    // split into sentences
     const sentences = clean
-      .split(/(?<=[.!?])\s+|\n+/)
+      .split(/(?<=[.!?])\s+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 2);
-    // group into chunks of ~120 chars
-    const slides: { title?: string; body: string }[] = [];
-    let buf = "";
-    for (const s of sentences) {
-      if ((buf + " " + s).length > 140 && buf) {
-        slides.push({ body: buf.trim() });
-        buf = s;
-      } else {
-        buf = buf ? buf + " " + s : s;
-      }
-    }
-    if (buf) slides.push({ body: buf.trim() });
-    return slides.length ? slides : [{ body: clean.slice(0, 140) }];
+    const slides: Slide[] = [{ kind: "title", text: "Manifest" }];
+    for (const s of sentences) slides.push({ kind: "point", text: s.slice(0, 140) });
+    slides.push({ kind: "outro", text: "·" });
+    return { title: "Manifest", slides };
   };
+
 
   // ---------- RENDER ----------
   const loadImage = (file: File): Promise<HTMLImageElement> =>
@@ -435,7 +450,8 @@ function VideoGenSection() {
       canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const slides = buildSlides(source);
+      const sc: Script = script ?? buildFallbackScript(source);
+      const slides = sc.slides;
       const refImgs = includeImages ? await Promise.all(images.map(loadImage)) : [];
       const totalSec = duration;
       const perSlide = totalSec / slides.length;
@@ -453,100 +469,167 @@ function VideoGenSection() {
       });
       recorder.start();
 
-      // narration plays live (audible during render)
       if (narration.trim()) speak(narration);
 
-      const drawBg = (t: number, slideIdx: number) => {
-        // animated gradient
-        const a = (slideIdx * 47 + t * 30) % 360;
+      const drawBg = (t: number, slideIdx: number, kind: Slide["kind"]) => {
+        const palettes: Record<Slide["kind"], [number, number, number]> = {
+          title: [285, 270, 250],
+          point: [275, 250, 230],
+          quote: [220, 260, 290],
+          stat:  [310, 285, 260],
+          outro: [260, 240, 220],
+        };
+        const [h1, h2, h3] = palettes[kind];
+        const wob = Math.sin(t * 0.4 + slideIdx) * 8;
         const g = ctx.createLinearGradient(0, 0, W, H);
-        g.addColorStop(0, `hsl(${a}, 55%, 8%)`);
-        g.addColorStop(0.5, `hsl(${(a + 40) % 360}, 60%, 6%)`);
-        g.addColorStop(1, `hsl(${(a + 80) % 360}, 65%, 10%)`);
+        g.addColorStop(0, `hsl(${h1 + wob}, 60%, 7%)`);
+        g.addColorStop(0.5, `hsl(${h2}, 55%, 5%)`);
+        g.addColorStop(1, `hsl(${h3 - wob}, 65%, 9%)`);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
-        // soft glow orbs
         for (let i = 0; i < 3; i++) {
-          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.6 + i) * 60;
-          const cy = H * (0.3 + 0.2 * Math.sin(i)) + Math.cos(t * 0.5 + i) * 40;
-          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 600);
-          rad.addColorStop(0, `hsla(${(a + i * 60) % 360}, 80%, 60%, 0.18)`);
+          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.5 + i) * 80;
+          const cy = H * (0.3 + 0.25 * Math.sin(i)) + Math.cos(t * 0.4 + i) * 60;
+          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 700);
+          rad.addColorStop(0, `hsla(${h1 + i * 30}, 80%, 60%, 0.20)`);
           rad.addColorStop(1, "transparent");
           ctx.fillStyle = rad;
           ctx.fillRect(0, 0, W, H);
         }
-        // grain / vignette
-        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75);
+        const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.78);
         vg.addColorStop(0, "transparent");
-        vg.addColorStop(1, "rgba(0,0,0,0.55)");
+        vg.addColorStop(1, "rgba(0,0,0,0.6)");
         ctx.fillStyle = vg;
         ctx.fillRect(0, 0, W, H);
       };
 
-      const drawSlide = (slide: { body: string }, localT: number, slideIdx: number, globalT: number) => {
-        drawBg(globalT, slideIdx);
-
-        // optional faded reference image
-        if (refImgs.length) {
-          const img = refImgs[slideIdx % refImgs.length];
-          const r = Math.min(W / img.width, H / img.height) * 0.9;
-          const iw = img.width * r;
-          const ih = img.height * r;
-          ctx.globalAlpha = 0.12;
-          ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
-          ctx.globalAlpha = 1;
-        }
-
-        // animation timings (localT = 0..1)
-        const fadeIn = Math.min(1, localT / 0.18);
-        const fadeOut = Math.min(1, (1 - localT) / 0.18);
-        const alpha = Math.max(0, Math.min(1, Math.min(fadeIn, fadeOut)));
-        const slide_y = (1 - fadeIn) * 30; // slide up
-
-        // counter
-        ctx.globalAlpha = 0.55 * alpha;
+      const drawChrome = (slideIdx: number, alpha: number) => {
+        ctx.globalAlpha = 0.5 * alpha;
         ctx.fillStyle = "#f0abfc";
         ctx.font = "500 24px 'Inter', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText(`${String(slideIdx + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`, 80, 80);
-
-        // accent line
-        ctx.globalAlpha = alpha;
-        const lineW = 120 + 200 * fadeIn;
-        const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
-        grad.addColorStop(0, "#d946ef");
-        grad.addColorStop(1, "#8b5cf6");
-        ctx.fillStyle = grad;
-        ctx.fillRect(80, H / 2 - 180 + slide_y, lineW, 4);
-
-        // body text
-        ctx.fillStyle = "#ffffff";
-        const baseSize = slide.body.length > 100 ? 56 : slide.body.length > 60 ? 72 : 92;
-        ctx.font = `700 ${baseSize}px 'Inter', 'Helvetica Neue', sans-serif`;
-        const maxW = W - 160;
-        const lines = wrapText(ctx, slide.body, maxW);
-        const lh = baseSize * 1.2;
-        const totalH = lines.length * lh;
-        let y = H / 2 - totalH / 2 + lh + slide_y;
-        ctx.shadowColor = "rgba(217,70,239,0.35)";
-        ctx.shadowBlur = 30;
-        for (let i = 0; i < lines.length; i++) {
-          const lineAlpha = Math.max(0, Math.min(1, fadeIn * 3 - i * 0.3)) * fadeOut;
-          ctx.globalAlpha = lineAlpha;
-          ctx.fillText(lines[i], 80, y);
-          y += lh;
-        }
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1;
-
-        // footer mark
-        ctx.globalAlpha = 0.4 * alpha;
-        ctx.fillStyle = "#f0abfc";
+        ctx.fillText(
+          `${String(slideIdx + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`,
+          80, 80,
+        );
+        ctx.globalAlpha = 0.35 * alpha;
         ctx.font = "400 20px 'Inter', sans-serif";
         ctx.textAlign = "right";
         ctx.fillText("MOJE STUDIO · 2026", W - 80, H - 60);
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
+      };
+
+      const drawAccentLine = (y: number, fadeIn: number, alpha: number) => {
+        const lineW = 120 + 260 * fadeIn;
+        const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
+        grad.addColorStop(0, "#d946ef");
+        grad.addColorStop(1, "#8b5cf6");
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = grad;
+        ctx.fillRect(80, y, lineW, 4);
+        ctx.globalAlpha = 1;
+      };
+
+      const drawCenteredText = (
+        text: string,
+        size: number,
+        weight: number,
+        cy: number,
+        alpha: number,
+        color = "#ffffff",
+        offY = 0,
+      ) => {
+        ctx.fillStyle = color;
+        ctx.font = `${weight} ${size}px 'Inter', 'Helvetica Neue', sans-serif`;
+        ctx.textAlign = "center";
+        const lines = wrapText(ctx, text, W - 200);
+        const lh = size * 1.18;
+        let y = cy - (lines.length - 1) * lh / 2 + offY;
+        ctx.shadowColor = "rgba(217,70,239,0.4)";
+        ctx.shadowBlur = 40;
+        for (let i = 0; i < lines.length; i++) {
+          const a = Math.max(0, Math.min(1, alpha * 3 - i * 0.25));
+          ctx.globalAlpha = a;
+          ctx.fillText(lines[i], W / 2, y);
+          y += lh;
+        }
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+        ctx.textAlign = "left";
+      };
+
+      const drawSlide = (slide: Slide, localT: number, slideIdx: number, globalT: number) => {
+        drawBg(globalT, slideIdx, slide.kind);
+
+        if (refImgs.length) {
+          const img = refImgs[slideIdx % refImgs.length];
+          const r = Math.min(W / img.width, H / img.height) * 0.95;
+          const iw = img.width * r;
+          const ih = img.height * r;
+          const zoom = 1 + 0.08 * localT;
+          ctx.globalAlpha = 0.1;
+          ctx.drawImage(img, (W - iw * zoom) / 2, (H - ih * zoom) / 2, iw * zoom, ih * zoom);
+          ctx.globalAlpha = 1;
+        }
+
+        const fadeIn = Math.min(1, localT / 0.18);
+        const fadeOut = Math.min(1, (1 - localT) / 0.18);
+        const alpha = Math.min(fadeIn, fadeOut);
+        const offY = (1 - fadeIn) * 30;
+
+        drawChrome(slideIdx, alpha);
+
+        switch (slide.kind) {
+          case "title": {
+            drawAccentLine(H / 2 - 60, fadeIn, alpha);
+            drawCenteredText(slide.text, 120, 800, H / 2 + 30, alpha, "#ffffff", offY);
+            if (slide.sub) {
+              drawCenteredText(slide.sub, 36, 400, H / 2 + 160, alpha, "#f0abfc", offY);
+            }
+            break;
+          }
+          case "point": {
+            drawAccentLine(H / 2 - 140, fadeIn, alpha);
+            const t = slide.text;
+            const size = t.length > 90 ? 56 : t.length > 50 ? 72 : 88;
+            drawCenteredText(t, size, 700, H / 2 + 20, alpha, "#ffffff", offY);
+            if (slide.accent) {
+              drawCenteredText(slide.accent.toUpperCase(), 26, 600, H - 200, alpha, "#f0abfc", 0);
+            }
+            break;
+          }
+          case "quote": {
+            // huge quotes mark
+            ctx.globalAlpha = 0.25 * alpha;
+            ctx.fillStyle = "#d946ef";
+            ctx.font = `900 320px 'Georgia', serif`;
+            ctx.textAlign = "center";
+            ctx.fillText("\u201C", W / 2, H / 2 - 80);
+            ctx.globalAlpha = 1;
+            ctx.textAlign = "left";
+            const t = slide.text;
+            const size = t.length > 90 ? 52 : 68;
+            drawCenteredText(t, size, 500, H / 2 + 80, alpha, "#ffffff", offY);
+            break;
+          }
+          case "stat": {
+            drawCenteredText(slide.value, 200, 900, H / 2 - 20, alpha, "#ffffff", offY);
+            drawAccentLine(H / 2 + 100, fadeIn, alpha);
+            drawCenteredText(slide.label, 38, 400, H / 2 + 180, alpha, "#f0abfc", offY);
+            break;
+          }
+          case "outro": {
+            const pulse = 1 + 0.04 * Math.sin(globalT * 2);
+            ctx.save();
+            ctx.translate(W / 2, H / 2);
+            ctx.scale(pulse, pulse);
+            ctx.translate(-W / 2, -H / 2);
+            drawCenteredText(slide.text, 96, 700, H / 2, alpha, "#ffffff", offY);
+            ctx.restore();
+            break;
+          }
+        }
       };
 
       const start = performance.now();
@@ -578,6 +661,7 @@ function VideoGenSection() {
     }
   };
 
+
   return (
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
@@ -585,7 +669,7 @@ function VideoGenSection() {
         <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Wrzuć zrzuty ekranu — odczytam z nich tekst (OCR pol+eng) i zmontuję kinetyczny film typograficzny.
+        Wrzuć zrzuty — Gemini Vision odczyta tekst (polskie znaki OK) i napisze scenariusz filmu (tytuł · punkty · cytaty · puenta).
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -624,9 +708,9 @@ function VideoGenSection() {
         {ocrBusy ? "Czytam tekst…" : "Odczytaj tekst ze zrzutów (OCR)"}
       </Button>
 
-      {(ocrBusy || ocrProgress > 0) && (
+      {ocrBusy && (
         <div className="mt-3">
-          <Progress value={ocrProgress} className="h-2 bg-fuchsia-950" />
+          <Progress value={undefined} className="h-2 bg-fuchsia-950 animate-pulse" />
           <p className="text-xs text-fuchsia-200/60 mt-1">{ocrStatus}</p>
         </div>
       )}
@@ -801,7 +885,7 @@ export default function MojeStudioWideo() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-fuchsia-200/40">
-          Whisper przez @xenova/transformers · Web Speech API · canvas + MediaRecorder
+          Whisper (lokalnie) · Gemini Vision (Lovable Cloud) · canvas + MediaRecorder
         </footer>
       </div>
     </div>
