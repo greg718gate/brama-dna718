@@ -669,7 +669,7 @@ function VideoGenSection() {
         <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Wrzuć zrzuty ekranu — odczytam z nich tekst (OCR pol+eng) i zmontuję kinetyczny film typograficzny.
+        Wrzuć zrzuty — Gemini Vision odczyta tekst (polskie znaki OK) i napisze scenariusz filmu (tytuł · punkty · cytaty · puenta).
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
