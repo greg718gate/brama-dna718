@@ -603,13 +603,13 @@ function VideoGenSection() {
       </label>
 
       {images.length > 0 && (
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2 mt-3 pb-1">
           {images.map((f, i) => (
             <img
               key={i}
               src={URL.createObjectURL(f)}
               alt=""
-              className="h-16 w-16 object-cover rounded border border-fuchsia-500/30"
+              className="h-14 w-14 object-cover rounded border border-fuchsia-500/30 shrink-0"
             />
           ))}
         </div>
