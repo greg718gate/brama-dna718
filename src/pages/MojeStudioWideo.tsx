@@ -188,7 +188,7 @@ function TranscriptionSection() {
   };
 
   return (
-    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-6 backdrop-blur">
+    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <FileAudio className="w-5 h-5 text-fuchsia-400" />
         <h2 className="text-lg font-semibold text-white">Sekcja 1 · Wideo/Audio → Tekst</h2>
@@ -579,7 +579,7 @@ function VideoGenSection() {
   };
 
   return (
-    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-6 backdrop-blur">
+    <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
         <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
