@@ -97,7 +97,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 
 
 // ============================================================================
-// TRANSCRIPTION (Whisper via @xenova/transformers)
+// TRANSCRIPTION (Lovable AI Gateway via edge function)
 // ============================================================================
 function TranscriptionSection() {
   const { toast } = useToast();
@@ -106,7 +106,7 @@ function TranscriptionSection() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
-  const pipelineRef = useRef<any>(null);
+
 
   const run = async () => {
     if (!file) return;
