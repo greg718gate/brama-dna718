@@ -177,7 +177,7 @@ function TranscriptionSection() {
         <h2 className="text-lg font-semibold text-white">Sekcja 1 · Wideo/Audio → Tekst</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Lokalna transkrypcja przez Whisper (Transformers.js). Plik nigdy nie opuszcza Twojej przeglądarki.
+        Transkrypcja w chmurze (Lovable AI · OpenAI gpt-4o-mini-transcribe). Limit pliku: 25 MB. Telefon nie liczy nic lokalnie.
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-8 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
