@@ -108,65 +108,46 @@ function TranscriptionSection() {
   const [busy, setBusy] = useState(false);
   const pipelineRef = useRef<any>(null);
 
-  const decodeAudio = async (f: File): Promise<Float32Array> => {
-    const arrayBuf = await f.arrayBuffer();
-    const Ctx = (window.AudioContext || (window as any).webkitAudioContext);
-    const ctx = new Ctx({ sampleRate: 16000 });
-    const audio = await ctx.decodeAudioData(arrayBuf.slice(0));
-    // mix to mono
-    if (audio.numberOfChannels === 1) return audio.getChannelData(0);
-    const left = audio.getChannelData(0);
-    const right = audio.getChannelData(1);
-    const out = new Float32Array(left.length);
-    for (let i = 0; i < left.length; i++) out[i] = (left[i] + right[i]) / 2;
-    return out;
-  };
-
   const run = async () => {
     if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      toast({
+        title: "Plik za duży",
+        description: "Maks. 25 MB. Skróć nagranie lub wyciągnij sam dźwięk (mp3/m4a).",
+        variant: "destructive",
+      });
+      return;
+    }
     setBusy(true);
     setText("");
-    setProgress(2);
-    setStatus("Inicjalizacja modelu Whisper (lokalnie w przeglądarce)…");
+    setProgress(10);
+    setStatus("Wysyłanie pliku na serwer transkrypcji…");
+
+    // fake progress so user widzi ruch
+    const tick = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + 2 : p));
+    }, 800);
 
     try {
-      const { pipeline, env } = await import("@xenova/transformers");
-      env.allowLocalModels = false;
+      const fd = new FormData();
+      fd.append("file", file, file.name || "audio");
 
-      if (!pipelineRef.current) {
-        pipelineRef.current = await pipeline(
-          "automatic-speech-recognition",
-          "Xenova/whisper-tiny",
-          {
-            progress_callback: (p: any) => {
-              if (p.status === "progress" && p.progress) {
-                setProgress(Math.min(40, Math.round(p.progress * 0.4)));
-                setStatus(`Pobieranie modelu: ${p.file} (${Math.round(p.progress)}%)`);
-              }
-            },
-          } as any,
-        );
-      }
-      setProgress(45);
-      setStatus("Dekodowanie audio…");
-      const audio = await decodeAudio(file);
+      const projectId = (import.meta as any).env.VITE_SUPABASE_PROJECT_ID;
+      const anon = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const url = `https://${projectId}.supabase.co/functions/v1/transcribe-audio`;
 
-      setProgress(55);
-      setStatus("Transkrypcja w toku (lokalnie, bez wysyłania pliku)…");
-      const result: any = await pipelineRef.current(audio, {
-        chunk_length_s: 30,
-        stride_length_s: 5,
-        language: "polish",
-        task: "transcribe",
-        return_timestamps: false,
-        callback_function: (beams: any) => {
-          // streaming-ish update
-          if (beams?.[0]?.output_token_ids) {
-            setProgress((p) => Math.min(95, p + 1));
-          }
-        },
+      setStatus("Transkrypcja w toku (chmura, nic nie liczy się na telefonie)…");
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${anon}`, apikey: anon },
+        body: fd,
       });
-      setText(result?.text?.trim() || "");
+
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        throw new Error(data?.error || `HTTP ${r.status}`);
+      }
+      setText((data?.text || "").trim());
       setProgress(100);
       setStatus("Gotowe.");
       toast({ title: "Transkrypcja ukończona" });
@@ -179,6 +160,7 @@ function TranscriptionSection() {
       });
       setStatus("Błąd: " + (e?.message || "nieznany"));
     } finally {
+      clearInterval(tick);
       setBusy(false);
     }
   };
