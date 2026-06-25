@@ -407,7 +407,7 @@ function VideoGenSection() {
       const url = URL.createObjectURL(f);
       img.onload = () => {
         try {
-          const maxSide = 1800;
+          const maxSide = 1500;
           const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.round(img.width * scale));
@@ -417,7 +417,7 @@ function VideoGenSection() {
           c.fillRect(0, 0, canvas.width, canvas.height);
           c.drawImage(img, 0, 0, canvas.width, canvas.height);
           URL.revokeObjectURL(url);
-          res(canvas.toDataURL("image/jpeg", 0.92));
+          res(canvas.toDataURL("image/jpeg", 0.86));
         } catch (e) {
           URL.revokeObjectURL(url);
           rej(e);
