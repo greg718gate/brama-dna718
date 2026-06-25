@@ -456,7 +456,7 @@ function VideoGenSection() {
       const b64s = await Promise.all(images.map(fileToBase64));
       setOcrStatus("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…");
       const { data, error } = await supabase.functions.invoke("video-script-from-images", {
-        body: { images: b64s, duration },
+        body: { images: b64s, duration, instruction: command.trim() },
       });
       if (error) throw new Error(error.message);
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -469,6 +469,9 @@ function VideoGenSection() {
       setNarration(narr);
       const normalized = normalizeScript(sc);
       if (normalized) setScript(normalized);
+      if ((data as any)?.warning) {
+        toast({ title: "Tryb awaryjny", description: String((data as any).warning) });
+      }
 
       toast({
         title: "Tekst i scenariusz gotowe",
@@ -476,10 +479,16 @@ function VideoGenSection() {
       });
     } catch (e: any) {
       console.error(e);
+      const fallbackSource = command.trim() || images.map((f, i) => `Ekran ${i + 1}: ${f.name}`).join(". ");
+      const fallback = buildFallbackScript(fallbackSource || "Analiza materiału ze zrzutów ekranu");
+      setExtractedText(
+        `Tryb awaryjny lokalny: funkcja AI nie odpowiedziała poprawnie.\n\n${fallbackSource || "Brak opisu — film zostanie zbudowany na podstawie miniatur i tematycznych plansz."}`,
+      );
+      setNarration(fallbackSource || "Film pokazuje materiał źródłowy i tematyczne plansze, bez dopowiadania niepotwierdzonych faktów.");
+      setScript(fallback);
       toast({
-        title: "Błąd analizy",
-        description: e?.message || "Spróbuj ponownie.",
-        variant: "destructive",
+        title: "AI nie odpowiedziało — włączono tryb awaryjny",
+        description: "Możesz od razu wygenerować film z tematycznymi planszami i miniaturami źródeł.",
       });
     } finally {
       setOcrBusy(false);
@@ -495,16 +504,41 @@ function VideoGenSection() {
       .map((s) => s.trim())
       .filter((s) => s.length > 2);
     const formulaLike = clean.match(/[^.!?\n]*(?:=|≈|≤|≥|√|∑|∆|Δ|Ω|µ|φ|π|\bHz\b|\bmm\b|\bcm\b|\bkg\b|\bN\b|\bV\b|\bA\b|\bm\/s\b)[^.!?\n]*/g) || [];
-    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "wzory · obliczenia · źródła", imageIndex: 1 }];
+    const baseCue = inferVisualCue(clean);
+    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "źródła · temat · wizualizacja", imageIndex: 1, visualMode: "thematic", visualCue: baseCue }];
     formulaLike.slice(0, 12).forEach((f, i) => {
-      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}` });
+      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}`, visualMode: "hybrid", visualCue: "engineering_blueprint" });
     });
     for (const [i, s] of sentences.entries()) {
       if (slides.length > 34) break;
-      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}` });
+      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}`, visualMode: "hybrid", visualCue: inferVisualCue(s) });
     }
-    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1 });
+    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1, visualMode: "thematic", visualCue: baseCue });
     return { title: "Analiza materiału", slides };
+  };
+
+  const inferVisualCue = (text: string): VisualCue => {
+    const t = text.toLowerCase();
+    if (/(drzew|las|liść|liście|gałą|korze|korzeń|roślin|natura|forest|tree)/.test(t)) return "forest_trees";
+    if (/(wz[oó]r|równ|oblicz|sił|moment|napręż|prąd|napię|hz|mm|cm|kg|newton|schemat|inżyn|engineer)/.test(t)) return "engineering_blueprint";
+    if (/(dna|gen|chromosom|mitochond|komór|biolog)/.test(t)) return "dna_biology";
+    if (/(gwiazd|kosmos|planeta|orbita|światło|foton|kwant)/.test(t)) return "cosmic_physics";
+    if (/(woda|rzeka|morze|ocean|fala)/.test(t)) return "water_waves";
+    if (/(ogień|płomień|temperatur|ciepł)/.test(t)) return "fire_energy";
+    return "abstract_technical";
+  };
+
+  const normalizeVisualMode = (mode: unknown, kind: Slide["kind"]): VisualMode => {
+    if (mode === "source" || mode === "hybrid" || mode === "thematic") return mode;
+    if (kind === "formula" || kind === "calculation" || kind === "sketch") return "hybrid";
+    if (kind === "evidence") return "source";
+    return "thematic";
+  };
+
+  const normalizeVisualCue = (cue: unknown, text: string): VisualCue => {
+    const value = String(cue || "") as VisualCue;
+    const allowed: VisualCue[] = ["forest_trees", "engineering_blueprint", "dna_biology", "cosmic_physics", "water_waves", "fire_energy", "abstract_technical"];
+    return allowed.includes(value) ? value : inferVisualCue(text);
   };
 
   const normalizeScript = (candidate: unknown): Script | null => {
@@ -518,26 +552,30 @@ function VideoGenSection() {
             ? (i % images.length) + 1
             : undefined;
         const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `Ekran ${imageIndex}` : undefined;
+        const visualText = String(slide?.text || slide?.title || slide?.formula || slide?.caption || slide?.label || input.title || "");
+        const visualMode = normalizeVisualMode(slide?.visualMode, slide?.kind || "point");
+        const visualCue = normalizeVisualCue(slide?.visualCue, visualText);
+        const visual = { visualMode, visualCue };
         switch (slide?.kind) {
           case "title":
-            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex };
+            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex, ...visual };
           case "formula":
-            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source };
+            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source, ...visual };
           case "calculation":
-            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source };
+            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source, ...visual };
           case "sketch":
-            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source };
+            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source, ...visual };
           case "stat":
-            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source };
+            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source, ...visual };
           case "evidence":
-            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source };
+            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source, ...visual };
           case "quote":
-            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source };
+            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source, ...visual };
           case "outro":
-            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex };
+            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex, ...visual };
           case "point":
           default:
-            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source };
+            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source, ...visual };
         }
       })
       .filter((slide): slide is Slide => Boolean(slide));
