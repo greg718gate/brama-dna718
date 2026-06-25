@@ -577,7 +577,7 @@ function VideoGenSection() {
       canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const sc: Script = script ?? buildFallbackScript(source);
+      const sc: Script = normalizeScript(script) ?? buildFallbackScript(source);
       const slides = sc.slides;
       const refImgs = includeImages ? await Promise.all(images.map(loadImage)) : [];
       const totalSec = duration;
@@ -828,17 +828,17 @@ function VideoGenSection() {
             break;
           }
           case "quote": {
-            // huge quotes mark
-            ctx.globalAlpha = 0.25 * alpha;
-            ctx.fillStyle = "#d946ef";
-            ctx.font = `900 320px 'Georgia', serif`;
-            ctx.textAlign = "center";
-            ctx.fillText("\u201C", W / 2, H / 2 - 80);
-            ctx.globalAlpha = 1;
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            ctx.globalAlpha = 0.2 * alpha;
+            ctx.fillStyle = "#00CED1";
+            ctx.font = `900 220px 'Inter', sans-serif`;
             ctx.textAlign = "left";
+            ctx.fillText("≡", 1250, 350);
+            ctx.globalAlpha = 1;
             const t = slide.text;
-            const size = t.length > 90 ? 52 : 68;
-            drawCenteredText(t, size, 500, H / 2 + 80, alpha, "#ffffff", offY);
+            const size = t.length > 90 ? 38 : 48;
+            drawBlockText(t, 1250, 430 + offY, 540, size, 520, alpha, "#ffffff", 8);
             break;
           }
           case "stat": {
