@@ -235,20 +235,22 @@ Deno.serve(async (req) => {
     if (!aiRes.ok) {
       const errTxt = await aiRes.text();
       console.error("AI gateway error", aiRes.status, errTxt);
-      if (aiRes.status === 429) {
-        return new Response(JSON.stringify({ error: "Limit zapytań AI — spróbuj za chwilę." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiRes.status === 402) {
-        return new Response(JSON.stringify({ error: "Brak kredytów AI w workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ error: "AI gateway: " + errTxt }), {
-        status: 500,
+      const fallback = buildFallback(
+        instruction
+          ? `Polecenie użytkownika: ${instruction}. Analiza AI nie została ukończona: HTTP ${aiRes.status}.`
+          : `Analiza AI nie została ukończona: HTTP ${aiRes.status}.`,
+        targetSec,
+        images.length,
+      );
+      return new Response(JSON.stringify({
+        ...fallback,
+        warning: aiRes.status === 429
+          ? "Limit zapytań AI — użyto lokalnego trybu awaryjnego."
+          : aiRes.status === 402
+            ? "Brak kredytów AI — użyto lokalnego trybu awaryjnego bez OCR."
+            : "AI nie ukończyło analizy — użyto lokalnego trybu awaryjnego.",
+      }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -273,8 +275,9 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error(e);
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
-      status: 500,
+    const fallback = buildFallback(`Błąd funkcji analizy: ${(e as Error).message}`, 60, 0);
+    return new Response(JSON.stringify({ ...fallback, warning: "Funkcja analizy uruchomiła tryb awaryjny." }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
