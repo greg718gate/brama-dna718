@@ -99,6 +99,50 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 // ============================================================================
 // TRANSCRIPTION (Lovable AI Gateway via edge function)
 // ============================================================================
+// Encode a Float32 PCM buffer (mono) as a 16-bit WAV Blob
+function encodeWav(samples: Float32Array, sampleRate: number): Blob {
+  const buffer = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buffer);
+  const writeStr = (off: number, s: string) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+  };
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + samples.length * 2, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, "data");
+  view.setUint32(40, samples.length * 2, true);
+  let off = 44;
+  for (let i = 0; i < samples.length; i++, off += 2) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Blob([buffer], { type: "audio/wav" });
+}
+
+// Downsample mono Float32 to target rate (simple averaging)
+function downsample(input: Float32Array, inRate: number, outRate: number): Float32Array {
+  if (outRate === inRate) return input;
+  const ratio = inRate / outRate;
+  const newLen = Math.floor(input.length / ratio);
+  const out = new Float32Array(newLen);
+  for (let i = 0; i < newLen; i++) {
+    const start = Math.floor(i * ratio);
+    const end = Math.min(input.length, Math.floor((i + 1) * ratio));
+    let sum = 0;
+    for (let j = start; j < end; j++) sum += input[j];
+    out[i] = sum / Math.max(1, end - start);
+  }
+  return out;
+}
+
 function TranscriptionSection() {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -107,60 +151,90 @@ function TranscriptionSection() {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const SR = 16000; // 16 kHz mono
+  const CHUNK_SECONDS = 600; // 10 min per chunk → ~19 MB WAV (< 25 MB limit)
+
+  const sendChunk = async (blob: Blob, idx: number): Promise<string> => {
+    const fd = new FormData();
+    fd.append("file", blob, `chunk-${idx}.wav`);
+    const projectId = (import.meta as any).env.VITE_SUPABASE_PROJECT_ID;
+    const anon = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const url = `https://${projectId}.supabase.co/functions/v1/transcribe-audio`;
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${anon}`, apikey: anon },
+      body: fd,
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data?.error || `HTTP ${r.status}`);
+    return (data?.text || "").trim();
+  };
 
   const run = async () => {
     if (!file) return;
-    if (file.size > 25 * 1024 * 1024) {
-      toast({
-        title: "Plik za duży",
-        description: "Maks. 25 MB. Skróć nagranie lub wyciągnij sam dźwięk (mp3/m4a).",
-        variant: "destructive",
-      });
+    if (file.size > 500 * 1024 * 1024) {
+      toast({ title: "Plik za duży", description: "Maks. 500 MB.", variant: "destructive" });
       return;
     }
     setBusy(true);
     setText("");
-    setProgress(10);
-    setStatus("Wysyłanie pliku na serwer transkrypcji…");
-
-    // fake progress so user widzi ruch
-    const tick = setInterval(() => {
-      setProgress((p) => (p < 90 ? p + 2 : p));
-    }, 800);
+    setProgress(2);
+    setStatus("Wczytuję plik…");
 
     try {
-      const fd = new FormData();
-      fd.append("file", file, file.name || "audio");
+      const arrayBuf = await file.arrayBuffer();
+      setProgress(8);
+      setStatus("Dekoduję ścieżkę dźwiękową (lokalnie w przeglądarce)…");
 
-      const projectId = (import.meta as any).env.VITE_SUPABASE_PROJECT_ID;
-      const anon = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const url = `https://${projectId}.supabase.co/functions/v1/transcribe-audio`;
+      const AC: typeof AudioContext =
+        (window as any).AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AC();
+      const audio = await ctx.decodeAudioData(arrayBuf.slice(0));
+      await ctx.close().catch(() => {});
 
-      setStatus("Transkrypcja w toku (chmura, nic nie liczy się na telefonie)…");
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${anon}`, apikey: anon },
-        body: fd,
-      });
-
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        throw new Error(data?.error || `HTTP ${r.status}`);
+      // Mono mix
+      const ch0 = audio.getChannelData(0);
+      let mono: Float32Array;
+      if (audio.numberOfChannels > 1) {
+        const ch1 = audio.getChannelData(1);
+        mono = new Float32Array(ch0.length);
+        for (let i = 0; i < ch0.length; i++) mono[i] = (ch0[i] + ch1[i]) * 0.5;
+      } else {
+        mono = ch0;
       }
-      setText((data?.text || "").trim());
+
+      setProgress(20);
+      setStatus("Konwertuję do 16 kHz mono…");
+      const down = downsample(mono, audio.sampleRate, SR);
+
+      const chunkSamples = CHUNK_SECONDS * SR;
+      const totalChunks = Math.max(1, Math.ceil(down.length / chunkSamples));
+      const parts: string[] = [];
+
+      for (let i = 0; i < totalChunks; i++) {
+        const slice = down.subarray(i * chunkSamples, Math.min(down.length, (i + 1) * chunkSamples));
+        const wav = encodeWav(slice, SR);
+        setStatus(
+          `Wysyłam fragment ${i + 1}/${totalChunks} (${(wav.size / 1024 / 1024).toFixed(1)} MB) do transkrypcji…`
+        );
+        const piece = await sendChunk(wav, i + 1);
+        parts.push(piece);
+        setText(parts.join(" "));
+        setProgress(20 + Math.round(((i + 1) / totalChunks) * 78));
+      }
+
       setProgress(100);
-      setStatus("Gotowe.");
+      setStatus(`Gotowe. Fragmentów: ${totalChunks}.`);
       toast({ title: "Transkrypcja ukończona" });
     } catch (e: any) {
       console.error(e);
       toast({
         title: "Błąd transkrypcji",
-        description: e?.message || "Spróbuj krótszego pliku lub innego formatu.",
+        description: e?.message || "Spróbuj innego formatu (mp4/m4a/mp3/wav).",
         variant: "destructive",
       });
       setStatus("Błąd: " + (e?.message || "nieznany"));
     } finally {
-      clearInterval(tick);
       setBusy(false);
     }
   };
@@ -177,7 +251,7 @@ function TranscriptionSection() {
         <h2 className="text-lg font-semibold text-white">Sekcja 1 · Wideo/Audio → Tekst</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Transkrypcja w chmurze (Lovable AI · OpenAI gpt-4o-mini-transcribe). Limit pliku: 25 MB. Telefon nie liczy nic lokalnie.
+        Obsługa dużych plików (do ~500 MB). Telefon wyciąga sam dźwięk, konwertuje do 16 kHz mono i dzieli na 10-minutowe fragmenty — każdy wysyłany osobno do transkrypcji w chmurze (gpt-4o-mini-transcribe), a wyniki sklejane.
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-8 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
