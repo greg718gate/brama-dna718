@@ -1006,6 +1006,18 @@ function VideoGenSection() {
         />
       </div>
 
+      <div className="mt-3">
+        <label className="text-xs text-fuchsia-200/60 mb-1 block">
+          Odczyt źródłowy OCR (do kontroli wzorów, liczb i polskich znaków)
+        </label>
+        <Textarea
+          value={extractedText}
+          onChange={(e) => setExtractedText(e.target.value)}
+          placeholder="Tu pojawi się pełny odczyt ekran po ekranie…"
+          className="bg-black/40 border-cyan-400/20 text-white placeholder:text-cyan-100/30 min-h-[150px]"
+        />
+      </div>
+
       {/* duration selector */}
       <div className="mt-4">
         <label className="text-xs text-fuchsia-200/60 mb-2 block">Długość filmu</label>
