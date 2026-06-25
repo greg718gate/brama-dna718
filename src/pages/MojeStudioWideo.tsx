@@ -945,7 +945,7 @@ function VideoGenSection() {
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
-        <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
+        <h2 className="text-lg font-semibold text-white">Sekcja 2 · Zrzuty → film techniczny</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
         Wrzuć zrzuty — AI ma zachować fakty, wzory, liczby, obliczenia i szkice, a film pokazuje obrazy źródłowe zamiast samego czarnego tła z tekstem.
@@ -961,7 +961,7 @@ function VideoGenSection() {
         />
         <Images className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — zrzuty ekranu / szkice / wzory"}
+          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — do 40 zrzutów / szkiców / wzorów"}
         </p>
       </label>
 
@@ -1142,7 +1142,7 @@ export default function MojeStudioWideo() {
               Moje Studio Wideo
             </h1>
             <p className="text-xs text-fuchsia-200/60 mt-1">
-              Prywatne narzędzia — transkrypcja i generator filmów. 100% lokalnie.
+              Prywatne narzędzia — transkrypcja i generator filmów technicznych.
             </p>
           </div>
           <Button
@@ -1164,7 +1164,7 @@ export default function MojeStudioWideo() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-fuchsia-200/40">
-          Whisper (lokalnie) · Gemini Vision (Lovable Cloud) · canvas + MediaRecorder
+          Analiza wizualna · transkrypcja audio · render canvas + MediaRecorder
         </footer>
       </div>
     </div>
