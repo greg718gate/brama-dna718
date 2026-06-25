@@ -313,15 +313,30 @@ function TranscriptionSection() {
 // ============================================================================
 type Duration = 60 | 120 | 300;
 type Slide =
-  | { kind: "title"; text: string; sub?: string; imageIndex?: number }
-  | { kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string }
-  | { kind: "quote"; text: string; imageIndex?: number; source?: string }
-  | { kind: "stat"; value: string; label: string; imageIndex?: number; source?: string }
-  | { kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string }
-  | { kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string }
-  | { kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string }
-  | { kind: "evidence"; text: string; imageIndex?: number; source?: string }
-  | { kind: "outro"; text: string; imageIndex?: number };
+  | ({ kind: "title"; text: string; sub?: string; imageIndex?: number } & VisualPlan)
+  | ({ kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "quote"; text: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "stat"; value: string; label: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "evidence"; text: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "outro"; text: string; imageIndex?: number } & VisualPlan);
+
+type VisualMode = "source" | "hybrid" | "thematic";
+type VisualCue =
+  | "forest_trees"
+  | "engineering_blueprint"
+  | "dna_biology"
+  | "cosmic_physics"
+  | "water_waves"
+  | "fire_energy"
+  | "abstract_technical";
+
+type VisualPlan = {
+  visualMode?: VisualMode;
+  visualCue?: VisualCue | string;
+};
 
 type Script = {
   title?: string;
@@ -441,7 +456,7 @@ function VideoGenSection() {
       const b64s = await Promise.all(images.map(fileToBase64));
       setOcrStatus("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…");
       const { data, error } = await supabase.functions.invoke("video-script-from-images", {
-        body: { images: b64s, duration },
+        body: { images: b64s, duration, instruction: command.trim() },
       });
       if (error) throw new Error(error.message);
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -454,6 +469,9 @@ function VideoGenSection() {
       setNarration(narr);
       const normalized = normalizeScript(sc);
       if (normalized) setScript(normalized);
+      if ((data as any)?.warning) {
+        toast({ title: "Tryb awaryjny", description: String((data as any).warning) });
+      }
 
       toast({
         title: "Tekst i scenariusz gotowe",
@@ -461,10 +479,16 @@ function VideoGenSection() {
       });
     } catch (e: any) {
       console.error(e);
+      const fallbackSource = command.trim() || images.map((f, i) => `Ekran ${i + 1}: ${f.name}`).join(". ");
+      const fallback = buildFallbackScript(fallbackSource || "Analiza materiału ze zrzutów ekranu");
+      setExtractedText(
+        `Tryb awaryjny lokalny: funkcja AI nie odpowiedziała poprawnie.\n\n${fallbackSource || "Brak opisu — film zostanie zbudowany na podstawie miniatur i tematycznych plansz."}`,
+      );
+      setNarration(fallbackSource || "Film pokazuje materiał źródłowy i tematyczne plansze, bez dopowiadania niepotwierdzonych faktów.");
+      setScript(fallback);
       toast({
-        title: "Błąd analizy",
-        description: e?.message || "Spróbuj ponownie.",
-        variant: "destructive",
+        title: "AI nie odpowiedziało — włączono tryb awaryjny",
+        description: "Możesz od razu wygenerować film z tematycznymi planszami i miniaturami źródeł.",
       });
     } finally {
       setOcrBusy(false);
@@ -480,16 +504,41 @@ function VideoGenSection() {
       .map((s) => s.trim())
       .filter((s) => s.length > 2);
     const formulaLike = clean.match(/[^.!?\n]*(?:=|≈|≤|≥|√|∑|∆|Δ|Ω|µ|φ|π|\bHz\b|\bmm\b|\bcm\b|\bkg\b|\bN\b|\bV\b|\bA\b|\bm\/s\b)[^.!?\n]*/g) || [];
-    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "wzory · obliczenia · źródła", imageIndex: 1 }];
+    const baseCue = inferVisualCue(clean);
+    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "źródła · temat · wizualizacja", imageIndex: 1, visualMode: "thematic", visualCue: baseCue }];
     formulaLike.slice(0, 12).forEach((f, i) => {
-      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}` });
+      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}`, visualMode: "hybrid", visualCue: "engineering_blueprint" });
     });
     for (const [i, s] of sentences.entries()) {
       if (slides.length > 34) break;
-      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}` });
+      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}`, visualMode: "hybrid", visualCue: inferVisualCue(s) });
     }
-    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1 });
+    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1, visualMode: "thematic", visualCue: baseCue });
     return { title: "Analiza materiału", slides };
+  };
+
+  const inferVisualCue = (text: string): VisualCue => {
+    const t = text.toLowerCase();
+    if (/(drzew|las|liść|liście|gałą|korze|korzeń|roślin|natura|forest|tree)/.test(t)) return "forest_trees";
+    if (/(wz[oó]r|równ|oblicz|sił|moment|napręż|prąd|napię|hz|mm|cm|kg|newton|schemat|inżyn|engineer)/.test(t)) return "engineering_blueprint";
+    if (/(dna|gen|chromosom|mitochond|komór|biolog)/.test(t)) return "dna_biology";
+    if (/(gwiazd|kosmos|planeta|orbita|światło|foton|kwant)/.test(t)) return "cosmic_physics";
+    if (/(woda|rzeka|morze|ocean|fala)/.test(t)) return "water_waves";
+    if (/(ogień|płomień|temperatur|ciepł)/.test(t)) return "fire_energy";
+    return "abstract_technical";
+  };
+
+  const normalizeVisualMode = (mode: unknown, kind: Slide["kind"]): VisualMode => {
+    if (mode === "source" || mode === "hybrid" || mode === "thematic") return mode;
+    if (kind === "formula" || kind === "calculation" || kind === "sketch") return "hybrid";
+    if (kind === "evidence") return "source";
+    return "thematic";
+  };
+
+  const normalizeVisualCue = (cue: unknown, text: string): VisualCue => {
+    const value = String(cue || "") as VisualCue;
+    const allowed: VisualCue[] = ["forest_trees", "engineering_blueprint", "dna_biology", "cosmic_physics", "water_waves", "fire_energy", "abstract_technical"];
+    return allowed.includes(value) ? value : inferVisualCue(text);
   };
 
   const normalizeScript = (candidate: unknown): Script | null => {
@@ -503,26 +552,30 @@ function VideoGenSection() {
             ? (i % images.length) + 1
             : undefined;
         const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `Ekran ${imageIndex}` : undefined;
+        const visualText = String(slide?.text || slide?.title || slide?.formula || slide?.caption || slide?.label || input.title || "");
+        const visualMode = normalizeVisualMode(slide?.visualMode, slide?.kind || "point");
+        const visualCue = normalizeVisualCue(slide?.visualCue, visualText);
+        const visual = { visualMode, visualCue };
         switch (slide?.kind) {
           case "title":
-            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex };
+            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex, ...visual };
           case "formula":
-            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source };
+            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source, ...visual };
           case "calculation":
-            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source };
+            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source, ...visual };
           case "sketch":
-            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source };
+            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source, ...visual };
           case "stat":
-            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source };
+            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source, ...visual };
           case "evidence":
-            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source };
+            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source, ...visual };
           case "quote":
-            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source };
+            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source, ...visual };
           case "outro":
-            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex };
+            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex, ...visual };
           case "point":
           default:
-            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source };
+            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source, ...visual };
         }
       })
       .filter((slide): slide is Slide => Boolean(slide));
@@ -659,6 +712,161 @@ function VideoGenSection() {
         ctx.drawImage(img, ix, iy, iw, ih);
       };
 
+      const drawThematicVisual = (cue: string | undefined, t: number, slideIdx: number, alpha: number) => {
+        const visual = cue || "abstract_technical";
+        ctx.save();
+        ctx.globalAlpha = 0.95 * alpha;
+
+        if (visual === "forest_trees") {
+          const sky = ctx.createLinearGradient(0, 0, 0, H);
+          sky.addColorStop(0, "#04130c");
+          sky.addColorStop(0.52, "#082315");
+          sky.addColorStop(1, "#020806");
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, W, H);
+          for (let i = 0; i < 34; i++) {
+            const x = ((i * 173 + slideIdx * 41) % (W + 260)) - 130;
+            const base = H - ((i % 5) * 18);
+            const trunkH = 390 + (i % 7) * 55;
+            const sway = Math.sin(t * 0.7 + i) * 12;
+            ctx.globalAlpha = (0.22 + (i % 6) * 0.045) * alpha;
+            ctx.strokeStyle = i % 3 === 0 ? "#8b5a2b" : "#14532d";
+            ctx.lineWidth = 16 + (i % 4) * 5;
+            ctx.beginPath();
+            ctx.moveTo(x, base);
+            ctx.bezierCurveTo(x + sway, base - trunkH * 0.35, x - sway, base - trunkH * 0.7, x + sway * 0.4, base - trunkH);
+            ctx.stroke();
+            const crownY = base - trunkH - 30;
+            const crownR = 82 + (i % 5) * 24;
+            const leaf = ctx.createRadialGradient(x, crownY, 8, x, crownY, crownR);
+            leaf.addColorStop(0, "rgba(74,222,128,0.75)");
+            leaf.addColorStop(1, "rgba(20,83,45,0.08)");
+            ctx.fillStyle = leaf;
+            ctx.beginPath();
+            ctx.arc(x + sway, crownY, crownR, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 0.18 * alpha;
+          ctx.fillStyle = "#bbf7d0";
+          for (let i = 0; i < 90; i++) {
+            const x = (i * 71 + t * 25) % W;
+            const y = 90 + ((i * 47 + slideIdx * 33) % 760);
+            ctx.beginPath();
+            ctx.ellipse(x, y, 13, 5, Math.sin(i), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (visual === "engineering_blueprint") {
+          ctx.fillStyle = "#04111f";
+          ctx.fillRect(0, 0, W, H);
+          ctx.globalAlpha = 0.24 * alpha;
+          ctx.strokeStyle = "#38bdf8";
+          ctx.lineWidth = 1;
+          for (let x = 0; x < W; x += 48) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+          }
+          for (let y = 0; y < H; y += 48) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+          }
+          ctx.globalAlpha = 0.62 * alpha;
+          ctx.strokeStyle = "#67e8f9";
+          ctx.lineWidth = 6;
+          const cx = 700 + Math.sin(t * 0.4) * 30;
+          const cy = 520;
+          ctx.strokeRect(cx - 280, cy - 170, 560, 340);
+          ctx.beginPath();
+          ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+          ctx.moveTo(cx - 420, cy); ctx.lineTo(cx + 420, cy);
+          ctx.moveTo(cx, cy - 260); ctx.lineTo(cx, cy + 260);
+          ctx.stroke();
+          ctx.font = "700 54px 'Inter', sans-serif";
+          ctx.fillStyle = "#e0f2fe";
+          ctx.fillText("Σ F = m · a", 240, 250);
+          ctx.fillText("Δx / Δt", 1160, 820);
+        } else if (visual === "dna_biology") {
+          ctx.fillStyle = "#061014";
+          ctx.fillRect(0, 0, W, H);
+          for (let i = 0; i < 52; i++) {
+            const y = i * 28 - 80;
+            const phase = t * 1.2 + i * 0.35;
+            const x1 = W * 0.5 + Math.sin(phase) * 240;
+            const x2 = W * 0.5 + Math.sin(phase + Math.PI) * 240;
+            ctx.globalAlpha = 0.58 * alpha;
+            ctx.strokeStyle = i % 2 ? "#22d3ee" : "#facc15";
+            ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y + 18); ctx.stroke();
+            ctx.fillStyle = "#cffafe";
+            ctx.beginPath(); ctx.arc(x1, y, 9, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x2, y + 18, 9, 0, Math.PI * 2); ctx.fill();
+          }
+        } else if (visual === "cosmic_physics") {
+          ctx.fillStyle = "#030712";
+          ctx.fillRect(0, 0, W, H);
+          ctx.globalAlpha = 0.85 * alpha;
+          for (let i = 0; i < 150; i++) {
+            ctx.fillStyle = i % 9 === 0 ? "#fde68a" : "#cffafe";
+            ctx.fillRect((i * 127 + slideIdx * 19) % W, (i * 83) % H, i % 3 + 1, i % 3 + 1);
+          }
+          ctx.strokeStyle = "#22d3ee";
+          ctx.lineWidth = 3;
+          for (let r = 120; r <= 420; r += 90) {
+            ctx.globalAlpha = (0.45 - r / 1400) * alpha;
+            ctx.beginPath(); ctx.ellipse(W / 2, H / 2, r * 1.8, r, t * 0.15, 0, Math.PI * 2); ctx.stroke();
+          }
+        } else if (visual === "water_waves") {
+          const g = ctx.createLinearGradient(0, 0, 0, H);
+          g.addColorStop(0, "#042f2e");
+          g.addColorStop(1, "#020617");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, W, H);
+          ctx.strokeStyle = "#67e8f9";
+          for (let y = 160; y < H; y += 58) {
+            ctx.globalAlpha = 0.25 * alpha;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            for (let x = 0; x <= W; x += 24) {
+              const yy = y + Math.sin(x * 0.011 + t * 1.6 + y) * 22;
+              x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+            }
+            ctx.stroke();
+          }
+        } else if (visual === "fire_energy") {
+          ctx.fillStyle = "#120807";
+          ctx.fillRect(0, 0, W, H);
+          for (let i = 0; i < 26; i++) {
+            const x = 160 + i * 70;
+            const h = 280 + Math.sin(t * 2 + i) * 90;
+            const flame = ctx.createRadialGradient(x, H - 210, 10, x, H - 260, h);
+            flame.addColorStop(0, "rgba(250,204,21,0.8)");
+            flame.addColorStop(0.45, "rgba(249,115,22,0.36)");
+            flame.addColorStop(1, "rgba(127,29,29,0)");
+            ctx.globalAlpha = 0.7 * alpha;
+            ctx.fillStyle = flame;
+            ctx.beginPath();
+            ctx.ellipse(x, H - 230, 52, h, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          ctx.globalAlpha = 0.42 * alpha;
+          ctx.strokeStyle = "#00CED1";
+          ctx.lineWidth = 5;
+          for (let i = 0; i < 14; i++) {
+            ctx.beginPath();
+            const r = 90 + i * 42 + Math.sin(t + i) * 10;
+            ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+
+        ctx.globalAlpha = 0.62 * alpha;
+        const shade = ctx.createLinearGradient(0, 0, W, H);
+        shade.addColorStop(0, "rgba(0,0,0,0.12)");
+        shade.addColorStop(0.55, "rgba(0,0,0,0.34)");
+        shade.addColorStop(1, "rgba(0,0,0,0.72)");
+        ctx.fillStyle = shade;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      };
+
       const slideImage = (slide: Slide, fallbackIdx: number) => {
         if (!refImgs.length) return null;
         const wanted = typeof slide.imageIndex === "number" ? slide.imageIndex - 1 : fallbackIdx;
@@ -666,7 +874,7 @@ function VideoGenSection() {
         return refImgs[idx];
       };
 
-      const drawSourceFrame = (slide: Slide, slideIdx: number, alpha: number, mode: "side" | "full" = "side") => {
+      const drawSourceFrame = (slide: Slide, slideIdx: number, alpha: number, mode: "side" | "full" | "mini" = "side") => {
         const img = slideImage(slide, slideIdx % Math.max(1, refImgs.length));
         if (!img) return;
 
@@ -677,6 +885,23 @@ function VideoGenSection() {
           ctx.globalAlpha = 0.44 * alpha;
           ctx.fillStyle = "#030712";
           ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+          return;
+        }
+
+        if (mode === "mini") {
+          const x = 80;
+          const y = 700;
+          const w = 455;
+          const h = 300;
+          ctx.globalAlpha = 0.9 * alpha;
+          ctx.fillStyle = "rgba(2,6,23,0.76)";
+          ctx.fillRect(x - 14, y - 14, w + 28, h + 28);
+          ctx.strokeStyle = "rgba(0,206,209,0.45)";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x - 14, y - 14, w + 28, h + 28);
+          drawImageContain(img, x, y, w, h);
+          ctx.globalAlpha = 1;
           ctx.restore();
           return;
         }
@@ -798,8 +1023,14 @@ function VideoGenSection() {
         const alpha = Math.min(fadeIn, fadeOut);
         const offY = (1 - fadeIn) * 30;
 
-        const fullImage = slide.kind === "title" || slide.kind === "outro";
-        drawSourceFrame(slide, slideIdx, alpha, fullImage ? "full" : "side");
+        const visualMode = slide.visualMode ?? (slide.kind === "evidence" ? "source" : "hybrid");
+        const fullSource = visualMode === "source" && (slide.kind === "title" || slide.kind === "outro");
+        if (visualMode === "source" && refImgs.length) {
+          drawSourceFrame(slide, slideIdx, alpha, fullSource ? "full" : "side");
+        } else {
+          drawThematicVisual(slide.visualCue, globalT, slideIdx, alpha);
+          if (visualMode === "hybrid" && refImgs.length) drawSourceFrame(slide, slideIdx, alpha, "mini");
+        }
         drawChrome(slideIdx, alpha);
 
         switch (slide.kind) {
