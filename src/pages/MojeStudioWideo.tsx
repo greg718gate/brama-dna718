@@ -313,11 +313,15 @@ function TranscriptionSection() {
 // ============================================================================
 type Duration = 60 | 120 | 300;
 type Slide =
-  | { kind: "title"; text: string; sub?: string }
-  | { kind: "point"; text: string; accent?: string }
-  | { kind: "quote"; text: string }
-  | { kind: "stat"; value: string; label: string }
-  | { kind: "outro"; text: string };
+  | { kind: "title"; text: string; sub?: string; imageIndex?: number }
+  | { kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string }
+  | { kind: "quote"; text: string; imageIndex?: number; source?: string }
+  | { kind: "stat"; value: string; label: string; imageIndex?: number; source?: string }
+  | { kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string }
+  | { kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string }
+  | { kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string }
+  | { kind: "evidence"; text: string; imageIndex?: number; source?: string }
+  | { kind: "outro"; text: string; imageIndex?: number };
 
 type Script = {
   title?: string;
@@ -331,7 +335,7 @@ function VideoGenSection() {
   const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
   const [script, setScript] = useState<Script | null>(null);
-  const [includeImages, setIncludeImages] = useState(false);
+  const [includeImages, setIncludeImages] = useState(true);
   const [duration, setDuration] = useState<Duration>(60);
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrStatus, setOcrStatus] = useState("");
