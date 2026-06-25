@@ -1023,8 +1023,14 @@ function VideoGenSection() {
         const alpha = Math.min(fadeIn, fadeOut);
         const offY = (1 - fadeIn) * 30;
 
-        const fullImage = slide.kind === "title" || slide.kind === "outro";
-        drawSourceFrame(slide, slideIdx, alpha, fullImage ? "full" : "side");
+        const visualMode = slide.visualMode ?? (slide.kind === "evidence" ? "source" : "hybrid");
+        const fullSource = visualMode === "source" && (slide.kind === "title" || slide.kind === "outro");
+        if (visualMode === "source" && refImgs.length) {
+          drawSourceFrame(slide, slideIdx, alpha, fullSource ? "full" : "side");
+        } else {
+          drawThematicVisual(slide.visualCue, globalT, slideIdx, alpha);
+          if (visualMode === "hybrid" && refImgs.length) drawSourceFrame(slide, slideIdx, alpha, "mini");
+        }
         drawChrome(slideIdx, alpha);
 
         switch (slide.kind) {
