@@ -909,7 +909,7 @@ function VideoGenSection() {
         <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Wrzuć zrzuty — Gemini Vision odczyta tekst (polskie znaki OK) i napisze scenariusz filmu (tytuł · punkty · cytaty · puenta).
+        Wrzuć zrzuty — AI ma zachować fakty, wzory, liczby, obliczenia i szkice, a film pokazuje obrazy źródłowe zamiast samego czarnego tła z tekstem.
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -922,7 +922,7 @@ function VideoGenSection() {
         />
         <Images className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — zrzuty ekranu"}
+          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — zrzuty ekranu / szkice / wzory"}
         </p>
       </label>
 
@@ -945,7 +945,7 @@ function VideoGenSection() {
         className="w-full mt-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0"
       >
         {ocrBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-        {ocrBusy ? "Czytam tekst…" : "Odczytaj tekst ze zrzutów (OCR)"}
+        {ocrBusy ? "Analizuję materiał…" : "Odczytaj zrzuty i zbuduj scenariusz techniczny"}
       </Button>
 
       {ocrBusy && (
@@ -957,12 +957,12 @@ function VideoGenSection() {
 
       <div className="mt-4">
         <label className="text-xs text-fuchsia-200/60 mb-1 block">
-          Tekst do filmu / lektora (edytowalny — pochodzi z OCR lub wpisz własny)
+          Lektor filmu (edytowalny — ma trzymać się faktów ze zrzutów)
         </label>
         <Textarea
           value={narration}
           onChange={(e) => setNarration(e.target.value)}
-          placeholder="Tu pojawi się odczytany tekst albo wpisz własny…"
+          placeholder="Tu pojawi się rzeczowy lektor na podstawie zrzutów…"
           className="bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30 min-h-[120px]"
         />
       </div>
@@ -996,7 +996,7 @@ function VideoGenSection() {
           onChange={(e) => setIncludeImages(e.target.checked)}
           className="accent-fuchsia-500"
         />
-        Pokaż oryginalne zrzuty w tle (delikatnie, 12% krycia)
+        Pokazuj oryginalne zrzuty jako główny materiał wizualny filmu
       </label>
 
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
