@@ -313,15 +313,30 @@ function TranscriptionSection() {
 // ============================================================================
 type Duration = 60 | 120 | 300;
 type Slide =
-  | { kind: "title"; text: string; sub?: string; imageIndex?: number }
-  | { kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string }
-  | { kind: "quote"; text: string; imageIndex?: number; source?: string }
-  | { kind: "stat"; value: string; label: string; imageIndex?: number; source?: string }
-  | { kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string }
-  | { kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string }
-  | { kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string }
-  | { kind: "evidence"; text: string; imageIndex?: number; source?: string }
-  | { kind: "outro"; text: string; imageIndex?: number };
+  | ({ kind: "title"; text: string; sub?: string; imageIndex?: number } & VisualPlan)
+  | ({ kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "quote"; text: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "stat"; value: string; label: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "evidence"; text: string; imageIndex?: number; source?: string } & VisualPlan)
+  | ({ kind: "outro"; text: string; imageIndex?: number } & VisualPlan);
+
+type VisualMode = "source" | "hybrid" | "thematic";
+type VisualCue =
+  | "forest_trees"
+  | "engineering_blueprint"
+  | "dna_biology"
+  | "cosmic_physics"
+  | "water_waves"
+  | "fire_energy"
+  | "abstract_technical";
+
+type VisualPlan = {
+  visualMode?: VisualMode;
+  visualCue?: VisualCue | string;
+};
 
 type Script = {
   title?: string;
