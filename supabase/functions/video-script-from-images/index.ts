@@ -1,4 +1,4 @@
-// Vision OCR + film script generator (Gemini 2.5 Flash via Lovable AI Gateway)
+// Vision OCR + technical film script generator (Gemini Pro via Lovable AI Gateway)
 // Public function — no auth required (page itself is password-gated client-side)
 
 const corsHeaders = {
@@ -20,6 +20,12 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (images.length > 40) {
+      return new Response(JSON.stringify({ error: "Maksymalnie 40 zrzutów w jednej analizie." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -30,39 +36,43 @@ Deno.serve(async (req) => {
     }
 
     const targetSec = Number(duration) || 60;
-    // 1 slajd ~ 6-8s narracji
-    const slideCount = Math.max(5, Math.min(28, Math.round(targetSec / 7)));
+    // Film techniczny potrzebuje więcej krótkich ujęć, żeby pokazać wzory i źródła.
+    const slideCount = Math.max(10, Math.min(60, Math.round(targetSec / 5)));
 
     const userParts: any[] = [
       {
         type: "text",
         text:
-          `Otrzymujesz ${images.length} zrzut(ów) ekranu. Wykonaj DWA zadania:\n\n` +
-          `1) OCR — odczytaj DOKŁADNIE cały tekst z obrazów po polsku (zachowaj polskie znaki: ą ć ę ł ń ó ś ź ż). Popraw oczywiste literówki OCR.\n\n` +
-          `2) Na podstawie tego tekstu zbuduj ELEGANCKI SCENARIUSZ KINETYCZNEGO FILMU typograficznego o długości ${targetSec}s (~${slideCount} ujęć). Film ma wyglądać jak teaser/manifest — nie jak surowy zrzut.\n\n` +
+          `Otrzymujesz ${images.length} zrzut(ów) ekranu z materiałem technicznym: obliczenia, wzory, notatki, szkice inżynierskie lub schematy. Wykonaj DWA zadania:\n\n` +
+          `1) OCR I ANALIZA ŹRÓDŁOWA — odczytaj możliwie DOKŁADNIE każdy ekran. Zachowaj polskie znaki: ą ć ę ł ń ó ś ź ż. Zachowaj wzory, znaki matematyczne, jednostki, liczby, współczynniki, wyniki pośrednie i końcowe. Jeżeli fragment jest nieczytelny, wpisz [nieczytelne] zamiast zgadywać.\n\n` +
+          `2) SCENARIUSZ FILMU TECHNICZNEGO o długości ${targetSec}s (~${slideCount} ujęć). To ma być dynamiczna prezentacja materiału źródłowego: zrzuty jako obrazy, wzory jako plansze, obliczenia jako kroki, szkice jako ujęcia inżynierskie. NIE rób bajki, manifestu ani ogólnego opowiadania.\n\n` +
           `Zwróć WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy) w schemacie:\n` +
           `{\n` +
-          `  "rawText": "pełny odczytany tekst",\n` +
-          `  "narration": "płynny tekst dla lektora po polsku, ~${Math.round(targetSec * 2.5)} słów",\n` +
+          `  "rawText": "pełny odczytany tekst, najlepiej z podziałem: [Ekran 1], [Ekran 2]...",\n` +
+          `  "narration": "rzeczowy lektor po polsku, wyłącznie na podstawie zrzutów, ~${Math.round(targetSec * 2.1)} słów",\n` +
           `  "script": {\n` +
-          `    "title": "krótki, mocny tytuł (max 5 słów)",\n` +
-          `    "subtitle": "podtytuł (max 8 słów)",\n` +
+          `    "title": "krótki tytuł techniczny (max 6 słów)",\n` +
+          `    "subtitle": "co pokazuje materiał (max 10 słów)",\n` +
           `    "slides": [\n` +
-          `      { "kind": "title", "text": "...", "sub": "..." },\n` +
-          `      { "kind": "point", "text": "jedno krótkie zdanie, max 12 słów", "accent": "1-2 słowa do podświetlenia" },\n` +
-          `      { "kind": "quote", "text": "cytat lub kluczowa myśl" },\n` +
-          `      { "kind": "stat", "value": "liczba/krótka fraza", "label": "co to znaczy" },\n` +
-          `      { "kind": "outro", "text": "puenta / CTA" }\n` +
+          `      { "kind": "title", "text": "...", "sub": "...", "imageIndex": 1 },\n` +
+          `      { "kind": "formula", "formula": "dokładny wzór / równanie", "explanation": "krótko co oznacza", "imageIndex": 3, "source": "Ekran 3" },\n` +
+          `      { "kind": "calculation", "title": "nazwa obliczenia", "lines": ["krok 1", "krok 2", "wynik"], "result": "wynik końcowy", "imageIndex": 5, "source": "Ekran 5" },\n` +
+          `      { "kind": "sketch", "title": "co widać na szkicu", "caption": "krótki podpis", "imageIndex": 7, "source": "Ekran 7" },\n` +
+          `      { "kind": "point", "text": "fakt z materiału, max 14 słów", "accent": "liczba/wzór/słowo", "imageIndex": 9, "source": "Ekran 9" },\n` +
+          `      { "kind": "stat", "value": "liczba/jednostka/wynik", "label": "co oznacza", "imageIndex": 11, "source": "Ekran 11" },\n` +
+          `      { "kind": "evidence", "text": "dosłowny istotny fragment z OCR", "source": "Ekran 12", "imageIndex": 12 },\n` +
+          `      { "kind": "outro", "text": "rzeczowe domknięcie bez dopowiadania faktów", "imageIndex": 1 }\n` +
           `    ]\n` +
           `  }\n` +
           `}\n\n` +
           `Reguły:\n` +
           `- ${slideCount} slajdów łącznie, w tym 1 "title" na początku i 1 "outro" na końcu\n` +
-          `- pomiędzy: mix "point", "quote", "stat"\n` +
-          `- każdy "point.text" max 12 słów, jedno zdanie, bez nudy\n` +
-          `- używaj polskich znaków poprawnie\n` +
-          `- jeśli tekst jest osobisty/refleksyjny — zachowaj ton; jeśli informacyjny — zrób z tego klarowny manifest\n` +
-          `- NIE wymyślaj faktów spoza zrzutów`,
+          `- jeśli na zrzutach są wzory/obliczenia: użyj wielu slajdów "formula" i "calculation"; nie pomijaj liczb ani jednostek\n` +
+          `- jeśli są szkice/schematy: użyj slajdów "sketch" z właściwym imageIndex\n` +
+          `- każdy slajd poza outro musi mieć imageIndex (numer ekranu od 1) i source, żeby film pokazywał materiał źródłowy\n` +
+          `- narration ma wyjaśniać konkrety: wzory, wyniki, założenia, szkice; bez patosu i bez bajkowego tonu\n` +
+          `- NIE wymyślaj faktów spoza zrzutów. NIE dodawaj własnej teorii. NIE zastępuj obliczeń ogólną narracją\n` +
+          `- jeśli nie jesteś pewien znaku/liczby, oznacz to w rawText jako [nieczytelne]`,
       },
       ...images.map((b64: string) => ({
         type: "image_url",
@@ -73,16 +83,18 @@ Deno.serve(async (req) => {
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Lovable-API-Key": LOVABLE_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
+        temperature: 0.15,
+        max_tokens: 12000,
         messages: [
           {
             role: "system",
             content:
-              "Jesteś polskim reżyserem montażu i copywriterem. Odpowiadasz wyłącznie poprawnym JSON-em, bez bloków kodu.",
+              "Jesteś precyzyjnym polskim analitykiem OCR i reżyserem technicznego filmu edukacyjnego. Twoim obowiązkiem jest zachować fakty, wzory, liczby, jednostki i szkice ze źródła. Nie tworzysz bajkowej narracji, nie dopowiadasz faktów, nie ukrywasz obliczeń. Odpowiadasz wyłącznie poprawnym JSON-em, bez bloków kodu.",
           },
           { role: "user", content: userParts },
         ],

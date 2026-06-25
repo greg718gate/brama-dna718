@@ -313,11 +313,15 @@ function TranscriptionSection() {
 // ============================================================================
 type Duration = 60 | 120 | 300;
 type Slide =
-  | { kind: "title"; text: string; sub?: string }
-  | { kind: "point"; text: string; accent?: string }
-  | { kind: "quote"; text: string }
-  | { kind: "stat"; value: string; label: string }
-  | { kind: "outro"; text: string };
+  | { kind: "title"; text: string; sub?: string; imageIndex?: number }
+  | { kind: "point"; text: string; accent?: string; imageIndex?: number; source?: string }
+  | { kind: "quote"; text: string; imageIndex?: number; source?: string }
+  | { kind: "stat"; value: string; label: string; imageIndex?: number; source?: string }
+  | { kind: "formula"; formula: string; explanation?: string; imageIndex?: number; source?: string }
+  | { kind: "calculation"; title: string; lines: string[]; result?: string; imageIndex?: number; source?: string }
+  | { kind: "sketch"; title: string; caption?: string; imageIndex?: number; source?: string }
+  | { kind: "evidence"; text: string; imageIndex?: number; source?: string }
+  | { kind: "outro"; text: string; imageIndex?: number };
 
 type Script = {
   title?: string;
@@ -331,7 +335,7 @@ function VideoGenSection() {
   const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
   const [script, setScript] = useState<Script | null>(null);
-  const [includeImages, setIncludeImages] = useState(false);
+  const [includeImages, setIncludeImages] = useState(true);
   const [duration, setDuration] = useState<Duration>(60);
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrStatus, setOcrStatus] = useState("");
@@ -399,10 +403,31 @@ function VideoGenSection() {
   // ---------- AI VISION: OCR + SCRIPT ----------
   const fileToBase64 = (f: File): Promise<string> =>
     new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(f);
+      const img = new Image();
+      const url = URL.createObjectURL(f);
+      img.onload = () => {
+        try {
+          const maxSide = 1500;
+          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const c = canvas.getContext("2d")!;
+          c.fillStyle = "#ffffff";
+          c.fillRect(0, 0, canvas.width, canvas.height);
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          res(canvas.toDataURL("image/jpeg", 0.86));
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          rej(e);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        rej(new Error("Nie udało się wczytać obrazu"));
+      };
+      img.src = url;
     });
 
   const runOCR = async () => {
@@ -411,10 +436,10 @@ function VideoGenSection() {
       return;
     }
     setOcrBusy(true);
-    setOcrStatus("Wysyłam obrazy do Gemini Vision…");
+    setOcrStatus("Przygotowuję zrzuty do dokładnej analizy…");
     try {
       const b64s = await Promise.all(images.map(fileToBase64));
-      setOcrStatus("Gemini czyta tekst i pisze scenariusz filmu…");
+      setOcrStatus("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…");
       const { data, error } = await supabase.functions.invoke("video-script-from-images", {
         body: { images: b64s, duration },
       });
@@ -427,7 +452,8 @@ function VideoGenSection() {
 
       setExtractedText(raw);
       setNarration(narr);
-      if (sc?.slides?.length) setScript(sc);
+      const normalized = normalizeScript(sc);
+      if (normalized) setScript(normalized);
 
       toast({
         title: "Tekst i scenariusz gotowe",
@@ -453,10 +479,55 @@ function VideoGenSection() {
       .split(/(?<=[.!?])\s+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 2);
-    const slides: Slide[] = [{ kind: "title", text: "Manifest" }];
-    for (const s of sentences) slides.push({ kind: "point", text: s.slice(0, 140) });
-    slides.push({ kind: "outro", text: "·" });
-    return { title: "Manifest", slides };
+    const formulaLike = clean.match(/[^.!?\n]*(?:=|≈|≤|≥|√|∑|∆|Δ|Ω|µ|φ|π|\bHz\b|\bmm\b|\bcm\b|\bkg\b|\bN\b|\bV\b|\bA\b|\bm\/s\b)[^.!?\n]*/g) || [];
+    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "wzory · obliczenia · źródła", imageIndex: 1 }];
+    formulaLike.slice(0, 12).forEach((f, i) => {
+      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}` });
+    });
+    for (const [i, s] of sentences.entries()) {
+      if (slides.length > 34) break;
+      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}` });
+    }
+    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1 });
+    return { title: "Analiza materiału", slides };
+  };
+
+  const normalizeScript = (candidate: unknown): Script | null => {
+    const input = candidate as Partial<Script> | undefined;
+    if (!input || !Array.isArray(input.slides)) return null;
+    const slides = input.slides
+      .map((slide: any, i): Slide | null => {
+        const imageIndex = Number.isFinite(Number(slide?.imageIndex))
+          ? Number(slide.imageIndex)
+          : images.length
+            ? (i % images.length) + 1
+            : undefined;
+        const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `Ekran ${imageIndex}` : undefined;
+        switch (slide?.kind) {
+          case "title":
+            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex };
+          case "formula":
+            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source };
+          case "calculation":
+            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source };
+          case "sketch":
+            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source };
+          case "stat":
+            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source };
+          case "evidence":
+            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source };
+          case "quote":
+            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source };
+          case "outro":
+            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex };
+          case "point":
+          default:
+            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source };
+        }
+      })
+      .filter((slide): slide is Slide => Boolean(slide));
+    if (!slides.length) return null;
+    return { title: input.title, subtitle: input.subtitle, slides };
   };
 
 
@@ -506,7 +577,7 @@ function VideoGenSection() {
       canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const sc: Script = script ?? buildFallbackScript(source);
+      const sc: Script = normalizeScript(script) ?? buildFallbackScript(source);
       const slides = sc.slides;
       const refImgs = includeImages ? await Promise.all(images.map(loadImage)) : [];
       const totalSec = duration;
@@ -529,29 +600,40 @@ function VideoGenSection() {
 
       const drawBg = (t: number, slideIdx: number, kind: Slide["kind"]) => {
         const palettes: Record<Slide["kind"], [number, number, number]> = {
-          title: [285, 270, 250],
-          point: [275, 250, 230],
-          quote: [220, 260, 290],
-          stat:  [310, 285, 260],
-          outro: [260, 240, 220],
+          title: [190, 170, 45],
+          point: [185, 205, 45],
+          quote: [190, 160, 45],
+          stat: [45, 185, 205],
+          formula: [185, 45, 205],
+          calculation: [45, 190, 170],
+          sketch: [190, 205, 45],
+          evidence: [170, 190, 45],
+          outro: [180, 160, 45],
         };
         const [h1, h2, h3] = palettes[kind];
         const wob = Math.sin(t * 0.4 + slideIdx) * 8;
         const g = ctx.createLinearGradient(0, 0, W, H);
-        g.addColorStop(0, `hsl(${h1 + wob}, 60%, 7%)`);
-        g.addColorStop(0.5, `hsl(${h2}, 55%, 5%)`);
-        g.addColorStop(1, `hsl(${h3 - wob}, 65%, 9%)`);
+        g.addColorStop(0, `hsl(${h1 + wob}, 42%, 8%)`);
+        g.addColorStop(0.5, `hsl(${h2}, 32%, 5%)`);
+        g.addColorStop(1, `hsl(${h3 - wob}, 48%, 9%)`);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
-        for (let i = 0; i < 3; i++) {
-          const cx = W * (0.2 + 0.3 * i) + Math.sin(t * 0.5 + i) * 80;
-          const cy = H * (0.3 + 0.25 * Math.sin(i)) + Math.cos(t * 0.4 + i) * 60;
-          const rad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 700);
-          rad.addColorStop(0, `hsla(${h1 + i * 30}, 80%, 60%, 0.20)`);
-          rad.addColorStop(1, "transparent");
-          ctx.fillStyle = rad;
-          ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = 0.12;
+        ctx.strokeStyle = `hsl(${h1}, 80%, 62%)`;
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 80) {
+          ctx.beginPath();
+          ctx.moveTo(x + (slideIdx % 3) * 10, 0);
+          ctx.lineTo(x - 180, H);
+          ctx.stroke();
         }
+        for (let y = 0; y < H; y += 80) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y + Math.sin(t + y) * 20);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
         const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.78);
         vg.addColorStop(0, "transparent");
         vg.addColorStop(1, "rgba(0,0,0,0.6)");
@@ -559,9 +641,74 @@ function VideoGenSection() {
         ctx.fillRect(0, 0, W, H);
       };
 
+      const drawImageContain = (img: HTMLImageElement, x: number, y: number, w: number, h: number) => {
+        const scale = Math.min(w / img.width, h / img.height);
+        const iw = img.width * scale;
+        const ih = img.height * scale;
+        const ix = x + (w - iw) / 2;
+        const iy = y + (h - ih) / 2;
+        ctx.drawImage(img, ix, iy, iw, ih);
+      };
+
+      const drawImageCover = (img: HTMLImageElement, x: number, y: number, w: number, h: number) => {
+        const scale = Math.max(w / img.width, h / img.height);
+        const iw = img.width * scale;
+        const ih = img.height * scale;
+        const ix = x + (w - iw) / 2;
+        const iy = y + (h - ih) / 2;
+        ctx.drawImage(img, ix, iy, iw, ih);
+      };
+
+      const slideImage = (slide: Slide, fallbackIdx: number) => {
+        if (!refImgs.length) return null;
+        const wanted = typeof slide.imageIndex === "number" ? slide.imageIndex - 1 : fallbackIdx;
+        const idx = Math.max(0, Math.min(refImgs.length - 1, wanted));
+        return refImgs[idx];
+      };
+
+      const drawSourceFrame = (slide: Slide, slideIdx: number, alpha: number, mode: "side" | "full" = "side") => {
+        const img = slideImage(slide, slideIdx % Math.max(1, refImgs.length));
+        if (!img) return;
+
+        ctx.save();
+        if (mode === "full") {
+          ctx.globalAlpha = 0.98 * alpha;
+          drawImageCover(img, 0, 0, W, H);
+          ctx.globalAlpha = 0.44 * alpha;
+          ctx.fillStyle = "#030712";
+          ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+          return;
+        }
+
+        const x = 70;
+        const y = 135;
+        const w = 1080;
+        const h = 810;
+        ctx.globalAlpha = 0.98 * alpha;
+        ctx.fillStyle = "rgba(2,6,23,0.72)";
+        ctx.fillRect(x - 18, y - 18, w + 36, h + 36);
+        ctx.strokeStyle = "rgba(0,206,209,0.45)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x - 18, y - 18, w + 36, h + 36);
+        drawImageContain(img, x, y, w, h);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+      };
+
+      const drawPanel = (alpha: number, x = 1210, y = 135, w = 640, h = 810) => {
+        ctx.globalAlpha = 0.86 * alpha;
+        ctx.fillStyle = "rgba(2,6,23,0.82)";
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(255,215,0,0.36)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, w, h);
+        ctx.globalAlpha = 1;
+      };
+
       const drawChrome = (slideIdx: number, alpha: number) => {
         ctx.globalAlpha = 0.5 * alpha;
-        ctx.fillStyle = "#f0abfc";
+        ctx.fillStyle = "#67e8f9";
         ctx.font = "500 24px 'Inter', sans-serif";
         ctx.textAlign = "left";
         ctx.fillText(
@@ -571,7 +718,7 @@ function VideoGenSection() {
         ctx.globalAlpha = 0.35 * alpha;
         ctx.font = "400 20px 'Inter', sans-serif";
         ctx.textAlign = "right";
-        ctx.fillText("MOJE STUDIO · 2026", W - 80, H - 60);
+        ctx.fillText("ANALIZA ŹRÓDŁOWA", W - 80, H - 60);
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
       };
@@ -579,8 +726,8 @@ function VideoGenSection() {
       const drawAccentLine = (y: number, fadeIn: number, alpha: number) => {
         const lineW = 120 + 260 * fadeIn;
         const grad = ctx.createLinearGradient(80, 0, 80 + lineW, 0);
-        grad.addColorStop(0, "#d946ef");
-        grad.addColorStop(1, "#8b5cf6");
+        grad.addColorStop(0, "#00CED1");
+        grad.addColorStop(1, "#FFD700");
         ctx.globalAlpha = alpha;
         ctx.fillStyle = grad;
         ctx.fillRect(80, y, lineW, 4);
@@ -602,8 +749,8 @@ function VideoGenSection() {
         const lines = wrapText(ctx, text, W - 200);
         const lh = size * 1.18;
         let y = cy - (lines.length - 1) * lh / 2 + offY;
-        ctx.shadowColor = "rgba(217,70,239,0.4)";
-        ctx.shadowBlur = 40;
+        ctx.shadowColor = "rgba(0,206,209,0.35)";
+        ctx.shadowBlur = 30;
         for (let i = 0; i < lines.length; i++) {
           const a = Math.max(0, Math.min(1, alpha * 3 - i * 0.25));
           ctx.globalAlpha = a;
@@ -615,64 +762,136 @@ function VideoGenSection() {
         ctx.textAlign = "left";
       };
 
+      const drawBlockText = (text: string, x: number, y: number, maxWidth: number, size: number, weight: number, alpha: number, color = "#ffffff", maxLines = 10) => {
+        ctx.fillStyle = color;
+        ctx.font = `${weight} ${size}px 'Inter', 'Helvetica Neue', sans-serif`;
+        ctx.textAlign = "left";
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 20;
+        const lines = wrapText(ctx, text, maxWidth).slice(0, maxLines);
+        const lh = size * 1.28;
+        ctx.globalAlpha = alpha;
+        lines.forEach((line, i) => ctx.fillText(line, x, y + i * lh));
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      };
+
+      const drawSourceLabel = (source: string | undefined, x: number, y: number, alpha: number) => {
+        if (!source) return;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "rgba(0,206,209,0.18)";
+        ctx.fillRect(x, y - 34, 210, 44);
+        ctx.strokeStyle = "rgba(0,206,209,0.55)";
+        ctx.strokeRect(x, y - 34, 210, 44);
+        ctx.fillStyle = "#67e8f9";
+        ctx.font = "600 22px 'Inter', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(source, x + 16, y - 5);
+        ctx.globalAlpha = 1;
+      };
+
       const drawSlide = (slide: Slide, localT: number, slideIdx: number, globalT: number) => {
         drawBg(globalT, slideIdx, slide.kind);
-
-        if (refImgs.length) {
-          const img = refImgs[slideIdx % refImgs.length];
-          const r = Math.min(W / img.width, H / img.height) * 0.95;
-          const iw = img.width * r;
-          const ih = img.height * r;
-          const zoom = 1 + 0.08 * localT;
-          ctx.globalAlpha = 0.1;
-          ctx.drawImage(img, (W - iw * zoom) / 2, (H - ih * zoom) / 2, iw * zoom, ih * zoom);
-          ctx.globalAlpha = 1;
-        }
 
         const fadeIn = Math.min(1, localT / 0.18);
         const fadeOut = Math.min(1, (1 - localT) / 0.18);
         const alpha = Math.min(fadeIn, fadeOut);
         const offY = (1 - fadeIn) * 30;
 
+        const fullImage = slide.kind === "title" || slide.kind === "outro";
+        drawSourceFrame(slide, slideIdx, alpha, fullImage ? "full" : "side");
         drawChrome(slideIdx, alpha);
 
         switch (slide.kind) {
           case "title": {
-            drawAccentLine(H / 2 - 60, fadeIn, alpha);
-            drawCenteredText(slide.text, 120, 800, H / 2 + 30, alpha, "#ffffff", offY);
+            ctx.globalAlpha = 0.62 * alpha;
+            ctx.fillStyle = "rgba(2,6,23,0.72)";
+            ctx.fillRect(120, 300, W - 240, 390);
+            ctx.globalAlpha = 1;
+            drawAccentLine(H / 2 - 120, fadeIn, alpha);
+            drawCenteredText(slide.text, 112, 800, H / 2 - 10, alpha, "#ffffff", offY);
             if (slide.sub) {
-              drawCenteredText(slide.sub, 36, 400, H / 2 + 160, alpha, "#f0abfc", offY);
+              drawCenteredText(slide.sub, 36, 500, H / 2 + 135, alpha, "#67e8f9", offY);
             }
             break;
           }
           case "point": {
-            drawAccentLine(H / 2 - 140, fadeIn, alpha);
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawAccentLine(260, fadeIn, alpha);
             const t = slide.text;
-            const size = t.length > 90 ? 56 : t.length > 50 ? 72 : 88;
-            drawCenteredText(t, size, 700, H / 2 + 20, alpha, "#ffffff", offY);
+            const size = t.length > 90 ? 46 : t.length > 50 ? 56 : 68;
+            drawBlockText(t, 1250, 340 + offY, 555, size, 750, alpha, "#ffffff", 6);
             if (slide.accent) {
-              drawCenteredText(slide.accent.toUpperCase(), 26, 600, H - 200, alpha, "#f0abfc", 0);
+              drawBlockText(slide.accent.toUpperCase(), 1250, 785, 530, 34, 800, alpha, "#facc15", 2);
             }
             break;
           }
           case "quote": {
-            // huge quotes mark
-            ctx.globalAlpha = 0.25 * alpha;
-            ctx.fillStyle = "#d946ef";
-            ctx.font = `900 320px 'Georgia', serif`;
-            ctx.textAlign = "center";
-            ctx.fillText("\u201C", W / 2, H / 2 - 80);
-            ctx.globalAlpha = 1;
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            ctx.globalAlpha = 0.2 * alpha;
+            ctx.fillStyle = "#00CED1";
+            ctx.font = `900 220px 'Inter', sans-serif`;
             ctx.textAlign = "left";
+            ctx.fillText("≡", 1250, 350);
+            ctx.globalAlpha = 1;
             const t = slide.text;
-            const size = t.length > 90 ? 52 : 68;
-            drawCenteredText(t, size, 500, H / 2 + 80, alpha, "#ffffff", offY);
+            const size = t.length > 90 ? 38 : 48;
+            drawBlockText(t, 1250, 430 + offY, 540, size, 520, alpha, "#ffffff", 8);
             break;
           }
           case "stat": {
-            drawCenteredText(slide.value, 200, 900, H / 2 - 20, alpha, "#ffffff", offY);
-            drawAccentLine(H / 2 + 100, fadeIn, alpha);
-            drawCenteredText(slide.label, 38, 400, H / 2 + 180, alpha, "#f0abfc", offY);
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawBlockText(slide.value, 1250, 350 + offY, 555, 110, 900, alpha, "#ffffff", 3);
+            drawAccentLine(585, fadeIn, alpha);
+            drawBlockText(slide.label, 1250, 650 + offY, 540, 38, 500, alpha, "#67e8f9", 4);
+            break;
+          }
+          case "formula": {
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawBlockText("WZÓR", 1250, 270, 540, 28, 800, alpha, "#67e8f9", 1);
+            drawBlockText(slide.formula, 1250, 365 + offY, 540, slide.formula.length > 90 ? 42 : 54, 760, alpha, "#ffffff", 6);
+            if (slide.explanation) {
+              drawAccentLine(690, fadeIn, alpha);
+              drawBlockText(slide.explanation, 1250, 760 + offY, 540, 32, 450, alpha, "#d1d5db", 4);
+            }
+            break;
+          }
+          case "calculation": {
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawBlockText(slide.title, 1250, 275 + offY, 540, 44, 760, alpha, "#ffffff", 2);
+            const lines = Array.isArray(slide.lines) ? slide.lines.slice(0, 7) : [];
+            ctx.font = "520 31px 'Inter', sans-serif";
+            ctx.textAlign = "left";
+            lines.forEach((line, i) => {
+              const y = 400 + i * 58 + offY;
+              ctx.globalAlpha = 0.13 * alpha;
+              ctx.fillStyle = "#00CED1";
+              ctx.fillRect(1250, y - 36, 540, 48);
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = "#e5e7eb";
+              ctx.fillText(line.slice(0, 46), 1270, y);
+            });
+            ctx.globalAlpha = 1;
+            if (slide.result) drawBlockText(slide.result, 1250, 835, 540, 40, 850, alpha, "#facc15", 2);
+            break;
+          }
+          case "sketch": {
+            drawPanel(alpha, 1200, 705, 650, 235);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawBlockText(slide.title, 1235, 770 + offY, 580, 40, 800, alpha, "#ffffff", 2);
+            if (slide.caption) drawBlockText(slide.caption, 1235, 870 + offY, 575, 28, 450, alpha, "#d1d5db", 2);
+            break;
+          }
+          case "evidence": {
+            drawPanel(alpha);
+            drawSourceLabel(slide.source, 1238, 190, alpha);
+            drawBlockText("FRAGMENT ŹRÓDŁOWY", 1250, 275, 540, 26, 800, alpha, "#67e8f9", 1);
+            drawBlockText(slide.text, 1250, 355 + offY, 540, 38, 520, alpha, "#ffffff", 10);
             break;
           }
           case "outro": {
@@ -681,7 +900,11 @@ function VideoGenSection() {
             ctx.translate(W / 2, H / 2);
             ctx.scale(pulse, pulse);
             ctx.translate(-W / 2, -H / 2);
-            drawCenteredText(slide.text, 96, 700, H / 2, alpha, "#ffffff", offY);
+            ctx.globalAlpha = 0.62 * alpha;
+            ctx.fillStyle = "rgba(2,6,23,0.75)";
+            ctx.fillRect(180, 360, W - 360, 280);
+            ctx.globalAlpha = 1;
+            drawCenteredText(slide.text, 86, 700, H / 2, alpha, "#ffffff", offY);
             ctx.restore();
             break;
           }
@@ -722,10 +945,10 @@ function VideoGenSection() {
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
-        <h2 className="text-lg font-semibold text-white">Sekcja 2 · OCR → elegancki film</h2>
+        <h2 className="text-lg font-semibold text-white">Sekcja 2 · Zrzuty → film techniczny</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Wrzuć zrzuty — Gemini Vision odczyta tekst (polskie znaki OK) i napisze scenariusz filmu (tytuł · punkty · cytaty · puenta).
+        Wrzuć zrzuty — AI ma zachować fakty, wzory, liczby, obliczenia i szkice, a film pokazuje obrazy źródłowe zamiast samego czarnego tła z tekstem.
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -738,7 +961,7 @@ function VideoGenSection() {
         />
         <Images className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — zrzuty ekranu"}
+          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — do 40 zrzutów / szkiców / wzorów"}
         </p>
       </label>
 
@@ -761,7 +984,7 @@ function VideoGenSection() {
         className="w-full mt-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0"
       >
         {ocrBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-        {ocrBusy ? "Czytam tekst…" : "Odczytaj tekst ze zrzutów (OCR)"}
+        {ocrBusy ? "Analizuję materiał…" : "Odczytaj zrzuty i zbuduj scenariusz techniczny"}
       </Button>
 
       {ocrBusy && (
@@ -773,13 +996,25 @@ function VideoGenSection() {
 
       <div className="mt-4">
         <label className="text-xs text-fuchsia-200/60 mb-1 block">
-          Tekst do filmu / lektora (edytowalny — pochodzi z OCR lub wpisz własny)
+          Lektor filmu (edytowalny — ma trzymać się faktów ze zrzutów)
         </label>
         <Textarea
           value={narration}
           onChange={(e) => setNarration(e.target.value)}
-          placeholder="Tu pojawi się odczytany tekst albo wpisz własny…"
+          placeholder="Tu pojawi się rzeczowy lektor na podstawie zrzutów…"
           className="bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30 min-h-[120px]"
+        />
+      </div>
+
+      <div className="mt-3">
+        <label className="text-xs text-fuchsia-200/60 mb-1 block">
+          Odczyt źródłowy OCR (do kontroli wzorów, liczb i polskich znaków)
+        </label>
+        <Textarea
+          value={extractedText}
+          onChange={(e) => setExtractedText(e.target.value)}
+          placeholder="Tu pojawi się pełny odczyt ekran po ekranie…"
+          className="bg-black/40 border-cyan-400/20 text-white placeholder:text-cyan-100/30 min-h-[150px]"
         />
       </div>
 
@@ -812,7 +1047,7 @@ function VideoGenSection() {
           onChange={(e) => setIncludeImages(e.target.checked)}
           className="accent-fuchsia-500"
         />
-        Pokaż oryginalne zrzuty w tle (delikatnie, 12% krycia)
+        Pokazuj oryginalne zrzuty jako główny materiał wizualny filmu
       </label>
 
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
@@ -919,7 +1154,7 @@ export default function MojeStudioWideo() {
               Moje Studio Wideo
             </h1>
             <p className="text-xs text-fuchsia-200/60 mt-1">
-              Prywatne narzędzia — transkrypcja i generator filmów. 100% lokalnie.
+              Prywatne narzędzia — transkrypcja i generator filmów technicznych.
             </p>
           </div>
           <Button
@@ -941,7 +1176,7 @@ export default function MojeStudioWideo() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-fuchsia-200/40">
-          Whisper (lokalnie) · Gemini Vision (Lovable Cloud) · canvas + MediaRecorder
+          Analiza wizualna · transkrypcja audio · render canvas + MediaRecorder
         </footer>
       </div>
     </div>
