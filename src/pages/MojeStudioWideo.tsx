@@ -452,7 +452,8 @@ function VideoGenSection() {
 
       setExtractedText(raw);
       setNarration(narr);
-      if (sc?.slides?.length) setScript(sc);
+      const normalized = normalizeScript(sc);
+      if (normalized) setScript(normalized);
 
       toast({
         title: "Tekst i scenariusz gotowe",
@@ -489,6 +490,44 @@ function VideoGenSection() {
     }
     slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1 });
     return { title: "Analiza materiału", slides };
+  };
+
+  const normalizeScript = (candidate: unknown): Script | null => {
+    const input = candidate as Partial<Script> | undefined;
+    if (!input || !Array.isArray(input.slides)) return null;
+    const slides = input.slides
+      .map((slide: any, i): Slide | null => {
+        const imageIndex = Number.isFinite(Number(slide?.imageIndex))
+          ? Number(slide.imageIndex)
+          : images.length
+            ? (i % images.length) + 1
+            : undefined;
+        const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `Ekran ${imageIndex}` : undefined;
+        switch (slide?.kind) {
+          case "title":
+            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex };
+          case "formula":
+            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source };
+          case "calculation":
+            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source };
+          case "sketch":
+            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source };
+          case "stat":
+            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source };
+          case "evidence":
+            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source };
+          case "quote":
+            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source };
+          case "outro":
+            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex };
+          case "point":
+          default:
+            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source };
+        }
+      })
+      .filter((slide): slide is Slide => Boolean(slide));
+    if (!slides.length) return null;
+    return { title: input.title, subtitle: input.subtitle, slides };
   };
 
 
