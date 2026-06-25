@@ -403,10 +403,31 @@ function VideoGenSection() {
   // ---------- AI VISION: OCR + SCRIPT ----------
   const fileToBase64 = (f: File): Promise<string> =>
     new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(f);
+      const img = new Image();
+      const url = URL.createObjectURL(f);
+      img.onload = () => {
+        try {
+          const maxSide = 1800;
+          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const c = canvas.getContext("2d")!;
+          c.fillStyle = "#ffffff";
+          c.fillRect(0, 0, canvas.width, canvas.height);
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          res(canvas.toDataURL("image/jpeg", 0.92));
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          rej(e);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        rej(new Error("Nie udało się wczytać obrazu"));
+      };
+      img.src = url;
     });
 
   const runOCR = async () => {
@@ -415,10 +436,10 @@ function VideoGenSection() {
       return;
     }
     setOcrBusy(true);
-    setOcrStatus("Wysyłam obrazy do Gemini Vision…");
+    setOcrStatus("Przygotowuję zrzuty do dokładnej analizy…");
     try {
       const b64s = await Promise.all(images.map(fileToBase64));
-      setOcrStatus("Gemini czyta tekst i pisze scenariusz filmu…");
+      setOcrStatus("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…");
       const { data, error } = await supabase.functions.invoke("video-script-from-images", {
         body: { images: b64s, duration },
       });
