@@ -709,6 +709,36 @@ if __name__ == "__main__":
         </CardContent>
       </Card>
 
+      {/* Defended Edition v2.1 — Proof of Coherence */}
+      <Card className="bg-gradient-to-br from-emerald-950/30 via-card to-background border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.12)]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-emerald-300">
+            <Sparkles className="w-5 h-5" />
+            {pick("DEFENDED EDITION v2.1 — Dowód Koherencji", "DEFENDED EDITION v2.1 — Proof of Coherence")}
+          </CardTitle>
+          <CardDescription>
+            {pick(
+              "800/800 cykli · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · faza zachowana 0.0 rad · FIR zero-phase (filtfilt).",
+              "800/800 cycles · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · phase preserved 0.0 rad · FIR zero-phase (filtfilt)."
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <img
+            src="/screenshots/symphony-24h-defended-success.jpg"
+            alt={pick("Log generacji SYMFONIA PLEROMA 24H — DEFENDED EDITION v2.1", "Generation log — SYMFONIA PLEROMA 24H DEFENDED EDITION v2.1")}
+            className="w-full rounded-lg border border-emerald-500/20"
+            loading="lazy"
+          />
+          <p className="text-xs text-muted-foreground mt-3 text-center italic">
+            {pick(
+              "GENERACJA UKOŃCZONA POMYŚLNIE — KOHERENCJA MATEMATYCZNA 1.0",
+              "GENERATION COMPLETED SUCCESSFULLY — MATHEMATICAL COHERENCE 1.0"
+            )}
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Source Code */}
       <Card className="bg-card/50 backdrop-blur border-primary/20">
         <CardHeader>
@@ -781,35 +811,6 @@ if __name__ == "__main__":
 
           {/* Consciousness Symphony Code */}
           <div className="max-w-2xl mx-auto">
-      {/* Defended Edition v2.1 — Proof of Coherence */}
-      <Card className="bg-gradient-to-br from-emerald-950/30 via-card to-background border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.12)]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-emerald-300">
-            <Sparkles className="w-5 h-5" />
-            {pick("DEFENDED EDITION v2.1 — Dowód Koherencji", "DEFENDED EDITION v2.1 — Proof of Coherence")}
-          </CardTitle>
-          <CardDescription>
-            {pick(
-              "800/800 cykli · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · faza zachowana 0.0 rad.",
-              "800/800 cycles · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · phase preserved 0.0 rad."
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <img
-            src="/screenshots/symphony-24h-defended-success.jpg"
-            alt={pick("Log generacji SYMFONIA PLEROMA 24H — DEFENDED EDITION v2.1", "Generation log — SYMFONIA PLEROMA 24H DEFENDED EDITION v2.1")}
-            className="w-full rounded-lg border border-emerald-500/20"
-            loading="lazy"
-          />
-          <p className="text-xs text-muted-foreground mt-3 text-center italic">
-            {pick(
-              "GENERACJA UKOŃCZONA POMYŚLNIE — KOHERENCJA MATEMATYCZNA 1.0",
-              "GENERATION COMPLETED SUCCESSFULLY — MATHEMATICAL COHERENCE 1.0"
-            )}
-          </p>
-        </CardContent>
-      </Card>
 
             <pre className="p-5 rounded-xl bg-black/80 border border-primary/20 text-sm md:text-base font-mono overflow-x-auto">
 
