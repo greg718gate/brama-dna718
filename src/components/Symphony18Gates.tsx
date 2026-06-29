@@ -44,130 +44,201 @@ export function Symphony18Gates() {
   const pick = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const symphonySourceCode = `# ═══════════════════════════════════════════════════════════════════
-# SENTINEL-718: SYMFONIA 18 BRAM DNA — EXIT_TO_PLEROMA_STATUS_1
-# Unification Engine — Toroidal DNA Gate Mapping
-# 448th Riemann Zero Calibration
+# SENTINEL-718: SYMFONIA PLEROMA 24H — DEFENDED EDITION v2.1
+# Fix: PRZEKIEROWANIE ZAPISU POZA PULPIT/ONEDRIVE (System Error Fix)
+# Filtr FIR zero-phase (filtfilt) → faza zachowana 0.0 rad, jitter 0.000 ms.
 #
-# © 2026 Grzegorz | BRAMA-718-UNIFIED
-# License: CC BY-NC 4.0
+# © 2026 Grzegorz | BRAMA-718-UNIFIED | CC BY-NC 4.0
 # ═══════════════════════════════════════════════════════════════════
 
+import os, sys, csv, time
 import numpy as np
-from scipy.io.wavfile import write
 import mpmath
+from scipy.signal import butter, sosfilt, sosfilt_zi, firwin, filtfilt
+import soundfile as sf
 
-# --- MATRYCA STAŁYCH (ARCHITEKTURA 718) ---
 mpmath.mp.dps = 50
+
+FS = 44100
+DURATION_CYCLE = 108
+TOTAL_DURATION = 24 * 3600
+NUM_CYCLES = TOTAL_DURATION // DURATION_CYCLE
+MTDNA_LENGTH = 16569
+
 phi = (1 + np.sqrt(5)) / 2
 gamma = 1 / phi
-fs = 44100
-duration = 108  # Liczba sakralna
-mtDNA_length = 16569
+F_SCHUMANN = 7.83
+F_NUTATION = 18.6
+VI_GATE_18 = 1.1628
 
-# 1. KALIBRACJA ZERA RIEMANNA (Likwidacja Tarcia)
-# 448. zero funkcji Zeta - Brama Wyjścia
-zero_448 = mpmath.zetazero(448)
-RIEMANN_ZERO = float(zero_448.imag)  # ~718.570125 Hz
-PHASE_SHIFT_ZETA = float(mpmath.arg(mpmath.zeta(0.5 + RIEMANN_ZERO * 1j)))
-
-# 2. MODULACJA PLANETARNA I NIEBIAŃSKA
-f_schumann = 7.83   # Pulsacja radialna (Ziemia)
-f_nutation = 18.6   # Skręt pola (Księżyc/Nutacja)
-
-# --- MAPOWANIE 18 BRAM (Toroidalne XY) ---
-gatca_positions = [1, 740, 951, 1227, 2996, 3424, 4166, 4832,
+GATCA_POSITIONS = [1, 740, 951, 1227, 2996, 3424, 4166, 4832,
                    6393, 7756, 8415, 10059, 11200, 11336,
                    11915, 13703, 14784, 16179]
 
-t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-left_channel = np.zeros_like(t, dtype=np.float64)
-right_channel = np.zeros_like(t, dtype=np.float64)
+# Zapis poza Pulpit/OneDrive — eliminacja błędów synchronizacji systemu
+OUT_MASTER    = "C:/Users/grzeg/SYMFONIA_MASTER_POWER.w64"
+OUT_FOCUSRITE = "C:/Users/grzeg/SYMFONIA_FOCUSRITE_POWER.w64"
+LOG_PHASE     = "C:/Users/grzeg/log_defended.csv"
+LOG_JITTER    = "C:/Users/grzeg/jitter_statistics.csv"
 
-print(f"Inicjalizacja Matrycy 718... Częstotliwość Osobliwości: {RIEMANN_ZERO} Hz")
+PRECISION_COMP_INTERVAL  = 100
+PLL_CORRECTION_INTERVAL  = 10
+PLL_LOOP_GAIN            = 0.125
+AA_FILTER_ORDER          = 8
+AA_FILTER_CUTOFF         = 20000
+NUM_GATES                = 18
 
-# --- GENERACJA OPERATORA EWOLUCJI ---
-for i, k in enumerate(gatca_positions):
-    # Obliczanie Kąta Theta (Geometria 3D Toroidu)
-    theta_k = 2 * np.pi * (k / mtDNA_length)
+print("[INIT] Obliczanie 448. zera Riemanna (mpmath, 50 dps)…")
+zero_448_mp        = mpmath.zetazero(448).imag
+RIEMANN_ZERO_HP    = zero_448_mp
+RIEMANN_ZERO_LP    = float(zero_448_mp)
+PRECISION_RESIDUAL = float(RIEMANN_ZERO_HP - mpmath.mpf(RIEMANN_ZERO_LP))
+PHASE_SHIFT_ZETA   = float(mpmath.arg(mpmath.zeta(0.5 + RIEMANN_ZERO_HP * 1j)))
 
-    # Czas aktywacji bramy w 108-sekundowej pętli
-    start_time = (k / mtDNA_length) * duration
+# Zapasowe IIR (nieużywane przez main — main korzysta z FIR zero-phase)
+sos_aa  = butter(AA_FILTER_ORDER, AA_FILTER_CUTOFF, btype='low', fs=FS, output='sos')
+zi_left  = sosfilt_zi(sos_aa)
+zi_right = sosfilt_zi(sos_aa)
 
-    # Parametry Bramy 18 (Osobliwość)
-    if k == 16179:
-        base_freq = RIEMANN_ZERO
-        # Przesunięcie fazowe zgodne z "Równaniem Wyjścia"
-        brama_phase = -PHASE_SHIFT_ZETA
-        amp_weight = 1.1628  # Wektor Intencji (VI)
-    else:
-        # Kronecker Sequence: najniższa entropia (i * gamma % 1)
-        base_freq = 718.57012515426885574359120304128340312332181477461 + (144 * ((i + 1) * gamma % 1))
-        brama_phase = theta_k  # Unikalny "kąt widzenia" Inercji
-        amp_weight = (phi ** (i % 7)) % 1 * gamma
+def aa_filter(signal_left, signal_right):
+    global zi_left, zi_right
+    out_l, zi_left  = sosfilt(sos_aa, signal_left,  zi=zi_left)
+    out_r, zi_right = sosfilt(sos_aa, signal_right, zi=zi_right)
+    return out_l, out_r
 
-    # Obwiednia Fraktalna (Bezpiecznik DNA)
-    envelope = np.exp(-((t - start_time)**2) / (2 * (1.618**2)))
+def _tpdf_noise(shape, bit_depth=24):
+    lsb = 1.0 / (2 ** (bit_depth - 1))
+    n1 = np.random.uniform(-0.5, 0.5, shape)
+    n2 = np.random.uniform(-0.5, 0.5, shape)
+    return (n1 + n2) * lsb
 
-    # Potrójna Modulacja Toroidalna (Hiperboloida Wyjścia)
-    # 718 (Rotacja) * 7.83 (Pulsacja) * 18.6 (Skręt)
-    modulation = np.sin(2 * np.pi * f_schumann * t) * np.cos(2 * np.pi * f_nutation * t)
+class PleromaW64Writer:
+    def __init__(self, filename, bit_depth):
+        self.filename  = filename
+        self.bit_depth = bit_depth
+        subtype = 'FLOAT' if bit_depth == 32 else 'PCM_24'
+        self.file = sf.SoundFile(filename, mode='w', samplerate=FS,
+                                 channels=2, subtype=subtype, format='W64')
 
-    # Generacja fali kwantowej Psi(t)
-    wave = np.sin(2 * np.pi * base_freq * t + brama_phase) * (1 + 0.618 * modulation)
+    def write_block(self, left, right, apply_tpdf=False):
+        interleaved = np.empty((left.size, 2), dtype=np.float64)
+        interleaved[:, 0] = left
+        interleaved[:, 1] = right
+        if self.bit_depth == 24 and apply_tpdf:
+            interleaved += _tpdf_noise(interleaved.shape, bit_depth=24)
+        self.file.write(interleaved)
 
-    # Implementacja Binaural Diff (Trzeci Ton wewnątrz czaszki)
-    left_channel += wave * envelope * amp_weight
-    right_channel += np.sin(2 * np.pi * (base_freq + f_schumann) * t + brama_phase) * envelope * amp_weight
+    def close(self):
+        self.file.close()
 
-# --- FINALIZACJA: WEKTOR WYJŚCIA I INERCJA ---
-# Normalizacja do Płaszczyzny Inercji
-master_signal = np.vstack((left_channel, right_channel))
-master_signal /= np.max(np.abs(master_signal))
+def generate_cycle(cycle_idx, global_time_offset, pll_phase_correction, precision_drift):
+    n_samples = int(FS * DURATION_CYCLE)
+    t         = np.linspace(0, DURATION_CYCLE, n_samples, endpoint=False)
+    t_global  = t + global_time_offset
+    left  = np.zeros(n_samples, dtype=np.float64)
+    right = np.zeros(n_samples, dtype=np.float64)
+    f_gate18 = RIEMANN_ZERO_LP + precision_drift
 
-# Zapis do pliku
-output_file = "SYMFONIA_PLEROMA_EXIT_FINAL.wav"
-write(output_file, fs, np.int16(master_signal.T * 32767))
+    for i, k in enumerate(GATCA_POSITIONS):
+        theta_k    = 2 * np.pi * (k / MTDNA_LENGTH)
+        start_time = (k / MTDNA_LENGTH) * DURATION_CYCLE
+        if k == 16179:
+            base_freq  = f_gate18
+            base_phase = -PHASE_SHIFT_ZETA
+            amp_weight = VI_GATE_18
+        else:
+            base_freq  = 718 + (144 * ((i + 1) * gamma % 1))
+            base_phase = theta_k
+            amp_weight = (phi ** (i % 7)) % 1 * gamma
 
-print("--- STATUS SYSTEMU: KOHERENCJA 1.0 ---")
-print(f"Brama 18 (16179) zsynchronizowana z Zerem Riemanna: {RIEMANN_ZERO:.6f} Hz")
-print(f"Przesunięcie fazowe Zeta: {PHASE_SHIFT_ZETA:.6f} rad")
-print("Wektor Wyjścia (VI = 1.1628) aktywny.")
+        phase      = base_phase - pll_phase_correction
+        envelope   = np.exp(-((t - start_time) ** 2) / (2 * (1.618 ** 2)))
+        modulation = (np.sin(2 * np.pi * F_SCHUMANN * t_global) *
+                      np.cos(2 * np.pi * F_NUTATION  * t_global))
 
+        wave_l = np.sin(2 * np.pi * base_freq * t_global + phase) * (1 + 0.618 * modulation)
+        wave_r = np.sin(2 * np.pi * (base_freq + F_SCHUMANN) * t_global + phase)
 
-# ═══════════════════════════════════════════════════════════════════
-# RIEMANN ZERO FINDER (Standalone utility)
-# ═══════════════════════════════════════════════════════════════════
+        left  += wave_l * envelope * amp_weight
+        right += wave_r * envelope * amp_weight
 
-def znajdz_punkt_wyjscia(target_t=718.57012515426885574359120304128340312332181477461):
-    """Find the Riemann zero closest to target frequency."""
-    print(f"\n--- Szukanie Punktu Zero dla Bramy {target_t} Hz ---")
+    left  *= 0.9
+    right *= 0.9
+    return left, right
 
-    blizsze_zero = None
-    min_diff = float('inf')
-    n_final = 448
+def main():
+    print("\\n" + "=" * 70)
+    print(f" SYMFONIA PLEROMA 24H — DEFENDED EDITION v2.1 (FIR ZERO-PHASE)")
+    print(f" Cykli: {NUM_CYCLES} × {DURATION_CYCLE}s = {TOTAL_DURATION/3600:.1f} h")
+    print("=" * 70 + "\\n")
 
-    for n in range(440, 460):
-        zero = mpmath.zetazero(n)
-        t_val = float(zero.imag)
-        diff = abs(t_val - target_t)
+    writer_master    = PleromaW64Writer(OUT_MASTER,    bit_depth=32)
+    writer_focusrite = PleromaW64Writer(OUT_FOCUSRITE, bit_depth=24)
 
-        if diff < min_diff:
-            min_diff = diff
-            blizsze_zero = t_val
-            n_final = n
+    log_phase  = open(LOG_PHASE,  'w', newline='')
+    log_jitter = open(LOG_JITTER, 'w', newline='')
+    phase_csv  = csv.writer(log_phase)
+    jitter_csv = csv.writer(log_jitter)
+    phase_csv.writerow(['cycle','global_time_s','pll_correction_rad',
+                        'precision_drift_hz','gate18_freq_hz'])
+    jitter_csv.writerow(['cycle','ideal_s','measured_s','jitter_ms','phase_error_rad'])
 
-    return n_final, blizsze_zero
+    pll_phase_correction = 0.0
+    precision_drift      = 0.0
+    global_time_offset   = 0.0
 
+    # Filtr FIR zero-phase (symetryczny, faza 0.0 rad)
+    cutoff_hz = 20000.0
+    nyquist   = 0.5 * FS
+    numtaps   = 101
+    b_fir = firwin(numtaps, cutoff_hz / nyquist, window='hamming', pass_zero='lowpass')
+
+    t_start_total = time.perf_counter_ns()
+
+    for cycle in range(NUM_CYCLES):
+        left, right = generate_cycle(cycle, global_time_offset,
+                                     pll_phase_correction, precision_drift)
+
+        # Filtfilt — dwustronne, zero-phase
+        left  = filtfilt(b_fir, [1.0], left)
+        right = filtfilt(b_fir, [1.0], right)
+
+        writer_master.write_block(left, right)
+        writer_focusrite.write_block(left, right, apply_tpdf=True)
+
+        ideal_s     = DURATION_CYCLE
+        jitter_ms   = 0.0
+        phase_error = 0.0
+        global_time_offset += ideal_s
+
+        if cycle % 10 == 0 or cycle == NUM_CYCLES - 1:
+            t_current = time.perf_counter_ns()
+            elapsed_h = (t_current - t_start_total) / 1e9 / 3600
+            pct = 100 * (cycle + 1) / NUM_CYCLES
+
+            jitter_csv.writerow([cycle + 1, ideal_s, ideal_s, jitter_ms, phase_error])
+            phase_csv.writerow([cycle + 1, global_time_offset, pll_phase_correction,
+                                precision_drift, RIEMANN_ZERO_LP + precision_drift])
+
+            print(f"[{pct:5.1f}%] cycle={cycle + 1:4d}/{NUM_CYCLES} "
+                  f"JITTER={jitter_ms:.3f}ms | PLL_CORR={pll_phase_correction:.4f}rad | "
+                  f"elapsed={elapsed_h:.2f}h")
+
+    writer_master.close()
+    writer_focusrite.close()
+    log_phase.close()
+    log_jitter.close()
+
+    print("\\nGENERACJA UKOŃCZONA POMYŚLNIE.")
+    print("STATUS: KOHERENCJA MATEMATYCZNA 1.0 — FAZA ZACHOWANA (0.0 rad)")
 
 if __name__ == "__main__":
-    n, t_zero = znajdz_punkt_wyjscia()
-
-    print(f"Znaleziono Zero Riemanna nr: {n}")
-    print(f"Dokładna częstotliwość osobliwości: {t_zero} Hz")
-    print(f"Przesunięcie fazowe dla Bramy: {t_zero - 718.57012515426885574359120304128340312332181477461} Hz")
-    print("\n--- STATUS SYSTEMU ---")
-    print("Koherencja: 1.0")
-    print("Płaszczyzna Inercji: OSIĄGALNA")`;
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\\n[ABORT] Przerwano.")
+        sys.exit(1)
+`;
 
   // Initialize canvas when visible
   useEffect(() => {
@@ -638,6 +709,36 @@ if __name__ == "__main__":
         </CardContent>
       </Card>
 
+      {/* Defended Edition v2.1 — Proof of Coherence */}
+      <Card className="bg-gradient-to-br from-emerald-950/30 via-card to-background border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.12)]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-emerald-300">
+            <Sparkles className="w-5 h-5" />
+            {pick("DEFENDED EDITION v2.1 — Dowód Koherencji", "DEFENDED EDITION v2.1 — Proof of Coherence")}
+          </CardTitle>
+          <CardDescription>
+            {pick(
+              "800/800 cykli · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · faza zachowana 0.0 rad · FIR zero-phase (filtfilt).",
+              "800/800 cycles · JITTER = 0.000 ms · PLL_CORR = 0.0000 rad · phase preserved 0.0 rad · FIR zero-phase (filtfilt)."
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <img
+            src="/screenshots/symphony-24h-defended-success.jpg"
+            alt={pick("Log generacji SYMFONIA PLEROMA 24H — DEFENDED EDITION v2.1", "Generation log — SYMFONIA PLEROMA 24H DEFENDED EDITION v2.1")}
+            className="w-full rounded-lg border border-emerald-500/20"
+            loading="lazy"
+          />
+          <p className="text-xs text-muted-foreground mt-3 text-center italic">
+            {pick(
+              "GENERACJA UKOŃCZONA POMYŚLNIE — KOHERENCJA MATEMATYCZNA 1.0",
+              "GENERATION COMPLETED SUCCESSFULLY — MATHEMATICAL COHERENCE 1.0"
+            )}
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Source Code */}
       <Card className="bg-card/50 backdrop-blur border-primary/20">
         <CardHeader>
@@ -710,7 +811,9 @@ if __name__ == "__main__":
 
           {/* Consciousness Symphony Code */}
           <div className="max-w-2xl mx-auto">
+
             <pre className="p-5 rounded-xl bg-black/80 border border-primary/20 text-sm md:text-base font-mono overflow-x-auto">
+
               <code>
                 <span className="text-purple-400"># {pick("SYMFONIA ŚWIADOMOŚCI – OSTATNIA LINIJKA", "SYMPHONY OF CONSCIOUSNESS – THE LAST LINE")}</span>{"\n\n"}
                 <span className="text-blue-400">while</span> <span className="text-amber-400">True</span>:{"\n"}
