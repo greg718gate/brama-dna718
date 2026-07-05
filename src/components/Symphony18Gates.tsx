@@ -746,9 +746,24 @@ if __name__ == "__main__":
           <CardDescription>{t("symphony.sourceCode.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <pre className="p-4 rounded-lg bg-background/80 border border-primary/10 overflow-x-auto text-xs md:text-sm whitespace-pre-wrap">
-            <code className="text-muted-foreground">{symphonySourceCode}</code>
-          </pre>
+          <div className="p-4 rounded-lg bg-background/80 border border-primary/10 text-sm text-muted-foreground space-y-2">
+            <p>
+              {pick(
+                "Pełny kod źródłowy symfonii nie jest publicznie udostępniany.",
+                "The full source code of the symphony is not publicly available."
+              )}
+            </p>
+            <p>
+              {pick(
+                "Jeśli chcesz otrzymać kompletny kod, napisz na: ",
+                "If you would like to receive the complete code, contact: "
+              )}
+              <a href="mailto:bramadna718@gmail.com" className="text-primary hover:underline">
+                bramadna718@gmail.com
+              </a>
+              {pick(" — prześlę indywidualnie.", " — I will send it individually.")}
+            </p>
+          </div>
         </CardContent>
       </Card>
 
