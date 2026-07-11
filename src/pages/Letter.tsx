@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Copy, Check, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const letterText = `Professor John Lennox
 Green Templeton College
@@ -89,6 +90,8 @@ https://github.com/greg718gate/brama-dna718
 const Letter = () => {
   const [copiedLetter, setCopiedLetter] = useState(false);
   const [copiedAttachment, setCopiedAttachment] = useState(false);
+  const { language } = useLanguage();
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const copyToClipboard = async (text: string, type: "letter" | "attachment") => {
     try {
@@ -100,9 +103,9 @@ const Letter = () => {
         setCopiedAttachment(true);
         setTimeout(() => setCopiedAttachment(false), 2000);
       }
-      toast.success(type === "letter" ? "List skopiowany!" : "Załącznik skopiowany!");
+      toast.success(type === "letter" ? tr("List skopiowany!", "Letter copied!") : tr("Załącznik skopiowany!", "Attachment copied!"));
     } catch (err) {
-      toast.error("Nie udało się skopiować");
+      toast.error(tr("Nie udało się skopiować", "Could not copy"));
     }
   };
 
@@ -115,7 +118,7 @@ const Letter = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">List do Prof. Johna Lennoxa</h1>
+          <h1 className="text-2xl font-bold">{tr("List do Prof. Johna Lennoxa", "Letter to Prof. John Lennox")}</h1>
         </div>
 
         {/* Letter */}
@@ -128,7 +131,7 @@ const Letter = () => {
               className="gap-2"
             >
               {copiedLetter ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copiedLetter ? "Skopiowano!" : "Kopiuj list"}
+              {copiedLetter ? tr("Skopiowano!", "Copied!") : tr("Kopiuj list", "Copy letter")}
             </Button>
           </div>
           <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap font-mono overflow-x-auto">
@@ -146,7 +149,7 @@ const Letter = () => {
               className="gap-2"
             >
               {copiedAttachment ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copiedAttachment ? "Skopiowano!" : "Kopiuj załącznik"}
+              {copiedAttachment ? tr("Skopiowano!", "Copied!") : tr("Kopiuj załącznik", "Copy attachment")}
             </Button>
           </div>
           <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap font-mono overflow-x-auto">
@@ -156,12 +159,12 @@ const Letter = () => {
 
         {/* Instructions */}
         <Card className="p-6 bg-primary/5 border-primary/20">
-          <h3 className="font-semibold mb-2">📬 Instrukcja wysyłki:</h3>
+          <h3 className="font-semibold mb-2">📬 {tr("Instrukcja wysyłki:", "Mailing instructions:")}</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>1. Skopiuj list → wklej do Worda → uzupełnij [Your Full Name] itd.</li>
-            <li>2. Skopiuj załącznik → wklej na drugą stronę → dodaj QR kod na dole</li>
-            <li>3. Wydrukuj 2 strony A4</li>
-            <li>4. Wyślij: Royal Mail "Signed For 1st Class"</li>
+            <li>{tr("1. Skopiuj list → wklej do Worda → uzupełnij [Your Full Name] itd.", "1. Copy the letter → paste it into Word → complete [Your Full Name], etc.")}</li>
+            <li>{tr("2. Skopiuj załącznik → wklej na drugą stronę → dodaj QR kod na dole", "2. Copy the attachment → paste it onto the second page → add the QR code at the bottom")}</li>
+            <li>{tr("3. Wydrukuj 2 strony A4", "3. Print 2 A4 pages")}</li>
+            <li>{tr("4. Wyślij: Royal Mail \"Signed For 1st Class\"", "4. Send via Royal Mail \"Signed For 1st Class\"")}</li>
           </ul>
         </Card>
       </div>
