@@ -7,11 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
-
-const authSchema = z.object({
-  email: z.string().email("Nieprawidłowy adres email"),
-  password: z.string().min(6, "Hasło musi mieć minimum 6 znaków"),
-});
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,6 +16,13 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language, t } = useLanguage();
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
+
+  const authSchema = z.object({
+    email: z.string().email(tr("Nieprawidłowy adres email", "Invalid email address")),
+    password: z.string().min(6, tr("Hasło musi mieć minimum 6 znaków", "Password must be at least 6 characters")),
+  });
 
   // Sprawdź czy użytkownik jest już zalogowany
   useEffect(() => {
@@ -53,14 +56,14 @@ const Auth = () => {
 
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
-            throw new Error("Nieprawidłowy email lub hasło");
+            throw new Error(tr("Nieprawidłowy email lub hasło", "Invalid email or password"));
           }
           throw error;
         }
 
         toast({
-          title: "Zalogowano pomyślnie",
-          description: "Witaj z powrotem!",
+          title: tr("Zalogowano pomyślnie", "Signed in successfully"),
+          description: tr("Witaj z powrotem!", "Welcome back!"),
         });
       } else {
         const { error } = await supabase.auth.signUp({
@@ -73,27 +76,27 @@ const Auth = () => {
 
         if (error) {
           if (error.message.includes("already registered")) {
-            throw new Error("Ten email jest już zarejestrowany");
+            throw new Error(tr("Ten email jest już zarejestrowany", "This email is already registered"));
           }
           throw error;
         }
 
         toast({
-          title: "Konto utworzone",
-          description: "Możesz się teraz zalogować",
+          title: tr("Konto utworzone", "Account created"),
+          description: tr("Możesz się teraz zalogować", "You can now sign in"),
         });
         setIsLogin(true);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
-          title: "Błąd walidacji",
+          title: tr("Błąd walidacji", "Validation error"),
           description: error.errors[0].message,
           variant: "destructive",
         });
       } else if (error instanceof Error) {
         toast({
-          title: "Błąd",
+          title: tr("Błąd", "Error"),
           description: error.message,
           variant: "destructive",
         });
@@ -112,7 +115,7 @@ const Auth = () => {
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          Powrót
+          {t('backToMain')}
         </Button>
       </div>
 
@@ -120,12 +123,12 @@ const Auth = () => {
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center gap-2">
             <User className="w-6 h-6 text-primary" />
-            {isLogin ? "Logowanie" : "Rejestracja"}
+            {isLogin ? tr("Logowanie", "Sign in") : tr("Rejestracja", "Register")}
           </CardTitle>
           <CardDescription>
             {isLogin
-              ? "Zaloguj się, aby dodawać komentarze"
-              : "Utwórz konto, aby dołączyć do społeczności"}
+              ? tr("Zaloguj się, aby dodawać komentarze", "Sign in to add comments")
+              : tr("Utwórz konto, aby dołączyć do społeczności", "Create an account to join the community")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +151,7 @@ const Auth = () => {
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="password"
-                  placeholder="Hasło (min. 6 znaków)"
+                  placeholder={tr("Hasło (min. 6 znaków)", "Password (min. 6 characters)")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
@@ -159,10 +162,10 @@ const Auth = () => {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading
-                ? "Proszę czekać..."
+                ? tr("Proszę czekać...", "Please wait...")
                 : isLogin
-                ? "Zaloguj się"
-                : "Zarejestruj się"}
+                ? tr("Zaloguj się", "Sign in")
+                : tr("Zarejestruj się", "Register")}
             </Button>
           </form>
 
@@ -173,8 +176,8 @@ const Auth = () => {
               className="text-sm text-primary hover:underline"
             >
               {isLogin
-                ? "Nie masz konta? Zarejestruj się"
-                : "Masz już konto? Zaloguj się"}
+                ? tr("Nie masz konta? Zarejestruj się", "No account? Register")
+                : tr("Masz już konto? Zaloguj się", "Already have an account? Sign in")}
             </button>
           </div>
         </CardContent>
