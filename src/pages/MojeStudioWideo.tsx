@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Lock,
   Upload,
@@ -31,9 +32,11 @@ const STORAGE_KEY = "moje-studio-wideo-auth";
 // PASSWORD GATE
 // ============================================================================
 function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+  const { language } = useLanguage();
   const [pwd, setPwd] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState(false);
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,9 +58,9 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-fuchsia-500 to-violet-700 flex items-center justify-center shadow-[0_0_30px_rgba(217,70,239,0.6)]">
             <Lock className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-xl font-semibold tracking-wide">Dostęp ograniczony</h1>
+          <h1 className="text-xl font-semibold tracking-wide">{tr("Dostęp ograniczony", "Restricted access")}</h1>
           <p className="text-xs text-fuchsia-200/60 text-center">
-            Strefa prywatna. Wpisz hasło, aby kontynuować.
+            {tr("Strefa prywatna. Wpisz hasło, aby kontynuować.", "Private area. Enter the password to continue.")}
           </p>
         </div>
         <div className="relative">
@@ -76,19 +79,19 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
             type="button"
             onClick={() => setShowPwd((v) => !v)}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-fuchsia-200/60 hover:text-white focus:outline-none"
-            aria-label={showPwd ? "Ukryj hasło" : "Pokaż hasło"}
+            aria-label={showPwd ? tr("Ukryj hasło", "Hide password") : tr("Pokaż hasło", "Show password")}
           >
             {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
         {error && (
-          <p className="text-xs text-red-400 mt-2">Nieprawidłowe hasło.</p>
+          <p className="text-xs text-red-400 mt-2">{tr("Nieprawidłowe hasło.", "Invalid password.")}</p>
         )}
         <Button
           type="submit"
           className="w-full mt-4 bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0"
         >
-          Odblokuj
+          {tr("Odblokuj", "Unlock")}
         </Button>
       </form>
     </div>
@@ -145,6 +148,7 @@ function downsample(input: Float32Array, inRate: number, outRate: number): Float
 
 function TranscriptionSection() {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [progress, setProgress] = useState(0);
@@ -153,6 +157,7 @@ function TranscriptionSection() {
 
   const SR = 16000; // 16 kHz mono
   const CHUNK_SECONDS = 600; // 10 min per chunk → ~19 MB WAV (< 25 MB limit)
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const sendChunk = async (blob: Blob, idx: number): Promise<string> => {
     const fd = new FormData();
@@ -173,18 +178,18 @@ function TranscriptionSection() {
   const run = async () => {
     if (!file) return;
     if (file.size > 500 * 1024 * 1024) {
-      toast({ title: "Plik za duży", description: "Maks. 500 MB.", variant: "destructive" });
+      toast({ title: tr("Plik za duży", "File too large"), description: tr("Maks. 500 MB.", "Max. 500 MB."), variant: "destructive" });
       return;
     }
     setBusy(true);
     setText("");
     setProgress(2);
-    setStatus("Wczytuję plik…");
+    setStatus(tr("Wczytuję plik…", "Loading file…"));
 
     try {
       const arrayBuf = await file.arrayBuffer();
       setProgress(8);
-      setStatus("Dekoduję ścieżkę dźwiękową (lokalnie w przeglądarce)…");
+      setStatus(tr("Dekoduję ścieżkę dźwiękową (lokalnie w przeglądarce)…", "Decoding the audio track locally in the browser…"));
 
       const AC: typeof AudioContext =
         (window as any).AudioContext || (window as any).webkitAudioContext;
@@ -204,7 +209,7 @@ function TranscriptionSection() {
       }
 
       setProgress(20);
-      setStatus("Konwertuję do 16 kHz mono…");
+      setStatus(tr("Konwertuję do 16 kHz mono…", "Converting to 16 kHz mono…"));
       const down = downsample(mono, audio.sampleRate, SR);
 
       const chunkSamples = CHUNK_SECONDS * SR;
@@ -215,7 +220,9 @@ function TranscriptionSection() {
         const slice = down.subarray(i * chunkSamples, Math.min(down.length, (i + 1) * chunkSamples));
         const wav = encodeWav(slice, SR);
         setStatus(
-          `Wysyłam fragment ${i + 1}/${totalChunks} (${(wav.size / 1024 / 1024).toFixed(1)} MB) do transkrypcji…`
+          language === "pl"
+            ? `Wysyłam fragment ${i + 1}/${totalChunks} (${(wav.size / 1024 / 1024).toFixed(1)} MB) do transkrypcji…`
+            : `Sending chunk ${i + 1}/${totalChunks} (${(wav.size / 1024 / 1024).toFixed(1)} MB) for transcription…`
         );
         const piece = await sendChunk(wav, i + 1);
         parts.push(piece);
@@ -224,16 +231,16 @@ function TranscriptionSection() {
       }
 
       setProgress(100);
-      setStatus(`Gotowe. Fragmentów: ${totalChunks}.`);
-      toast({ title: "Transkrypcja ukończona" });
+      setStatus(language === "pl" ? `Gotowe. Fragmentów: ${totalChunks}.` : `Done. Chunks: ${totalChunks}.`);
+      toast({ title: tr("Transkrypcja ukończona", "Transcription complete") });
     } catch (e: any) {
       console.error(e);
       toast({
-        title: "Błąd transkrypcji",
-        description: e?.message || "Spróbuj innego formatu (mp4/m4a/mp3/wav).",
+        title: tr("Błąd transkrypcji", "Transcription error"),
+        description: e?.message || tr("Spróbuj innego formatu (mp4/m4a/mp3/wav).", "Try another format (mp4/m4a/mp3/wav)."),
         variant: "destructive",
       });
-      setStatus("Błąd: " + (e?.message || "nieznany"));
+      setStatus(tr("Błąd: ", "Error: ") + (e?.message || tr("nieznany", "unknown")));
     } finally {
       setBusy(false);
     }
@@ -241,17 +248,20 @@ function TranscriptionSection() {
 
   const copyText = async () => {
     await navigator.clipboard.writeText(text);
-    toast({ title: "Skopiowano do schowka" });
+    toast({ title: tr("Skopiowano do schowka", "Copied to clipboard") });
   };
 
   return (
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <FileAudio className="w-5 h-5 text-fuchsia-400" />
-        <h2 className="text-lg font-semibold text-white">Sekcja 1 · Wideo/Audio → Tekst</h2>
+        <h2 className="text-lg font-semibold text-white">{tr("Sekcja 1 · Wideo/Audio → Tekst", "Section 1 · Video/Audio → Text")}</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Obsługa dużych plików (do ~500 MB). Telefon wyciąga sam dźwięk, konwertuje do 16 kHz mono i dzieli na 10-minutowe fragmenty — każdy wysyłany osobno do transkrypcji w chmurze (gpt-4o-mini-transcribe), a wyniki sklejane.
+        {tr(
+          "Obsługa dużych plików (do ~500 MB). Telefon wyciąga sam dźwięk, konwertuje do 16 kHz mono i dzieli na 10-minutowe fragmenty — każdy wysyłany osobno do transkrypcji w chmurze, a wyniki sklejane.",
+          "Supports large files (up to ~500 MB). The browser extracts audio, converts it to 16 kHz mono, splits it into 10-minute chunks, sends each chunk for cloud transcription, and merges the results."
+        )}
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-8 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -263,7 +273,7 @@ function TranscriptionSection() {
         />
         <Upload className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {file ? file.name : "Upuść lub kliknij — mp4 / mov / mp3 / wav"}
+          {file ? file.name : tr("Upuść lub kliknij — mp4 / mov / mp3 / wav", "Drop or click — mp4 / mov / mp3 / wav")}
         </p>
         {file && (
           <p className="text-xs text-fuchsia-200/50 mt-1">
@@ -278,7 +288,7 @@ function TranscriptionSection() {
         className="w-full mt-4 bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0"
       >
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-        {busy ? "Pracuję…" : "Transkrybuj"}
+        {busy ? tr("Pracuję…", "Working…") : tr("Transkrybuj", "Transcribe")}
       </Button>
 
       {(busy || progress > 0) && (
@@ -291,7 +301,7 @@ function TranscriptionSection() {
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Transkrypcja pojawi się tutaj…"
+        placeholder={tr("Transkrypcja pojawi się tutaj…", "The transcription will appear here…")}
         className="mt-4 min-h-[200px] bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30"
       />
 
@@ -301,7 +311,7 @@ function TranscriptionSection() {
         variant="outline"
         className="mt-3 border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white"
       >
-        <Copy className="w-4 h-4" /> Kopiuj tekst do schowka
+        <Copy className="w-4 h-4" /> {tr("Kopiuj tekst do schowka", "Copy text to clipboard")}
       </Button>
     </Card>
   );
@@ -346,6 +356,7 @@ type Script = {
 
 function VideoGenSection() {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [images, setImages] = useState<File[]>([]);
   const [extractedText, setExtractedText] = useState("");
   const [narration, setNarration] = useState("");
@@ -360,6 +371,7 @@ function VideoGenSection() {
   const [command, setCommand] = useState("");
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   // ---------- VOICE COMMAND ----------
   const toggleMic = () => {
@@ -367,8 +379,8 @@ function VideoGenSection() {
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
       toast({
-        title: "Brak Web Speech API",
-        description: "Użyj Chrome/Edge dla komend głosowych.",
+        title: tr("Brak Web Speech API", "Web Speech API unavailable"),
+        description: tr("Użyj Chrome/Edge dla komend głosowych.", "Use Chrome/Edge for voice commands."),
         variant: "destructive",
       });
       return;
@@ -379,7 +391,7 @@ function VideoGenSection() {
       return;
     }
     const r = new SR();
-    r.lang = "pl-PL";
+    r.lang = language === "pl" ? "pl-PL" : "en-US";
     r.onresult = (e: any) => {
       const txt = e.results[0][0].transcript;
       setCommand(txt);
@@ -394,24 +406,25 @@ function VideoGenSection() {
 
   const handleCommand = (raw: string) => {
     const cmd = raw.toLowerCase();
-    if (/(5|pięć).*min/.test(cmd)) setDuration(300);
-    else if (/(2|dwa|dwie).*min/.test(cmd)) setDuration(120);
-    else if (/(1|jedn|minut)/.test(cmd)) setDuration(60);
-    if (/(film|zrób|stwórz|wygeneruj|montaż)/.test(cmd)) renderVideo();
-    else if (/(przeczytaj|lektor|powiedz)/.test(cmd)) speak(narration || extractedText);
+    if (/(5|pięć|five).*min/.test(cmd)) setDuration(300);
+    else if (/(2|dwa|dwie|two).*min/.test(cmd)) setDuration(120);
+    else if (/(1|jedn|minut|one).*min?/.test(cmd)) setDuration(60);
+    if (/(film|video|zrób|stwórz|wygeneruj|montaż|create|generate|render)/.test(cmd)) renderVideo();
+    else if (/(przeczytaj|lektor|powiedz|read|narrate|speak)/.test(cmd)) speak(narration || extractedText);
   };
 
   const speak = (txt: string) => {
     if (!txt.trim()) {
-      toast({ title: "Brak tekstu", variant: "destructive" });
+      toast({ title: tr("Brak tekstu", "No text"), variant: "destructive" });
       return;
     }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(txt);
-    u.lang = "pl-PL";
+    u.lang = language === "pl" ? "pl-PL" : "en-US";
     u.rate = 0.95;
-    const pl = speechSynthesis.getVoices().find((v) => v.lang.startsWith("pl"));
-    if (pl) u.voice = pl;
+    const voicePrefix = language === "pl" ? "pl" : "en";
+    const voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith(voicePrefix));
+    if (voice) u.voice = voice;
     speechSynthesis.speak(u);
   };
 
@@ -440,23 +453,23 @@ function VideoGenSection() {
       };
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        rej(new Error("Nie udało się wczytać obrazu"));
+          rej(new Error(tr("Nie udało się wczytać obrazu", "Could not load image")));
       };
       img.src = url;
     });
 
   const runOCR = async () => {
     if (images.length === 0) {
-      toast({ title: "Najpierw dodaj zrzuty ekranu", variant: "destructive" });
+      toast({ title: tr("Najpierw dodaj zrzuty ekranu", "Add screenshots first"), variant: "destructive" });
       return;
     }
     setOcrBusy(true);
-    setOcrStatus("Przygotowuję zrzuty do dokładnej analizy…");
+    setOcrStatus(tr("Przygotowuję zrzuty do dokładnej analizy…", "Preparing screenshots for detailed analysis…"));
     try {
       const b64s = await Promise.all(images.map(fileToBase64));
-      setOcrStatus("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…");
+      setOcrStatus(tr("AI czyta wzory, obliczenia, szkice i buduje film źródłowy…", "AI is reading formulas, calculations, sketches, and building the source-based film…"));
       const { data, error } = await supabase.functions.invoke("video-script-from-images", {
-        body: { images: b64s, duration, instruction: command.trim() },
+        body: { images: b64s, duration, instruction: command.trim(), lang: language },
       });
       if (error) throw new Error(error.message);
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -470,25 +483,25 @@ function VideoGenSection() {
       const normalized = normalizeScript(sc);
       if (normalized) setScript(normalized);
       if ((data as any)?.warning) {
-        toast({ title: "Tryb awaryjny", description: String((data as any).warning) });
+        toast({ title: tr("Tryb awaryjny", "Fallback mode"), description: String((data as any).warning) });
       }
 
       toast({
-        title: "Tekst i scenariusz gotowe",
-        description: `${raw.length} znaków · ${sc?.slides?.length ?? 0} ujęć`,
+        title: tr("Tekst i scenariusz gotowe", "Text and script ready"),
+        description: language === "pl" ? `${raw.length} znaków · ${sc?.slides?.length ?? 0} ujęć` : `${raw.length} characters · ${sc?.slides?.length ?? 0} shots`,
       });
     } catch (e: any) {
       console.error(e);
-      const fallbackSource = command.trim() || images.map((f, i) => `Ekran ${i + 1}: ${f.name}`).join(". ");
-      const fallback = buildFallbackScript(fallbackSource || "Analiza materiału ze zrzutów ekranu");
+      const fallbackSource = command.trim() || images.map((f, i) => `${tr("Ekran", "Screen")} ${i + 1}: ${f.name}`).join(". ");
+      const fallback = buildFallbackScript(fallbackSource || tr("Analiza materiału ze zrzutów ekranu", "Screenshot material analysis"));
       setExtractedText(
-        `Tryb awaryjny lokalny: funkcja AI nie odpowiedziała poprawnie.\n\n${fallbackSource || "Brak opisu — film zostanie zbudowany na podstawie miniatur i tematycznych plansz."}`,
+        `${tr("Tryb awaryjny lokalny: funkcja AI nie odpowiedziała poprawnie.", "Local fallback mode: AI function did not respond correctly.")}\n\n${fallbackSource || tr("Brak opisu — film zostanie zbudowany na podstawie miniatur i tematycznych plansz.", "No description — the film will be built from thumbnails and thematic boards.")}`,
       );
-      setNarration(fallbackSource || "Film pokazuje materiał źródłowy i tematyczne plansze, bez dopowiadania niepotwierdzonych faktów.");
+      setNarration(fallbackSource || tr("Film pokazuje materiał źródłowy i tematyczne plansze, bez dopowiadania niepotwierdzonych faktów.", "The film shows source material and thematic boards without adding unverified facts."));
       setScript(fallback);
       toast({
-        title: "AI nie odpowiedziało — włączono tryb awaryjny",
-        description: "Możesz od razu wygenerować film z tematycznymi planszami i miniaturami źródeł.",
+        title: tr("AI nie odpowiedziało — włączono tryb awaryjny", "AI did not respond — fallback mode enabled"),
+        description: tr("Możesz od razu wygenerować film z tematycznymi planszami i miniaturami źródeł.", "You can generate a film immediately using thematic boards and source thumbnails."),
       });
     } finally {
       setOcrBusy(false);
@@ -505,16 +518,16 @@ function VideoGenSection() {
       .filter((s) => s.length > 2);
     const formulaLike = clean.match(/[^.!?\n]*(?:=|≈|≤|≥|√|∑|∆|Δ|Ω|µ|φ|π|\bHz\b|\bmm\b|\bcm\b|\bkg\b|\bN\b|\bV\b|\bA\b|\bm\/s\b)[^.!?\n]*/g) || [];
     const baseCue = inferVisualCue(clean);
-    const slides: Slide[] = [{ kind: "title", text: "Analiza materiału", sub: "źródła · temat · wizualizacja", imageIndex: 1, visualMode: "thematic", visualCue: baseCue }];
+    const slides: Slide[] = [{ kind: "title", text: tr("Analiza materiału", "Material analysis"), sub: tr("źródła · temat · wizualizacja", "sources · topic · visualization"), imageIndex: 1, visualMode: "thematic", visualCue: baseCue }];
     formulaLike.slice(0, 12).forEach((f, i) => {
-      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: "Fragment wzoru lub obliczenia z materiału źródłowego.", imageIndex: i + 1, source: `Ekran ${i + 1}`, visualMode: "hybrid", visualCue: "engineering_blueprint" });
+      slides.push({ kind: "formula", formula: f.trim().slice(0, 180), explanation: tr("Fragment wzoru lub obliczenia z materiału źródłowego.", "Formula or calculation fragment from the source material."), imageIndex: i + 1, source: `${tr("Ekran", "Screen")} ${i + 1}`, visualMode: "hybrid", visualCue: "engineering_blueprint" });
     });
     for (const [i, s] of sentences.entries()) {
       if (slides.length > 34) break;
-      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `Ekran ${(i % Math.max(1, images.length)) + 1}`, visualMode: "hybrid", visualCue: inferVisualCue(s) });
+      slides.push({ kind: "point", text: s.slice(0, 140), imageIndex: (i % Math.max(1, images.length)) + 1, source: `${tr("Ekran", "Screen")} ${(i % Math.max(1, images.length)) + 1}`, visualMode: "hybrid", visualCue: inferVisualCue(s) });
     }
-    slides.push({ kind: "outro", text: "Koniec analizy źródłowej", imageIndex: 1, visualMode: "thematic", visualCue: baseCue });
-    return { title: "Analiza materiału", slides };
+    slides.push({ kind: "outro", text: tr("Koniec analizy źródłowej", "End of source analysis"), imageIndex: 1, visualMode: "thematic", visualCue: baseCue });
+    return { title: tr("Analiza materiału", "Material analysis"), slides };
   };
 
   const inferVisualCue = (text: string): VisualCue => {
@@ -551,31 +564,31 @@ function VideoGenSection() {
           : images.length
             ? (i % images.length) + 1
             : undefined;
-        const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `Ekran ${imageIndex}` : undefined;
+        const source = typeof slide?.source === "string" ? slide.source : imageIndex ? `${tr("Ekran", "Screen")} ${imageIndex}` : undefined;
         const visualText = String(slide?.text || slide?.title || slide?.formula || slide?.caption || slide?.label || input.title || "");
         const visualMode = normalizeVisualMode(slide?.visualMode, slide?.kind || "point");
         const visualCue = normalizeVisualCue(slide?.visualCue, visualText);
         const visual = { visualMode, visualCue };
         switch (slide?.kind) {
           case "title":
-            return { kind: "title", text: String(slide.text || input.title || "Analiza materiału"), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex, ...visual };
+            return { kind: "title", text: String(slide.text || input.title || tr("Analiza materiału", "Material analysis")), sub: slide.sub ? String(slide.sub) : input.subtitle, imageIndex, ...visual };
           case "formula":
-            return { kind: "formula", formula: String(slide.formula || slide.text || "[wzór nieczytelny]"), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source, ...visual };
+            return { kind: "formula", formula: String(slide.formula || slide.text || tr("[wzór nieczytelny]", "[formula unreadable]")), explanation: slide.explanation ? String(slide.explanation) : undefined, imageIndex, source, ...visual };
           case "calculation":
-            return { kind: "calculation", title: String(slide.title || "Obliczenie"), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || "[krok nieczytelny]")], result: slide.result ? String(slide.result) : undefined, imageIndex, source, ...visual };
+            return { kind: "calculation", title: String(slide.title || tr("Obliczenie", "Calculation")), lines: Array.isArray(slide.lines) ? slide.lines.map(String) : [String(slide.text || slide.result || tr("[krok nieczytelny]", "[step unreadable]"))], result: slide.result ? String(slide.result) : undefined, imageIndex, source, ...visual };
           case "sketch":
-            return { kind: "sketch", title: String(slide.title || "Szkic / schemat"), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source, ...visual };
+            return { kind: "sketch", title: String(slide.title || tr("Szkic / schemat", "Sketch / diagram")), caption: slide.caption ? String(slide.caption) : undefined, imageIndex, source, ...visual };
           case "stat":
-            return { kind: "stat", value: String(slide.value || slide.text || "[wartość]"), label: String(slide.label || "Wartość z materiału źródłowego"), imageIndex, source, ...visual };
+            return { kind: "stat", value: String(slide.value || slide.text || tr("[wartość]", "[value]")), label: String(slide.label || tr("Wartość z materiału źródłowego", "Value from source material")), imageIndex, source, ...visual };
           case "evidence":
-            return { kind: "evidence", text: String(slide.text || "[fragment nieczytelny]"), imageIndex, source, ...visual };
+            return { kind: "evidence", text: String(slide.text || tr("[fragment nieczytelny]", "[fragment unreadable]")), imageIndex, source, ...visual };
           case "quote":
-            return { kind: "quote", text: String(slide.text || "[fragment źródłowy]"), imageIndex, source, ...visual };
+            return { kind: "quote", text: String(slide.text || tr("[fragment źródłowy]", "[source fragment]")), imageIndex, source, ...visual };
           case "outro":
-            return { kind: "outro", text: String(slide.text || "Koniec analizy źródłowej"), imageIndex, ...visual };
+            return { kind: "outro", text: String(slide.text || tr("Koniec analizy źródłowej", "End of source analysis")), imageIndex, ...visual };
           case "point":
           default:
-            return { kind: "point", text: String(slide?.text || slide?.title || "Fragment materiału źródłowego"), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source, ...visual };
+            return { kind: "point", text: String(slide?.text || slide?.title || tr("Fragment materiału źródłowego", "Source material fragment")), accent: slide?.accent ? String(slide.accent) : undefined, imageIndex, source, ...visual };
         }
       })
       .filter((slide): slide is Slide => Boolean(slide));
@@ -615,7 +628,7 @@ function VideoGenSection() {
   const renderVideo = async () => {
     const source = (narration.trim() || extractedText).trim();
     if (!source) {
-      toast({ title: "Brak tekstu", description: "Najpierw zrób OCR lub wpisz tekst.", variant: "destructive" });
+      toast({ title: tr("Brak tekstu", "No text"), description: tr("Najpierw zrób OCR lub wpisz tekst.", "Run OCR first or enter text."), variant: "destructive" });
       return;
     }
     setRendering(true);
@@ -943,7 +956,7 @@ function VideoGenSection() {
         ctx.globalAlpha = 0.35 * alpha;
         ctx.font = "400 20px 'Inter', sans-serif";
         ctx.textAlign = "right";
-        ctx.fillText("ANALIZA ŹRÓDŁOWA", W - 80, H - 60);
+        ctx.fillText(tr("ANALIZA ŹRÓDŁOWA", "SOURCE ANALYSIS"), W - 80, H - 60);
         ctx.textAlign = "left";
         ctx.globalAlpha = 1;
       };
@@ -1083,7 +1096,7 @@ function VideoGenSection() {
           case "formula": {
             drawPanel(alpha);
             drawSourceLabel(slide.source, 1238, 190, alpha);
-            drawBlockText("WZÓR", 1250, 270, 540, 28, 800, alpha, "#67e8f9", 1);
+            drawBlockText(tr("WZÓR", "FORMULA"), 1250, 270, 540, 28, 800, alpha, "#67e8f9", 1);
             drawBlockText(slide.formula, 1250, 365 + offY, 540, slide.formula.length > 90 ? 42 : 54, 760, alpha, "#ffffff", 6);
             if (slide.explanation) {
               drawAccentLine(690, fadeIn, alpha);
@@ -1121,7 +1134,7 @@ function VideoGenSection() {
           case "evidence": {
             drawPanel(alpha);
             drawSourceLabel(slide.source, 1238, 190, alpha);
-            drawBlockText("FRAGMENT ŹRÓDŁOWY", 1250, 275, 540, 26, 800, alpha, "#67e8f9", 1);
+            drawBlockText(tr("FRAGMENT ŹRÓDŁOWY", "SOURCE FRAGMENT"), 1250, 275, 540, 26, 800, alpha, "#67e8f9", 1);
             drawBlockText(slide.text, 1250, 355 + offY, 540, 38, 520, alpha, "#ffffff", 10);
             break;
           }
@@ -1162,10 +1175,10 @@ function VideoGenSection() {
       const blob = await done;
       setVideoUrl(URL.createObjectURL(blob));
       setRenderProgress(100);
-      toast({ title: "Film gotowy", description: `${slides.length} ujęć · ${totalSec}s` });
+      toast({ title: tr("Film gotowy", "Film ready"), description: language === "pl" ? `${slides.length} ujęć · ${totalSec}s` : `${slides.length} shots · ${totalSec}s` });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Błąd renderowania", description: e?.message, variant: "destructive" });
+      toast({ title: tr("Błąd renderowania", "Rendering error"), description: e?.message, variant: "destructive" });
     } finally {
       setRendering(false);
     }
@@ -1176,10 +1189,13 @@ function VideoGenSection() {
     <Card className="bg-[#120a1f]/70 border-fuchsia-500/20 p-4 sm:p-6 backdrop-blur overflow-hidden">
       <div className="flex items-center gap-2 mb-4">
         <Film className="w-5 h-5 text-fuchsia-400" />
-        <h2 className="text-lg font-semibold text-white">Sekcja 2 · Zrzuty → film techniczny</h2>
+        <h2 className="text-lg font-semibold text-white">{tr("Sekcja 2 · Zrzuty → film techniczny", "Section 2 · Screenshots → Technical film")}</h2>
       </div>
       <p className="text-xs text-fuchsia-200/60 mb-4">
-        Wrzuć zrzuty — AI ma zachować fakty, wzory, liczby, obliczenia i szkice, a film pokazuje obrazy źródłowe zamiast samego czarnego tła z tekstem.
+        {tr(
+          "Wrzuć zrzuty — AI ma zachować fakty, wzory, liczby, obliczenia i szkice, a film pokazuje obrazy źródłowe zamiast samego czarnego tła z tekstem.",
+          "Upload screenshots — AI preserves facts, formulas, numbers, calculations, and sketches, while the film shows source visuals instead of only text on a dark background."
+        )}
       </p>
 
       <label className="block border-2 border-dashed border-fuchsia-500/40 rounded-xl p-6 text-center cursor-pointer hover:border-fuchsia-400 hover:bg-fuchsia-500/5 transition">
@@ -1192,7 +1208,9 @@ function VideoGenSection() {
         />
         <Images className="w-8 h-8 mx-auto text-fuchsia-400 mb-2" />
         <p className="text-sm text-white">
-          {images.length > 0 ? `Wybrano ${images.length} obrazów` : "Upuść lub kliknij — do 40 zrzutów / szkiców / wzorów"}
+          {images.length > 0
+            ? language === "pl" ? `Wybrano ${images.length} obrazów` : `Selected ${images.length} images`
+            : tr("Upuść lub kliknij — do 40 zrzutów / szkiców / wzorów", "Drop or click — up to 40 screenshots / sketches / formulas")}
         </p>
       </label>
 
@@ -1215,7 +1233,7 @@ function VideoGenSection() {
         className="w-full mt-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0"
       >
         {ocrBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-        {ocrBusy ? "Analizuję materiał…" : "Odczytaj zrzuty i zbuduj scenariusz techniczny"}
+        {ocrBusy ? tr("Analizuję materiał…", "Analyzing material…") : tr("Odczytaj zrzuty i zbuduj scenariusz techniczny", "Read screenshots and build a technical script")}
       </Button>
 
       {ocrBusy && (
@@ -1227,31 +1245,31 @@ function VideoGenSection() {
 
       <div className="mt-4">
         <label className="text-xs text-fuchsia-200/60 mb-1 block">
-          Lektor filmu (edytowalny — ma trzymać się faktów ze zrzutów)
+          {tr("Lektor filmu (edytowalny — ma trzymać się faktów ze zrzutów)", "Film narration (editable — must stay tied to screenshot facts)")}
         </label>
         <Textarea
           value={narration}
           onChange={(e) => setNarration(e.target.value)}
-          placeholder="Tu pojawi się rzeczowy lektor na podstawie zrzutów…"
+          placeholder={tr("Tu pojawi się rzeczowy lektor na podstawie zrzutów…", "A factual narration based on the screenshots will appear here…")}
           className="bg-black/40 border-fuchsia-500/20 text-white placeholder:text-fuchsia-200/30 min-h-[120px]"
         />
       </div>
 
       <div className="mt-3">
         <label className="text-xs text-fuchsia-200/60 mb-1 block">
-          Odczyt źródłowy OCR (do kontroli wzorów, liczb i polskich znaków)
+          {tr("Odczyt źródłowy OCR (do kontroli wzorów, liczb i polskich znaków)", "Source OCR reading (for checking formulas, numbers, and characters)")}
         </label>
         <Textarea
           value={extractedText}
           onChange={(e) => setExtractedText(e.target.value)}
-          placeholder="Tu pojawi się pełny odczyt ekran po ekranie…"
+          placeholder={tr("Tu pojawi się pełny odczyt ekran po ekranie…", "The full screen-by-screen reading will appear here…")}
           className="bg-black/40 border-cyan-400/20 text-white placeholder:text-cyan-100/30 min-h-[150px]"
         />
       </div>
 
       {/* duration selector */}
       <div className="mt-4">
-        <label className="text-xs text-fuchsia-200/60 mb-2 block">Długość filmu</label>
+        <label className="text-xs text-fuchsia-200/60 mb-2 block">{tr("Długość filmu", "Film length")}</label>
         <div className="grid grid-cols-3 gap-2">
           {([60, 120, 300] as Duration[]).map((d) => (
             <Button
@@ -1278,7 +1296,7 @@ function VideoGenSection() {
           onChange={(e) => setIncludeImages(e.target.checked)}
           className="accent-fuchsia-500"
         />
-        Pokazuj oryginalne zrzuty jako główny materiał wizualny filmu
+        {tr("Pokazuj oryginalne zrzuty jako główny materiał wizualny filmu", "Show original screenshots as the main visual material of the film")}
       </label>
 
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
@@ -1286,7 +1304,7 @@ function VideoGenSection() {
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCommand(command)}
-          placeholder='Komenda: „Zrób film 2 min" / „Przeczytaj tekst"'
+          placeholder={tr('Komenda: „Zrób film 2 min" / „Przeczytaj tekst"', 'Command: “Create a 2 min video” / “Read the text”')}
           className="bg-black/40 border-fuchsia-500/30 text-white placeholder:text-fuchsia-200/30 focus-visible:ring-fuchsia-500 min-w-0 flex-1"
         />
         <Button
@@ -1303,7 +1321,7 @@ function VideoGenSection() {
 
       {images.length > 0 && !extractedText.trim() && !narration.trim() && (
         <p className="mt-3 text-xs text-amber-300/80">
-          Wskazówka: najpierw kliknij „Odczytaj tekst ze zrzutów (OCR)", potem przycisk generowania filmu się odblokuje.
+          {tr("Wskazówka: najpierw kliknij „Odczytaj tekst ze zrzutów (OCR)\", potem przycisk generowania filmu się odblokuje.", "Tip: first click “Read screenshots and build a technical script”; then the film generation button will unlock.")}
         </p>
       )}
 
@@ -1314,21 +1332,21 @@ function VideoGenSection() {
           className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0 whitespace-normal h-auto py-3"
         >
           {rendering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />}
-          <span className="ml-2">Wygeneruj film ({duration === 60 ? "1 min" : duration === 120 ? "2 min" : "5 min"})</span>
+          <span className="ml-2">{tr("Wygeneruj film", "Generate film")} ({duration === 60 ? "1 min" : duration === 120 ? "2 min" : "5 min"})</span>
         </Button>
         <Button
           onClick={() => speak(narration || extractedText)}
           variant="outline"
           className="border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-500/10 hover:text-white whitespace-normal h-auto py-3"
         >
-          <Volume2 className="w-4 h-4" /> <span className="ml-2">Przeczytaj tekst</span>
+          <Volume2 className="w-4 h-4" /> <span className="ml-2">{tr("Przeczytaj tekst", "Read text")}</span>
         </Button>
       </div>
 
       {rendering && (
         <div className="mt-4">
           <Progress value={renderProgress} className="h-2 bg-fuchsia-950" />
-          <p className="text-xs text-fuchsia-200/60 mt-2">Renderowanie: {renderProgress}% (potrwa tyle, ile długość filmu)</p>
+          <p className="text-xs text-fuchsia-200/60 mt-2">{tr("Renderowanie", "Rendering")}: {renderProgress}% {tr("(potrwa tyle, ile długość filmu)", "(takes as long as the film length)")}</p>
         </div>
       )}
 
@@ -1337,7 +1355,7 @@ function VideoGenSection() {
           <video src={videoUrl} controls className="w-full rounded-lg border border-fuchsia-500/30" />
           <a href={videoUrl} download="moje-studio-wideo.webm">
             <Button className="w-full bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white border-0">
-              <Download className="w-4 h-4" /> Pobierz film (.webm)
+              <Download className="w-4 h-4" /> {tr("Pobierz film (.webm)", "Download film (.webm)")}
             </Button>
           </a>
         </div>
@@ -1350,11 +1368,13 @@ function VideoGenSection() {
 // MAIN PAGE
 // ============================================================================
 export default function MojeStudioWideo() {
+  const { language } = useLanguage();
   const [unlocked, setUnlocked] = useState(false);
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY) === "1") setUnlocked(true);
-    document.title = "Studio · prywatne";
+    document.title = language === "pl" ? "Studio · prywatne" : "Studio · private";
     const meta = document.querySelector('meta[name="robots"]');
     if (meta) meta.setAttribute("content", "noindex, nofollow");
     else {
@@ -1363,7 +1383,7 @@ export default function MojeStudioWideo() {
       m.content = "noindex, nofollow";
       document.head.appendChild(m);
     }
-  }, []);
+  }, [language]);
 
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
@@ -1382,10 +1402,10 @@ export default function MojeStudioWideo() {
         <header className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
-              Moje Studio Wideo
+              {tr("Moje Studio Wideo", "My Video Studio")}
             </h1>
             <p className="text-xs text-fuchsia-200/60 mt-1">
-              Prywatne narzędzia — transkrypcja i generator filmów technicznych.
+              {tr("Prywatne narzędzia — transkrypcja i generator filmów technicznych.", "Private tools — transcription and technical film generator.")}
             </p>
           </div>
           <Button
@@ -1397,7 +1417,7 @@ export default function MojeStudioWideo() {
             }}
             className="text-fuchsia-200/70 hover:text-white hover:bg-fuchsia-500/10"
           >
-            <Lock className="w-4 h-4" /> Wyloguj
+            <Lock className="w-4 h-4" /> {tr("Wyloguj", "Log out")}
           </Button>
         </header>
 
@@ -1407,7 +1427,7 @@ export default function MojeStudioWideo() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-fuchsia-200/40">
-          Analiza wizualna · transkrypcja audio · render canvas + MediaRecorder
+          {tr("Analiza wizualna · transkrypcja audio · render canvas + MediaRecorder", "Visual analysis · audio transcription · canvas render + MediaRecorder")}
         </footer>
       </div>
     </div>

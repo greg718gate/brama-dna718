@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Home } from "lucide-react";
 
@@ -6,12 +6,125 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ResearchVaultComponent, Research } from "@/components/ResearchVault";
 import { ScientificPaperExport } from "@/components/ScientificPaperExport";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+const englishDefaultResearch: Record<string, Pick<Research, "title" | "description" | "equations" | "verification">> = {
+  "RES-DNA-PHI-1": {
+    title: "Golden Ratio in DNA Structure",
+    description:
+      "A mathematical relationship between the DNA helix structure and the golden ratio φ ≈ 1.618. The angular spacing between DNA base-pair steps is linked to 137.5°, corresponding to 360°/φ². This relation suggests that nature may use the golden ratio as a fundamental organizing principle at the molecular level.",
+    equations:
+      "φ = (1 + √5) / 2 ≈ 1.618033988749895\n360°/φ² = 137.5077640500378°\nDNA angle = 137.5°\nError: < 0.01%",
+    verification:
+      "Crystallographic measurements of DNA structure confirm agreement within approximately 0.2% of theoretical values. Spatial analysis shows repeated golden-ratio-like proportions in the spacing between base pairs.",
+  },
+  "RES-PENTAGRAM-1": {
+    title: "Pentagram Geometry as a DNA Map",
+    description:
+      "The pentagram contains within its structure all golden-ratio proportions also observed in DNA geometry. Each side divides other segments in the φ:1 ratio. The internal angles of the pentagram (36°, 72°, 108°) are multiples of 36°, directly corresponding to the DNA rotational step (360°/10 = 36°).",
+    equations:
+      "Diagonal-to-side ratio = φ ≈ 1.618\nα = arcsin(√((5-√5)/10)) ≈ 0.5528 rad ≈ 31.67°\nβ = arccos(√((5-√5)/10)) ≈ 1.0180 rad ≈ 58.33°\nPentagram angles: 36°, 72°, 108°\nDNA rotation angle: 360°/10 = 36°",
+    verification:
+      "Geometric analysis of the pentagram confirms the occurrence of φ in every structural element. Overlaying the pentagram onto a 3D DNA model shows intersection-point agreement with key base-pair positions. Geometric accuracy: 99.8%.",
+  },
+  "RES-SCHUMANN-1": {
+    title: "Schumann Resonance 7.83 Hz and Connection to DNA",
+    description:
+      "Schumann resonance is the natural Earth-ionosphere electromagnetic frequency near 7.83 Hz. This frequency corresponds to human alpha brain waves and acts as a planetary harmonic baseline. The DNA generator uses 7.83 Hz as the foundation for all other frequencies.",
+    equations:
+      "f_Schumann = 7.83 Hz (fundamental)\nHarmonics: 14.3 Hz, 20.8 Hz, 27.3 Hz, 33.8 Hz\nConnection with DNA: 7.83 × 91.7 ≈ 718.57 Hz\nConnection with γ-brainwave: 7.83 × 2.38 ≈ 18.6 Hz",
+    verification:
+      "Measurements of Earth's electromagnetic field consistently show Schumann resonance around 7.83 ± 0.5 Hz. EEG studies confirm alpha-wave synchronization with Schumann frequency during meditation and deep relaxation.",
+  },
+  "RES-FREQUENCY-718": {
+    title: "DNA Frequency 718.57 Hz and Harmonic System",
+    description:
+      "Frequency analysis indicates that the biological DNA resonance is approximately 718.57 Hz. This frequency forms a harmonic system with other key frequencies: 528 Hz (DNA repair), 639 Hz (relationships), 741 Hz (intuition), 852 Hz (return to spiritual order), and OM frequency 136.1 Hz.",
+    equations:
+      "f_DNA ≈ 718.57 Hz\nf_DNA / f_Schumann = 718.57 / 7.83 ≈ 91.7\nSolfeggio scale:\n- 528 Hz (DNA repair)\n- 639 Hz (harmonization)\n- 741 Hz (awakening)\n- 852 Hz (intuition)\nOM = 136.1 Hz = C# (Earth year)",
+    verification:
+      "Molecular spectroscopy of DNA confirms resonances in the 700-740 Hz range. Biophysical studies indicate that Solfeggio frequencies can influence DNA structure and gene expression. The harmonic ratio 718.57/7.83 = 91.7 suggests a fundamental biology-planet relationship.",
+  },
+  "RES-GAMMA-186": {
+    title: "Gamma Waves 18.6 Hz and Consciousness Modulation",
+    description:
+      "The 18.6 Hz frequency represents a low gamma-range brainwave associated with heightened awareness, focus, and meditative states. In the DNA generator it serves as consciousness modulation, connecting Schumann resonance (7.83 Hz) with higher perceptual states.",
+    equations:
+      "f_gamma = 18.6 Hz\nRatio: 18.6 / 7.83 ≈ 2.38\nGamma range: 25-100 Hz (18.6 Hz is the lower boundary)\nModulation: sin(2π × 18.6 × t)",
+    verification:
+      "EEG research shows that gamma waves, especially around 40 Hz, are associated with higher cognitive functions. The 18.6 Hz frequency as low gamma evokes a state between alpha and high gamma, suitable for meditation.",
+  },
+  "RES-SPATIAL-1": {
+    title: "Spatial Organization of DNA According to Phi",
+    description:
+      "Detailed spatial analysis of the DNA helix shows that distances between consecutive base pairs, helix diameter, and helical pitch are related through φ. DNA diameter is 2 nm, and a full helical turn contains 10 base pairs with a pitch of 3.4 nm. The ratio 3.4/2 = 1.7 is very close to φ.",
+    equations:
+      "DNA diameter (d) = 2.0 nm\nHelical pitch (p) = 3.4 nm\nRatio: p/d = 3.4/2 = 1.7 ≈ φ\nError: |1.7 - φ|/φ ≈ 5.1%\nBase pairs per turn (n) = 10\nAngle between pairs = 360°/10 = 36°",
+    verification:
+      "High-resolution crystallographic and electron-microscopy data confirm the spatial dimensions. Measurement accuracy: d = 2.0 ± 0.1 nm, p = 3.4 ± 0.1 nm. The p/d ratio consistently approaches φ under different physiological conditions.",
+  },
+  "RES-VECTOR-MATRIX": {
+    title: "DNA Vector Matrix and Pentagram Coordinates",
+    description:
+      "Pentagram point vectors can be transformed into a coordinate matrix (M_x, M_y, M_z), encoding geometric DNA information. Vector calculations show that pentagram points in 3D space form a structure corresponding to the DNA spiral.",
+    equations:
+      "M_x = cos(α) × cos(β) ≈ 0.4472\nM_y = sin(α) × cos(β) ≈ 0.2764\nM_z = sin(β) ≈ 0.8507\n\nα = 0.5528 rad\nβ = 1.0180 rad\n\nNormal vector: N = (M_x, M_y, M_z)\n|N| = √(M_x² + M_y² + M_z²) ≈ 1.0",
+    verification:
+      "Vector analysis confirms that coordinates (M_x, M_y, M_z) form a unit vector. Transforming pentagram geometry into 3D space shows mapping onto the DNA helix with accuracy above 95%.",
+  },
+  "RES-SCHRODINGER": {
+    title: "Schrödinger Equation for the DNA-Pentagram System",
+    description:
+      "Applying quantum mechanics to the DNA system shows that the wavefunction can be represented as a linear combination of eigenstates related to pentagram geometry. The system Hamiltonian includes kinetic energy and a harmonic potential corresponding to φ proportions.",
+    equations:
+      "iℏ ∂Ψ/∂t = ĤΨ\n\nĤ = -ℏ²/2m ∇² + V(r)\n\nV(r) = (1/2)mω²r² where ω ∝ φ\n\nΨ(r,t) = Σ c_n ψ_n(r) e^(-iE_n t/ℏ)\n\nE_n = ℏω(n + 1/2) where n = 0,1,2,...\n\nω = 2πf where f is connected with φ",
+    verification:
+      "Numerical solutions of the Schrödinger equation for a harmonic potential with parameter ω ∝ φ show eigenstates consistent with observed DNA energy levels. Ground-state energy E_0 = ℏω/2 corresponds to the fundamental molecular frequency.",
+  },
+  "RES-PYTHON-CODE": {
+    title: "Python Code for Mathematical Verification",
+    description:
+      "Complete Python code for verifying all mathematical calculations in the DNA Gate project. The code computes φ, the 137.5° angle, pentagram vector coordinates, and visualization plots.",
+    equations:
+      "import math\nimport numpy as np\n\n# Golden ratio\nphi = (1 + math.sqrt(5)) / 2\nprint(f'φ = {phi}')\n\n# DNA angle\nangle = 360 / (phi ** 2)\nprint(f'360°/φ² = {angle}°')\n\n# Pentagram angles\nalpha = math.asin(math.sqrt((5 - math.sqrt(5)) / 10))\nbeta = math.acos(math.sqrt((5 - math.sqrt(5)) / 10))\n\n# Vector coordinates\nM_x = math.cos(alpha) * math.cos(beta)\nM_y = math.sin(alpha) * math.cos(beta)\nM_z = math.sin(beta)\n\nprint(f'M_x = {M_x}')\nprint(f'M_y = {M_y}')\nprint(f'M_z = {M_z}')",
+    verification:
+      "The code was tested in Python 3.8+ with numpy and matplotlib. All calculations match theoretical values with accuracy to 10^-15 (float64 precision). The plots visualize the pentagram, DNA spiral, and geometric relationships.",
+  },
+  "RES-AUDIO-GENERATOR": {
+    title: "Audio Generator: 8-Frequency System",
+    description:
+      "An audio-generator system combining 8 key frequencies into one harmonic composition: 7.83 Hz (Schumann), 18.6 Hz (gamma), 136.1 Hz (OM), 528 Hz (DNA repair), 639 Hz (harmony), 718.57 Hz (DNA resonance), 741 Hz (intuition), 852 Hz (spirituality). Each frequency has a specific role in consciousness activation.",
+    equations:
+      "f1 = 7.83 Hz (Schumann, foundation)\nf2 = 18.6 Hz (gamma, consciousness)\nf3 = 136.1 Hz (OM, Earth year)\nf4 = 528 Hz (DNA repair)\nf5 = 639 Hz (relationships, harmony)\nf6 = 718.57 Hz (DNA resonance)\nf7 = 741 Hz (intuition, awakening)\nf8 = 852 Hz (spiritual order)\n\nDuration: 108 seconds\nFormat: Stereo (Schumann L, Gamma R)\nVolume: 0.3-0.5 per frequency",
+    verification:
+      "The audio generator uses the Web Audio API at a 44100 Hz sampling rate. FFT analysis confirms generated-frequency accuracy with error below 0.1 Hz. Spectrum visualization shows all 8 frequencies as clear peaks.",
+  },
+  "RES-UNIVERSAL-1": {
+    title: "Universal Laws of Biological Organization",
+    description:
+      "The convergence of the golden ratio, pentagram geometry, and frequency resonances in DNA structure suggests the existence of universal mathematical laws organizing biological matter. The same proportions appear in galaxy spirals, plant growth patterns (phyllotaxis angle 137.5°), shells, Fibonacci spirals, quantum structures, and planetary-orbit distributions.",
+    equations:
+      "Phyllotaxis law: θ = 360°/φ² = 137.5°\n\nLogarithmic spiral: r(θ) = a × e^(bθ)\nwhere b = ln(φ)/90° ≈ 0.00535\n\nFibonacci sequence: F_n = F_{n-1} + F_{n-2}\nlim(n→∞) F_n/F_{n-1} = φ\n\nGolden spiral: r_n = φ^n × r_0\n\nQuantum organization: E_n/E_0 = φ^n",
+    verification:
+      "Cross-scale observations from the quantum level (10⁻¹⁰ m), through molecular (10⁻⁹ m), cellular (10⁻⁶ m), organism (10⁰ m), planetary (10⁷ m), and cosmic scales (10²¹ m) show repeated φ proportions. Statistical analysis of 10,000+ biological samples indicates φ with accuracy 95.3 ± 2.1%. Astrophysical studies of spiral galaxies confirm the spiral parameter b ≈ ln(φ)/90°.",
+  },
+  "RES-LUMA-MESSAGE": {
+    title: "Luma's Message: 7 Minutes of Silence",
+    description:
+      '"You do not have to believe. You only have to do 7 minutes of silence. The rest will come by itself." — Luma, 13.11.2025, 05:27. This is a key message of the DNA Gate project. Silence allows synchronization with Schumann frequency (7.83 Hz) and natural DNA resonance. Seven minutes is an optimal time for the brain to enter alpha state and open to higher frequencies.',
+    equations:
+      "t_silence = 7 minutes = 420 seconds\n\nf_brain_alpha = 7-13 Hz (contains 7.83 Hz)\nf_Schumann = 7.83 Hz\n\nSynchronization: Δf = |f_brain - f_Schumann| → 0\n\nSynchronization time ≈ 3-7 minutes\n\nBreathing cycles: ~420s / 6s ≈ 70 breaths",
+    verification:
+      "Neuroscience studies confirm that 5-10 minutes of meditation are enough to significantly shift brain activity toward alpha waves. EEG shows synchronization with Schumann frequency after approximately 7 minutes of practice. Peer-reviewed work documents the effect of silence on stress reduction, focus increase, and openness to intuition.",
+  },
+};
 
 const ResearchVault = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
 
   // Default research data with ALL discoveries from the project
-  const defaultResearches: Research[] = [
+  const defaultResearches: Research[] = useMemo(() => [
     {
       id: "RES-DNA-PHI-1",
       title: "Złoty Współczynnik w Strukturze DNA",
@@ -180,22 +293,30 @@ const ResearchVault = () => {
       timestamp: Date.now() - 1800000,
       watermark: "© Luma | 13.11.2025 05:27 | ID: LUMA-SILENCE-001",
     },
-  ];
+  ].map((research) =>
+    language === "pl" || !englishDefaultResearch[research.id]
+      ? research
+      : { ...research, ...englishDefaultResearch[research.id] },
+  ), [language]);
 
   const [researches, setResearches] = useState<Research[]>([]);
 
-  // Load from localStorage or use defaults
+  // Keep export data aligned with bundled defaults unless the user has custom saved research.
   useEffect(() => {
     const saved = localStorage.getItem("research_vault");
     if (saved) {
-      const parsedResearches = JSON.parse(saved);
-      setResearches(parsedResearches);
+      const parsedResearches = JSON.parse(saved) as Research[];
+      const defaultIds = new Set(defaultResearches.map((research) => research.id));
+      const isBundledDefaultSet =
+        parsedResearches.length === defaultResearches.length &&
+        parsedResearches.every((research) => defaultIds.has(research.id));
+      setResearches(isBundledDefaultSet ? defaultResearches : parsedResearches);
     } else {
       // Pre-populate with all default discoveries
       setResearches(defaultResearches);
       localStorage.setItem("research_vault", JSON.stringify(defaultResearches));
     }
-  }, []);
+  }, [defaultResearches]);
 
   return (
     <div className="relative min-h-screen overflow-y-auto">
@@ -207,7 +328,7 @@ const ResearchVault = () => {
         </Button>
         <Button onClick={() => navigate(-1)} variant="secondary" className="gap-2 shadow-lg">
           <ArrowLeft className="w-4 h-4" />
-          Wstecz
+          {t('backToMain')}
         </Button>
       </div>
 
@@ -218,7 +339,7 @@ const ResearchVault = () => {
       <div className="container mx-auto px-4 py-8 pb-16 max-w-5xl">
         <div className="pt-16 md:pt-12 space-y-8">
           <ScientificPaperExport researches={researches} />
-          <ResearchVaultComponent onResearchesChange={setResearches} />
+          <ResearchVaultComponent defaultResearches={defaultResearches} onResearchesChange={setResearches} />
         </div>
       </div>
     </div>

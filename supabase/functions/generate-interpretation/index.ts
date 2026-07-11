@@ -6,6 +6,46 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const AI_MODEL = "google/gemini-3-flash-preview";
+
+function extractJsonObject(rawInput: string) {
+  const raw = rawInput.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+  try {
+    return JSON.parse(raw);
+  } catch (_) {
+    // Continue with a balanced-brace extractor. This protects against short prefaces/code fences.
+  }
+
+  const start = raw.indexOf("{");
+  if (start < 0) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < raw.length; i++) {
+    const ch = raw[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        try {
+          return JSON.parse(raw.slice(start, i + 1));
+        } catch (_) {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -58,14 +98,14 @@ CRITICAL RULES:
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          "Lovable-API-Key": apiKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: AI_MODEL,
           messages: [{ role: "user", content: lookupPrompt }],
           temperature: 0.3,
-          max_tokens: 2000,
+          max_tokens: 6000,
         }),
       });
 
@@ -79,12 +119,9 @@ CRITICAL RULES:
       const content = data.choices?.[0]?.message?.content;
       if (!content) throw new Error("No content in AI response");
 
-      let parsed;
-      try {
-        const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-        parsed = JSON.parse(jsonStr);
-      } catch {
-        console.error("Failed to parse lookup response:", content);
+      const parsed = extractJsonObject(content);
+      if (!parsed) {
+        console.error("Failed to parse lookup response:", content, "finish_reason:", data.choices?.[0]?.finish_reason);
         throw new Error("Failed to parse AI response");
       }
 
@@ -116,14 +153,14 @@ CRITICAL: The "hebrewText" field MUST contain actual Hebrew/Greek/Arabic charact
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          "Lovable-API-Key": apiKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: AI_MODEL,
           messages: [{ role: "user", content: fetchOriginalPrompt }],
           temperature: 0.2,
-          max_tokens: 1000,
+          max_tokens: 2500,
         }),
       });
 
@@ -137,12 +174,9 @@ CRITICAL: The "hebrewText" field MUST contain actual Hebrew/Greek/Arabic charact
       const content = data.choices?.[0]?.message?.content;
       if (!content) throw new Error("No content in AI response");
 
-      let parsed;
-      try {
-        const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-        parsed = JSON.parse(jsonStr);
-      } catch {
-        console.error("Failed to parse fetch_original response:", content);
+      const parsed = extractJsonObject(content);
+      if (!parsed) {
+        console.error("Failed to parse fetch_original response:", content, "finish_reason:", data.choices?.[0]?.finish_reason);
         throw new Error("Failed to parse AI response");
       }
 
@@ -180,19 +214,20 @@ Return a JSON object with exactly these 6 fields:
 CRITICAL RULES:
 1. The "plainMeaning" field MUST explain what "${text}" actually says in simple words. Unique to this exact verse.
 2. Every field must reference the actual content of the verse "${reference}".
-3. Return ONLY the JSON object, no markdown, no code fences.`;
+3. Do not stop after the first fields. Complete ALL 6 fields fully in ${langLabel}.
+4. Return ONLY the JSON object, no markdown, no code fences.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "Lovable-API-Key": apiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: AI_MODEL,
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 2000,
+        max_tokens: 7000,
       }),
     });
 
@@ -209,12 +244,9 @@ CRITICAL RULES:
       throw new Error("No content in AI response");
     }
 
-    let parsed;
-    try {
-      const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      parsed = JSON.parse(jsonStr);
-    } catch {
-      console.error("Failed to parse AI response:", content);
+    const parsed = extractJsonObject(content);
+    if (!parsed) {
+      console.error("Failed to parse AI response:", content, "finish_reason:", data.choices?.[0]?.finish_reason);
       throw new Error("Failed to parse AI response as JSON");
     }
 

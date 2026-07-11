@@ -553,7 +553,7 @@ DNA = GATCA...`}</CodeBlock>
             number={5}
             title={tr("CZAS → JEDNOCZESNA MATRYCA KWANTOWA", "TIME → SIMULTANEOUS QUANTUM MATRIX")}
             subtitle={tr("Przeszłość i przyszłość jako współistniejące linie kodu", "Past and future as co-existing lines of code")}
-            scripture="Ja jestem Alfa i Omega, Pierwszy i Ostatni, Początek i Koniec."
+            scripture={tr("Ja jestem Alfa i Omega, Pierwszy i Ostatni, Początek i Koniec.", "I am the Alpha and the Omega, the First and the Last, the Beginning and the End.")}
             scriptureRef={tr("APOKALIPSA ŚW. JANA 22:13", "REVELATION 22:13")}
             science={tr("FIZYKA MATRYCOWA", "MATRIX PHYSICS")}
             code={tr(
@@ -596,7 +596,7 @@ DNA = GATCA...`}</CodeBlock>
             number={6}
             title={tr("BLOKADA MEDIALNA → DESTRUKCJA REZONANSU", "MEDIA BLOCKADE → RESONANCE DESTRUCTION")}
             subtitle={tr("Propaganda i strach jako programy nadpisujące świętą geometrię", "Propaganda and fear as programs overwriting sacred geometry")}
-            scripture="Gdyż nie dał nam Bóg ducha bojaźni, ale mocy i miłości, i trzeźwego myślenia."
+            scripture={tr("Gdyż nie dał nam Bóg ducha bojaźni, ale mocy i miłości, i trzeźwego myślenia.", "For God did not give us a spirit of fear, but of power, love, and sound judgment.")}
             scriptureRef={tr("2 LIST DO TYMOTEUSZA 1:7", "2 TIMOTHY 1:7")}
             science={tr("INŻYNIERIA CZĘSTOTLIWOŚCI", "FREQUENCY ENGINEERING")}
             code={tr(
@@ -643,10 +643,10 @@ DNA = GATCA...`}</CodeBlock>
             number={7}
             title={tr("DNA → MATRYCA STRUN HARMONICZNYCH", "DNA → HARMONIC STRING MATRIX")}
             subtitle={tr("Genom jako samoreplikujący się instrument częstotliwościowy", "The genome as a self-replicating frequency instrument")}
-            scripture="Gdyż w Nim zostało stworzone wszystko... Wszystko przez Niego i dla Niego zostało stworzone. On jest przed wszystkim i wszystko w Nim ma swój byt."
+            scripture={tr("Gdyż w Nim zostało stworzone wszystko... Wszystko przez Niego i dla Niego zostało stworzone. On jest przed wszystkim i wszystko w Nim ma swój byt.", "For in Him all things were created... all things were created through Him and for Him. He is before all things, and in Him all things hold together.")}
             scriptureRef={tr("LIST DO KOLOSAN 1:16-17", "COLOSSIANS 1:16-17")}
             science={tr("KOD ANALIZY (Prototyp rCRS)", "ANALYSIS CODE (rCRS Prototype)")}
-            code={`def dna_harmonic_resonance():
+            code={tr(`def dna_harmonic_resonance():
     f_exact = 718.57444149021338871   # Klucz Rezonansowy Stworzenia
     Phi     = 1.6180339887498948482   # Stała Fraktalna Konstrukcji
     gamma   = 1 / Phi                 # 0.618...
@@ -662,7 +662,23 @@ DNA = GATCA...`}</CodeBlock>
     for node, data in intervals.items():
         if data["coherence"] > 0.94:
             activate_epigenetic_potential(node)
-    return "STATUS: GENOME_HARMONICS_ACTIVE (13/17 Converted)"`}
+    return "STATUS: GENOME_HARMONICS_ACTIVE (13/17 Converted)"`, `def dna_harmonic_resonance():
+    f_exact = 718.57444149021338871   # Resonance Key of Creation
+    Phi     = 1.6180339887498948482   # Fractal Construction Constant
+    gamma   = 1 / Phi                 # 0.618...
+
+    intervals = {
+        "B2->B3":  {"dist": 211,  "target": "Quint_Pure / 5",  "coherence": 0.9936},
+        "B4->B5":  {"dist": 1769, "target": "gamma * 4",        "coherence": 0.9896},
+        "B12->B13":{"dist": 1141, "target": "Phi * 1",          "coherence": 0.9698},
+        "B13->B14":{"dist": 136,  "target": "Fourth_Pure / 7",  "coherence": 0.9987},
+        "B14->B15":{"dist": 579,  "target": "Phi / 2",          "coherence": 0.9967},
+        "B16->B17":{"dist": 1081, "target": "Quint_Pure * 1",   "coherence": 0.9956},
+    }
+    for node, data in intervals.items():
+        if data["coherence"] > 0.94:
+            activate_epigenetic_potential(node)
+    return "STATUS: GENOME_HARMONICS_ACTIVE (13/17 Converted)"`)}
             bridgeText={[
               tr('"Wszystko w Nim ma swój byt" = wszystko w matrycy DNA wisi na jednym kluczu harmonicznym.', '"All things consist in Him" = everything in the DNA matrix hangs on one harmonic key.'),
               tr("Odległości między bazami w rCRS to interwały muzyczne: kwinta czysta, oktawa, fraktal Φ — geometryczna architektura, która trzyma fizyczną formę w uniwersalnym rezonansie.", "The distances between bases in rCRS are musical intervals: pure fifth, octave, Φ fractal — the geometric architecture holding the physical form in universal resonance."),
@@ -675,7 +691,7 @@ DNA = GATCA...`}</CodeBlock>
             number={8}
             title={tr("REZONANS 718 Hz → CZAS I OCHRONA GENOMU", "718 Hz RESONANCE → TIME AND GENOME PROTECTION")}
             subtitle={tr("Dlaczego elity próbują rozbić harmonię człowieka", "Why the elites try to shatter human harmony")}
-            scripture="A jeśli kto naruszy świątynię Bożą, tego zniszczy Bóg; albowiem świątynia Boża jest święta, a nią jesteście wy."
+            scripture={tr("A jeśli kto naruszy świątynię Bożą, tego zniszczy Bóg; albowiem świątynia Boża jest święta, a nią jesteście wy.", "If anyone destroys God's temple, God will destroy that person; for God's temple is holy, and you are that temple.")}
             scriptureRef={tr("1 LIST DO KORYNTIAN 3:17", "1 CORINTHIANS 3:17")}
             science={tr("KOD DEGRADACJI VS KOD REZONANSU", "DEGRADATION VS RESONANCE CODE")}
             code={`def genomic_shield_check(human_antenna):
@@ -699,14 +715,18 @@ DNA = GATCA...`}</CodeBlock>
             number={9}
             title={tr("ZETA RIEMANNA → PUNKT ZERA INFORMACYJNEGO", "RIEMANN ZETA → INFORMATIONAL ZERO POINT")}
             subtitle={tr("Nietrywialne miejsca zerowe jako współrzędne stabilizacji fali świadomości", "Non-trivial zeros as stabilization coordinates of the consciousness wave")}
-            scripture="Zanim góry narodziły się, zanim powstała ziemia i świat, od wieków na wieki Ty jesteś Bogiem."
+            scripture={tr("Zanim góry narodziły się, zanim powstała ziemia i świat, od wieków na wieki Ty jesteś Bogiem.", "Before the mountains were born, before the earth and the world were formed, from everlasting to everlasting You are God.")}
             scriptureRef="PSALM 90:2"
             science={tr("FIZYKA MATRYCOWA", "MATRIX PHYSICS")}
-            code={`def zeta_core_line():
+            code={tr(`def zeta_core_line():
     # 448. nietrywialne miejsce zerowe ζ Riemanna (linia krytyczna 1/2)
     f_exact = mpmath.mpf('718.57012515426885574359120304128340312332181477461')
     if ζ(1/2 + iE/ħ) == 0:
-        return "PUNKT_CISZY_PRZED_KREACJĄ"`}
+        return "PUNKT_CISZY_PRZED_KREACJĄ"`, `def zeta_core_line():
+    # 448th non-trivial zero of Riemann ζ (critical line 1/2)
+    f_exact = mpmath.mpf('718.57012515426885574359120304128340312332181477461')
+    if ζ(1/2 + iE/ħ) == 0:
+        return "POINT_OF_SILENCE_BEFORE_CREATION"`)}
             bridgeText={[
               tr('"Przed powstaniem ziemi" = linia krytyczna 1/2 funkcji ζ Riemanna.', '"Before the earth was formed" = the critical line 1/2 of the Riemann ζ function.'),
               tr("ζ = 0 to matematyczny stan czystego potencjału, zanim informacja zagęści się w masę.", "ζ = 0 is the mathematical state of pure potential before information condenses into mass."),
@@ -719,15 +739,20 @@ DNA = GATCA...`}</CodeBlock>
             number={10}
             title={tr("ZŁAMANIE SYMETRII → ARCHITEKTURA MATERII", "BROKEN SYMMETRY → ARCHITECTURE OF MATTER")}
             subtitle={tr("Tarcie topologiczne jako narzędzie manifestacji fizycznych nanomaszyn", "Topological friction as the tool of physical nanomachine manifestation")}
-            scripture="A Słowo ciałem się stało i zamieszkało wśród nas."
+            scripture={tr("A Słowo ciałem się stało i zamieszkało wśród nas.", "And the Word became flesh and dwelt among us.")}
             scriptureRef={tr("EWANGELIA ŚW. JANA 1:14", "GOSPEL OF JOHN 1:14")}
             science={tr("KOD KONDENSACJI (Moduł Tarciowy rCRS)", "CONDENSATION CODE (rCRS Friction Module)")}
-            code={`def materialization_engine():
+            code={tr(`def materialization_engine():
     # Idealna harmonia (99%+) przenosi czyste światło/informację bezmasowo.
     # Aby zbudować ciało (materię), system musi celowo wprowadzić "skazę".
     Mc_static = 1561 * (1.0 - 0.827643)   # Mc = 269.049  -> Kompleks I  -> pik UV
     Mc_vortex = 1644 * (1.0 - 0.815727)   # Mc = 302.945  -> Syntaza ATP -> Fano
-    return [Mc_static, Mc_vortex]`}
+    return [Mc_static, Mc_vortex]`, `def materialization_engine():
+    # Ideal harmony (99%+) transfers pure light/information without mass.
+    # To build a body (matter), the system must intentionally introduce a "flaw".
+    Mc_static = 1561 * (1.0 - 0.827643)   # Mc = 269.049  -> Complex I   -> UV peak
+    Mc_vortex = 1644 * (1.0 - 0.815727)   # Mc = 302.945  -> ATP synthase -> Fano
+    return [Mc_static, Mc_vortex]`)}
             bridgeText={[
               tr('"Słowo ciałem się stało" = dokładny mechanizm przejścia fali w cząstkę.', '"The Word became flesh" = the exact mechanism of a wave transitioning into a particle.'),
               tr("Najcięższe białka (Kompleks I, Syntaza ATP) powstają tam, gdzie matryca DNA celowo zrzuca koherencję do ~81–82%.", "The heaviest proteins (Complex I, ATP synthase) form where the DNA matrix intentionally drops coherence to ~81–82%."),
@@ -740,7 +765,7 @@ DNA = GATCA...`}</CodeBlock>
             number={11}
             title={tr("ORME → STAN WYSOKIEGO SPINU / SUPERPRZEWODNICTWO", "ORME → HIGH-SPIN STATE / SUPERCONDUCTIVITY")}
             subtitle={tr("Monatomiczne pierwiastki jako fizyczny most falowy", "Monatomic elements as a physical wave bridge")}
-            scripture="A zwycięzcy dam manny ukrytej oraz dam mu biały kamyk, a na kamyku wypisane nowe imię, którego nikt nie zna oprócz tego, kto je otrzymuje."
+            scripture={tr("A zwycięzcy dam manny ukrytej oraz dam mu biały kamyk, a na kamyku wypisane nowe imię, którego nikt nie zna oprócz tego, kto je otrzymuje.", "To the one who overcomes I will give some of the hidden manna, and a white stone with a new name written on it, known only to the one who receives it.")}
             scriptureRef={tr("APOKALIPSA ŚW. JANA 2:17", "REVELATION 2:17")}
             science={tr("CHEMIA KWANTOWA", "QUANTUM CHEMISTRY")}
             code={`def orme_extraction_sea():
@@ -763,7 +788,7 @@ DNA = GATCA...`}</CodeBlock>
             number={12}
             title={tr("REZONANS 718 Hz → KALIBRACJA I PŁUKANIE ORME", "718 Hz RESONANCE → ORME CALIBRATION AND WASHING")}
             subtitle={tr("Użycie f_exact do strukturyzacji i usuwania toksycznego tła (soli)", "Using f_exact to structure and remove toxic background (salts)")}
-            scripture="Oczyść mnie hizopem, a stanę się czysty, obmyj mnie, a nad śnieg bielszy się stanę."
+            scripture={tr("Oczyść mnie hizopem, a stanę się czysty, obmyj mnie, a nad śnieg bielszy się stanę.", "Cleanse me with hyssop, and I will be clean; wash me, and I will be whiter than snow.")}
             scriptureRef="PSALM 51:9"
             science={tr("INŻYNIERIA REZONANSU", "RESONANCE ENGINEERING")}
             code={`def orme_purification(raw_precipitate):
@@ -784,7 +809,7 @@ DNA = GATCA...`}</CodeBlock>
             number={13}
             title={tr("HARDWARE ANALOGOWY → INŻYNIERIA GEOMETRII NATURALNEJ", "ANALOG HARDWARE → ENGINEERING OF NATURAL GEOMETRY")}
             subtitle={tr("Niskobudżetowa ekstrakcja w wysokim spinie za pomocą fizycznych pól", "Low-budget high-spin extraction using physical fields")}
-            scripture="Mądrość zbudowała sobie dom i wyciosała siedem filarów... Przygotowała stół i zaprasza: Chodźcie, jedzcie mój chleb i pijcie wino, które zmieszałam."
+            scripture={tr("Mądrość zbudowała sobie dom i wyciosała siedem filarów... Przygotowała stół i zaprasza: Chodźcie, jedzcie mój chleb i pijcie wino, które zmieszałam.", "Wisdom has built her house and carved out her seven pillars... She has prepared her table and invites: Come, eat my bread and drink the wine I have mixed.")}
             scriptureRef={tr("KSIĘGA PRZYPOWIEŚCI 9:1-5", "PROVERBS 9:1-5")}
             science={tr("KOD STERUJĄCY (Rdzeń Python — Emisja Koherentna)", "CONTROL CODE (Python Core — Coherent Emission)")}
             code={`def emit_zeta_core_frequency():
@@ -804,7 +829,7 @@ DNA = GATCA...`}</CodeBlock>
             number={14}
             title={tr("CYFROWY SILNIK FAZOWY → ANTY-ALTERACJA SYGNAŁU", "DIGITAL PHASE ENGINE → SIGNAL ANTI-ALTERATION")}
             subtitle={tr("Eliminacja jitteru i kwantyzacji jako technologia stabilizacji pola 718.57 Hz", "Eliminating jitter and quantization as 718.57 Hz field stabilization technology")}
-            scripture="Głos Pana nad wodami, Bóg chwały grzmi... Głos Pana łamie cedry, Głos Pana krzesze płomienie ognia."
+            scripture={tr("Głos Pana nad wodami, Bóg chwały grzmi... Głos Pana łamie cedry, Głos Pana krzesze płomienie ognia.", "The voice of the Lord is over the waters, the God of glory thunders... The voice of the Lord breaks the cedars; the voice of the Lord strikes with flashes of fire.")}
             scriptureRef="PSALM 29:3-7"
             science={tr("STRUKTURA ALGORYTMU AUDIO (Rdzeń Emisyjny)", "AUDIO ALGORITHM (Emission Core)")}
             code={`class ZetaPhaseLockedLoop:
@@ -842,7 +867,7 @@ DNA = GATCA...`}</CodeBlock>
             number={15}
             title={tr("PĘTLA 108 SEKUND → GEOMETRIA CYKLU KOSMICZNEGO", "108-SECOND LOOP → GEOMETRY OF THE COSMIC CYCLE")}
             subtitle={tr("Zsynchronizowana inkubacja fali jako stabilizator struktury ORME", "Synchronized wave incubation as ORME structure stabilizer")}
-            scripture="Mierząc osiemnaście łokci wysokości... a sznur dwunastołokciowy obejmował go wokoło... i tak samo uczynił drugi filar."
+            scripture={tr("Mierząc osiemnaście łokci wysokości... a sznur dwunastołokciowy obejmował go wokoło... i tak samo uczynił drugi filar.", "Measuring eighteen cubits in height... and a twelve-cubit cord encircled it... and he made the second pillar the same way.")}
             scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 7:15", "1 KINGS 7:15")}
             science={tr("MATRYCA CZASOWA (24h Blok Emisyjny)", "TIME MATRIX (24h Emission Block)")}
             code={`def time_incubation_matrix():
@@ -865,7 +890,7 @@ DNA = GATCA...`}</CodeBlock>
             number={16}
             title={tr("24-GODZINNE CZYSZCZENIE POLA → KASOWANIE BLOKAD SODOWYCH", "24-HOUR FIELD CLEANSING → ERASING SODIUM BLOCKS")}
             subtitle={tr("Długofalowa inkubacja jako fizyczny proces separacji monatomów", "Long-term incubation as the physical separation of monatoms")}
-            scripture="I pozostał tam przez czterdzieści dni i czterdzieści nocy, chleba nie jadł i wody nie pił. I napisał na tablicach słowa przymierza."
+            scripture={tr("I pozostał tam przez czterdzieści dni i czterdzieści nocy, chleba nie jadł i wody nie pił. I napisał na tablicach słowa przymierza.", "He remained there forty days and forty nights; he ate no bread and drank no water. And he wrote on the tablets the words of the covenant.")}
             scriptureRef={tr("KSIĘGA WYJŚCIA 34:28", "EXODUS 34:28")}
             science={tr("FIZYKA KONDENSACJI FAZOWEJ", "PHASE CONDENSATION PHYSICS")}
             code={`def long_term_field_purification(solution_matrix):
@@ -887,7 +912,7 @@ DNA = GATCA...`}</CodeBlock>
             number={17}
             title={tr("STRUMIEŃ REZONANSU 30 GB → ABSOLUTNA TRANSMISJA POLA", "30 GB RESONANCE STREAM → ABSOLUTE FIELD TRANSMISSION")}
             subtitle={tr("Rozmiar danych jako bariera przed stratnością informacyjną", "Data size as a barrier against informational lossiness")}
-            scripture="I widziałem rzekę wody żywota, czystą jak kryształ, wypływającą z tronu Boga i Baranka."
+            scripture={tr("I widziałem rzekę wody żywota, czystą jak kryształ, wypływającą z tronu Boga i Baranka.", "I saw the river of the water of life, clear as crystal, flowing from the throne of God and of the Lamb.")}
             scriptureRef={tr("APOKALIPSA ŚW. JANA 22:1", "REVELATION 22:1")}
             science={tr("KONSOLIDACJA DANYCH (Monolit 30 GB)", "DATA CONSOLIDATION (30 GB Monolith)")}
             code={`def continuous_quantum_stream():
@@ -906,7 +931,7 @@ DNA = GATCA...`}</CodeBlock>
             number={18}
             title={tr("PLATFORMA AKRYLOWA + SORBOTHANE → IZOLACJA PUNKTU ZEROWEGO", "ACRYLIC + SORBOTHANE PLATFORM → ZERO-POINT ISOLATION")}
             subtitle={tr("Fizyczne tłumienie szumu tła jako warunek koherencji matrycy rCRS", "Physical background-noise damping as a condition of rCRS coherence")}
-            scripture="A dom, gdy go budowano, budowany był z kamieni wyciosanych w kamieniołomie, tak iż ani młota, ani siekiery, ani żadnego narzędzia żelaznego nie było słychać w domu podczas jego budowy."
+            scripture={tr("A dom, gdy go budowano, budowany był z kamieni wyciosanych w kamieniołomie, tak iż ani młota, ani siekiery, ani żadnego narzędzia żelaznego nie było słychać w domu podczas jego budowy.", "The temple was built of stones finished at the quarry, so that neither hammer nor axe nor any iron tool was heard in the house while it was being built.")}
             scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 6:7", "1 KINGS 6:7")}
             science={tr("KONFIGURACJA SPRZĘTOWA PLATFORMY", "PLATFORM HARDWARE CONFIGURATION")}
             code={`def hardware_resonance_bridge(focusrite_signal):
@@ -927,7 +952,7 @@ DNA = GATCA...`}</CodeBlock>
             number={19}
             title={tr("BOROKRZEMOWE SZKŁO PYREX → OPTYMALIZACJA GEOMETRII WARSTWY", "BOROSILICATE PYREX → LAYER GEOMETRY OPTIMIZATION")}
             subtitle={tr("Szalka Petriego 100 mm jako niepolaryzacyjny rezonator cieczowy", "100 mm Petri dish as a non-polarizing liquid resonator")}
-            scripture="I uczynił morze odlewane z brązu, okrągłe, dziesięć łokci od jednego brzegu do drugiego... a dookoła opasywały je wypukłości."
+            scripture={tr("I uczynił morze odlewane z brązu, okrągłe, dziesięć łokci od jednego brzegu do drugiego... a dookoła opasywały je wypukłości.", "He made the cast Sea, circular in shape, ten cubits from rim to rim... and around it were encircling ornaments.")}
             scriptureRef={tr("1 KSIĘGA KRÓLEWSKA 7:23", "1 KINGS 7:23")}
             science={tr("KOD REZONATORA", "RESONATOR CODE")}
             code={`def pyrex_geometry_resonance(water_volume):
@@ -947,7 +972,7 @@ DNA = GATCA...`}</CodeBlock>
             number={20}
             title={tr("HANNA EC215 → ANALOGOWY MONITOR NADPRZEWODNICTWA", "HANNA EC215 → ANALOG SUPERCONDUCTIVITY MONITOR")}
             subtitle={tr("Pomiary przewodnictwa bez cyfrowego próbkowania jako wskaźnik transformacji ORME", "Conductivity readings without digital sampling as ORME transformation indicator")}
-            scripture="I odważył srebro, i złoto, i naczynia, które król, jego doradcy i możnowładcy złożyli w ofierze... i zważyłem w ich ręce."
+            scripture={tr("I odważył srebro, i złoto, i naczynia, które król, jego doradcy i możnowładcy złożyli w ofierze... i zważyłem w ich ręce.", "I weighed out the silver, the gold, and the vessels that the king, his counselors, and his officials had offered... and I weighed them into their hands.")}
             scriptureRef={tr("KSIĘGA EZDRASZA 8:25-26", "EZRA 8:25-26")}
             science={tr("METRYKA KONTROLNA", "CONTROL METRIC")}
             code={`def hanna_ec215_readout(solution_sample):
@@ -968,7 +993,7 @@ DNA = GATCA...`}</CodeBlock>
             number={21}
             title={tr("MACIERZ FIOLEK → MATRYCA PROCESORÓW KWANTOWYCH", "VIAL ARRAY → QUANTUM PROCESSOR MATRIX")}
             subtitle={tr("100 punktów węzłowych jako fizyczna reprezentacja tablicy binarnej", "100 nodes as a physical representation of a binary array")}
-            scripture="I przyniósł sto naczyń ze złota... a wszystkie naczynia były jednakowej wagi i tej samej miary, odmierzone na służbę w świątyni."
+            scripture={tr("I przyniósł sto naczyń ze złota... a wszystkie naczynia były jednakowej wagi i tej samej miary, odmierzone na służbę w świątyni.", "He brought one hundred vessels of gold... and all the vessels were of equal weight and the same measure, appointed for service in the temple.")}
             scriptureRef={tr("2 KSIĘGA KRONIK 4:8", "2 CHRONICLES 4:8")}
             science={tr("ARCHITEKTURA MATRYCY 10×10", "10×10 MATRIX ARCHITECTURE")}
             code={`def pyrex_array_resonance(vial_matrix):
@@ -989,7 +1014,7 @@ DNA = GATCA...`}</CodeBlock>
             number={22}
             title={tr("DIAGNOSTYKA TABLICOWA → MAPOWANIE KRZYWEJ KOHERENCJI", "ARRAY DIAGNOSTICS → COHERENCE CURVE MAPPING")}
             subtitle={tr("Hanna EC215 do weryfikacji statystycznej próby 100 punktów", "Hanna EC215 for statistical verification of the 100-point sample")}
-            scripture="Przejrzyjcie i zbadajcie każdą rzecz z osobna... aby żaden błąd nie wkradł się do świętego zapisu."
+            scripture={tr("Przejrzyjcie i zbadajcie każdą rzecz z osobna... aby żaden błąd nie wkradł się do świętego zapisu.", "Review and examine each thing separately... so that no error enters the sacred record.")}
             scriptureRef={tr("KSIĘGA NEHEMIASZA 7:5", "NEHEMIAH 7:5")}
             science={tr("KONTROLA MATRYCY POMIAROWEJ", "MEASUREMENT MATRIX CONTROL")}
             code={`def hanna_matrix_scan(vial_array):
@@ -1012,7 +1037,7 @@ DNA = GATCA...`}</CodeBlock>
             number={23}
             title={tr("PODWÓJNE POLE MAGNETYCZNE → POLARYZACJA SPINU", "DUAL MAGNETIC FIELD → SPIN POLARIZATION")}
             subtitle={tr("Duże i małe magnesy jako kleszcze geometryczne dla monatomicznego złota", "Large and small magnets as geometric tweezers for monatomic gold")}
-            scripture="I uczynisz dwa cheruby ze złota; skuwane z jednej bryły uczynisz je na obu końcach przebłagalni... rozpościerające skrzydła ku górze."
+            scripture={tr("I uczynisz dwa cheruby ze złota; skuwane z jednej bryły uczynisz je na obu końcach przebłagalni... rozpościerające skrzydła ku górze.", "You shall make two cherubim of gold; of hammered work you shall make them at the two ends of the mercy seat... spreading their wings upward.")}
             scriptureRef={tr("KSIĘGA WYJŚCIA 25:18-20", "EXODUS 25:18-20")}
             science={tr("KONFIGURACJA POLA (Pułapka Globalno-Lokalna)", "FIELD CONFIGURATION (Global-Local Trap)")}
             code={`def dual_magnetic_gate(vial_matrix):
@@ -1032,7 +1057,7 @@ DNA = GATCA...`}</CodeBlock>
             number={24}
             title={tr("STABILIZACJA KINETYCZNA FIOLEK → ANTY-DRYF GEOMETRYCZNY", "VIAL KINETIC STABILIZATION → ANTI-GEOMETRIC DRIFT")}
             subtitle={tr("Przyciąganie magnetyczne jako bezmasowy uchwyt laboratoryjny", "Magnetic attraction as a massless laboratory clamp")}
-            scripture="Wtedy utwierdził na stałe fundamenty ziemi, tak iż się nie zachwieje na wieki wieków."
+            scripture={tr("Wtedy utwierdził na stałe fundamenty ziemi, tak iż się nie zachwieje na wieki wieków.", "He established the foundations of the earth, so that it shall never be moved.")}
             scriptureRef="PSALM 104:5"
             science={tr("KOD STABILIZACJI MECHANICZNEJ", "MECHANICAL STABILIZATION CODE")}
             code={`def kinetic_drift_prevention(vial_array, acrylic_plate):
@@ -1055,7 +1080,7 @@ DNA = GATCA...`}</CodeBlock>
             number={25}
             title={tr("CISZA NOCNA → MINIMALIZACJA SZUMU PERCEPCYJNEGO", "NIGHT SILENCE → MINIMIZING PERCEPTUAL NOISE")}
             subtitle={tr("Pobór w punkcie najniższej entropii dobowej jako fundament czystości próbki", "Sampling at the lowest diurnal entropy as the foundation of sample purity")}
-            scripture="Gdy nastała głęboka noc... powiał wiatr północny... i rozstąpiły się wody, ukazując dno."
+            scripture={tr("Gdy nastała głęboka noc... powiał wiatr północny... i rozstąpiły się wody, ukazując dno.", "When deep night came... a north wind blew... and the waters parted, revealing the ground.")}
             scriptureRef={tr("KSIĘGA WYJŚCIA 14:21", "EXODUS 14:21")}
             science={tr("PARAMETRY OPERACJI TERENOWEJ", "FIELD OPERATION PARAMETERS")}
             code={`def night_sampling_protocol():
@@ -1074,7 +1099,7 @@ DNA = GATCA...`}</CodeBlock>
             number={26}
             title={tr("PÓŁNOCNA MATRYCA HYDROLOGICZNA → SEPARACJA UJŚCIA", "NORTHERN HYDROLOGICAL MATRIX → ESTUARY SEPARATION")}
             subtitle={tr("Współrzędne Aberdeen (Seaton Beach) jako punkt stabilnego zasolenia oceanicznego", "Aberdeen (Seaton Beach) coordinates as a point of stable oceanic salinity")}
-            scripture="Odwrócił rzeki w pustynię, a źródła wód w ziemię suchą... Ale pustynię zamienia w zbiornik zasobny w wodę, a ziemię spękaną w źródła wód żywych."
+            scripture={tr("Odwrócił rzeki w pustynię, a źródła wód w ziemię suchą... Ale pustynię zamienia w zbiornik zasobny w wodę, a ziemię spękaną w źródła wód żywych.", "He turned rivers into a desert, springs of water into thirsty ground... But He turns the desert into pools of water, and parched land into springs of living water.")}
             scriptureRef="PSALM 107:33-35"
             science={tr("PARAMETRY KOORDYNACJI TERENOWEJ", "FIELD COORDINATION PARAMETERS")}
             code={`def north_sea_coast_sampling():
@@ -1097,10 +1122,10 @@ DNA = GATCA...`}</CodeBlock>
               "Uniwersalny filtr odszumiający tekst — separacja Głosu Projektanta od historycznego szumu Władzy",
               "Universal denoising filter — separating the Voice of the Designer from historical Power-system noise"
             )}
-            scripture="Wszelkie słowo Boga jest czyste; On jest tarczą dla tych, którzy Mu ufają. Nie dodawaj nic do Jego słów, aby cię nie skarcił i abyś nie okazał się kłamcą."
+            scripture={tr("Wszelkie słowo Boga jest czyste; On jest tarczą dla tych, którzy Mu ufają. Nie dodawaj nic do Jego słów, aby cię nie skarcił i abyś nie okazał się kłamcą.", "Every word of God is pure; He is a shield to those who trust in Him. Add nothing to His words, lest He rebuke you and you be found a liar.")}
             scriptureRef={tr("KSIĘGA PRZYSŁÓW 30:5-6", "PROVERBS 30:5-6")}
             science={tr("ALGORYTM KOREKCJI POLA", "FIELD CORRECTION ALGORITHM")}
-            code={`def mkp94_field_correction(text, coherence, hurst, gate_idx, original_text):
+            code={tr(`def mkp94_field_correction(text, coherence, hurst, gate_idx, original_text):
     # 1. Wymóg tekstu oryginalnego (heb/grc/ar) — bez niego max 70%
     original_used = bool(original_text.strip())
     truth = coherence * 100 if original_used else min(coherence * 100, 70.0)
@@ -1126,7 +1151,33 @@ DNA = GATCA...`}</CodeBlock>
     if truth >= 99.5: return "VOICE_OF_DESIGNER"     # Głos Projektanta
     if truth >= 94.0: return "PURE_SOURCE_CODE"      # Czysty Kod Źródłowy
     if truth >= 60.0: return "MINOR_NOISE"           # Szum historyczny
-    return "SYSTEM_INTERFERENCE"                     # Ingerencja Systemu Władzy`}
+    return "SYSTEM_INTERFERENCE"                     # Ingerencja Systemu Władzy`, `def mkp94_field_correction(text, coherence, hurst, gate_idx, original_text):
+    # 1. Original-text requirement (heb/grc/ar) — without it max 70%
+    original_used = bool(original_text.strip())
+    truth = coherence * 100 if original_used else min(coherence * 100, 70.0)
+
+    # 2. Control Vector detection (historical Power-system noise)
+    CONTROL_VECTORS = [
+        "musisz", "bój się", "kara", "potępienie", "gniew boży",
+        "posłuszeństwo", "poddaj się", "niewolnik", "piekło",
+        "must obey", "fear", "wrath", "damnation", "submit", "hell",
+        "original sin", "eternal fire", "vengeance"
+    ]
+    detected = [kw for kw in CONTROL_VECTORS if kw in text.lower()]
+
+    # 3. Coherence penalty for each control vector
+    if detected:
+        truth = max(truth - min(len(detected) * 5, 30), 0)
+        coherence *= (1 - len(detected) * 0.03)
+
+    # 4. Closed-Circuit Test (phase teleportation condition)
+    circuit_closed = (coherence >= 0.94 and 0.15 <= hurst <= 0.85 and 0 <= gate_idx < 18)
+
+    # 5. Status classification
+    if truth >= 99.5: return "VOICE_OF_DESIGNER"     # Voice of Designer
+    if truth >= 94.0: return "PURE_SOURCE_CODE"      # Pure Source Code
+    if truth >= 60.0: return "MINOR_NOISE"           # Historical noise
+    return "SYSTEM_INTERFERENCE"                     # Power-System Interference`)}
             bridgeText={[
               tr(
                 '"Wszelkie słowo Boga jest czyste" = oryginalna wibracja w hebrajskim/greckim/aramejskim jest niezakłóconym kodem źródłowym.',
@@ -1247,7 +1298,7 @@ DNA = GATCA...`}</CodeBlock>
               <p className="text-yellow-400 text-center py-2 text-lg">
                 "{tr("Nigdy nie było oddzielenia.", "There never was a separation.")}"
               </p>
-              <SystemLog time="00:00:00.068" message="BLACKBOX STREAM:" highlight />
+              <SystemLog time="00:00:00.068" message={tr("STRUMIEŃ BLACKBOX:", "BLACKBOX STREAM:")} highlight />
               <p className="text-purple-400 pl-4">"{tr("Einstein był mistykiem z równaniami.", "Einstein was a mystic with equations.")}"</p>
               <p className="text-purple-400 pl-4">"{tr("Jezus był fizykiem kwantowym z przypowieściami.", "Jesus was a quantum physicist with parables.")}"</p>
               <p className="text-purple-400 pl-4">"{tr("Jesteś jednocześnie naukowcem i kapłanem rzeczywistości.", "You are both scientist and priest of reality.")}"</p>
