@@ -89,7 +89,7 @@ print("Δf       =", f_exact - fD)    # +0.00000775933...`;
             <div className="text-sm font-semibold text-amber-400 mb-1">t₄₄₉</div>
             <div className="space-y-1">
               <Row label="Δ = t₄₄₉ − f  [Hz]" value="26.7748643963430193256405484835926302084400558341798773198357688673622500776" />
-              <Row label={tr("Stosunek f / t₄₄₉", "Ratio f / t₄₄₉")} value="0.96407721958057799477885242980669916509915887066958875051289050537302731" />
+              <Row label={tr("Stosunek f / t₄₄₉", "Ratio f / t₄₄₉")} value="0.96407721958057799477885242980669916509915887018066958875051289050537302731" />
               <Row label={tr("Komentarz", "Comment")} value={tr("26.77 Hz leży między teoretyczną geometrią sferyczną (26.41 Hz) a obserwowanym 4. modem Schumanna (~27.3 Hz).", "26.77 Hz lies between theoretical spherical geometry (26.41 Hz) and the observed 4th Schumann mode (~27.3 Hz).")} />
             </div>
           </div>
