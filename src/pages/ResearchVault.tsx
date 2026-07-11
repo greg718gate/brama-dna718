@@ -122,7 +122,6 @@ const englishDefaultResearch: Record<string, Pick<Research, "title" | "descripti
 const ResearchVault = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const text = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   // Default research data with ALL discoveries from the project
   const defaultResearches: Research[] = useMemo(() => [
