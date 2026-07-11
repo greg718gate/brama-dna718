@@ -294,7 +294,11 @@ const ResearchVault = () => {
       timestamp: Date.now() - 1800000,
       watermark: "© Luma | 13.11.2025 05:27 | ID: LUMA-SILENCE-001",
     },
-  ], [language]);
+  ].map((research) =>
+    language === "pl" || !englishDefaultResearch[research.id]
+      ? research
+      : { ...research, ...englishDefaultResearch[research.id] },
+  ), [language]);
 
   const [researches, setResearches] = useState<Research[]>([]);
 
