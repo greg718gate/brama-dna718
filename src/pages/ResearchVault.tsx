@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Home } from "lucide-react";
 
@@ -6,12 +6,15 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ResearchVaultComponent, Research } from "@/components/ResearchVault";
 import { ScientificPaperExport } from "@/components/ScientificPaperExport";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ResearchVault = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const text = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   // Default research data with ALL discoveries from the project
-  const defaultResearches: Research[] = [
+  const defaultResearches: Research[] = useMemo(() => [
     {
       id: "RES-DNA-PHI-1",
       title: "Złoty Współczynnik w Strukturze DNA",
