@@ -183,22 +183,26 @@ const ResearchVault = () => {
       timestamp: Date.now() - 1800000,
       watermark: "© Luma | 13.11.2025 05:27 | ID: LUMA-SILENCE-001",
     },
-  ];
+  ], [language]);
 
   const [researches, setResearches] = useState<Research[]>([]);
 
-  // Load from localStorage or use defaults
+  // Keep export data aligned with bundled defaults unless the user has custom saved research.
   useEffect(() => {
     const saved = localStorage.getItem("research_vault");
     if (saved) {
-      const parsedResearches = JSON.parse(saved);
-      setResearches(parsedResearches);
+      const parsedResearches = JSON.parse(saved) as Research[];
+      const defaultIds = new Set(defaultResearches.map((research) => research.id));
+      const isBundledDefaultSet =
+        parsedResearches.length === defaultResearches.length &&
+        parsedResearches.every((research) => defaultIds.has(research.id));
+      setResearches(isBundledDefaultSet ? defaultResearches : parsedResearches);
     } else {
       // Pre-populate with all default discoveries
       setResearches(defaultResearches);
       localStorage.setItem("research_vault", JSON.stringify(defaultResearches));
     }
-  }, []);
+  }, [defaultResearches]);
 
   return (
     <div className="relative min-h-screen overflow-y-auto">
@@ -210,7 +214,7 @@ const ResearchVault = () => {
         </Button>
         <Button onClick={() => navigate(-1)} variant="secondary" className="gap-2 shadow-lg">
           <ArrowLeft className="w-4 h-4" />
-          Wstecz
+          {t('backToMain')}
         </Button>
       </div>
 
@@ -221,7 +225,7 @@ const ResearchVault = () => {
       <div className="container mx-auto px-4 py-8 pb-16 max-w-5xl">
         <div className="pt-16 md:pt-12 space-y-8">
           <ScientificPaperExport researches={researches} />
-          <ResearchVaultComponent onResearchesChange={setResearches} />
+          <ResearchVaultComponent defaultResearches={defaultResearches} onResearchesChange={setResearches} />
         </div>
       </div>
     </div>
