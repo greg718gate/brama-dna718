@@ -25,9 +25,10 @@ export interface Research {
 
 interface ResearchVaultProps {
   onResearchesChange?: (researches: Research[]) => void;
+  defaultResearches?: Research[];
 }
 
-export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProps = {}) => {
+export const ResearchVaultComponent = ({ onResearchesChange, defaultResearches = [] }: ResearchVaultProps = {}) => {
   const { t } = useLanguage();
   const [researches, setResearches] = useState<Research[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -40,17 +41,31 @@ export const ResearchVaultComponent = ({ onResearchesChange }: ResearchVaultProp
     verification: "",
   });
 
-  // Load from localStorage
+  // Load from localStorage, but keep bundled default discoveries synchronized with the active language.
   useEffect(() => {
     const saved = localStorage.getItem("research_vault");
     if (saved) {
-      setResearches(JSON.parse(saved));
+      const parsed = JSON.parse(saved) as Research[];
+      const defaultIds = new Set(defaultResearches.map((research) => research.id));
+      const isBundledDefaultSet =
+        defaultResearches.length > 0 &&
+        parsed.length === defaultResearches.length &&
+        parsed.every((research) => defaultIds.has(research.id));
+
+      const nextResearches = isBundledDefaultSet ? defaultResearches : parsed;
+      setResearches(nextResearches);
+      if (isBundledDefaultSet) {
+        localStorage.setItem("research_vault", JSON.stringify(defaultResearches));
+      }
+    } else if (defaultResearches.length > 0) {
+      setResearches(defaultResearches);
+      localStorage.setItem("research_vault", JSON.stringify(defaultResearches));
     }
     const savedAuthor = localStorage.getItem("research_author");
     if (savedAuthor) {
       setAuthor(savedAuthor);
     }
-  }, []);
+  }, [defaultResearches]);
 
   // Save to localStorage
   useEffect(() => {
