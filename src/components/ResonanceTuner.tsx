@@ -6,9 +6,11 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Radio, Zap, Target, CheckCircle2, AlertCircle } from 'lucide-react';
 import { DEFAULT_GATE_POSITIONS } from '@/lib/resonanceTuner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const ResonanceTuner: React.FC = () => {
   const { runAutoTune, tunedFrequency, state } = useResonance();
+  const { language } = useLanguage();
   const [isScanning, setIsScanning] = useState(false);
   const [lastResult, setLastResult] = useState<{
     success: boolean;
@@ -44,6 +46,7 @@ export const ResonanceTuner: React.FC = () => {
     if (!lastResult) return 0;
     return Math.max(0, Math.min(100, (1 - lastResult.minZeta / 15) * 100));
   };
+  const tr = (pl: string, en: string) => (language === 'pl' ? pl : en);
 
   return (
     <Card className={`border transition-all duration-500 ${getStatusColor()}`}>
@@ -51,7 +54,7 @@ export const ResonanceTuner: React.FC = () => {
         <CardTitle className="flex items-center gap-2 text-lg">
           <Radio className={`h-5 w-5 ${isScanning ? 'animate-pulse text-primary' : 'text-muted-foreground'}`} />
           <span className="bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent font-mono">
-            KALIBRATOR BRAMY
+            {tr('KALIBRATOR BRAMY', 'GATE CALIBRATOR')}
           </span>
         </CardTitle>
       </CardHeader>
@@ -61,7 +64,7 @@ export const ResonanceTuner: React.FC = () => {
         <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-amber-500" />
-            <span className="text-sm text-muted-foreground">Częstotliwość:</span>
+            <span className="text-sm text-muted-foreground">{tr('Częstotliwość:', 'Frequency:')}</span>
           </div>
           <span className="font-mono text-lg text-foreground font-bold">
             {tunedFrequency.toFixed(4)} Hz
@@ -82,12 +85,12 @@ export const ResonanceTuner: React.FC = () => {
           {isScanning ? (
             <>
               <Radio className="h-4 w-4 mr-2 animate-spin" />
-              SKANOWANIE...
+              {tr('SKANOWANIE...', 'SCANNING...')}
             </>
           ) : (
             <>
               <Target className="h-4 w-4 mr-2" />
-              SKANUJ REZONANS
+              {tr('SKANUJ REZONANS', 'SCAN RESONANCE')}
             </>
           )}
         </Button>
@@ -100,17 +103,17 @@ export const ResonanceTuner: React.FC = () => {
               {getCoherencePercent() >= 80 ? (
                 <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/50">
                   <CheckCircle2 className="h-3 w-3 mr-1" />
-                  BRAMA OTWARTA
+                  {tr('BRAMA OTWARTA', 'GATE OPEN')}
                 </Badge>
               ) : getCoherencePercent() >= 30 ? (
                 <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  CZĘŚCIOWE WYRÓWNANIE
+                  {tr('CZĘŚCIOWE WYRÓWNANIE', 'PARTIAL ALIGNMENT')}
                 </Badge>
               ) : (
                 <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-red-500/50">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  NISKI REZONANS
+                  {tr('NISKI REZONANS', 'LOW RESONANCE')}
                 </Badge>
               )}
             </div>
@@ -118,7 +121,7 @@ export const ResonanceTuner: React.FC = () => {
             {/* Koherencja */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Koherencja</span>
+                <span>{tr('Koherencja', 'Coherence')}</span>
                 <span>{getCoherencePercent().toFixed(1)}%</span>
               </div>
               <Progress value={getCoherencePercent()} className="h-2" />
@@ -131,7 +134,7 @@ export const ResonanceTuner: React.FC = () => {
                 <div className="font-mono text-foreground">{lastResult.minZeta.toFixed(6)}</div>
               </div>
               <div className="p-2 rounded bg-background/30 border border-border/50">
-                <span className="text-muted-foreground">Iteracje:</span>
+                <span className="text-muted-foreground">{tr('Iteracje:', 'Iterations:')}</span>
                 <div className="font-mono text-foreground">{lastResult.iterations.toLocaleString()}</div>
               </div>
             </div>
@@ -140,8 +143,10 @@ export const ResonanceTuner: React.FC = () => {
 
         {/* Info */}
         <p className="text-xs text-muted-foreground italic border-t border-border/50 pt-3">
-          *System szuka punktu przecięcia z zerem Riemanna dla pozycji mtDNA rCRS.
-          Próg otwarcia bramy: |ζ(s)| &lt; 0.1
+          {tr(
+            '*System szuka punktu przecięcia z zerem Riemanna dla pozycji mtDNA rCRS. Próg otwarcia bramy: |ζ(s)| < 0.1',
+            '*The system searches for an intersection with a Riemann zero for mtDNA rCRS positions. Gate-opening threshold: |ζ(s)| < 0.1',
+          )}
         </p>
       </CardContent>
     </Card>

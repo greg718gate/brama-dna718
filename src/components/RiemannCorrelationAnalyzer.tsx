@@ -20,16 +20,18 @@ import {
   analyzeCorrelation, 
   exportCorrelationPythonCode,
   AnalysisResult,
-  CorrelationResult 
 } from "@/lib/riemannCorrelationAnalyzer";
 import { GAMMA } from "@/lib/bramaUnificationEngine";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const RiemannCorrelationAnalyzer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const runAnalysis = async () => {
     setIsAnalyzing(true);
@@ -52,16 +54,16 @@ const RiemannCorrelationAnalyzer = () => {
       setAnalysisResult(result);
       
       toast({
-        title: "Analiza zakończona",
-        description: `Skuteczność unifikacji: ${result.successRate.toFixed(2)}%`,
+        title: tr("Analiza zakończona", "Analysis complete"),
+        description: `${tr("Skuteczność unifikacji", "Unification effectiveness")}: ${result.successRate.toFixed(2)}%`,
       });
       
       await audioContext.close();
     } catch (error) {
       console.error("Błąd analizy:", error);
       toast({
-        title: "Błąd analizy",
-        description: "Nie udało się przeprowadzić analizy korelacji",
+        title: tr("Błąd analizy", "Analysis error"),
+        description: tr("Nie udało się przeprowadzić analizy korelacji", "Could not complete the correlation analysis"),
         variant: "destructive",
       });
     } finally {
@@ -80,7 +82,7 @@ const RiemannCorrelationAnalyzer = () => {
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Pobrano skrypt Python",
+      title: tr("Pobrano skrypt Python", "Python script downloaded"),
       description: "riemann_correlation_analyzer.py",
     });
   };
@@ -96,10 +98,13 @@ const RiemannCorrelationAnalyzer = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-purple-300">
           <Activity className="w-5 h-5" />
-          Analiza Korelacji: Symfonia vs. Funkcja Zeta
+          {tr("Analiza Korelacji: Symfonia vs. Funkcja Zeta", "Correlation Analysis: Symphony vs. Zeta Function")}
         </CardTitle>
         <p className="text-sm text-gray-400">
-          Szukanie punktów wspólnych między dźwiękiem a linią krytyczną Riemanna (s = 1/2 + iE/ħ)
+          {tr(
+            "Szukanie punktów wspólnych między dźwiękiem a linią krytyczną Riemanna (s = 1/2 + iE/ħ)",
+            "Searching for common points between sound and the Riemann critical line (s = 1/2 + iE/ħ)",
+          )}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -113,12 +118,12 @@ const RiemannCorrelationAnalyzer = () => {
             {isAnalyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analizuję...
+                {tr("Analizuję...", "Analyzing...")}
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 mr-2" />
-                Uruchom Analizę
+                {tr("Uruchom Analizę", "Run Analysis")}
               </>
             )}
           </Button>
@@ -129,7 +134,7 @@ const RiemannCorrelationAnalyzer = () => {
             className="border-purple-500/50"
           >
             <Download className="w-4 h-4 mr-2" />
-            Pobierz Skrypt Python
+            {tr("Pobierz Skrypt Python", "Download Python Script")}
           </Button>
         </div>
 
@@ -137,7 +142,7 @@ const RiemannCorrelationAnalyzer = () => {
         {isAnalyzing && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-400">
-              <span>Postęp analizy</span>
+              <span>{tr("Postęp analizy", "Analysis progress")}</span>
               <span>{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -148,20 +153,20 @@ const RiemannCorrelationAnalyzer = () => {
         {analysisResult && (
           <Tabs defaultValue="summary" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-black/50">
-              <TabsTrigger value="summary">Podsumowanie</TabsTrigger>
-              <TabsTrigger value="details">Szczegóły</TabsTrigger>
-              <TabsTrigger value="peaks">Bramy (Szczyty)</TabsTrigger>
+              <TabsTrigger value="summary">{tr("Podsumowanie", "Summary")}</TabsTrigger>
+              <TabsTrigger value="details">{tr("Szczegóły", "Details")}</TabsTrigger>
+              <TabsTrigger value="peaks">{tr("Bramy (Szczyty)", "Gates (Peaks)")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="summary" className="space-y-4 mt-4">
               {/* Main Result */}
               <div className="text-center p-6 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-500/30">
-                <p className="text-gray-400 mb-2">SKUTECZNOŚĆ UNIFIKACJI</p>
+                <p className="text-gray-400 mb-2">{tr("SKUTECZNOŚĆ UNIFIKACJI", "UNIFICATION EFFECTIVENESS")}</p>
                 <p className={`text-5xl font-bold ${getSuccessColor(analysisResult.successRate)}`}>
                   {analysisResult.successRate.toFixed(2)}%
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
-                  trafień blisko zera Riemanna
+                  {tr("trafień blisko zera Riemanna", "hits near a Riemann zero")}
                 </p>
               </div>
 
@@ -170,7 +175,7 @@ const RiemannCorrelationAnalyzer = () => {
                 <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
                   <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <Zap className="w-4 h-4" />
-                    <span className="text-xs">Wykryte Bramy</span>
+                    <span className="text-xs">{tr("Wykryte Bramy", "Detected Gates")}</span>
                   </div>
                   <p className="text-2xl font-bold text-white">
                     {analysisResult.totalPeaks}
@@ -180,7 +185,7 @@ const RiemannCorrelationAnalyzer = () => {
                 <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
                   <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <Target className="w-4 h-4" />
-                    <span className="text-xs">Blisko Zera</span>
+                    <span className="text-xs">{tr("Blisko Zera", "Near Zero")}</span>
                   </div>
                   <p className="text-2xl font-bold text-green-400">
                     {analysisResult.nearZeroCount}
@@ -190,7 +195,7 @@ const RiemannCorrelationAnalyzer = () => {
                 <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
                   <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <BarChart3 className="w-4 h-4" />
-                    <span className="text-xs">Średnia |ζ(s)|</span>
+                    <span className="text-xs">{tr("Średnia |ζ(s)|", "Average |ζ(s)|")}</span>
                   </div>
                   <p className="text-lg font-bold text-blue-400">
                     {analysisResult.averageZetaMagnitude.toFixed(4)}
@@ -200,7 +205,7 @@ const RiemannCorrelationAnalyzer = () => {
                 <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
                   <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <Activity className="w-4 h-4" />
-                    <span className="text-xs">Próg γ</span>
+                    <span className="text-xs">{tr("Próg γ", "γ threshold")}</span>
                   </div>
                   <p className="text-lg font-bold text-purple-400">
                     {GAMMA.toFixed(4)}
@@ -211,29 +216,29 @@ const RiemannCorrelationAnalyzer = () => {
             
             <TabsContent value="details" className="space-y-4 mt-4">
               <div className="bg-black/30 p-4 rounded-lg border border-gray-700 space-y-3">
-                <h4 className="text-purple-300 font-medium">Parametry Analizy</h4>
+                <h4 className="text-purple-300 font-medium">{tr("Parametry Analizy", "Analysis Parameters")}</h4>
                 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-400">Próg koherencji (γ):</span>
+                    <span className="text-gray-400">{tr("Próg koherencji (γ):", "Coherence threshold (γ):")}</span>
                     <span className="ml-2 text-white">{GAMMA.toFixed(6)}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Próg zera Riemanna:</span>
+                    <span className="text-gray-400">{tr("Próg zera Riemanna:", "Riemann zero threshold:")}</span>
                     <span className="ml-2 text-white">0.1</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Częstotliwość bazowa:</span>
+                    <span className="text-gray-400">{tr("Częstotliwość bazowa:", "Base frequency:")}</span>
                     <span className="ml-2 text-white">718.57 Hz</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Stała Plancka (ħ):</span>
+                    <span className="text-gray-400">{tr("Stała Plancka (ħ):", "Planck constant (ħ):")}</span>
                     <span className="ml-2 text-white">1.0545718e-34 J·s</span>
                   </div>
                 </div>
                 
                 <div className="border-t border-gray-700 pt-3 mt-3">
-                  <h4 className="text-purple-300 font-medium mb-2">Statystyki |ζ(s)|</h4>
+                  <h4 className="text-purple-300 font-medium mb-2">{tr("Statystyki |ζ(s)|", "|ζ(s)| Statistics")}</h4>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <span className="text-gray-400">Min:</span>
@@ -242,7 +247,7 @@ const RiemannCorrelationAnalyzer = () => {
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-400">Średnia:</span>
+                      <span className="text-gray-400">{tr("Średnia:", "Average:")}</span>
                       <span className="ml-2 text-blue-400">
                         {analysisResult.averageZetaMagnitude.toFixed(6)}
                       </span>
@@ -257,15 +262,15 @@ const RiemannCorrelationAnalyzer = () => {
                 </div>
                 
                 <div className="border-t border-gray-700 pt-3 mt-3">
-                  <h4 className="text-purple-300 font-medium mb-2">Równanie Analizy</h4>
+                  <h4 className="text-purple-300 font-medium mb-2">{tr("Równanie Analizy", "Analysis Equation")}</h4>
                   <code className="text-xs bg-black/50 p-2 rounded block text-gray-300 break-words whitespace-normal">
-                    s = 1/2 + i(E/ħ), gdzie E = t × 718.57 × ħ
+                    s = 1/2 + i(E/ħ), {tr("gdzie", "where")} E = t × 718.57 × ħ
                   </code>
                   <p className="text-[10px] text-gray-500 italic mt-1">
-                    718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz (50 miejsc po przecinku)
+                    718.57 Hz = 718.57012515426885574359120304128340312332181477461 Hz ({tr("50 miejsc po przecinku", "50 decimal places")})
                   </p>
                   <p className="text-xs text-gray-500 mt-2">
-                    Dla każdego szczytu t, obliczamy |ζ(s)| i sprawdzamy, czy &lt; 0.1
+                    {tr("Dla każdego szczytu t, obliczamy |ζ(s)| i sprawdzamy, czy < 0.1", "For each peak t, |ζ(s)| is calculated and checked for < 0.1")}
                   </p>
                 </div>
               </div>
@@ -277,10 +282,10 @@ const RiemannCorrelationAnalyzer = () => {
                   <thead className="sticky top-0 bg-black/80">
                     <tr className="text-gray-400 border-b border-gray-700">
                       <th className="p-2 text-left">#</th>
-                      <th className="p-2 text-left">Czas (s)</th>
-                      <th className="p-2 text-left">Energia (J)</th>
+                      <th className="p-2 text-left">{tr("Czas (s)", "Time (s)")}</th>
+                      <th className="p-2 text-left">{tr("Energia (J)", "Energy (J)")}</th>
                       <th className="p-2 text-left">|ζ(s)|</th>
-                      <th className="p-2 text-center">Status</th>
+                      <th className="p-2 text-center">{tr("Status", "Status")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -312,7 +317,7 @@ const RiemannCorrelationAnalyzer = () => {
                 </table>
                 {analysisResult.correlations.length > 50 && (
                   <p className="text-center text-gray-500 py-2 text-sm">
-                    Pokazano 50 z {analysisResult.correlations.length} wyników
+                    {tr("Pokazano 50 z", "Showing 50 of")} {analysisResult.correlations.length} {tr("wyników", "results")}
                   </p>
                 )}
               </div>
@@ -324,9 +329,12 @@ const RiemannCorrelationAnalyzer = () => {
         {!analysisResult && !isAnalyzing && (
           <div className="text-center py-8 text-gray-500">
             <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Kliknij "Uruchom Analizę" aby rozpocząć</p>
+            <p>{tr('Kliknij "Uruchom Analizę" aby rozpocząć', 'Click "Run Analysis" to begin')}</p>
             <p className="text-xs mt-2">
-              Analiza wygeneruje Symfonię 18 Bram DNA i sprawdzi korelację z linią krytyczną Riemanna
+              {tr(
+                "Analiza wygeneruje Symfonię 18 Bram DNA i sprawdzi korelację z linią krytyczną Riemanna",
+                "The analysis will generate the 18 DNA Gates Symphony and check correlation with the Riemann critical line",
+              )}
             </p>
           </div>
         )}

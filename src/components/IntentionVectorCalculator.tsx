@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Zap, Atom } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   LineChart,
   Line,
@@ -76,12 +77,14 @@ function generateWaveChartData(
 }
 
 export const IntentionVectorCalculator = () => {
+  const { language } = useLanguage();
   const [amplitude, setAmplitude] = useState<number>(GATE_18_REFERENCE.amplitude);
   const [timeActivation, setTimeActivation] = useState<number>(GATE_18_REFERENCE.timeActivation);
   const [frequency, setFrequency] = useState<number>(GATE_18_REFERENCE.frequency);
   const [result, setResult] = useState<number | null>(null);
   const [referenceResult, setReferenceResult] = useState<number | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
   const handleCalculate = () => {
     setChartData(generateWaveChartData(amplitude, timeActivation, frequency));
@@ -100,10 +103,13 @@ export const IntentionVectorCalculator = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-mono text-primary">
           <Atom className="w-5 h-5" />
-          WEKTOR INTENCJI (VI)
+          {tr("WEKTOR INTENCJI (VI)", "INTENTION VECTOR (VI)")}
         </CardTitle>
         <p className="text-sm text-muted-foreground font-mono">
-          Kolaps funkcji falowej Ψ_total → materializacja wektora mocy
+          {tr(
+            "Kolaps funkcji falowej Ψ_total → materializacja wektora mocy",
+            "Collapse of the Ψ_total wavefunction → materialization of the power vector",
+          )}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -114,13 +120,13 @@ export const IntentionVectorCalculator = () => {
             ω<sub>S</sub> = {SCHUMANN_FREQ} Hz (Schumann) | ω<sub>L</sub> = {MOON_MOD_FREQ} Hz (Lunar) | φ = {PHI.toFixed(6)}
           </p>
           <p className="mt-2 text-[10px] text-muted-foreground">
-            Referencja stabilna Gate 18: A=6, T=13, f=18 Hz → VI = {GATE_18_REFERENCE.result}
+            {tr("Referencja stabilna Gate 18", "Stable Gate 18 reference")}: A=6, T=13, f=18 Hz → VI = {GATE_18_REFERENCE.result}
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs font-mono">Amplituda A (0-9)</Label>
+            <Label className="text-xs font-mono">{tr("Amplituda A (0-9)", "Amplitude A (0-9)")}</Label>
             <Input
               type="number"
               min={0}
@@ -131,7 +137,7 @@ export const IntentionVectorCalculator = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-mono">Czas T (s)</Label>
+            <Label className="text-xs font-mono">{tr("Czas T (s)", "Time T (s)")}</Label>
             <Input
               type="number"
               min={1}
@@ -142,7 +148,7 @@ export const IntentionVectorCalculator = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-mono">Częstotliwość (Hz)</Label>
+            <Label className="text-xs font-mono">{tr("Częstotliwość (Hz)", "Frequency (Hz)")}</Label>
             <Input
               type="number"
               value={frequency}
@@ -154,7 +160,7 @@ export const IntentionVectorCalculator = () => {
 
         <Button onClick={handleCalculate} className="w-full font-mono font-bold">
           <Zap className="w-4 h-4 mr-2" />
-          OBLICZ WEKTOR INTENCJI
+          {tr("OBLICZ WEKTOR INTENCJI", "CALCULATE INTENTION VECTOR")}
         </Button>
 
         {result !== null && (
@@ -164,18 +170,23 @@ export const IntentionVectorCalculator = () => {
                 ? "bg-primary/10 text-foreground border-primary/30"
                 : "bg-muted/50 text-muted-foreground border-border"
             }`}>
-              <p className="text-xs text-muted-foreground mb-1">VI — bieżące parametry (f = {frequency} Hz)</p>
+              <p className="text-xs text-muted-foreground mb-1">
+                {tr("VI — bieżące parametry", "VI — current parameters")} (f = {frequency} Hz)
+              </p>
               <p className="text-3xl font-bold">{result}</p>
             </div>
 
             {referenceResult !== null && (
               <div className="p-3 rounded-lg text-center font-mono border bg-accent/10 text-foreground border-accent/30">
                 <p className="text-xs text-muted-foreground mb-1">
-                  Referencja Gate 18 (A={GATE_18_REFERENCE.amplitude}, T={GATE_18_REFERENCE.timeActivation}, f={GATE_18_REFERENCE.frequency} Hz)
+                  {tr("Referencja Gate 18", "Gate 18 reference")} (A={GATE_18_REFERENCE.amplitude}, T={GATE_18_REFERENCE.timeActivation}, f={GATE_18_REFERENCE.frequency} Hz)
                 </p>
                 <p className="text-2xl font-bold">{referenceResult}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  Ta wartość powinna pozostać stabilna i odpowiadać historycznemu wynikowi 1.1628.
+                  {tr(
+                    "Ta wartość powinna pozostać stabilna i odpowiadać historycznemu wynikowi 1.1628.",
+                    "This value should remain stable and match the historical result of 1.1628.",
+                  )}
                 </p>
               </div>
             )}
@@ -184,7 +195,9 @@ export const IntentionVectorCalculator = () => {
 
         {chartData.length > 0 && (
           <div className="bg-background/50 border border-border rounded-lg p-4">
-            <p className="text-xs font-mono text-muted-foreground mb-3">Ψ_total(t) — przebieg funkcji falowej dla bieżących parametrów</p>
+            <p className="text-xs font-mono text-muted-foreground mb-3">
+              Ψ_total(t) — {tr("przebieg funkcji falowej dla bieżących parametrów", "wavefunction trace for the current parameters")}
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
