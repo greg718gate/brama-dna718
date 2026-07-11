@@ -67,7 +67,9 @@ function inferVisualCue(text: string) {
   return "abstract_technical";
 }
 
-function buildFallback(rawInput: string, duration: number, imageCount: number) {
+function buildFallback(rawInput: string, duration: number, imageCount: number, lang = "pl") {
+  const isPl = lang !== "en";
+  const tr = (pl: string, en: string) => isPl ? pl : en;
   const rawText = cleanText(rawInput, 12000) || "[AI nie zwróciło poprawnego JSON-a. Zachowano surową odpowiedź do ręcznej kontroli.]";
   const targetSlides = Math.max(8, Math.min(42, Math.round((Number(duration) || 60) / 5)));
   const chunks = rawText
@@ -79,8 +81,8 @@ function buildFallback(rawInput: string, duration: number, imageCount: number) {
   const slides: SafeSlide[] = [
     {
       kind: "title",
-      text: "Analiza materiału",
-      sub: "fakty · źródła · wizualizacja tematu",
+      text: tr("Analiza materiału", "Material analysis"),
+      sub: tr("fakty · źródła · wizualizacja tematu", "facts · sources · thematic visualization"),
       imageIndex: imageCount ? 1 : undefined,
       visualMode: "thematic",
       visualCue: cue,
@@ -93,9 +95,9 @@ function buildFallback(rawInput: string, duration: number, imageCount: number) {
       kind: formula.includes("=") ? "formula" : "evidence",
       formula: cleanText(formula, 180),
       text: cleanText(formula, 180),
-      explanation: "Fragment techniczny wykryty w materiale źródłowym.",
+      explanation: tr("Fragment techniczny wykryty w materiale źródłowym.", "Technical fragment detected in the source material."),
       imageIndex: imageCount ? ((idx - 1) % imageCount) + 1 : undefined,
-      source: imageCount ? `Ekran ${((idx - 1) % imageCount) + 1}` : undefined,
+      source: imageCount ? `${tr("Ekran", "Screen")} ${((idx - 1) % imageCount) + 1}` : undefined,
       visualMode: "hybrid",
       visualCue: inferVisualCue(formula),
     });
@@ -109,7 +111,7 @@ function buildFallback(rawInput: string, duration: number, imageCount: number) {
       text: chunk,
       accent: chunk.match(/\b\d+(?:[,.]\d+)?\s*(?:Hz|mm|cm|kg|N|V|A|%)?\b/i)?.[0],
       imageIndex: imageCount ? ((idx - 1) % imageCount) + 1 : undefined,
-      source: imageCount ? `Ekran ${((idx - 1) % imageCount) + 1}` : undefined,
+      source: imageCount ? `${tr("Ekran", "Screen")} ${((idx - 1) % imageCount) + 1}` : undefined,
       visualMode: "hybrid",
       visualCue: inferVisualCue(chunk),
     });
@@ -117,7 +119,7 @@ function buildFallback(rawInput: string, duration: number, imageCount: number) {
 
   slides.push({
     kind: "outro",
-    text: "Koniec analizy źródłowej",
+    text: tr("Koniec analizy źródłowej", "End of source analysis"),
     imageIndex: imageCount ? 1 : undefined,
     visualMode: "thematic",
     visualCue: cue,
@@ -127,11 +129,11 @@ function buildFallback(rawInput: string, duration: number, imageCount: number) {
     rawText,
     narration: chunks.slice(0, Math.max(5, targetSlides)).join(" ") || rawText.slice(0, 1800),
     script: {
-      title: "Analiza materiału",
-      subtitle: "źródła i wizualizacja tematu",
+      title: tr("Analiza materiału", "Material analysis"),
+      subtitle: tr("źródła i wizualizacja tematu", "sources and thematic visualization"),
       slides,
     },
-    warning: "Użyto trybu awaryjnego, ponieważ AI nie zwróciło poprawnego JSON-a.",
+    warning: tr("Użyto trybu awaryjnego, ponieważ AI nie zwróciło poprawnego JSON-a.", "Fallback mode was used because AI did not return valid JSON."),
   };
 }
 
@@ -141,15 +143,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { images, duration, instruction } = await req.json();
+    const { images, duration, instruction, lang } = await req.json();
+    const responseLang = lang === "en" ? "en" : "pl";
+    const isPl = responseLang !== "en";
+    const tr = (pl: string, en: string) => isPl ? pl : en;
+    const outputLanguage = isPl ? "Polish" : "English";
     if (!Array.isArray(images) || images.length === 0) {
-      return new Response(JSON.stringify({ error: "Brak obrazów" }), {
+      return new Response(JSON.stringify({ error: tr("Brak obrazów", "No images provided") }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     if (images.length > 40) {
-      return new Response(JSON.stringify({ error: "Maksymalnie 40 zrzutów w jednej analizie." }), {
+      return new Response(JSON.stringify({ error: tr("Maksymalnie 40 zrzutów w jednej analizie.", "Maximum 40 screenshots in one analysis.") }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -157,7 +163,7 @@ Deno.serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "Brak LOVABLE_API_KEY" }), {
+      return new Response(JSON.stringify({ error: "Missing AI gateway key" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -171,6 +177,7 @@ Deno.serve(async (req) => {
       {
         type: "text",
         text:
+          `JĘZYK ODPOWIEDZI / OUTPUT LANGUAGE: ${outputLanguage}. Wszystkie pola użytkowe JSON (narration, script.title, script.subtitle, slides[].text/title/explanation/caption/label/result) mają być w języku: ${outputLanguage}. rawText zachowuje literalny OCR i język źródła, ale komentarze typu [nieczytelne] tłumacz zgodnie z językiem odpowiedzi.\n\n` +
           `Otrzymujesz ${images.length} zrzut(ów) ekranu z materiałem technicznym: obliczenia, wzory, notatki, szkice inżynierskie lub schematy. Wykonaj DWA zadania:\n\n` +
           `1) OCR I ANALIZA ŹRÓDŁOWA — odczytaj możliwie DOKŁADNIE każdy ekran. Zachowaj polskie znaki: ą ć ę ł ń ó ś ź ż. Zachowaj wzory, znaki matematyczne, jednostki, liczby, współczynniki, wyniki pośrednie i końcowe. Jeżeli fragment jest nieczytelny, wpisz [nieczytelne] zamiast zgadywać.\n\n` +
           `2) SCENARIUSZ FILMU TECHNICZNEGO o długości ${targetSec}s (~${slideCount} ujęć). To ma być dynamiczna prezentacja materiału źródłowego oraz MYŚLĄCA wizualizacja tematu. Jeżeli zrzut zawiera poboczne elementy z filmu/aplikacji, NIE rób z niego ślepego slajdu. Wyłuskaj temat, fakty, wzory i obliczenia, a dla obrazu wybierz visualMode: "thematic" albo "hybrid". Przykład: jeśli materiał jest o drzewach, visualCue ma prowadzić do lasu/drzew, a nie do przypadkowego screena. NIE rób bajki, manifestu ani ogólnego opowiadania.\n\n` +
@@ -178,7 +185,7 @@ Deno.serve(async (req) => {
           `Zwróć WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy) w schemacie:\n` +
           `{\n` +
           `  "rawText": "pełny odczytany tekst, najlepiej z podziałem: [Ekran 1], [Ekran 2]...",\n` +
-          `  "narration": "rzeczowy lektor po polsku, wyłącznie na podstawie zrzutów, ~${Math.round(targetSec * 2.1)} słów",\n` +
+          `  "narration": "rzeczowy lektor w języku ${outputLanguage}, wyłącznie na podstawie zrzutów, ~${Math.round(targetSec * 2.1)} słów",\n` +
           `  "script": {\n` +
           `    "title": "krótki tytuł techniczny (max 6 słów)",\n` +
           `    "subtitle": "co pokazuje materiał (max 10 słów)",\n` +
@@ -225,7 +232,7 @@ Deno.serve(async (req) => {
           {
             role: "system",
             content:
-              "Jesteś precyzyjnym polskim analitykiem OCR i reżyserem technicznego filmu edukacyjnego. Twoim obowiązkiem jest zachować fakty, wzory, liczby, jednostki i szkice ze źródła, ale obraz filmu ma być świadomie dobrany do tematu. Nie tworzysz bajkowej narracji, nie dopowiadasz faktów, nie ukrywasz obliczeń. Odpowiadasz wyłącznie poprawnym JSON-em, bez bloków kodu.",
+              `Jesteś precyzyjnym analitykiem OCR i reżyserem technicznego filmu edukacyjnego. Odpowiadasz w języku: ${outputLanguage}. Twoim obowiązkiem jest zachować fakty, wzory, liczby, jednostki i szkice ze źródła, ale obraz filmu ma być świadomie dobrany do tematu. Nie tworzysz bajkowej narracji, nie dopowiadasz faktów, nie ukrywasz obliczeń. Odpowiadasz wyłącznie poprawnym JSON-em, bez bloków kodu.`,
           },
           { role: "user", content: userParts },
         ],
@@ -241,14 +248,15 @@ Deno.serve(async (req) => {
           : `Analiza AI nie została ukończona: HTTP ${aiRes.status}.`,
         targetSec,
         images.length,
+        responseLang,
       );
       return new Response(JSON.stringify({
         ...fallback,
         warning: aiRes.status === 429
-          ? "Limit zapytań AI — użyto lokalnego trybu awaryjnego."
+          ? tr("Limit zapytań AI — użyto lokalnego trybu awaryjnego.", "AI request limit — local fallback mode was used.")
           : aiRes.status === 402
-            ? "Brak kredytów AI — użyto lokalnego trybu awaryjnego bez OCR."
-            : "AI nie ukończyło analizy — użyto lokalnego trybu awaryjnego.",
+            ? tr("Brak kredytów AI — użyto lokalnego trybu awaryjnego bez OCR.", "AI credits unavailable — local fallback mode was used without OCR.")
+            : tr("AI nie ukończyło analizy — użyto lokalnego trybu awaryjnego.", "AI did not complete analysis — local fallback mode was used."),
       }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -263,11 +271,11 @@ Deno.serve(async (req) => {
     let parsed: any = extractJsonObject(raw);
     if (!parsed || typeof parsed !== "object") {
       console.error("AI returned non-JSON; using fallback", raw.slice(0, 1200));
-      parsed = buildFallback(raw, targetSec, images.length);
+      parsed = buildFallback(raw, targetSec, images.length, responseLang);
     }
 
     if (!parsed.script?.slides?.length) {
-      parsed = buildFallback(parsed.rawText || parsed.narration || raw, targetSec, images.length);
+      parsed = buildFallback(parsed.rawText || parsed.narration || raw, targetSec, images.length, responseLang);
     }
 
     return new Response(JSON.stringify(parsed), {
