@@ -27,3 +27,5 @@ This directory contains the core evaluation deployment package for technical ver
 ## Licensing & Contact
 
 This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, please contact the developer directly via LinkedIn.
+
+ZETA-CORE v2.0 now supports native 3-axis (X, Y, Z) spatial coherence tracking with zero-loop vectorization for advanced multi-dimensional asset diagnostics
