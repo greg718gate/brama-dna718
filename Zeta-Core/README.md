@@ -15,21 +15,21 @@ By utilizing the Hilbert transform to extract instantaneous phase and benchmarki
 
 ## Release Tiers
 
-The engine ships in three clearly separated maturity tiers. Each tier lives in its own folder and targets a different deployment scenario:
+The engine ships in three clearly separated maturity tiers. Each tier lives in its own folder and targets a different deployment scenario. All engines are distributed as **Cython-compiled native binaries** (`.so` for Linux/macOS gateways, `.pyd` equivalent for Windows) — the source is transpiled to C and compiled to machine code, so no Python bytecode or readable source is shipped.
 
 ### `v1.0-standard-core/` — Standard Core (Laboratory Baseline)
 Clean, lightweight phase algorithm intended for **ideal laboratory conditions** and reference benchmarking. This is the original sealed evaluation package.
-* `ZETA_ENGINE.pyc` — compiled reference engine
+* `ZETA_ENGINE.so` — Cython-compiled native binary (reference engine)
 * `ZETA_INTEGRATION_README.txt` — integration guide
 * `ZETA_FORENSIC_REPORT.txt` — validation logs
 
 ### `v1.1-adaptive-engine/` — Production / Adaptive Engine (Live Single-Axis Workhorse)
 Noise-resistant production build for **live single-axis sensors**. Adds a stateful narrow-band Butterworth pre-filter (`sosfilt` with persistent `zi` state, no edge artefacts on streaming windows) and adaptive RPM drift tracking that locks the reference wave to the instantaneous median frequency within a ±5 Hz mechanical tolerance band.
-* `ZETA-CORE_v1.1.pyc` — protected text-only source listing for `ZetaDiagnosticEngine`
+* `ZETA-CORE_v1.1.so` — Cython-compiled native binary for `ZetaDiagnosticEngine`
 
 ### `v2.0-spatial-multi-axis/` — Spatial Multi-Axis (X, Y, Z Vectorized)
 Vectorized 3-axis (X, Y, Z) spatial-coherence tracking with **zero-loop vectorization** for advanced multi-dimensional asset diagnostics. Runs Hilbert along `axis=-1` on a `(3, n_samples)` matrix and reports per-axis coherence plus the Euclidean-norm global spatial friction.
-* `ZETA-CORE_v2.0.pyc` — protected text-only source listing for `ZetaMultiAxisEngine`
+* `ZETA-CORE_v2.0.so` — Cython-compiled native binary for `ZetaMultiAxisEngine`
 
 ## Licensing & Contact
 
