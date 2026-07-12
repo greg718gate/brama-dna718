@@ -31,6 +31,10 @@ Noise-resistant production build for **live single-axis sensors**. Adds a statef
 Vectorized 3-axis (X, Y, Z) spatial-coherence tracking with **zero-loop vectorization** for advanced multi-dimensional asset diagnostics. Runs Hilbert along `axis=-1` on a `(3, n_samples)` matrix and reports per-axis coherence plus the Euclidean-norm global spatial friction.
 * `ZETA-CORE_v2.0.so` — Cython-compiled native binary for `ZetaMultiAxisEngine`
 
+## Source Protection
+
+The `.so` files in this repository are **compiled ELF shared objects** (machine code, not source). GitHub renders them as *"binary file not shown"* — the underlying algorithms, coefficients, and Cython-transpiled C code are not exposed publicly. No `.py`, `.pyc`, `.txt`, or plaintext source of the engine internals is committed to this repo.
+
 ## Licensing & Contact
 
-This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, please contact the developer directly via LinkedIn.
+This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, contact **bramadna718@gmail.com**.
