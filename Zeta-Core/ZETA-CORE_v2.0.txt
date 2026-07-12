@@ -1,0 +1,62 @@
+import numpy as np
+from scipy.signal import hilbert
+
+class ZetaMultiAxisEngine:
+def init(self, sample_rate: int):
+self.fs = sample_rate
+
+def analyze_spatial_coherence(self, matrix_signal: np.ndarray, target_freq: float) -> dict:
+"""
+Przetwarza macierz sygnałów (2D NumPy Array).
+Format wejściowy: shape=(3, n_samples) dla osi X, Y, Z.
+Obejmuje ultra-szybkie operacje wektorowe (Zero-Loop Vectorization).
+"""
+if matrix_signal.ndim != 2:
+raise ValueError("Sygnał wejściowy musi być macierzą dwuwymiarową (np. kształt 3 x próbki)")
+
+n_axes, n_samples = matrix_signal.shape
+t = np.linspace(0, n_samples / self.fs, n_samples, endpoint=False)
+
+# 1. Wektorowe generowanie idealnej bazy odniesienia
+reference_wave = np.sin(2 * np.pi * target_freq * t)
+analytic_reference = hilbert(reference_wave)
+phase_reference = np.unwrap(np.angle(analytic_reference))
+
+# 2. Transformata Hilberta po osi czasu (axis=-1) – brak pętli for, czysty C-Speed
+analytic_matrix = hilbert(matrix_signal, axis=-1)
+phase_matrix = np.unwrap(np.angle(analytic_matrix), axis=-1)
+
+# 3. Wyliczenie błędów fazowych dla każdej osi względem wzorca
+# Używamy nadawania kształtu macierzy (broadcasting)
+phase_errors = np.abs(phase_matrix - phase_reference)
+mean_errors_per_axis = np.mean(phase_errors, axis=-1) % (2 * np.pi)
+
+# 4. Wyliczenie metryk koherencji i tarcia topologicznego dla poszczególnych osi
+coherences = np.exp(-mean_errors_per_axis)
+frictions = 1.0 - coherences
+
+# 5. KLUCZOWY MATEMATYCZNY SKOK: Koherencja Przestrzenna (Wektorowa)
+# Obliczamy normę euklidesową tarcia – jak bardzo wypadkowy wektor dekoherencji ucieka od stanu zero
+total_spatial_friction = float(np.sqrt(np.sum(frictions ** 2)) / np.sqrt(n_axes))
+global_spatial_coherence = 1.0 - total_spatial_friction
+mass_condensation_index = n_samples * total_spatial_friction
+
+# 6. Globalna ocena strukturalna zespołu lożyskowego/wału
+if global_spatial_coherence > 0.94:
+status = "NOMINAL_SPATIAL_KOHERENTNY"
+action = "BRAK"
+elif global_spatial_coherence > 0.85:
+status = "SPATIAL_MIKRO_TARCIE"
+action = "PLANOWA_INSPEKCJA_ZESPOLU_OSIOWEGO"
+else:
+status = "SPATIAL_DEKOHERENCJA_KRYTYCZNA"
+action = "STOP_NATYCHMIASTOWY"
+
+return {
+"global_spatial_coherence_pct": global_spatial_coherence * 100,
+"total_spatial_friction_pct": total_spatial_friction * 100,
+"mass_condensation_index": mass_condensation_index,
+"axis_coherences_pct": (coherences * 100).tolist(),
+"status": status,
+"recommended_action": action
+}
