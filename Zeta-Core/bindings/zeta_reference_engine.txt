@@ -1,0 +1,193 @@
+# =============================================================================
+# ZETA-CORE Reference Python Engine (numerical spec, not the shipped binary)
+#
+# Format: plain-text reference implementation. Rename to `.py` locally if you
+# want to run it. Kept as `.txt` in the public repo so GitHub does not render
+# it as executable Python and so it is clear this is a *specification* mirror
+# of what the stripped `.so` binaries do internally — the production DSP
+# runs inside the compiled ELF, not from this file.
+#
+# This file exists to document the numerical contract of the engine after the
+# v1.1.1 review (see docs/adr/ADR-002-numerical-fixes.md). Every fix listed
+# in that ADR is implemented here in readable form.
+#
+# Requires: numpy, scipy.
+# =============================================================================
+
+from typing import Optional
+import numpy as np
+from scipy.signal import butter, sosfilt, sosfilt_zi, hilbert
+
+
+class ZetaDiagnosticEngine:
+    """
+    Reference implementation of the v1.1 adaptive single-axis engine.
+
+    Design contract (mirrors the compiled .so):
+      * setup / process are separated — the biquad is designed once in
+        `configure()` and its state `zi_bp` persists across `process()` calls
+        on contiguous streaming chunks.
+      * Reconfiguring to a new `target_freq` resets `zi_bp` so we never mix
+        the state of an old filter kernel with a newly designed one.
+      * All inputs are validated before any DSP runs.
+      * The reference wave is phase-aligned to the measured signal, so
+        `phase_error` reflects *drift*, not the arbitrary offset at t=0.
+      * Adaptive tracking uses a rolling median (last N samples), not the
+        global median of the whole buffer — a single impulse can no longer
+        yank the tracker.
+      * Mean phase error is a plain mean of |unwrapped error| — no modulo,
+        because modulo on a mean would mask systematic drift.
+      * `fault_condensation` is normalised so it is comparable across window
+        sizes (independent of `n_samples`).
+    """
+
+    # ---- construction ------------------------------------------------------
+    def __init__(self, sample_rate: int, tracker_tolerance_hz: float = 5.0,
+                 rolling_median_window: int = 50):
+        if not isinstance(sample_rate, int) or sample_rate <= 0:
+            raise ValueError("sample_rate must be a positive integer (Hz)")
+        if tracker_tolerance_hz <= 0:
+            raise ValueError("tracker_tolerance_hz must be positive")
+        if rolling_median_window < 8:
+            raise ValueError("rolling_median_window must be >= 8")
+
+        self.fs = int(sample_rate)
+        self._tol = float(tracker_tolerance_hz)
+        self._roll = int(rolling_median_window)
+
+        self._configured_freq: Optional[float] = None
+        self._bandwidth_hz: Optional[float] = None
+        self.sos_bandpass = None
+        self.zi_bp = None
+
+    # ---- one-shot setup ----------------------------------------------------
+    def configure(self, target_freq: float, bandwidth_hz: float = 20.0) -> None:
+        """Design the narrow-band biquad and (re)initialise filter state.
+
+        Call once before the first `process()`. Calling again with a different
+        `target_freq` or `bandwidth_hz` re-designs the kernel *and* resets
+        `zi_bp` — mixing an old state with a new kernel produces transient
+        artefacts (that was the v1.1.0 bug fixed in v1.1.1).
+        """
+        if not np.isfinite(target_freq) or target_freq <= 0:
+            raise ValueError("target_freq must be finite and > 0 Hz")
+        nyq = self.fs / 2.0
+        if target_freq >= nyq:
+            raise ValueError(
+                f"target_freq={target_freq} Hz exceeds Nyquist ({nyq} Hz) for fs={self.fs}"
+            )
+        if bandwidth_hz <= 0 or bandwidth_hz >= nyq:
+            raise ValueError("bandwidth_hz must be in (0, Nyquist)")
+
+        low = max(0.1, target_freq - bandwidth_hz / 2.0)
+        high = min(nyq - 0.1, target_freq + bandwidth_hz / 2.0)
+        if not (low < high):
+            raise ValueError("degenerate passband after clamping")
+
+        sos = butter(4, [low, high], btype="bandpass", fs=self.fs, output="sos")
+
+        # Kernel changed -> reset state to steady-state seed.
+        self.sos_bandpass = sos
+        self.zi_bp = sosfilt_zi(sos)
+        self._configured_freq = float(target_freq)
+        self._bandwidth_hz = float(bandwidth_hz)
+
+    # ---- streaming call ----------------------------------------------------
+    def process(self, raw_signal: np.ndarray,
+                adaptive_tracking: bool = True) -> dict:
+        if self.sos_bandpass is None or self.zi_bp is None:
+            raise RuntimeError("configure() must be called before process()")
+
+        # ---- input validation --------------------------------------------
+        x = np.ascontiguousarray(raw_signal, dtype=np.float64)
+        if x.ndim != 1:
+            raise ValueError("raw_signal must be 1-D")
+        n = x.size
+        if n < 64:
+            raise ValueError("raw_signal must contain at least 64 samples")
+        if not np.all(np.isfinite(x)):
+            raise ValueError("raw_signal contains NaN or Inf")
+
+        # ---- bandpass with preserved state -------------------------------
+        filtered, self.zi_bp = sosfilt(self.sos_bandpass, x, zi=self.zi_bp)
+
+        # ---- instantaneous phase / frequency -----------------------------
+        analytic = hilbert(filtered)
+        phase = np.unwrap(np.angle(analytic))
+
+        # np.diff loses one sample; prepend keeps length == n so downstream
+        # arrays line up with `t` and with any per-sample diagnostics.
+        inst_freq = np.diff(phase, prepend=phase[0]) * self.fs / (2.0 * np.pi)
+
+        # Rolling median on the tail — robust to single-sample impulses and
+        # cheap on streaming windows.
+        tail = inst_freq[-self._roll:] if n >= self._roll else inst_freq
+        tracked_freq = float(np.median(tail))
+
+        # Adaptive lock: only follow inside the mechanical tolerance band.
+        if adaptive_tracking and abs(tracked_freq - self._configured_freq) < self._tol:
+            ref_freq = tracked_freq
+        else:
+            ref_freq = self._configured_freq
+
+        # ---- phase-aligned reference wave --------------------------------
+        # Reference must start at the *same* initial phase as the measured
+        # signal, otherwise phase_error is dominated by the arbitrary t=0
+        # offset instead of by real drift.
+        t = np.arange(n) / self.fs
+        ref_phase = 2.0 * np.pi * ref_freq * t + phase[0]
+
+        # ---- coherence & friction ----------------------------------------
+        phase_error = np.abs(phase - ref_phase)          # unwrapped, no modulo
+        mean_error = float(np.mean(phase_error))
+        coherence = float(np.exp(-mean_error))           # 0..1
+        topological_friction = float(1.0 - coherence)    # 0..1
+
+        # Normalised so it is comparable across window sizes.
+        fault_condensation = topological_friction        # 0..1
+
+        return {
+            "phase_coherence": coherence,
+            "topological_friction": topological_friction,
+            "fault_condensation": fault_condensation,
+            "tracked_frequency_hz": ref_freq,
+            "configured_frequency_hz": self._configured_freq,
+            "n_samples": n,
+            "sample_rate_hz": self.fs,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Overlap-add helper for sliding-window operation.
+#
+# The compiled engine has no window boundary artefacts (biquad state is
+# preserved), so the correct streaming pattern is *contiguous, non-overlapping*
+# chunks. If a caller still needs overlap (e.g. to smooth downstream metrics),
+# aggregate results — do not re-run DSP on overlapping samples.
+# ---------------------------------------------------------------------------
+def aggregate_windows(results: list, mode: str = "median") -> dict:
+    if not results:
+        raise ValueError("empty result list")
+    keys = ("phase_coherence", "topological_friction",
+            "fault_condensation", "tracked_frequency_hz")
+    agg = {}
+    for k in keys:
+        vals = np.array([r[k] for r in results], dtype=np.float64)
+        agg[k] = float(np.median(vals) if mode == "median" else np.mean(vals))
+    agg["n_windows"] = len(results)
+    return agg
+
+
+# ---------------------------------------------------------------------------
+# Example (delete or gate behind __main__ before deployment)
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    fs = 10_000
+    eng = ZetaDiagnosticEngine(sample_rate=fs)
+    eng.configure(target_freq=150.0, bandwidth_hz=20.0)
+
+    rng = np.random.default_rng(0)
+    t = np.arange(fs) / fs
+    sig = 0.8 * np.sin(2 * np.pi * 150.0 * t + 0.37) + 0.05 * rng.standard_normal(t.size)
+
+    print(eng.process(sig))
