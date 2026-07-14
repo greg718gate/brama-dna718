@@ -9,11 +9,44 @@ Format follows Keep-a-Changelog; versions correspond to the engine folders.
 - Reference Python bindings (`bindings/zeta_client.txt`) wrapping the single-gate
   C ABI with dataclass-based structured / JSON output and a `HEALTHY / WATCH /
   DEGRADED / CRITICAL` status classifier.
+- Reference numerical spec (`bindings/zeta_reference_engine.txt`) mirroring
+  the DSP contract implemented in the compiled `.so` binaries.
 - `ROADMAP.md`, `CHANGELOG.md`, `docs/adr/`, `docs/PERFORMANCE_BUDGET.md`.
 
 ### Planned
 - v2.1 Temporal Coherence (`run_zeta_temporal`, additive ABI).
 - Fixed-point `v2.0-embedded` variant for PLC / MCU targets.
+
+## [v1.1.1-adaptive-engine] — Numerical hardening pass
+
+No ABI break. Same entry symbol, same argument layout, same 8-double output.
+
+### Fixed
+- `inst_freq` length now equals `n_samples` (was `n-1`), removing off-by-one
+  alignment against the `t` axis and any downstream per-sample diagnostics.
+- Biquad state `zi_bp` is reset on kernel re-design so reconfiguring to a
+  new `target_freq` no longer emits a transient artefact on the first window.
+- Reference wave is seeded with the measured signal's initial phase
+  (`ref_phase = 2π·f·t + phase[0]`), so `phase_error` reflects drift rather
+  than an arbitrary constant offset.
+- Mean phase error no longer wraps `% 2π`; systematic drift is now visible
+  instead of folded to a small residue.
+- `fault_condensation` is dimensionless (0..1), independent of window size —
+  scores are now comparable across chunk lengths and sensors.
+
+### Changed
+- Adaptive tracker switched from global buffer median to a rolling median
+  over the last 50 samples; robust to single-sample impulses on short
+  streaming windows.
+- Input validation extended: rejects empty / NaN / Inf signals,
+  `sample_rate ≤ 0`, `target_freq` above Nyquist, and degenerate bandpass
+  edges.
+
+### Notes
+- See `docs/adr/ADR-002-numerical-fixes.md` for full rationale.
+- Coherence values for a given signal are typically higher than under v1.1.0
+  (arbitrary initial offset is no longer punished). Re-baseline site-specific
+  operator thresholds if you inherited them from v1.1.0 logs.
 
 ## [v2.0-spatial-multi-axis] — Spatial Multi-Axis
 
