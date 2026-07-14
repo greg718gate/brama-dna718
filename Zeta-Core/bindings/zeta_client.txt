@@ -1,0 +1,247 @@
+# =============================================================================
+# ZETA-CORE Python Client Bindings (reference wrapper)
+#
+# Format: plain-text reference implementation. To use, rename to `zeta_client.py`
+# on the machine that integrates the engine. Kept as .txt in the public repo so
+# GitHub does not render/execute it as Python source.
+#
+# Wraps the single-gate C ABI of ZETA_ENGINE.so / ZETA-CORE_v1.1.so /
+# ZETA-CORE_v2.0.so and returns a structured JSON-serialisable dict.
+#
+# Requires: numpy (only for convenient float64 array handling).
+# =============================================================================
+
+import ctypes
+import json
+import os
+import time
+from dataclasses import dataclass, asdict
+from typing import Optional, Sequence, Union
+
+import numpy as np
+
+
+# ---------------------------------------------------------------------------
+# Return-code table (mirrors zeta_common.h)
+# ---------------------------------------------------------------------------
+RETURN_CODES = {
+    0:  "OK",
+    -1: "INVALID_ARGS",
+    -2: "MALFORMED_LICENSE",
+    -3: "SIGNATURE_MISMATCH",
+    -4: "LICENSE_EXPIRED",
+    -5: "MACHINE_BINDING_FAILED",
+    -6: "PRODUCT_MISMATCH",
+    -7: "FEATURE_NOT_LICENSED",
+}
+
+
+class ZetaLicenseError(RuntimeError):
+    """Raised when the engine rejects the license token."""
+
+
+class ZetaEngineError(RuntimeError):
+    """Raised for any non-license failure (invalid args, DSP failure)."""
+
+
+# ---------------------------------------------------------------------------
+# Result containers
+# ---------------------------------------------------------------------------
+@dataclass
+class ZetaDiagnosticResult:
+    """Result of run_zeta_diagnostic (v1.0 / v1.1)."""
+    engine: str                  # "v1.0-standard-core" | "v1.1-adaptive-engine"
+    phase_coherence: float       # 0..1
+    topological_friction: float  # 0..1  (Tf)
+    fault_condensation: float    # 0..1  (Mc)
+    tracked_frequency_hz: float  # target for v1.0, adaptive for v1.1
+    sample_rate_hz: int
+    n_samples: int
+    latency_ms: float
+    status: str                  # HEALTHY | WATCH | DEGRADED | CRITICAL
+    timestamp_utc: str
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(asdict(self), indent=indent)
+
+
+@dataclass
+class ZetaSpatialResult:
+    """Result of run_zeta_spatial (v2.0)."""
+    engine: str                  # "v2.0-spatial-multi-axis"
+    per_axis_coherence: dict     # {"x":..,"y":..,"z":..}
+    per_axis_friction: dict      # {"x":..,"y":..,"z":..}
+    global_spatial_friction: float
+    tracked_frequency_hz: float
+    sample_rate_hz: int
+    n_samples: int
+    latency_ms: float
+    status: str
+    timestamp_utc: str
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(asdict(self), indent=indent)
+
+
+# ---------------------------------------------------------------------------
+# Status classification (dimensionless Mc / Tf thresholds)
+# ---------------------------------------------------------------------------
+def _classify(tf: float) -> str:
+    if tf < 0.10:
+        return "HEALTHY"
+    if tf < 0.30:
+        return "WATCH"
+    if tf < 0.60:
+        return "DEGRADED"
+    return "CRITICAL"
+
+
+# ---------------------------------------------------------------------------
+# Base loader
+# ---------------------------------------------------------------------------
+class _ZetaBase:
+    def __init__(self, so_path: str, entry_symbol: str, license_key: str):
+        if not os.path.exists(so_path):
+            raise FileNotFoundError(f"Zeta-Core .so not found: {so_path}")
+        self._so_path = so_path
+        self._lib = ctypes.CDLL(so_path)
+        self._entry = getattr(self._lib, entry_symbol)
+        self._entry.restype = ctypes.c_int
+        self._entry.argtypes = [
+            ctypes.POINTER(ctypes.c_double),   # input
+            ctypes.POINTER(ctypes.c_double),   # output (>=8)
+            ctypes.c_int,                      # length / n_samples
+            ctypes.c_int,                      # sample_rate
+            ctypes.c_double,                   # target_freq
+            ctypes.c_char_p,                   # license token
+        ]
+        self._license = license_key.encode("ascii")
+
+    @staticmethod
+    def _check_rc(rc: int) -> None:
+        if rc == 0:
+            return
+        name = RETURN_CODES.get(rc, f"UNKNOWN({rc})")
+        if rc in (-2, -3, -4, -5, -6, -7):
+            raise ZetaLicenseError(f"Zeta-Core license error {rc}: {name}")
+        raise ZetaEngineError(f"Zeta-Core engine error {rc}: {name}")
+
+
+# ---------------------------------------------------------------------------
+# v1.0 / v1.1 wrapper
+# ---------------------------------------------------------------------------
+class ZetaDiagnostic(_ZetaBase):
+    def __init__(self, so_path: str, license_key: str, engine_tag: str):
+        super().__init__(so_path, "run_zeta_diagnostic", license_key)
+        self._tag = engine_tag  # "v1.0-standard-core" | "v1.1-adaptive-engine"
+
+    def analyze(
+        self,
+        signal: Union[Sequence[float], np.ndarray],
+        sample_rate: int,
+        target_freq: float,
+    ) -> ZetaDiagnosticResult:
+        arr = np.ascontiguousarray(signal, dtype=np.float64)
+        if arr.ndim != 1 or arr.size < 64:
+            raise ValueError("signal must be a 1-D array of at least 64 samples")
+
+        out = (ctypes.c_double * 8)()
+        t0 = time.perf_counter()
+        rc = self._entry(
+            arr.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+            out,
+            ctypes.c_int(arr.size),
+            ctypes.c_int(int(sample_rate)),
+            ctypes.c_double(float(target_freq)),
+            ctypes.c_char_p(self._license),
+        )
+        latency_ms = (time.perf_counter() - t0) * 1000.0
+        self._check_rc(rc)
+
+        tf = float(out[1])
+        return ZetaDiagnosticResult(
+            engine=self._tag,
+            phase_coherence=float(out[0]),
+            topological_friction=tf,
+            fault_condensation=float(out[2]),
+            tracked_frequency_hz=float(out[3]) if self._tag.startswith("v1.1") else float(target_freq),
+            sample_rate_hz=int(sample_rate),
+            n_samples=int(arr.size),
+            latency_ms=latency_ms,
+            status=_classify(tf),
+            timestamp_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        )
+
+
+# ---------------------------------------------------------------------------
+# v2.0 wrapper (spatial X, Y, Z)
+# ---------------------------------------------------------------------------
+class ZetaSpatial(_ZetaBase):
+    def __init__(self, so_path: str, license_key: str):
+        super().__init__(so_path, "run_zeta_spatial", license_key)
+
+    def analyze(
+        self,
+        xyz: Union[Sequence[Sequence[float]], np.ndarray],
+        sample_rate: int,
+        target_freq: float,
+    ) -> ZetaSpatialResult:
+        # accept (N,3) or interleaved (N*3,)
+        arr = np.ascontiguousarray(xyz, dtype=np.float64)
+        if arr.ndim == 2 and arr.shape[1] == 3:
+            n = arr.shape[0]
+            interleaved = arr.reshape(-1)
+        elif arr.ndim == 1 and arr.size % 3 == 0:
+            n = arr.size // 3
+            interleaved = arr
+        else:
+            raise ValueError("xyz must be shape (N,3) or a flat interleaved (N*3,) array")
+        if n < 64:
+            raise ValueError("need at least 64 samples per axis")
+
+        out = (ctypes.c_double * 8)()
+        t0 = time.perf_counter()
+        rc = self._entry(
+            interleaved.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+            out,
+            ctypes.c_int(n),
+            ctypes.c_int(int(sample_rate)),
+            ctypes.c_double(float(target_freq)),
+            ctypes.c_char_p(self._license),
+        )
+        latency_ms = (time.perf_counter() - t0) * 1000.0
+        self._check_rc(rc)
+
+        global_tf = float(out[6])
+        return ZetaSpatialResult(
+            engine="v2.0-spatial-multi-axis",
+            per_axis_coherence={"x": float(out[0]), "y": float(out[1]), "z": float(out[2])},
+            per_axis_friction={"x": float(out[3]), "y": float(out[4]), "z": float(out[5])},
+            global_spatial_friction=global_tf,
+            tracked_frequency_hz=float(out[7]),
+            sample_rate_hz=int(sample_rate),
+            n_samples=int(n),
+            latency_ms=latency_ms,
+            status=_classify(global_tf),
+            timestamp_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Example usage
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    LICENSE = os.environ.get("ZETA_LICENSE", "ZC1.<payload>.<sig>")
+
+    # v1.1 adaptive engine, single-axis
+    eng = ZetaDiagnostic(
+        so_path="./v1.1-adaptive-engine/ZETA-CORE_v1.1.so",
+        license_key=LICENSE,
+        engine_tag="v1.1-adaptive-engine",
+    )
+    fs = 44100
+    t = np.arange(fs) / fs
+    sig = 0.8 * np.sin(2 * np.pi * 150.0 * t) + 0.05 * np.random.randn(t.size)
+
+    result = eng.analyze(sig, sample_rate=fs, target_freq=150.0)
+    print(result.to_json())

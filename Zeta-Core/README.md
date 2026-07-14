@@ -104,6 +104,14 @@ $ nm -D --defined-only ZETA_ENGINE.so
 
 No `.py`, `.pyc`, `.c`, `.h`, or plaintext source of the engine internals is committed to this repo.
 
+## Integration & Documentation
+
+- **Python bindings** — [`bindings/zeta_client.txt`](./bindings/zeta_client.txt) — reference `ctypes` wrapper with dataclass / JSON output and `HEALTHY/WATCH/DEGRADED/CRITICAL` classification. Rename to `.py` on the integrating machine.
+- **Roadmap** — [`ROADMAP.md`](./ROADMAP.md) — v2.1 Temporal Coherence, v3.0 Fleet Aggregation, edge deployment.
+- **Changelog** — [`CHANGELOG.md`](./CHANGELOG.md) — ABI-level changes per engine version.
+- **Architecture Decision Records** — [`docs/adr/`](./docs/adr/) — e.g. ADR-001 (biquad vs STFT).
+- **Performance budget** — [`docs/PERFORMANCE_BUDGET.md`](./docs/PERFORMANCE_BUDGET.md) — CPU, RAM, latency ceilings per engine.
+
 ## Licensing & Contact
 
 This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, contact **bramadna718@gmail.com**.
