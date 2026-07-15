@@ -1,0 +1,75 @@
+# examples/02_temporal_trend.txt
+#
+# Rename to .py to execute.
+# Requirements:
+#   - v2.1-temporal/ZETA-CORE_v2.1.so   (available after v2.1 release)
+#   - bindings/zeta_client.py           (rename from .txt)
+#   - ZETA_LICENSE env var              (features: CORE + SPATIAL + TEMPORAL)
+#
+# What this shows: the reason v2.1 exists. A machine that looks fine
+# *right now* on every single window can still be trending toward
+# failure. The temporal engine accumulates a per-asset baseline,
+# classifies drift (stable / linear / exponential / step) and gives
+# an estimated lead time to CRITICAL.
+
+import os
+import numpy as np
+from zeta_client import ZetaTemporal  # planned wrapper, ADR-003
+
+SAMPLE_RATE = 20_000
+TARGET_FREQ = 1500.0
+BLOCK_S     = 1.0
+BLOCKS      = 600            # 10 minutes at 1 s/block
+HISTORY     = 600            # rolling window in blocks
+ALPHA       = 0.02           # baseline EWMA factor
+
+STATE_FILE = "asset_42.state"
+
+def synthetic_xyz(block_idx: int):
+    """Simulates a bearing whose Tf drifts up slowly after block 300."""
+    n = int(SAMPLE_RATE * BLOCK_S)
+    t = np.arange(n) / SAMPLE_RATE
+    rng = np.random.default_rng(block_idx)
+    drift = 0.0 if block_idx < 300 else 0.002 * (block_idx - 300)
+    tone  = np.sin(2 * np.pi * TARGET_FREQ * t)
+    noise = (0.05 + drift) * rng.standard_normal(n)
+    x = tone + noise
+    y = 0.7 * tone + 0.03 * rng.standard_normal(n)
+    z = 0.4 * tone + 0.02 * rng.standard_normal(n)
+    xyz = np.empty(3 * n)
+    xyz[0::3], xyz[1::3], xyz[2::3] = x, y, z
+    return xyz
+
+def main():
+    engine = ZetaTemporal(
+        so_path="v2.1-temporal/ZETA-CORE_v2.1.so",
+        license_token=os.environ["ZETA_LICENSE"],
+        history_window=HISTORY,
+        baseline_alpha=ALPHA,
+    )
+
+    # Resume from disk if a prior run exists — this is the whole point:
+    # months of history should persist across restarts.
+    if os.path.exists(STATE_FILE):
+        engine.load_state(STATE_FILE)
+
+    for i in range(BLOCKS):
+        r = engine.analyze(
+            signal=synthetic_xyz(i),
+            sample_rate=SAMPLE_RATE,
+            target_freq=TARGET_FREQ,
+        )
+        if i % 60 == 0:
+            print(
+                f"block {i:04d}  Tf={r.global_tf:.3f}  "
+                f"slope={r.tf_trend_per_s:+.5f}/s  "
+                f"drift={r.drift_class:8s}  "
+                f"z={r.anomaly_zscore:+.2f}σ  "
+                f"lead={r.lead_time_hours:>6}h"
+            )
+
+    engine.save_state(STATE_FILE)
+    print(f"state persisted → {STATE_FILE}")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,77 @@
+# examples/03_fleet_aggregation.txt
+#
+# Rename to .py to execute.
+# STATUS: v3.0 stub — the licensed engine does not yet expose fleet
+# roll-up. This example uses the v2.1 temporal client and aggregates
+# in Python. It exists so operators can wire dashboards *now* and
+# swap the implementation for the native v3.0 aggregator later
+# without changing the calling code.
+#
+# Requirements:
+#   - v2.1-temporal/ZETA-CORE_v2.1.so
+#   - bindings/zeta_client.py            (rename from .txt)
+#   - ZETA_LICENSE env var               (features: CORE + SPATIAL + TEMPORAL)
+#
+# What this shows: turn per-asset Tf / drift-class into a single
+# fleet-level "criticals rising" indicator that a site manager can act
+# on without reading 400 individual charts.
+
+import os
+from dataclasses import dataclass
+from zeta_client import ZetaTemporal
+
+@dataclass
+class Asset:
+    asset_id: str
+    so_path: str
+    state_path: str
+
+FLEET = [
+    Asset("PUMP-01", "v2.1-temporal/ZETA-CORE_v2.1.so", "state/pump_01.bin"),
+    Asset("PUMP-02", "v2.1-temporal/ZETA-CORE_v2.1.so", "state/pump_02.bin"),
+    Asset("FAN-07",  "v2.1-temporal/ZETA-CORE_v2.1.so", "state/fan_07.bin"),
+]
+
+def snapshot(asset: Asset, sig, fs, f0):
+    eng = ZetaTemporal(
+        so_path=asset.so_path,
+        license_token=os.environ["ZETA_LICENSE"],
+        history_window=600,
+        baseline_alpha=0.02,
+    )
+    if os.path.exists(asset.state_path):
+        eng.load_state(asset.state_path)
+    r = eng.analyze(signal=sig, sample_rate=fs, target_freq=f0)
+    eng.save_state(asset.state_path)
+    return r
+
+def fleet_roll_up(results):
+    """Site-level KPI. Replace with native call in v3.0."""
+    n = len(results)
+    critical = sum(1 for r in results if r.drift_class in ("linear", "exponential", "step"))
+    worst_lead = min((r.lead_time_hours for r in results if r.lead_time_hours > 0), default=-1)
+    mean_tf = sum(r.global_tf for r in results) / n if n else 0.0
+    return {
+        "assets_total": n,
+        "assets_drifting": critical,
+        "fleet_mean_tf": mean_tf,
+        "worst_lead_time_hours": worst_lead,
+    }
+
+def main():
+    # In production: replace with your DAQ read per asset.
+    results = []
+    for asset in FLEET:
+        sig, fs, f0 = load_latest_window(asset)   # user-supplied
+        results.append(snapshot(asset, sig, fs, f0))
+
+    kpi = fleet_roll_up(results)
+    print(kpi)
+
+def load_latest_window(asset):
+    raise NotImplementedError(
+        "Wire this to your data source (SCADA tag, Parquet file, MQTT, ...)"
+    )
+
+if __name__ == "__main__":
+    main()

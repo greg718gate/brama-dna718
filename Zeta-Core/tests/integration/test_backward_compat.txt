@@ -1,0 +1,152 @@
+# tests/integration/test_backward_compat.txt
+#
+# Integration test — v2.0 vs v2.1 backward compatibility.
+#
+# Contract under test (ADR-003):
+#   The first 8 output slots of run_zeta_temporal(v2.1) MUST equal the
+#   full 8-slot output of run_zeta_spatial(v2.0) for the same input,
+#   when the v2.1 temporal state is freshly initialised (no history).
+#
+# Kept as .txt in the public repo (see tests/README.md). Rename to .py
+# to execute. Requires:
+#   - libzeta_v2_0.so   at $ZETA_V20_SO
+#   - libzeta_v2_1.so   at $ZETA_V21_SO
+#   - $ZETA_LICENSE     valid for CORE|SPATIAL|TEMPORAL
+#
+# Not run in public CI (see STATUS_REPORT §5); executed manually before
+# each release. Sample log lives in STATUS_REPORT Appendix A.
+
+import os
+import ctypes as C
+import numpy as np
+import pytest
+
+TOL = 1e-9   # v2.1 slots 0..7 are computed by the same code path as v2.0
+
+
+def _load(path_env: str):
+    path = os.environ.get(path_env)
+    if not path or not os.path.exists(path):
+        pytest.skip(f"{path_env} not set; skipping licensed binary test")
+    return C.CDLL(path, mode=C.RTLD_LOCAL)
+
+
+def _make_signal(n=8192, fs=20_000, f0=1500.0, seed=0):
+    rng = np.random.default_rng(seed)
+    t = np.arange(n) / fs
+    axis = np.sin(2 * np.pi * f0 * t) + 0.05 * rng.standard_normal(n)
+    xyz = np.empty(3 * n, dtype=np.float64)
+    xyz[0::3] = axis
+    xyz[1::3] = 0.7 * axis + 0.03 * rng.standard_normal(n)
+    xyz[2::3] = 0.4 * axis + 0.02 * rng.standard_normal(n)
+    return xyz, n, fs, f0
+
+
+@pytest.fixture(scope="module")
+def lic():
+    tok = os.environ.get("ZETA_LICENSE")
+    if not tok:
+        pytest.skip("ZETA_LICENSE not set")
+    return tok.encode("ascii")
+
+
+def test_v20_v21_slots_0_to_7_match(lic):
+    v20 = _load("ZETA_V20_SO")
+    v21 = _load("ZETA_V21_SO")
+
+    v20.run_zeta_spatial.restype = C.c_int
+    v20.run_zeta_spatial.argtypes = [
+        C.POINTER(C.c_double), C.POINTER(C.c_double),
+        C.c_int, C.c_int, C.c_double, C.c_char_p,
+    ]
+
+    v21.zeta_temporal_state_new.restype = C.c_void_p
+    v21.zeta_temporal_state_new.argtypes = [C.c_int, C.c_double, C.c_char_p]
+    v21.zeta_temporal_state_free.argtypes = [C.c_void_p]
+    v21.run_zeta_temporal.restype = C.c_int
+    v21.run_zeta_temporal.argtypes = [
+        C.POINTER(C.c_double), C.POINTER(C.c_double),
+        C.c_int, C.c_int, C.c_double, C.c_void_p, C.c_char_p,
+    ]
+
+    xyz, n, fs, f0 = _make_signal()
+    inp = (C.c_double * len(xyz))(*xyz)
+
+    out20 = (C.c_double * 8)()
+    rc20 = v20.run_zeta_spatial(inp, out20, n, fs, C.c_double(f0), lic)
+    assert rc20 == 0, f"v2.0 rc={rc20}"
+
+    state = v21.zeta_temporal_state_new(600, C.c_double(0.02), lic)
+    assert state, "temporal state alloc failed"
+    try:
+        out21 = (C.c_double * 16)()
+        rc21 = v21.run_zeta_temporal(
+            inp, out21, n, fs, C.c_double(f0), state, lic
+        )
+        assert rc21 == 0, f"v2.1 rc={rc21}"
+
+        for i in range(8):
+            assert abs(out20[i] - out21[i]) < TOL, (
+                f"slot {i}: v2.0={out20[i]:.12f} v2.1={out21[i]:.12f}"
+            )
+
+        # Fresh state → history fill ratio must be minimal (1 window seen).
+        fill = out21[13]
+        assert 0.0 < fill <= 1.0 / 600 + 1e-9
+
+        # Fresh state → drift class must be 0 (stable) by contract.
+        assert int(out21[9]) == 0
+    finally:
+        v21.zeta_temporal_state_free(state)
+
+
+def test_v21_state_persistence_roundtrip(lic):
+    """serialize → free → new → deserialize must reproduce identical output."""
+    v21 = _load("ZETA_V21_SO")
+
+    v21.zeta_temporal_state_new.restype = C.c_void_p
+    v21.zeta_temporal_state_new.argtypes = [C.c_int, C.c_double, C.c_char_p]
+    v21.zeta_temporal_state_free.argtypes = [C.c_void_p]
+    v21.zeta_temporal_state_serialize.restype = C.c_int
+    v21.zeta_temporal_state_serialize.argtypes = [
+        C.c_void_p, C.POINTER(C.c_ubyte), C.c_int, C.POINTER(C.c_int),
+    ]
+    v21.zeta_temporal_state_deserialize.restype = C.c_int
+    v21.zeta_temporal_state_deserialize.argtypes = [
+        C.c_void_p, C.POINTER(C.c_ubyte), C.c_int,
+    ]
+    v21.run_zeta_temporal.restype = C.c_int
+    v21.run_zeta_temporal.argtypes = [
+        C.POINTER(C.c_double), C.POINTER(C.c_double),
+        C.c_int, C.c_int, C.c_double, C.c_void_p, C.c_char_p,
+    ]
+
+    xyz, n, fs, f0 = _make_signal(seed=1)
+    inp = (C.c_double * len(xyz))(*xyz)
+
+    s1 = v21.zeta_temporal_state_new(600, C.c_double(0.02), lic)
+    out_a = (C.c_double * 16)()
+    for _ in range(5):
+        assert v21.run_zeta_temporal(
+            inp, out_a, n, fs, C.c_double(f0), s1, lic
+        ) == 0
+
+    buf = (C.c_ubyte * 65536)()
+    written = C.c_int(0)
+    assert v21.zeta_temporal_state_serialize(s1, buf, 65536, C.byref(written)) == 0
+    v21.zeta_temporal_state_free(s1)
+
+    s2 = v21.zeta_temporal_state_new(600, C.c_double(0.02), lic)
+    assert v21.zeta_temporal_state_deserialize(s2, buf, written.value) == 0
+
+    out_b = (C.c_double * 16)()
+    assert v21.run_zeta_temporal(
+        inp, out_b, n, fs, C.c_double(f0), s2, lic
+    ) == 0
+    v21.zeta_temporal_state_free(s2)
+
+    for i in range(16):
+        assert abs(out_a[i] - out_b[i]) < 1e-12, (
+            f"slot {i} diverged after serialize/deserialize: "
+            f"{out_a[i]} vs {out_b[i]}"
+        )
