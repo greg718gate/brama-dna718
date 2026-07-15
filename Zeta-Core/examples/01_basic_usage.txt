@@ -1,0 +1,52 @@
+# examples/01_basic_usage.txt
+#
+# Rename to .py to execute.
+# Requirements:
+#   - v1.1-adaptive-engine/ZETA-CORE_v1.1.so
+#   - bindings/zeta_client.py  (rename from .txt)
+#   - ZETA_LICENSE env var  (feature: CORE)
+#
+# What this shows: one call, one health verdict on one axis. This is
+# the minimum viable integration — a rotating machine's vibration
+# passed through the engine once, then classified.
+
+import os
+import numpy as np
+from zeta_client import ZetaEngine  # from bindings/zeta_client.py
+
+SAMPLE_RATE = 20_000        # Hz — typical MEMS accelerometer
+TARGET_FREQ = 1500.0        # Hz — nominal shaft-related frequency
+DURATION_S  = 1.0
+
+def synthetic_signal():
+    """Stand-in for a real ADC read. Replace with your data source."""
+    n = int(SAMPLE_RATE * DURATION_S)
+    t = np.arange(n) / SAMPLE_RATE
+    rng = np.random.default_rng(0)
+    # Nominal tone + light broadband noise + subtle 2x harmonic.
+    return (
+        np.sin(2 * np.pi * TARGET_FREQ * t)
+        + 0.10 * np.sin(2 * np.pi * 2 * TARGET_FREQ * t)
+        + 0.05 * rng.standard_normal(n)
+    )
+
+def main():
+    engine = ZetaEngine(
+        so_path="v1.1-adaptive-engine/ZETA-CORE_v1.1.so",
+        license_token=os.environ["ZETA_LICENSE"],
+    )
+
+    signal = synthetic_signal()
+    result = engine.analyze(
+        signal=signal,
+        sample_rate=SAMPLE_RATE,
+        target_freq=TARGET_FREQ,
+    )
+
+    print(f"coherence        : {result.coherence:.4f}   (0..1, higher = healthier)")
+    print(f"fault_condens.   : {result.fault_condensation:.4f}   (0..1, lower = healthier)")
+    print(f"tracked frequency: {result.tracked_freq_hz:.2f} Hz")
+    print(f"status           : {result.status}         (HEALTHY / WATCH / DEGRADED / CRITICAL)")
+
+if __name__ == "__main__":
+    main()

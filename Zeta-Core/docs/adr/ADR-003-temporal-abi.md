@@ -132,3 +132,41 @@ predictable and matches the Performance Budget targets.
 - The Python reference client will grow a `ZetaTemporal` class that owns
   the opaque handle via `ctypes` and exposes `analyze()` / `reset()` /
   `save_state()` / `load_state()`.
+
+## §4.3 Memory ownership
+
+The `output[]` buffer is **caller-allocated, caller-owned**. Contract:
+
+- The caller allocates at least `16 * sizeof(double)` bytes and passes
+  the pointer in. The engine writes 16 doubles and returns.
+- The engine performs **no allocation on the output path**, no
+  `malloc`, no thread-local scratch that outlives the call. Slot 15 is
+  reserved and written as `0.0` — never left uninitialised.
+- The engine reads `input[]` and does not retain the pointer after the
+  call returns. The caller may free or reuse `input[]` immediately.
+
+The `zeta_temporal_state*` handle is the only heap object the engine
+owns. Its lifecycle is explicit and single-owner:
+
+```text
+zeta_temporal_state_new()   ─►   caller receives non-NULL handle
+                                 ─►   any number of run_zeta_temporal()
+                                 ─►   optional serialize()/deserialize()
+zeta_temporal_state_free()  ─►   handle invalidated, must not be reused
+```
+
+Calling `_free()` twice on the same handle is undefined. Passing
+`NULL` to `_free()` is a no-op. Passing a state allocated by one
+engine version to a `.so` of a different major version is rejected
+with `-8 STATE_VERSION_MISMATCH` — never dereferenced blindly.
+
+Thread-safety: a single `zeta_temporal_state*` is **not** safe to use
+from multiple threads concurrently. Each asset gets its own state.
+The engine itself carries no global mutable state, so N assets on N
+threads with N handles is fully supported.
+
+Rejected alternative: returning a `zeta_temporal_result_t*` that the
+caller must `free()`. That doubles the ownership rules the integrator
+has to remember (one for state, one for every result), for zero
+benefit — the result is fixed-size and the caller already owns a
+stack buffer for it.
