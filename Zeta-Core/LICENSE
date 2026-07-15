@@ -1,0 +1,49 @@
+Zeta-Core Industrial Diagnostic Engine — Proprietary License
+
+Copyright (c) 2026 Grzegorz (Brama-DNA-718). All rights reserved.
+
+This repository contains binary shared objects (*.so), reference bindings,
+architecture documents and technical notes for the Zeta-Core DSP engine
+("the Software").
+
+1. GRANT — EVALUATION ONLY
+   Subject to the terms below, the copyright holder grants any person who
+   obtains a copy of this repository a non-exclusive, non-transferable,
+   non-sublicensable, revocable right to READ the contents for the sole
+   purpose of technical evaluation.
+
+2. RESTRICTIONS
+   Without a separate written commercial agreement signed by the copyright
+   holder you MAY NOT:
+   (a) execute the Software in any production or revenue-generating context;
+   (b) redistribute, host, mirror, sublicense, sell, rent or lease the
+       Software or any derivative work;
+   (c) reverse-engineer, decompile, disassemble, or otherwise attempt to
+       recover source code, license keys, HMAC secrets, or internal symbols
+       from the compiled binaries, except where such right is granted by
+       mandatory local law and cannot be waived by contract;
+   (d) remove or alter any copyright, license, or attribution notice;
+   (e) use the Software or its outputs to train machine-learning models
+       intended to replicate its functionality.
+
+3. LICENSE TOKENS
+   Runtime execution requires a signed ZC1 license token issued by the
+   copyright holder. Tokens are personal to the licensee named in the
+   commercial agreement. Sharing tokens between organisations, machines
+   outside the bound machine hash, or after the `not_after` timestamp is a
+   breach of this license and terminates all rights granted herein.
+
+4. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM
+   THE USE OF, INABILITY TO USE, OR RELIANCE UPON THE SOFTWARE, INCLUDING
+   ANY INDUSTRIAL, INDIRECT OR CONSEQUENTIAL LOSS.
+
+5. TERMINATION
+   This license terminates automatically upon any breach. On termination,
+   all copies of the Software must be destroyed.
+
+6. CONTACT
+   Commercial licensing: bramadna718@gmail.com
