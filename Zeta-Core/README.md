@@ -106,10 +106,16 @@ No `.py`, `.pyc`, `.c`, `.h`, or plaintext source of the engine internals is com
 
 ## Integration & Documentation
 
+- **Full project snapshot** — [`docs/STATUS_REPORT.md`](./docs/STATUS_REPORT.md) — single owner-facing document: what ships, how it is protected, what is still open.
 - **Python bindings** — [`bindings/zeta_client.txt`](./bindings/zeta_client.txt) — reference `ctypes` wrapper with dataclass / JSON output and `HEALTHY/WATCH/DEGRADED/CRITICAL` classification. Rename to `.py` on the integrating machine.
+- **Reference numerical engine** — [`bindings/zeta_reference_engine.txt`](./bindings/zeta_reference_engine.txt) — the DSP contract as pure Python, used by the regression tests.
+- **Tests** — [`tests/README.md`](./tests/README.md) — reference-engine regression suite locking every ADR-002 fix.
+- **Benchmarks** — [`benchmarks/README.md`](./benchmarks/README.md) — CWRU / MFPT / NASA IMS harness and latency-report template.
 - **Roadmap** — [`ROADMAP.md`](./ROADMAP.md) — v2.1 Temporal Coherence, v3.0 Fleet Aggregation, edge deployment.
 - **Changelog** — [`CHANGELOG.md`](./CHANGELOG.md) — ABI-level changes per engine version.
-- **Architecture Decision Records** — [`docs/adr/`](./docs/adr/) — e.g. ADR-001 (biquad vs STFT).
+- **Security policy** — [`SECURITY.md`](./SECURITY.md) — vulnerability reporting and integrator hardening notes.
+- **License** — [`LICENSE`](./LICENSE) — proprietary, evaluation-only. Runtime use requires a signed commercial agreement.
+- **Architecture Decision Records** — [`docs/adr/`](./docs/adr/) — ADR-001 (biquad vs STFT), ADR-002 (numerical hardening), ADR-003 (v2.1 temporal ABI), ADR-004 (threshold re-baseline / migration).
 - **Performance budget** — [`docs/PERFORMANCE_BUDGET.md`](./docs/PERFORMANCE_BUDGET.md) — CPU, RAM, latency ceilings per engine.
 
 ## Licensing & Contact
