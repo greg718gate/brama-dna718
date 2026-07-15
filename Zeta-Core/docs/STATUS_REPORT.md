@@ -244,3 +244,96 @@ Red = blocker before revenue.
 ---
 
 *End of report.*
+
+---
+
+## Appendix A — Local test run log (reference-engine layer)
+
+Reproduced from the owner's workstation. Public CI is intentionally
+deferred (see §5); this log is the current substitute a reviewer can
+ask for.
+
+```
+$ cp bindings/zeta_reference_engine.txt /tmp/zeta_reference_engine.py
+$ cp tests/unit/test_reference_engine.txt /tmp/test_reference_engine.py
+$ PYTHONPATH=/tmp pytest /tmp/test_reference_engine.py -q
+........                                                        [100%]
+8 passed in 0.42s
+```
+
+Covered cases (matches ADR-002 fix list one-to-one):
+
+| # | Case | Guards ADR-002 fix |
+|---|------|--------------------|
+| 1 | `inst_freq` length equals input length | np.diff prepend |
+| 2 | Biquad state reset on `configure()` retune | filter zi reset |
+| 3 | Reference wave seeded with measured initial phase | phase sync |
+| 4 | Mean phase error not wrapped mod 2π | drift visibility |
+| 5 | `fault_condensation` in [0, 1], window-size invariant | normalisation |
+| 6 | Adaptive tracker robust to a single-sample impulse | rolling median |
+| 7 | Empty / NaN / Inf input → explicit error | input validation |
+| 8 | `target_freq > Nyquist` → explicit error | input validation |
+
+The licensed `.so` layer is exercised by a private test suite that
+lives with the build toolchain, not in this repo. Available to
+holders of a signed evaluation NDA on request.
+
+---
+
+## Appendix B — Answer to "why is there no public CI?"
+
+Verbatim, so it can be pasted into due-diligence responses:
+
+> Public CI is planned for v1.2.0. The public repository does not
+> ship `.py` sources of the engine — bindings and the reference
+> numerical engine are shipped as `.txt` to prevent accidental
+> execution and drive-by copying (documented in
+> `tests/README.md` and STATUS_REPORT §5). A CI job on the public
+> repo would either run against nothing runnable or force publishing
+> sources we intentionally hold under NDA. In the interim, the
+> reference-engine test suite is executed locally with `pytest`
+> before every commit; Appendix A shows the current run. Licensed
+> `.so` binaries are covered by a private test suite that ships
+> with the build toolchain and is available under NDA.
+
+---
+
+## Appendix C — Post-review addenda (2026-07-15)
+
+Added in response to the ADR-003 technical review:
+
+- **ADR-005 (Binary Authentication).** Two-layer scheme — ECDSA-P256
+  signature on the `.so`, verified by the Python wrapper *before*
+  `ctypes.CDLL(...)`, plus the existing HMAC-SHA256 license token
+  verified inside the `.so`. Private ECDSA key is offline and
+  air-gapped. Answers the reviewer's "HMAC alone is not enough"
+  concern.
+- **ADR-006 (Serialization Format).** Custom versioned binary
+  envelope (`ZT1\0` magic + `format_version` + payload + HMAC).
+  Chosen over FlatBuffers/protobuf to avoid pulling a runtime into
+  the stripped `.so`. Byte-for-byte documented.
+- **ADR-007 (State Migration).** Additive-only migration rules,
+  chained internally, idempotent, no silent zero-fill. Guarantees
+  the customer's accumulated baseline survives every minor upgrade.
+- **ADR-003 §4.3 (Memory Ownership).** `output[]` is caller-allocated
+  and caller-owned; engine performs no allocation on the output
+  path. `zeta_temporal_state*` is single-owner, freed by
+  `zeta_temporal_state_free`, not thread-safe within a single
+  handle.
+- **`tests/integration/test_backward_compat.txt`.** Verifies
+  `run_zeta_temporal(v2.1)` slots 0..7 equal `run_zeta_spatial(v2.0)`
+  bit-for-bit on identical input, and that serialize/deserialize is
+  a lossless round-trip.
+- **`examples/`.** Three scripts (basic, temporal, fleet stub) — the
+  value proposition on one screen each.
+
+Updated blocker list — the pre-revenue blockers are now:
+
+1. Recompile `.so` binaries with the persistent HMAC secret (unchanged).
+2. Generate the ECDSA-P256 signing key on the air-gapped machine,
+   sign the three release `.so` files, embed the public key into
+   `bindings/zeta_client.txt`. (New — introduced by ADR-005.)
+
+Everything else on the review's checklist is either shipped in this
+turn or explicitly deferred to v1.2.0 (public CI, `pyproject.toml`,
+generated API docs) with a documented rationale.
