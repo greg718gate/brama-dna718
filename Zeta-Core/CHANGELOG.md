@@ -6,6 +6,19 @@ Format follows Keep-a-Changelog; versions correspond to the engine folders.
 ## [Unreleased]
 
 ### Added
+- `LICENSE` — proprietary, evaluation-only terms; supersedes the implicit
+  "all rights reserved" state of earlier commits.
+- `SECURITY.md` — vulnerability reporting policy, scope, hardening notes.
+- `tests/` — reference-engine regression suite (`test_reference_engine.txt`),
+  locking every ADR-002 numerical fix and the input-validation contract.
+- `benchmarks/` — layout and reporting template for CWRU / MFPT / NASA IMS
+  fault-detection runs and per-platform latency snapshots.
+- `docs/adr/ADR-003-temporal-abi.md` — public ABI design for the planned
+  `run_zeta_temporal` (v2.1), opaque engine state, additive to v2.0.
+- `docs/adr/ADR-004-threshold-rebaseline.md` — v1.1.0 → v1.1.1 migration
+  guide with numeric distribution shift and suggested new operator bands.
+- `docs/STATUS_REPORT.md` — single-document project snapshot for the
+  owner: what ships, how it is protected, what is still open.
 - Reference Python bindings (`bindings/zeta_client.txt`) wrapping the single-gate
   C ABI with dataclass-based structured / JSON output and a `HEALTHY / WATCH /
   DEGRADED / CRITICAL` status classifier.
@@ -14,7 +27,7 @@ Format follows Keep-a-Changelog; versions correspond to the engine folders.
 - `ROADMAP.md`, `CHANGELOG.md`, `docs/adr/`, `docs/PERFORMANCE_BUDGET.md`.
 
 ### Planned
-- v2.1 Temporal Coherence (`run_zeta_temporal`, additive ABI).
+- v2.1 Temporal Coherence (`run_zeta_temporal`, additive ABI per ADR-003).
 - Fixed-point `v2.0-embedded` variant for PLC / MCU targets.
 
 ## [v1.1.1-adaptive-engine] — Numerical hardening pass
