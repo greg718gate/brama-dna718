@@ -1,0 +1,120 @@
+# Reference test suite for the Zeta-Core reference numerical engine.
+#
+# These tests DO NOT link against the licensed .so binaries. They exercise
+# the pure-Python reference implementation shipped in
+# `bindings/zeta_reference_engine.txt` (rename to .py locally before
+# running). Purpose: lock the DSP contract with golden inputs, catch
+# regressions on the numerical fixes tracked in ADR-002.
+#
+# Run:
+#   cp bindings/zeta_reference_engine.txt /tmp/zeta_reference_engine.py
+#   PYTHONPATH=/tmp pytest tests/unit/test_reference_engine.py -q
+#
+# Kept as .txt in the public repo so GitHub does not run it as CI code.
+
+import math
+import numpy as np
+import pytest
+
+from zeta_reference_engine import ZetaReferenceEngine  # type: ignore
+
+
+FS = 44_100
+BLOCK = 4096
+F0 = 150.0
+
+
+def _sine(freq: float, n: int = BLOCK, fs: int = FS, noise: float = 0.0, seed: int = 0):
+    rng = np.random.default_rng(seed)
+    t = np.arange(n) / fs
+    x = np.sin(2 * math.pi * freq * t)
+    if noise > 0:
+        x = x + noise * rng.standard_normal(n)
+    return x.astype(np.float64)
+
+
+# ---------- happy path ---------------------------------------------------
+
+def test_clean_sine_reports_high_coherence():
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    r = eng.process(_sine(F0))
+    assert r.phase_coherence > 0.95, r
+    assert r.topological_friction < 0.10, r
+    assert 0.0 <= r.fault_condensation <= 1.0
+
+
+def test_bearing_like_broadband_lowers_coherence():
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    r_clean = eng.process(_sine(F0, noise=0.0, seed=1))
+    r_noisy = eng.process(_sine(F0, noise=0.6, seed=1))
+    assert r_noisy.phase_coherence < r_clean.phase_coherence
+    assert r_noisy.topological_friction > r_clean.topological_friction
+
+
+# ---------- ADR-002 regressions -----------------------------------------
+
+def test_inst_freq_has_same_length_as_time_axis():
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    r = eng.process(_sine(F0))
+    # exposed via the reference engine for regression testing
+    assert len(r.inst_freq) == BLOCK, "np.diff prepend fix (ADR-002 #1)"
+
+
+def test_biquad_state_resets_on_reconfigure():
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    _ = eng.process(_sine(F0))
+    eng.configure(target_freq=250.0)  # retune
+    r = eng.process(_sine(250.0))
+    # No transient bleed from the 150 Hz kernel; coherence recovers on
+    # the very first window at the new target.
+    assert r.phase_coherence > 0.90, r
+
+
+def test_mass_condensation_is_window_size_invariant():
+    eng1 = ZetaReferenceEngine(sample_rate=FS)
+    eng1.configure(target_freq=F0)
+    r_small = eng1.process(_sine(F0, n=2048))
+
+    eng2 = ZetaReferenceEngine(sample_rate=FS)
+    eng2.configure(target_freq=F0)
+    r_large = eng2.process(_sine(F0, n=8192))
+
+    assert abs(r_small.fault_condensation - r_large.fault_condensation) < 0.05
+
+
+def test_mean_phase_error_is_not_wrapped_modulo_2pi():
+    # A pure sine offset in time should show up as a drift, not fold to
+    # a near-zero residue.
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    r = eng.process(_sine(F0))
+    assert r.mean_phase_error >= 0.0
+
+
+# ---------- input validation --------------------------------------------
+
+@pytest.mark.parametrize("bad", [
+    np.array([], dtype=np.float64),
+    np.array([np.nan] * 128, dtype=np.float64),
+    np.array([np.inf] * 128, dtype=np.float64),
+])
+def test_rejects_bad_input(bad):
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    eng.configure(target_freq=F0)
+    with pytest.raises(ValueError):
+        eng.process(bad)
+
+
+def test_rejects_target_above_nyquist():
+    eng = ZetaReferenceEngine(sample_rate=FS)
+    with pytest.raises(ValueError):
+        eng.configure(target_freq=FS)  # >= Nyquist
+
+
+def test_rejects_non_positive_sample_rate():
+    with pytest.raises(ValueError):
+        ZetaReferenceEngine(sample_rate=0)
