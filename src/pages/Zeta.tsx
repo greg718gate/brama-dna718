@@ -487,16 +487,29 @@ export default function Zeta() {
   };
 
   // ---------- Auth gate ----------
+  const LangToggle = (
+    <button
+      onClick={() => setLang(lang === "pl" ? "en" : "pl")}
+      className="text-xs px-2 py-1 rounded border border-white/20 text-white/70 hover:border-cyan-400 hover:text-cyan-300 transition font-mono"
+      aria-label="Toggle language"
+    >
+      {lang === "pl" ? "EN" : "PL"}
+    </button>
+  );
+
   if (!authed) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 bg-black/60 border-cyan-500/30">
-          <div className="flex items-center gap-3 mb-6">
-            <Lock className="w-6 h-6 text-cyan-400" />
-            <div>
-              <h1 className="text-xl font-bold">ZETA-CORE</h1>
-              <p className="text-xs text-white/60">{t("header")}</p>
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <Lock className="w-6 h-6 text-cyan-400" />
+              <div>
+                <h1 className="text-xl font-bold">ZETA-CORE</h1>
+                <p className="text-xs text-white/60">{t("header")}</p>
+              </div>
             </div>
+            {LangToggle}
           </div>
           <label className="text-sm text-white/70 block mb-2">{t("accessCode")}</label>
           <Input type="password" value={code} onChange={(e) => setCode(e.target.value)}
@@ -504,7 +517,7 @@ export default function Zeta() {
             className="bg-black/40 border-white/20" placeholder={t("accessCode")} />
           <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">{t("enter")}</Button>
           <p className="text-xs text-white/40 mt-6 text-center">
-            Zeta-Core Diagnostics &mdash; Aberdeen, UK<br />Contact: bramadna718@gmail.com
+            {t("footer")}<br />Contact: bramadna718@gmail.com
           </p>
         </Card>
       </div>
@@ -516,10 +529,11 @@ export default function Zeta() {
       <div className="max-w-5xl mx-auto p-4 md:p-8">
         <header className="mb-6 border-b border-white/10 pb-4 flex items-center gap-3">
           <Activity className="w-7 h-7 text-cyan-400" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold tracking-tight">ZETA-CORE</h1>
             <p className="text-sm text-white/60">{t("header")}</p>
           </div>
+          {LangToggle}
         </header>
 
         {/* Machine profile selector */}
