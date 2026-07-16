@@ -12,24 +12,32 @@ import jsPDF from "jspdf";
 
 const ACCESS_CODE = "ZETA-2026";
 
-// ---------- Machine profiles (engine variants) ----------
+// ---------- Machine profiles + engine variants ----------
 type ProfileId = "auto" | "motor50" | "motor60" | "pump" | "fan" | "bearing" | "gearbox";
+type EngineVersion = "v1.0" | "v1.1" | "v2.0";
 type Profile = {
   id: ProfileId;
   name: string;
   desc: string;
   targetFreq?: number; // Hz nominal
-  engine: string;
 };
 const PROFILES: Profile[] = [
-  { id: "auto",    name: "Auto (unknown machine)",       desc: "Engine picks dominant frequency automatically.",      engine: "v1.1 adaptive" },
-  { id: "motor50", name: "Electric motor · 50 Hz grid",  desc: "3-phase motor, EU/UK grid.",  targetFreq: 50,  engine: "v1.1 adaptive" },
-  { id: "motor60", name: "Electric motor · 60 Hz grid",  desc: "3-phase motor, US/Asia grid.", targetFreq: 60,  engine: "v1.1 adaptive" },
-  { id: "pump",    name: "Pump / compressor",            desc: "Rotational 20–60 Hz.",         targetFreq: 30,  engine: "v1.1 adaptive" },
-  { id: "fan",     name: "Fan / blower",                 desc: "Rotational 10–30 Hz.",         targetFreq: 20,  engine: "v1.1 adaptive" },
-  { id: "bearing", name: "Bearing (high-speed)",         desc: "Ball/roller bearing 100–500 Hz.", targetFreq: 200, engine: "v2.0 spatial" },
-  { id: "gearbox", name: "Gearbox / gearing",            desc: "Gear-mesh 200–2000 Hz.",       targetFreq: 500, engine: "v2.0 spatial" },
+  { id: "auto",    name: "Auto / Nieznana maszyna",       desc: "Engine picks dominant frequency automatically." },
+  { id: "motor50", name: "Electric motor · 50 Hz / Silnik 50 Hz",  desc: "3-phase motor, EU/UK grid.",  targetFreq: 50 },
+  { id: "motor60", name: "Electric motor · 60 Hz / Silnik 60 Hz",  desc: "3-phase motor, US/Asia grid.", targetFreq: 60 },
+  { id: "pump",    name: "Pump / compressor / Pompa",            desc: "Rotational 20–60 Hz.",         targetFreq: 30 },
+  { id: "fan",     name: "Fan / blower / Wentylator",                 desc: "Rotational 10–30 Hz.",         targetFreq: 20 },
+  { id: "bearing", name: "Bearing / Łożysko",         desc: "Ball/roller bearing 100–500 Hz.", targetFreq: 200 },
+  { id: "gearbox", name: "Gearbox / Przekładnia",            desc: "Gear-mesh 200–2000 Hz.",       targetFreq: 500 },
 ];
+
+const ENGINES: { id: EngineVersion; name: string; desc: string; bestFor: string }[] = [
+  { id: "v1.0", name: "v1.0 Standard Core", desc: "Stałe obroty / stable RPM", bestFor: "silnik, pompa, wentylator" },
+  { id: "v1.1", name: "v1.1 Adaptive Engine", desc: "Zmienny sygnał / adaptive tracker", bestFor: "dłuższe pliki, falowniki, różne RPM" },
+  { id: "v2.0", name: "v2.0 Spatial Multi-Axis", desc: "3 osie X/Y/Z / tri-axial", bestFor: "łożyska, przekładnie, czujniki 3-osiowe" },
+];
+
+type AxisSamples = { x: number[]; y: number[]; z: number[] };
 
 type ZetaResult = {
   phaseCoherence: number;
@@ -45,6 +53,14 @@ type ZetaResult = {
   filename: string;
   timestampUtc: string;
   engine: string;
+  engineVersion?: EngineVersion;
+  spatial?: {
+    axisCoherence: { x: number; y: number; z: number };
+    axisTf: { x: number; y: number; z: number };
+    axisMc: { x: number; y: number; z: number };
+    axisFrequencyHz: { x: number; y: number; z: number };
+    globalSpatialFriction: number;
+  } | null;
 };
 
 type TimelineEntry = {
@@ -77,7 +93,7 @@ const statusText: Record<string, string> = {
 };
 
 // ---------- Audio decoding ----------
-async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sampleRate: number }> {
+async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sampleRate: number; axes?: undefined }> {
   const buf = await file.arrayBuffer();
   const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
   const ctx = new AudioCtx();
@@ -90,18 +106,29 @@ async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sam
   return { channel: out, sampleRate: audio.sampleRate };
 }
 
-async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Float32Array; sampleRate: number }> {
+async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Float32Array; sampleRate: number; axes?: { x: Float32Array; y: Float32Array; z: Float32Array } }> {
   const text = await file.text();
   const lines = text.split(/\r?\n/);
   const samples: number[] = [];
+  const ax: number[] = [];
+  const ay: number[] = [];
+  const az: number[] = [];
   for (const line of lines) {
     if (!line.trim() || line.startsWith("#")) continue;
-    const parts = line.split(/[,;\s\t]+/).filter(Boolean);
-    const num = parseFloat(parts[parts.length - 1]);
-    if (!isNaN(num)) samples.push(num);
+    const nums = line.split(/[,;\s\t]+/).filter(Boolean).map((part) => parseFloat(part)).filter((num) => Number.isFinite(num));
+    if (nums.length === 0) continue;
+    samples.push(nums[nums.length - 1]);
+    if (nums.length >= 3) {
+      ax.push(nums[nums.length - 3]);
+      ay.push(nums[nums.length - 2]);
+      az.push(nums[nums.length - 1]);
+    }
   }
   if (samples.length < 512) throw new Error(`CSV too short: ${samples.length} samples (need 512+)`);
-  return { channel: Float32Array.from(samples), sampleRate };
+  const axes = ax.length >= 512 && ax.length === ay.length && ay.length === az.length
+    ? { x: Float32Array.from(ax), y: Float32Array.from(ay), z: Float32Array.from(az) }
+    : undefined;
+  return { channel: Float32Array.from(samples), sampleRate, axes };
 }
 
 // Downsample if > 22050 Hz to keep payloads small (spectral content < 11 kHz preserved)
@@ -119,9 +146,26 @@ function maybeDownsample(ch: Float32Array, sr: number): { ch: Float32Array; sr: 
   return { ch: out, sr: newSr };
 }
 
-async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string): Promise<ZetaResult> {
+function maybeDownsampleAxes(axes: { x: Float32Array; y: Float32Array; z: Float32Array } | undefined, sr: number, targetSr: number) {
+  if (!axes) return undefined;
+  const factor = Math.max(1, Math.round(sr / targetSr));
+  const down = (input: Float32Array) => {
+    if (factor <= 1) return input;
+    const outLen = Math.floor(input.length / factor);
+    const out = new Float32Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      let s = 0;
+      for (let k = 0; k < factor; k++) s += input[i * factor + k];
+      out[i] = s / factor;
+    }
+    return out;
+  };
+  return { x: down(axes.x), y: down(axes.y), z: down(axes.z) };
+}
+
+async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string, engineVersion: EngineVersion, axes?: AxisSamples): Promise<ZetaResult> {
   const { data, error } = await supabase.functions.invoke("zeta-analyze", {
-    body: { samples, sampleRate, targetFreq, filename },
+    body: { samples, axes, sampleRate, targetFreq, filename, engineVersion },
     headers: { "x-zeta-key": ACCESS_CODE },
   });
   if (error) throw new Error(error.message);
@@ -133,7 +177,9 @@ export default function Zeta() {
   const [code, setCode] = useState("");
   const [authed, setAuthed] = useState(false);
   const [profile, setProfile] = useState<ProfileId>("auto");
+  const [engineVersion, setEngineVersion] = useState<EngineVersion>("v1.1");
   const currentProfile = PROFILES.find((p) => p.id === profile)!;
+  const currentEngine = ENGINES.find((e) => e.id === engineVersion)!;
 
   // File mode
   const [file, setFile] = useState<File | null>(null);
@@ -180,6 +226,7 @@ export default function Zeta() {
 
       const decoded = isAudio ? await decodeAudioFull(file) : await decodeCsv(file, csvSampleRate);
       const { ch, sr } = maybeDownsample(decoded.channel, decoded.sampleRate);
+      const axesDownsampled = maybeDownsampleAxes(decoded.axes, decoded.sampleRate, sr);
       const totalSec = ch.length / sr;
 
       // Chunk length: 10s per window (min 2s), enough for stable spectrum
@@ -195,7 +242,12 @@ export default function Zeta() {
       for (let i = 0; i < nChunks; i++) {
         const seg = ch.subarray(i * windowLen, (i + 1) * windowLen);
         const samples = Array.from(seg);
-        const r = await analyzeChunk(samples, sr, currentProfile.targetFreq, file.name);
+        const axisChunk = axesDownsampled ? {
+          x: Array.from(axesDownsampled.x.subarray(i * windowLen, (i + 1) * windowLen)),
+          y: Array.from(axesDownsampled.y.subarray(i * windowLen, (i + 1) * windowLen)),
+          z: Array.from(axesDownsampled.z.subarray(i * windowLen, (i + 1) * windowLen)),
+        } : undefined;
+        const r = await analyzeChunk(samples, sr, currentProfile.targetFreq, file.name, engineVersion, axisChunk);
         const tStart = i * windowSec;
         timelineOut.push({
           t: tStart,
@@ -265,7 +317,7 @@ export default function Zeta() {
         const chunk = buf.splice(0, needed);
         const { ch, sr: dsr } = maybeDownsample(Float32Array.from(chunk), sr);
         try {
-          const r = await analyzeChunk(Array.from(ch), dsr, currentProfile.targetFreq, "live-mic");
+          const r = await analyzeChunk(Array.from(ch), dsr, currentProfile.targetFreq, "live-mic", engineVersion);
           setLiveLatest(r);
           const entry: TimelineEntry = {
             t: Date.now(),
@@ -324,7 +376,7 @@ export default function Zeta() {
     doc.setFontSize(10);
     doc.text(`File: ${result.filename}`, m, y); y += 5;
     doc.text(`Machine profile: ${currentProfile.name}`, m, y); y += 5;
-    doc.text(`Engine: ${currentProfile.engine}`, m, y); y += 5;
+    doc.text(`Engine: ${result.engine}`, m, y); y += 5;
     doc.text(`Analysed: ${new Date(result.timestampUtc).toUTCString()}`, m, y); y += 5;
     doc.text(`Samples: ${result.nSamples.toLocaleString()} @ ${result.sampleRateHz} Hz`, m, y); y += 10;
 
@@ -343,6 +395,9 @@ export default function Zeta() {
       ["Fault Condensation (Mc)", result.faultCondensation.toFixed(4)],
       ["Tracked Frequency", result.trackedFrequencyHz.toFixed(2) + " Hz"],
     ];
+    if (result.spatial) {
+      rows.push(["Spatial Friction X/Y/Z", `${result.spatial.axisTf.x.toFixed(3)} / ${result.spatial.axisTf.y.toFixed(3)} / ${result.spatial.axisTf.z.toFixed(3)}`]);
+    }
     for (const [k, v] of rows) {
       doc.setFont("helvetica", "bold"); doc.text(k + ":", m, y);
       doc.setFont("helvetica", "normal"); doc.text(v, m + 60, y);
@@ -405,12 +460,15 @@ export default function Zeta() {
 
         {/* Machine profile selector */}
         <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">Machine profile / engine variant</label>
+          <label className="text-xs text-white/60 uppercase tracking-wider">Machine profile / profil maszyny</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
             {PROFILES.map((p) => (
               <button
                 key={p.id}
-                onClick={() => setProfile(p.id)}
+                onClick={() => {
+                  setProfile(p.id);
+                  if (p.id === "bearing" || p.id === "gearbox") setEngineVersion("v2.0");
+                }}
                 className={`text-left p-3 rounded border transition ${
                   profile === p.id
                     ? "border-cyan-400 bg-cyan-500/10"
@@ -420,11 +478,35 @@ export default function Zeta() {
                 <div className="text-sm font-semibold">{p.name}</div>
                 <div className="text-xs text-white/50 mt-0.5">{p.desc}</div>
                 <div className="text-[10px] text-cyan-300/70 mt-1 font-mono">
-                  {p.targetFreq ? `target ≈ ${p.targetFreq} Hz` : "no prior"}  ·  engine {p.engine}
+                  {p.targetFreq ? `target ≈ ${p.targetFreq} Hz` : "no prior"}
                 </div>
               </button>
             ))}
           </div>
+        </Card>
+
+        <Card className="p-4 bg-black/40 border-white/10 mb-6">
+          <label className="text-xs text-white/60 uppercase tracking-wider">Engine version / wersja silnika</label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+            {ENGINES.map((engine) => (
+              <button
+                key={engine.id}
+                onClick={() => setEngineVersion(engine.id)}
+                className={`text-left p-3 rounded border transition ${
+                  engineVersion === engine.id
+                    ? "border-cyan-400 bg-cyan-500/10"
+                    : "border-white/10 bg-black/40 hover:border-white/30"
+                }`}
+              >
+                <div className="text-sm font-semibold">{engine.name}</div>
+                <div className="text-xs text-white/50 mt-0.5">{engine.desc}</div>
+                <div className="text-[10px] text-cyan-300/70 mt-1">{engine.bestFor}</div>
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-white/50">
+            Active / aktywny: <span className="text-cyan-300">{currentEngine.name}</span>. v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes.
+          </p>
         </Card>
 
         <Tabs defaultValue="file">
@@ -504,7 +586,22 @@ export default function Zeta() {
                     <Metric label="Fault Condensation" value={result.faultCondensation.toFixed(4)} hint="Mc · sideband energy" />
                     <Metric label="Tracked Frequency" value={result.trackedFrequencyHz.toFixed(1) + " Hz"} hint="Dominant peak" />
                   </div>
+                  <div className="mt-4 text-xs text-white/50 font-mono">{result.engine}</div>
                 </Card>
+
+                {result.spatial && (
+                  <Card className="p-6 bg-black/40 border-white/10 mb-6">
+                    <h2 className="text-lg font-semibold mb-4">v2.0 Spatial Multi-Axis / 3 osie X-Y-Z</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Metric label="Axis X" value={`Tf ${result.spatial.axisTf.x.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.x.toFixed(3)} · ${result.spatial.axisFrequencyHz.x.toFixed(1)} Hz`} />
+                      <Metric label="Axis Y" value={`Tf ${result.spatial.axisTf.y.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.y.toFixed(3)} · ${result.spatial.axisFrequencyHz.y.toFixed(1)} Hz`} />
+                      <Metric label="Axis Z" value={`Tf ${result.spatial.axisTf.z.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.z.toFixed(3)} · ${result.spatial.axisFrequencyHz.z.toFixed(1)} Hz`} />
+                    </div>
+                    <p className="mt-4 text-xs text-white/50">
+                      Global Spatial Friction: <span className="text-cyan-300 font-mono">{result.spatial.globalSpatialFriction.toFixed(4)}</span>
+                    </p>
+                  </Card>
+                )}
 
                 {timeline.length > 1 && (
                   <Card className="p-6 bg-black/40 border-white/10 mb-6">
