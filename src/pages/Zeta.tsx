@@ -823,7 +823,7 @@ export default function Zeta() {
         </Tabs>
 
         <footer className="mt-12 text-xs text-white/40 text-center border-t border-white/10 pt-4">
-          Zeta-Core Diagnostics &mdash; Aberdeen, UK &middot; bramadna718@gmail.com
+          {t("footer")} &middot; bramadna718@gmail.com
         </footer>
       </div>
     </div>
