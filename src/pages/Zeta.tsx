@@ -85,11 +85,72 @@ const statusBg: Record<string, string> = {
   DEGRADED: "bg-orange-500/15",
   CRITICAL: "bg-red-500/20",
 };
-const statusText: Record<string, string> = {
+const statusTextEn: Record<string, string> = {
   HEALTHY: "Machine operating within normal parameters.",
   WATCH: "Minor spectral anomalies detected. Continue monitoring.",
   DEGRADED: "Significant fault signature detected. Schedule inspection.",
   CRITICAL: "Severe fault detected. Immediate action recommended.",
+};
+const statusTextPl: Record<string, string> = {
+  HEALTHY: "Maszyna pracuje w normalnych parametrach.",
+  WATCH: "Wykryto drobne anomalie widmowe. Kontynuuj monitorowanie.",
+  DEGRADED: "Wykryto znaczącą sygnaturę usterki. Zaplanuj inspekcję.",
+  CRITICAL: "Poważna usterka. Zalecane natychmiastowe działanie.",
+};
+
+// ---------- Bilingual UI strings ----------
+type Lang = "pl" | "en";
+const T = {
+  header:            { pl: "Silnik Diagnostyki Kondycji Maszyn",       en: "Machine Health Diagnostic Engine" },
+  accessCode:        { pl: "Kod dostępu",                               en: "Access code" },
+  enter:             { pl: "Wejdź",                                     en: "Enter" },
+  invalidCode:       { pl: "Nieprawidłowy kod dostępu",                 en: "Invalid access code" },
+  accessGranted:     { pl: "Dostęp przyznany",                          en: "Access granted" },
+  machineProfile:    { pl: "Profil maszyny",                            en: "Machine profile" },
+  engineVersion:     { pl: "Wersja silnika",                            en: "Engine version" },
+  activeLabel:       { pl: "Aktywny",                                   en: "Active" },
+  activeNote:        { pl: "v2.0 przyjmuje CSV z 3 kolumnami X,Y,Z; audio/mikrofon działa jako mono na wszystkich osiach.", en: "v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes." },
+  tabFile:           { pl: "Analiza pliku",                             en: "File analysis" },
+  tabLive:           { pl: "Monitoring 24/7",                           en: "Live monitoring (24/7)" },
+  upload:            { pl: "Wgraj sygnał z maszyny",                    en: "Upload machine signal" },
+  uploadDesc:        { pl: "Dowolna długość — audio (WAV, MP3, M4A, OGG, FLAC) lub CSV/TXT z wartościami czujnika. Długie nagrania są automatycznie dzielone na okna 2–10 s i analizowane jako oś czasu.", en: "Any length — audio (WAV, MP3, M4A, OGG, FLAC) or CSV/TXT with sensor values. Long recordings are automatically split into 2–10 s windows and analysed as a timeline." },
+  chooseFile:        { pl: "Wybierz plik",                              en: "Choose file" },
+  csvSr:             { pl: "Częstotliwość próbkowania CSV (Hz):",       en: "CSV sample rate (Hz):" },
+  runDiag:           { pl: "Uruchom diagnostykę",                       en: "Run diagnostic" },
+  analysing:         { pl: "Analizuję…",                                en: "Analysing…" },
+  decoding:          { pl: "Dekoduję sygnał…",                          en: "Decoding signal…" },
+  complete:          { pl: "Zakończono",                                en: "Complete" },
+  worstStatus:       { pl: "Status najgorszego okna · przeanalizowanych okien:", en: "Worst-window status · windows analysed:" },
+  pdfReport:         { pl: "Raport PDF",                                en: "PDF report" },
+  metricsWorst:      { pl: "Metryki (najgorsze okno)",                  en: "Metrics (worst window)" },
+  phaseCoh:          { pl: "Koherencja fazy",                           en: "Phase Coherence" },
+  topoFric:          { pl: "Tarcie topologiczne",                       en: "Topological Friction" },
+  faultCond:         { pl: "Kondensacja usterki",                       en: "Fault Condensation" },
+  trackedFreq:       { pl: "Śledzona częstotliwość",                    en: "Tracked Frequency" },
+  hintCoh:           { pl: "0 = chaos · 1 = czysty ton",                en: "0 = chaotic · 1 = pure tone" },
+  hintTf:            { pl: "Tf · indeks nieporządku",                   en: "Tf · disorder index" },
+  hintMc:            { pl: "Mc · energia wstęg bocznych",               en: "Mc · sideband energy" },
+  hintFreq:          { pl: "Dominujący pik",                            en: "Dominant peak" },
+  spatialHead:       { pl: "v2.0 Spatial Multi-Axis · 3 osie X-Y-Z",    en: "v2.0 Spatial Multi-Axis · X-Y-Z" },
+  spatialGlobal:     { pl: "Globalne tarcie przestrzenne:",             en: "Global Spatial Friction:" },
+  timelineHead:      { pl: "Oś czasu · tarcie topologiczne",            en: "Timeline · Topological Friction over time" },
+  spectrumHead:      { pl: "Widmo częstotliwości (najgorsze okno)",     en: "Frequency spectrum (worst window)" },
+  liveHead:          { pl: "Monitoring 24/7",                           en: "Live 24/7 monitoring" },
+  liveDesc:          { pl: "Używa mikrofonu urządzenia lub podłączonego czujnika. Silnik analizuje okno 5 s co 5 s i uruchamia alert przy statusie DEGRADED/CRITICAL. Zostaw kartę otwartą na telefonie/tablecie/PC obok maszyny. Działa non-stop.", en: "Uses the device microphone or a connected sensor input. The engine analyses a 5-second window every 5 seconds and triggers an alert on DEGRADED or CRITICAL status. Leave the browser tab open on a phone, tablet or industrial PC placed near the machine. Runs continuously." },
+  startMon:          { pl: "Start monitoringu",                         en: "Start monitoring" },
+  stop:              { pl: "Stop",                                      en: "Stop" },
+  monitoring:        { pl: "Monitoring",                                en: "Monitoring" },
+  monStarted:        { pl: "Monitoring uruchomiony",                    en: "Live monitoring started" },
+  monStopped:        { pl: "Monitoring zatrzymany",                     en: "Live monitoring stopped" },
+  micDenied:         { pl: "Odmowa dostępu do mikrofonu: ",             en: "Microphone access denied: " },
+  currentStatus:     { pl: "Bieżący status",                            en: "Current status" },
+  liveTrend:         { pl: "Trend Tf (bieżący)",                        en: "Live Tf trend (rolling)" },
+  eventLog:          { pl: "Dziennik zdarzeń",                          en: "Event log" },
+  selectFileFirst:   { pl: "Najpierw wybierz plik",                     en: "Select a file first" },
+  analysisComplete:  { pl: "Analiza zakończona",                        en: "Analysis complete" },
+  analysisFailed:    { pl: "Analiza nie powiodła się",                  en: "Analysis failed" },
+  unsupported:       { pl: "Nieobsługiwany plik. Użyj WAV/MP3/M4A/OGG/FLAC lub CSV/TXT.", en: "Unsupported file. Use WAV/MP3/M4A/OGG/FLAC or CSV/TXT." },
+  footer:            { pl: "Zeta-Core Diagnostics — Aberdeen, UK",       en: "Zeta-Core Diagnostics — Aberdeen, UK" },
 };
 
 // ---------- Audio decoding ----------
@@ -174,6 +235,9 @@ async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: n
 }
 
 export default function Zeta() {
+  const [lang, setLang] = useState<Lang>(() => (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("pl") ? "pl" : "en"));
+  const t = (k: keyof typeof T) => T[k][lang];
+  const statusText = lang === "pl" ? statusTextPl : statusTextEn;
   const [code, setCode] = useState("");
   const [authed, setAuthed] = useState(false);
   const [profile, setProfile] = useState<ProfileId>("auto");
@@ -206,23 +270,23 @@ export default function Zeta() {
   const handleAuth = () => {
     if (code.trim() === ACCESS_CODE) {
       setAuthed(true);
-      toast.success("Access granted");
-    } else toast.error("Invalid access code");
+      toast.success(t("accessGranted"));
+    } else toast.error(t("invalidCode"));
   };
 
   // ---------- FILE ANALYSIS (long files → windowed timeline) ----------
   const handleAnalyze = async () => {
-    if (!file) return toast.error("Select a file first");
+    if (!file) return toast.error(t("selectFileFirst"));
     setAnalyzing(true);
     setProgress(5);
-    setProgressLabel("Decoding signal…");
+    setProgressLabel(t("decoding"));
     setResult(null);
     setTimeline([]);
 
     try {
       const isAudio = /\.(wav|mp3|m4a|ogg|webm|flac)$/i.test(file.name);
       const isCsv = /\.(csv|txt|tsv)$/i.test(file.name);
-      if (!isAudio && !isCsv) throw new Error("Unsupported file. Use WAV/MP3/M4A/OGG/FLAC or CSV/TXT.");
+      if (!isAudio && !isCsv) throw new Error(T.unsupported[lang]);
 
       const decoded = isAudio ? await decodeAudioFull(file) : await decodeCsv(file, csvSampleRate);
       const { ch, sr } = maybeDownsample(decoded.channel, decoded.sampleRate);
@@ -234,7 +298,7 @@ export default function Zeta() {
       const windowLen = Math.floor(windowSec * sr);
       const nChunks = Math.max(1, Math.floor(ch.length / windowLen));
 
-      setProgressLabel(`Analysing ${totalSec.toFixed(0)}s signal in ${nChunks} windows (${windowSec}s each)…`);
+      setProgressLabel(`${t("analysing")} ${totalSec.toFixed(0)}s · ${nChunks} × ${windowSec}s`);
 
       const timelineOut: TimelineEntry[] = [];
       let worst: ZetaResult | null = null;
@@ -269,10 +333,10 @@ export default function Zeta() {
 
       setResult(worst);
       setProgress(100);
-      setProgressLabel("Complete");
-      toast.success(`Analysis complete: ${nChunks} windows, ${totalSec.toFixed(0)}s of signal`);
+      setProgressLabel(t("complete"));
+      toast.success(`${t("analysisComplete")}: ${nChunks} × ${totalSec.toFixed(0)}s`);
     } catch (e: any) {
-      toast.error(e.message || "Analysis failed");
+      toast.error(e.message || T.analysisFailed[lang]);
     } finally {
       setAnalyzing(false);
       setTimeout(() => setProgress(0), 1000);
@@ -306,7 +370,7 @@ export default function Zeta() {
       processor.connect(ctx.destination);
 
       setLiveOn(true);
-      toast.success("Live monitoring started");
+      toast.success(t("monStarted"));
 
       // Every CHUNK_SECONDS, analyse the accumulated buffer
       const tick = window.setInterval(async () => {
@@ -339,7 +403,7 @@ export default function Zeta() {
       }, CHUNK_SECONDS * 1000);
       liveTickRef.current = tick;
     } catch (e: any) {
-      toast.error("Microphone access denied: " + (e.message || e));
+      toast.error(t("micDenied") + (e.message || e));
     }
   };
 
@@ -352,7 +416,7 @@ export default function Zeta() {
     liveCtxRef.current = null;
     liveBufferRef.current = [];
     setLiveOn(false);
-    toast.info("Live monitoring stopped");
+    toast.info(t("monStopped"));
   };
 
   useEffect(() => () => { if (liveOn) stopLive(); }, []); // cleanup on unmount
@@ -423,24 +487,37 @@ export default function Zeta() {
   };
 
   // ---------- Auth gate ----------
+  const LangToggle = (
+    <button
+      onClick={() => setLang(lang === "pl" ? "en" : "pl")}
+      className="text-xs px-2 py-1 rounded border border-white/20 text-white/70 hover:border-cyan-400 hover:text-cyan-300 transition font-mono"
+      aria-label="Toggle language"
+    >
+      {lang === "pl" ? "EN" : "PL"}
+    </button>
+  );
+
   if (!authed) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 bg-black/60 border-cyan-500/30">
-          <div className="flex items-center gap-3 mb-6">
-            <Lock className="w-6 h-6 text-cyan-400" />
-            <div>
-              <h1 className="text-xl font-bold">ZETA-CORE</h1>
-              <p className="text-xs text-white/60">Machine Health Diagnostic Portal</p>
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <Lock className="w-6 h-6 text-cyan-400" />
+              <div>
+                <h1 className="text-xl font-bold">ZETA-CORE</h1>
+                <p className="text-xs text-white/60">{t("header")}</p>
+              </div>
             </div>
+            {LangToggle}
           </div>
-          <label className="text-sm text-white/70 block mb-2">Access code</label>
+          <label className="text-sm text-white/70 block mb-2">{t("accessCode")}</label>
           <Input type="password" value={code} onChange={(e) => setCode(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-            className="bg-black/40 border-white/20" placeholder="Enter code" />
-          <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">Enter</Button>
+            className="bg-black/40 border-white/20" placeholder={t("accessCode")} />
+          <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">{t("enter")}</Button>
           <p className="text-xs text-white/40 mt-6 text-center">
-            Zeta-Core Diagnostics &mdash; Aberdeen, UK<br />Contact: bramadna718@gmail.com
+            {t("footer")}<br />Contact: bramadna718@gmail.com
           </p>
         </Card>
       </div>
@@ -452,15 +529,16 @@ export default function Zeta() {
       <div className="max-w-5xl mx-auto p-4 md:p-8">
         <header className="mb-6 border-b border-white/10 pb-4 flex items-center gap-3">
           <Activity className="w-7 h-7 text-cyan-400" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold tracking-tight">ZETA-CORE</h1>
-            <p className="text-sm text-white/60">Machine Health Diagnostic Engine</p>
+            <p className="text-sm text-white/60">{t("header")}</p>
           </div>
+          {LangToggle}
         </header>
 
         {/* Machine profile selector */}
         <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">Machine profile / profil maszyny</label>
+          <label className="text-xs text-white/60 uppercase tracking-wider">{t("machineProfile")}</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
             {PROFILES.map((p) => (
               <button
@@ -486,7 +564,7 @@ export default function Zeta() {
         </Card>
 
         <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">Engine version / wersja silnika</label>
+          <label className="text-xs text-white/60 uppercase tracking-wider">{t("engineVersion")}</label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
             {ENGINES.map((engine) => (
               <button
@@ -505,24 +583,20 @@ export default function Zeta() {
             ))}
           </div>
           <p className="mt-3 text-xs text-white/50">
-            Active / aktywny: <span className="text-cyan-300">{currentEngine.name}</span>. v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes.
-          </p>
+            {t("activeLabel")}: <span className="text-cyan-300">{currentEngine.name}</span>. {t("activeNote")}</p>
         </Card>
 
         <Tabs defaultValue="file">
           <TabsList className="bg-black/40 border border-white/10">
-            <TabsTrigger value="file"><FileAudio className="w-4 h-4 mr-2" />File analysis</TabsTrigger>
-            <TabsTrigger value="live"><Radio className="w-4 h-4 mr-2" />Live monitoring (24/7)</TabsTrigger>
+            <TabsTrigger value="file"><FileAudio className="w-4 h-4 mr-2" />{t("tabFile")}</TabsTrigger>
+            <TabsTrigger value="live"><Radio className="w-4 h-4 mr-2" />{t("tabLive")}</TabsTrigger>
           </TabsList>
 
           {/* -------------------- FILE TAB -------------------- */}
           <TabsContent value="file" className="mt-4">
             <Card className="p-6 bg-black/40 border-white/10 mb-6">
-              <h2 className="text-lg font-semibold mb-2">Upload machine signal</h2>
-              <p className="text-sm text-white/60 mb-4">
-                Any length — audio (WAV, MP3, M4A, OGG, FLAC) or CSV/TXT with sensor values.
-                Long recordings are automatically split into 2–10 s windows and analysed as a timeline.
-              </p>
+              <h2 className="text-lg font-semibold mb-2">{t("upload")}</h2>
+              <p className="text-sm text-white/60 mb-4">{t("uploadDesc")}</p>
 
               <div className="flex flex-col md:flex-row gap-3">
                 <input ref={fileInput} type="file"
@@ -532,12 +606,12 @@ export default function Zeta() {
                 <Button variant="outline" onClick={() => fileInput.current?.click()}
                   className="border-white/20 bg-black/40">
                   <Upload className="w-4 h-4 mr-2" />
-                  {file ? file.name : "Choose file"}
+                  {file ? file.name : t("chooseFile")}
                 </Button>
 
                 {file && /\.(csv|txt|tsv)$/i.test(file.name) && (
                   <div className="flex items-center gap-2">
-                    <label className="text-sm text-white/70">CSV sample rate (Hz):</label>
+                    <label className="text-sm text-white/70">{t("csvSr")}</label>
                     <Input type="number" value={csvSampleRate}
                       onChange={(e) => setCsvSampleRate(parseInt(e.target.value) || 1000)}
                       className="w-28 bg-black/40 border-white/20" />
@@ -546,7 +620,7 @@ export default function Zeta() {
 
                 <Button onClick={handleAnalyze} disabled={!file || analyzing}
                   className="bg-cyan-600 hover:bg-cyan-500 md:ml-auto">
-                  {analyzing ? "Analysing…" : "Run diagnostic"}
+                  {analyzing ? t("analysing") : t("runDiag")}
                 </Button>
               </div>
 
@@ -567,24 +641,24 @@ export default function Zeta() {
                       : <AlertTriangle className="w-10 h-10 shrink-0" />}
                     <div className="flex-1">
                       <div className="text-xs uppercase tracking-widest opacity-70">
-                        Worst-window status · {timeline.length} windows analysed
+                        {t("worstStatus")} {timeline.length}
                       </div>
                       <div className="text-3xl font-bold mt-1">{result.status}</div>
                       <p className="text-sm mt-2 text-white/70">{statusText[result.status]}</p>
                     </div>
                     <Button onClick={downloadPdf} variant="outline" className="border-white/20 text-white">
-                      <Download className="w-4 h-4 mr-2" />PDF report
+                      <Download className="w-4 h-4 mr-2" />{t("pdfReport")}
                     </Button>
                   </div>
                 </Card>
 
                 <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                  <h2 className="text-lg font-semibold mb-4">Metrics (worst window)</h2>
+                  <h2 className="text-lg font-semibold mb-4">{t("metricsWorst")}</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Metric label="Phase Coherence" value={result.phaseCoherence.toFixed(4)} hint="0 = chaotic · 1 = pure tone" />
-                    <Metric label="Topological Friction" value={result.topologicalFriction.toFixed(4)} hint="Tf · disorder index" />
-                    <Metric label="Fault Condensation" value={result.faultCondensation.toFixed(4)} hint="Mc · sideband energy" />
-                    <Metric label="Tracked Frequency" value={result.trackedFrequencyHz.toFixed(1) + " Hz"} hint="Dominant peak" />
+                    <Metric label={t("phaseCoh")} value={result.phaseCoherence.toFixed(4)} hint={t("hintCoh")} />
+                    <Metric label={t("topoFric")} value={result.topologicalFriction.toFixed(4)} hint={t("hintTf")} />
+                    <Metric label={t("faultCond")} value={result.faultCondensation.toFixed(4)} hint={t("hintMc")} />
+                    <Metric label={t("trackedFreq")} value={result.trackedFrequencyHz.toFixed(1) + " Hz"} hint={t("hintFreq")} />
                   </div>
                   <div className="mt-4 text-xs text-white/50 font-mono">{result.engine}</div>
                 </Card>
@@ -605,7 +679,7 @@ export default function Zeta() {
 
                 {timeline.length > 1 && (
                   <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                    <h2 className="text-lg font-semibold mb-2">Timeline · Topological Friction over time</h2>
+                    <h2 className="text-lg font-semibold mb-2">{t("timelineHead")}</h2>
                     <div className="h-56">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={timeline}>
@@ -634,7 +708,7 @@ export default function Zeta() {
                 )}
 
                 <Card className="p-6 bg-black/40 border-white/10">
-                  <h2 className="text-lg font-semibold mb-4">Frequency spectrum (worst window)</h2>
+                  <h2 className="text-lg font-semibold mb-4">{t("spectrumHead")}</h2>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={result.spectrum.map((v, i) => ({ f: result.freqAxis[i]?.toFixed(0), v }))}>
@@ -653,27 +727,23 @@ export default function Zeta() {
           {/* -------------------- LIVE TAB -------------------- */}
           <TabsContent value="live" className="mt-4">
             <Card className="p-6 bg-black/40 border-white/10 mb-6">
-              <h2 className="text-lg font-semibold mb-2">Live 24/7 monitoring</h2>
-              <p className="text-sm text-white/60 mb-4">
-                Uses the device microphone or a connected sensor input. The engine analyses a {CHUNK_SECONDS}-second window
-                every {CHUNK_SECONDS} seconds and triggers an alert on DEGRADED or CRITICAL status. Leave the browser tab open
-                on a phone, tablet or industrial PC placed near the machine. Runs continuously.
-              </p>
+              <h2 className="text-lg font-semibold mb-2">{t("liveHead")}</h2>
+              <p className="text-sm text-white/60 mb-4">{t("liveDesc")}</p>
 
               <div className="flex items-center gap-3">
                 {!liveOn ? (
                   <Button onClick={startLive} className="bg-red-600 hover:bg-red-500">
-                    <Mic className="w-4 h-4 mr-2" />Start monitoring
+                    <Mic className="w-4 h-4 mr-2" />{t("startMon")}
                   </Button>
                 ) : (
                   <Button onClick={stopLive} variant="outline" className="border-red-400 text-red-400">
-                    <Square className="w-4 h-4 mr-2" />Stop
+                    <Square className="w-4 h-4 mr-2" />{t("stop")}
                   </Button>
                 )}
                 {liveOn && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-white/70">Monitoring · {Math.floor(liveDuration / 60)}m {liveDuration % 60}s · {currentProfile.name}</span>
+                    <span className="text-white/70">{t("monitoring")} · {Math.floor(liveDuration / 60)}m {liveDuration % 60}s · {currentProfile.name}</span>
                   </div>
                 )}
               </div>
@@ -686,7 +756,7 @@ export default function Zeta() {
                     ? <CheckCircle2 className="w-10 h-10 shrink-0" />
                     : <AlertTriangle className="w-10 h-10 shrink-0" />}
                   <div className="flex-1">
-                    <div className="text-xs uppercase tracking-widest opacity-70">Current status</div>
+                    <div className="text-xs uppercase tracking-widest opacity-70">{t("currentStatus")}</div>
                     <div className="text-3xl font-bold mt-1">{liveLatest.status}</div>
                     <p className="text-sm mt-2 text-white/70">{statusText[liveLatest.status]}</p>
                   </div>
@@ -702,7 +772,7 @@ export default function Zeta() {
 
             {liveLog.length > 1 && (
               <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                <h2 className="text-lg font-semibold mb-2">Live Tf trend (rolling)</h2>
+                <h2 className="text-lg font-semibold mb-2">{t("liveTrend")}</h2>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={[...liveLog].reverse()}>
@@ -722,7 +792,7 @@ export default function Zeta() {
             {liveLog.length > 0 && (
               <Card className="p-6 bg-black/40 border-white/10">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold">Event log</h2>
+                  <h2 className="text-lg font-semibold">{t("eventLog")}</h2>
                   <Button variant="outline" size="sm" className="border-white/20"
                     onClick={() => {
                       const csv = "time,status,tf,mc,frequency_hz,coherence\n" +
@@ -753,7 +823,7 @@ export default function Zeta() {
         </Tabs>
 
         <footer className="mt-12 text-xs text-white/40 text-center border-t border-white/10 pt-4">
-          Zeta-Core Diagnostics &mdash; Aberdeen, UK &middot; bramadna718@gmail.com
+          {t("footer")} &middot; bramadna718@gmail.com
         </footer>
       </div>
     </div>

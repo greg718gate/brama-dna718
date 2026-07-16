@@ -136,6 +136,7 @@ All three engines are callable from the portal via the engine selector.
 | Date | Change |
 |---|---|
 | 2026-07-16 | Sanitized public version. All credentials moved to owner's private password manager. Engine selector for v1.0 / v1.1 / v2.0 confirmed as public capability. |
+| 2026-07-16 | Full PL/EN bilingual toggle on `/zeta` portal (auth gate, dashboard, toasts, PDF report). Vitest regression suite added (14 tests: reference DSP + component render + language toggle) — all passing. |
 
 ---
 
