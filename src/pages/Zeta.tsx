@@ -586,7 +586,22 @@ export default function Zeta() {
                     <Metric label="Fault Condensation" value={result.faultCondensation.toFixed(4)} hint="Mc · sideband energy" />
                     <Metric label="Tracked Frequency" value={result.trackedFrequencyHz.toFixed(1) + " Hz"} hint="Dominant peak" />
                   </div>
+                  <div className="mt-4 text-xs text-white/50 font-mono">{result.engine}</div>
                 </Card>
+
+                {result.spatial && (
+                  <Card className="p-6 bg-black/40 border-white/10 mb-6">
+                    <h2 className="text-lg font-semibold mb-4">v2.0 Spatial Multi-Axis / 3 osie X-Y-Z</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Metric label="Axis X" value={`Tf ${result.spatial.axisTf.x.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.x.toFixed(3)} · ${result.spatial.axisFrequencyHz.x.toFixed(1)} Hz`} />
+                      <Metric label="Axis Y" value={`Tf ${result.spatial.axisTf.y.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.y.toFixed(3)} · ${result.spatial.axisFrequencyHz.y.toFixed(1)} Hz`} />
+                      <Metric label="Axis Z" value={`Tf ${result.spatial.axisTf.z.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.z.toFixed(3)} · ${result.spatial.axisFrequencyHz.z.toFixed(1)} Hz`} />
+                    </div>
+                    <p className="mt-4 text-xs text-white/50">
+                      Global Spatial Friction: <span className="text-cyan-300 font-mono">{result.spatial.globalSpatialFriction.toFixed(4)}</span>
+                    </p>
+                  </Card>
+                )}
 
                 {timeline.length > 1 && (
                   <Card className="p-6 bg-black/40 border-white/10 mb-6">
