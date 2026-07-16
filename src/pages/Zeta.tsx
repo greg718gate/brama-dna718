@@ -177,7 +177,9 @@ export default function Zeta() {
   const [code, setCode] = useState("");
   const [authed, setAuthed] = useState(false);
   const [profile, setProfile] = useState<ProfileId>("auto");
+  const [engineVersion, setEngineVersion] = useState<EngineVersion>("v1.1");
   const currentProfile = PROFILES.find((p) => p.id === profile)!;
+  const currentEngine = ENGINES.find((e) => e.id === engineVersion)!;
 
   // File mode
   const [file, setFile] = useState<File | null>(null);
@@ -224,6 +226,7 @@ export default function Zeta() {
 
       const decoded = isAudio ? await decodeAudioFull(file) : await decodeCsv(file, csvSampleRate);
       const { ch, sr } = maybeDownsample(decoded.channel, decoded.sampleRate);
+      const axesDownsampled = maybeDownsampleAxes(decoded.axes, decoded.sampleRate, sr);
       const totalSec = ch.length / sr;
 
       // Chunk length: 10s per window (min 2s), enough for stable spectrum
@@ -239,7 +242,12 @@ export default function Zeta() {
       for (let i = 0; i < nChunks; i++) {
         const seg = ch.subarray(i * windowLen, (i + 1) * windowLen);
         const samples = Array.from(seg);
-        const r = await analyzeChunk(samples, sr, currentProfile.targetFreq, file.name);
+        const axisChunk = axesDownsampled ? {
+          x: Array.from(axesDownsampled.x.subarray(i * windowLen, (i + 1) * windowLen)),
+          y: Array.from(axesDownsampled.y.subarray(i * windowLen, (i + 1) * windowLen)),
+          z: Array.from(axesDownsampled.z.subarray(i * windowLen, (i + 1) * windowLen)),
+        } : undefined;
+        const r = await analyzeChunk(samples, sr, currentProfile.targetFreq, file.name, engineVersion, axisChunk);
         const tStart = i * windowSec;
         timelineOut.push({
           t: tStart,
@@ -309,7 +317,7 @@ export default function Zeta() {
         const chunk = buf.splice(0, needed);
         const { ch, sr: dsr } = maybeDownsample(Float32Array.from(chunk), sr);
         try {
-          const r = await analyzeChunk(Array.from(ch), dsr, currentProfile.targetFreq, "live-mic");
+          const r = await analyzeChunk(Array.from(ch), dsr, currentProfile.targetFreq, "live-mic", engineVersion);
           setLiveLatest(r);
           const entry: TimelineEntry = {
             t: Date.now(),
@@ -368,7 +376,7 @@ export default function Zeta() {
     doc.setFontSize(10);
     doc.text(`File: ${result.filename}`, m, y); y += 5;
     doc.text(`Machine profile: ${currentProfile.name}`, m, y); y += 5;
-    doc.text(`Engine: ${currentProfile.engine}`, m, y); y += 5;
+    doc.text(`Engine: ${result.engine}`, m, y); y += 5;
     doc.text(`Analysed: ${new Date(result.timestampUtc).toUTCString()}`, m, y); y += 5;
     doc.text(`Samples: ${result.nSamples.toLocaleString()} @ ${result.sampleRateHz} Hz`, m, y); y += 10;
 
@@ -387,6 +395,9 @@ export default function Zeta() {
       ["Fault Condensation (Mc)", result.faultCondensation.toFixed(4)],
       ["Tracked Frequency", result.trackedFrequencyHz.toFixed(2) + " Hz"],
     ];
+    if (result.spatial) {
+      rows.push(["Spatial Friction X/Y/Z", `${result.spatial.axisTf.x.toFixed(3)} / ${result.spatial.axisTf.y.toFixed(3)} / ${result.spatial.axisTf.z.toFixed(3)}`]);
+    }
     for (const [k, v] of rows) {
       doc.setFont("helvetica", "bold"); doc.text(k + ":", m, y);
       doc.setFont("helvetica", "normal"); doc.text(v, m + 60, y);
@@ -449,12 +460,15 @@ export default function Zeta() {
 
         {/* Machine profile selector */}
         <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">Machine profile / engine variant</label>
+          <label className="text-xs text-white/60 uppercase tracking-wider">Machine profile / profil maszyny</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
             {PROFILES.map((p) => (
               <button
                 key={p.id}
-                onClick={() => setProfile(p.id)}
+                onClick={() => {
+                  setProfile(p.id);
+                  if (p.id === "bearing" || p.id === "gearbox") setEngineVersion("v2.0");
+                }}
                 className={`text-left p-3 rounded border transition ${
                   profile === p.id
                     ? "border-cyan-400 bg-cyan-500/10"
@@ -464,11 +478,35 @@ export default function Zeta() {
                 <div className="text-sm font-semibold">{p.name}</div>
                 <div className="text-xs text-white/50 mt-0.5">{p.desc}</div>
                 <div className="text-[10px] text-cyan-300/70 mt-1 font-mono">
-                  {p.targetFreq ? `target ≈ ${p.targetFreq} Hz` : "no prior"}  ·  engine {p.engine}
+                  {p.targetFreq ? `target ≈ ${p.targetFreq} Hz` : "no prior"}
                 </div>
               </button>
             ))}
           </div>
+        </Card>
+
+        <Card className="p-4 bg-black/40 border-white/10 mb-6">
+          <label className="text-xs text-white/60 uppercase tracking-wider">Engine version / wersja silnika</label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+            {ENGINES.map((engine) => (
+              <button
+                key={engine.id}
+                onClick={() => setEngineVersion(engine.id)}
+                className={`text-left p-3 rounded border transition ${
+                  engineVersion === engine.id
+                    ? "border-cyan-400 bg-cyan-500/10"
+                    : "border-white/10 bg-black/40 hover:border-white/30"
+                }`}
+              >
+                <div className="text-sm font-semibold">{engine.name}</div>
+                <div className="text-xs text-white/50 mt-0.5">{engine.desc}</div>
+                <div className="text-[10px] text-cyan-300/70 mt-1">{engine.bestFor}</div>
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-white/50">
+            Active / aktywny: <span className="text-cyan-300">{currentEngine.name}</span>. v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes.
+          </p>
         </Card>
 
         <Tabs defaultValue="file">
