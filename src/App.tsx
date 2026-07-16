@@ -69,6 +69,10 @@ const App = () => (
               <Route path="/moje-studio-wideo" element={<MojeStudioWideo />} />
               <Route path="/moje-studio-wideo/*" element={<MojeStudioWideo />} />
 
+              <Route path="/zeta" element={<Zeta />} />
+              <Route path="/zeta/*" element={<Zeta />} />
+
+
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
