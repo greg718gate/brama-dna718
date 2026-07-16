@@ -12,24 +12,32 @@ import jsPDF from "jspdf";
 
 const ACCESS_CODE = "ZETA-2026";
 
-// ---------- Machine profiles (engine variants) ----------
+// ---------- Machine profiles + engine variants ----------
 type ProfileId = "auto" | "motor50" | "motor60" | "pump" | "fan" | "bearing" | "gearbox";
+type EngineVersion = "v1.0" | "v1.1" | "v2.0";
 type Profile = {
   id: ProfileId;
   name: string;
   desc: string;
   targetFreq?: number; // Hz nominal
-  engine: string;
 };
 const PROFILES: Profile[] = [
-  { id: "auto",    name: "Auto (unknown machine)",       desc: "Engine picks dominant frequency automatically.",      engine: "v1.1 adaptive" },
-  { id: "motor50", name: "Electric motor · 50 Hz grid",  desc: "3-phase motor, EU/UK grid.",  targetFreq: 50,  engine: "v1.1 adaptive" },
-  { id: "motor60", name: "Electric motor · 60 Hz grid",  desc: "3-phase motor, US/Asia grid.", targetFreq: 60,  engine: "v1.1 adaptive" },
-  { id: "pump",    name: "Pump / compressor",            desc: "Rotational 20–60 Hz.",         targetFreq: 30,  engine: "v1.1 adaptive" },
-  { id: "fan",     name: "Fan / blower",                 desc: "Rotational 10–30 Hz.",         targetFreq: 20,  engine: "v1.1 adaptive" },
-  { id: "bearing", name: "Bearing (high-speed)",         desc: "Ball/roller bearing 100–500 Hz.", targetFreq: 200, engine: "v2.0 spatial" },
-  { id: "gearbox", name: "Gearbox / gearing",            desc: "Gear-mesh 200–2000 Hz.",       targetFreq: 500, engine: "v2.0 spatial" },
+  { id: "auto",    name: "Auto / Nieznana maszyna",       desc: "Engine picks dominant frequency automatically." },
+  { id: "motor50", name: "Electric motor · 50 Hz / Silnik 50 Hz",  desc: "3-phase motor, EU/UK grid.",  targetFreq: 50 },
+  { id: "motor60", name: "Electric motor · 60 Hz / Silnik 60 Hz",  desc: "3-phase motor, US/Asia grid.", targetFreq: 60 },
+  { id: "pump",    name: "Pump / compressor / Pompa",            desc: "Rotational 20–60 Hz.",         targetFreq: 30 },
+  { id: "fan",     name: "Fan / blower / Wentylator",                 desc: "Rotational 10–30 Hz.",         targetFreq: 20 },
+  { id: "bearing", name: "Bearing / Łożysko",         desc: "Ball/roller bearing 100–500 Hz.", targetFreq: 200 },
+  { id: "gearbox", name: "Gearbox / Przekładnia",            desc: "Gear-mesh 200–2000 Hz.",       targetFreq: 500 },
 ];
+
+const ENGINES: { id: EngineVersion; name: string; desc: string; bestFor: string }[] = [
+  { id: "v1.0", name: "v1.0 Standard Core", desc: "Stałe obroty / stable RPM", bestFor: "silnik, pompa, wentylator" },
+  { id: "v1.1", name: "v1.1 Adaptive Engine", desc: "Zmienny sygnał / adaptive tracker", bestFor: "dłuższe pliki, falowniki, różne RPM" },
+  { id: "v2.0", name: "v2.0 Spatial Multi-Axis", desc: "3 osie X/Y/Z / tri-axial", bestFor: "łożyska, przekładnie, czujniki 3-osiowe" },
+];
+
+type AxisSamples = { x: number[]; y: number[]; z: number[] };
 
 type ZetaResult = {
   phaseCoherence: number;
@@ -45,6 +53,14 @@ type ZetaResult = {
   filename: string;
   timestampUtc: string;
   engine: string;
+  engineVersion?: EngineVersion;
+  spatial?: {
+    axisCoherence: { x: number; y: number; z: number };
+    axisTf: { x: number; y: number; z: number };
+    axisMc: { x: number; y: number; z: number };
+    axisFrequencyHz: { x: number; y: number; z: number };
+    globalSpatialFriction: number;
+  } | null;
 };
 
 type TimelineEntry = {
@@ -90,18 +106,29 @@ async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sam
   return { channel: out, sampleRate: audio.sampleRate };
 }
 
-async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Float32Array; sampleRate: number }> {
+async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Float32Array; sampleRate: number; axes?: { x: Float32Array; y: Float32Array; z: Float32Array } }> {
   const text = await file.text();
   const lines = text.split(/\r?\n/);
   const samples: number[] = [];
+  const ax: number[] = [];
+  const ay: number[] = [];
+  const az: number[] = [];
   for (const line of lines) {
     if (!line.trim() || line.startsWith("#")) continue;
-    const parts = line.split(/[,;\s\t]+/).filter(Boolean);
-    const num = parseFloat(parts[parts.length - 1]);
-    if (!isNaN(num)) samples.push(num);
+    const nums = line.split(/[,;\s\t]+/).filter(Boolean).map((part) => parseFloat(part)).filter((num) => Number.isFinite(num));
+    if (nums.length === 0) continue;
+    samples.push(nums[nums.length - 1]);
+    if (nums.length >= 3) {
+      ax.push(nums[0]);
+      ay.push(nums[1]);
+      az.push(nums[2]);
+    }
   }
   if (samples.length < 512) throw new Error(`CSV too short: ${samples.length} samples (need 512+)`);
-  return { channel: Float32Array.from(samples), sampleRate };
+  const axes = ax.length >= 512 && ax.length === ay.length && ay.length === az.length
+    ? { x: Float32Array.from(ax), y: Float32Array.from(ay), z: Float32Array.from(az) }
+    : undefined;
+  return { channel: Float32Array.from(samples), sampleRate, axes };
 }
 
 // Downsample if > 22050 Hz to keep payloads small (spectral content < 11 kHz preserved)
@@ -119,9 +146,26 @@ function maybeDownsample(ch: Float32Array, sr: number): { ch: Float32Array; sr: 
   return { ch: out, sr: newSr };
 }
 
-async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string): Promise<ZetaResult> {
+function maybeDownsampleAxes(axes: { x: Float32Array; y: Float32Array; z: Float32Array } | undefined, sr: number, targetSr: number) {
+  if (!axes) return undefined;
+  const factor = Math.max(1, Math.round(sr / targetSr));
+  const down = (input: Float32Array) => {
+    if (factor <= 1) return input;
+    const outLen = Math.floor(input.length / factor);
+    const out = new Float32Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      let s = 0;
+      for (let k = 0; k < factor; k++) s += input[i * factor + k];
+      out[i] = s / factor;
+    }
+    return out;
+  };
+  return { x: down(axes.x), y: down(axes.y), z: down(axes.z) };
+}
+
+async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string, engineVersion: EngineVersion, axes?: AxisSamples): Promise<ZetaResult> {
   const { data, error } = await supabase.functions.invoke("zeta-analyze", {
-    body: { samples, sampleRate, targetFreq, filename },
+    body: { samples, axes, sampleRate, targetFreq, filename, engineVersion },
     headers: { "x-zeta-key": ACCESS_CODE },
   });
   if (error) throw new Error(error.message);
