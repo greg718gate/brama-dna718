@@ -235,6 +235,9 @@ async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: n
 }
 
 export default function Zeta() {
+  const [lang, setLang] = useState<Lang>(() => (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("pl") ? "pl" : "en"));
+  const t = (k: keyof typeof T) => T[k][lang];
+  const statusText = lang === "pl" ? statusTextPl : statusTextEn;
   const [code, setCode] = useState("");
   const [authed, setAuthed] = useState(false);
   const [profile, setProfile] = useState<ProfileId>("auto");
