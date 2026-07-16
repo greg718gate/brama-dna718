@@ -18,6 +18,7 @@ import Prng from "./pages/Prng";
 import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
 import SourceArchive from "./pages/SourceArchive";
 import MojeStudioWideo from "./pages/MojeStudioWideo";
+import Zeta from "./pages/Zeta";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
