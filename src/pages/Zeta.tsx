@@ -119,9 +119,9 @@ async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Flo
     if (nums.length === 0) continue;
     samples.push(nums[nums.length - 1]);
     if (nums.length >= 3) {
-      ax.push(nums[0]);
-      ay.push(nums[1]);
-      az.push(nums[2]);
+      ax.push(nums[nums.length - 3]);
+      ay.push(nums[nums.length - 2]);
+      az.push(nums[nums.length - 1]);
     }
   }
   if (samples.length < 512) throw new Error(`CSV too short: ${samples.length} samples (need 512+)`);
