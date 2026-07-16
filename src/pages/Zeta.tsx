@@ -93,7 +93,7 @@ const statusText: Record<string, string> = {
 };
 
 // ---------- Audio decoding ----------
-async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sampleRate: number }> {
+async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sampleRate: number; axes?: undefined }> {
   const buf = await file.arrayBuffer();
   const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
   const ctx = new AudioCtx();
