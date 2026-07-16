@@ -85,11 +85,72 @@ const statusBg: Record<string, string> = {
   DEGRADED: "bg-orange-500/15",
   CRITICAL: "bg-red-500/20",
 };
-const statusText: Record<string, string> = {
+const statusTextEn: Record<string, string> = {
   HEALTHY: "Machine operating within normal parameters.",
   WATCH: "Minor spectral anomalies detected. Continue monitoring.",
   DEGRADED: "Significant fault signature detected. Schedule inspection.",
   CRITICAL: "Severe fault detected. Immediate action recommended.",
+};
+const statusTextPl: Record<string, string> = {
+  HEALTHY: "Maszyna pracuje w normalnych parametrach.",
+  WATCH: "Wykryto drobne anomalie widmowe. Kontynuuj monitorowanie.",
+  DEGRADED: "Wykryto znaczącą sygnaturę usterki. Zaplanuj inspekcję.",
+  CRITICAL: "Poważna usterka. Zalecane natychmiastowe działanie.",
+};
+
+// ---------- Bilingual UI strings ----------
+type Lang = "pl" | "en";
+const T = {
+  header:            { pl: "Silnik Diagnostyki Kondycji Maszyn",       en: "Machine Health Diagnostic Engine" },
+  accessCode:        { pl: "Kod dostępu",                               en: "Access code" },
+  enter:             { pl: "Wejdź",                                     en: "Enter" },
+  invalidCode:       { pl: "Nieprawidłowy kod dostępu",                 en: "Invalid access code" },
+  accessGranted:     { pl: "Dostęp przyznany",                          en: "Access granted" },
+  machineProfile:    { pl: "Profil maszyny",                            en: "Machine profile" },
+  engineVersion:     { pl: "Wersja silnika",                            en: "Engine version" },
+  activeLabel:       { pl: "Aktywny",                                   en: "Active" },
+  activeNote:        { pl: "v2.0 przyjmuje CSV z 3 kolumnami X,Y,Z; audio/mikrofon działa jako mono na wszystkich osiach.", en: "v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes." },
+  tabFile:           { pl: "Analiza pliku",                             en: "File analysis" },
+  tabLive:           { pl: "Monitoring 24/7",                           en: "Live monitoring (24/7)" },
+  upload:            { pl: "Wgraj sygnał z maszyny",                    en: "Upload machine signal" },
+  uploadDesc:        { pl: "Dowolna długość — audio (WAV, MP3, M4A, OGG, FLAC) lub CSV/TXT z wartościami czujnika. Długie nagrania są automatycznie dzielone na okna 2–10 s i analizowane jako oś czasu.", en: "Any length — audio (WAV, MP3, M4A, OGG, FLAC) or CSV/TXT with sensor values. Long recordings are automatically split into 2–10 s windows and analysed as a timeline." },
+  chooseFile:        { pl: "Wybierz plik",                              en: "Choose file" },
+  csvSr:             { pl: "Częstotliwość próbkowania CSV (Hz):",       en: "CSV sample rate (Hz):" },
+  runDiag:           { pl: "Uruchom diagnostykę",                       en: "Run diagnostic" },
+  analysing:         { pl: "Analizuję…",                                en: "Analysing…" },
+  decoding:          { pl: "Dekoduję sygnał…",                          en: "Decoding signal…" },
+  complete:          { pl: "Zakończono",                                en: "Complete" },
+  worstStatus:       { pl: "Status najgorszego okna · przeanalizowanych okien:", en: "Worst-window status · windows analysed:" },
+  pdfReport:         { pl: "Raport PDF",                                en: "PDF report" },
+  metricsWorst:      { pl: "Metryki (najgorsze okno)",                  en: "Metrics (worst window)" },
+  phaseCoh:          { pl: "Koherencja fazy",                           en: "Phase Coherence" },
+  topoFric:          { pl: "Tarcie topologiczne",                       en: "Topological Friction" },
+  faultCond:         { pl: "Kondensacja usterki",                       en: "Fault Condensation" },
+  trackedFreq:       { pl: "Śledzona częstotliwość",                    en: "Tracked Frequency" },
+  hintCoh:           { pl: "0 = chaos · 1 = czysty ton",                en: "0 = chaotic · 1 = pure tone" },
+  hintTf:            { pl: "Tf · indeks nieporządku",                   en: "Tf · disorder index" },
+  hintMc:            { pl: "Mc · energia wstęg bocznych",               en: "Mc · sideband energy" },
+  hintFreq:          { pl: "Dominujący pik",                            en: "Dominant peak" },
+  spatialHead:       { pl: "v2.0 Spatial Multi-Axis · 3 osie X-Y-Z",    en: "v2.0 Spatial Multi-Axis · X-Y-Z" },
+  spatialGlobal:     { pl: "Globalne tarcie przestrzenne:",             en: "Global Spatial Friction:" },
+  timelineHead:      { pl: "Oś czasu · tarcie topologiczne",            en: "Timeline · Topological Friction over time" },
+  spectrumHead:      { pl: "Widmo częstotliwości (najgorsze okno)",     en: "Frequency spectrum (worst window)" },
+  liveHead:          { pl: "Monitoring 24/7",                           en: "Live 24/7 monitoring" },
+  liveDesc:          { pl: "Używa mikrofonu urządzenia lub podłączonego czujnika. Silnik analizuje okno 5 s co 5 s i uruchamia alert przy statusie DEGRADED/CRITICAL. Zostaw kartę otwartą na telefonie/tablecie/PC obok maszyny. Działa non-stop.", en: "Uses the device microphone or a connected sensor input. The engine analyses a 5-second window every 5 seconds and triggers an alert on DEGRADED or CRITICAL status. Leave the browser tab open on a phone, tablet or industrial PC placed near the machine. Runs continuously." },
+  startMon:          { pl: "Start monitoringu",                         en: "Start monitoring" },
+  stop:              { pl: "Stop",                                      en: "Stop" },
+  monitoring:        { pl: "Monitoring",                                en: "Monitoring" },
+  monStarted:        { pl: "Monitoring uruchomiony",                    en: "Live monitoring started" },
+  monStopped:        { pl: "Monitoring zatrzymany",                     en: "Live monitoring stopped" },
+  micDenied:         { pl: "Odmowa dostępu do mikrofonu: ",             en: "Microphone access denied: " },
+  currentStatus:     { pl: "Bieżący status",                            en: "Current status" },
+  liveTrend:         { pl: "Trend Tf (bieżący)",                        en: "Live Tf trend (rolling)" },
+  eventLog:          { pl: "Dziennik zdarzeń",                          en: "Event log" },
+  selectFileFirst:   { pl: "Najpierw wybierz plik",                     en: "Select a file first" },
+  analysisComplete:  { pl: "Analiza zakończona",                        en: "Analysis complete" },
+  analysisFailed:    { pl: "Analiza nie powiodła się",                  en: "Analysis failed" },
+  unsupported:       { pl: "Nieobsługiwany plik. Użyj WAV/MP3/M4A/OGG/FLAC lub CSV/TXT.", en: "Unsupported file. Use WAV/MP3/M4A/OGG/FLAC or CSV/TXT." },
+  footer:            { pl: "Zeta-Core Diagnostics — Aberdeen, UK",       en: "Zeta-Core Diagnostics — Aberdeen, UK" },
 };
 
 // ---------- Audio decoding ----------
