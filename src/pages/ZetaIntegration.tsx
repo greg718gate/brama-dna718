@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Smartphone, Cable, Network, KeyRound, ShieldCheck, Mail } from "lucide-react";
+import ZetaFooter from "@/components/ZetaFooter";
 
 type Lang = "pl" | "en";
 
@@ -276,6 +277,7 @@ export default function ZetaIntegration() {
           <p className="text-xs text-white/50 mt-2">{t.contactRegion}</p>
         </Card>
       </div>
+      <ZetaFooter lang={'lang' in Object.keys(this||{})?undefined:undefined as any} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import ZetaFooter from "@/components/ZetaFooter";
 
 type Lang = "pl" | "en";
 
@@ -184,6 +185,7 @@ export default function ZetaFAQ() {
           </CardContent>
         </Card>
       </div>
+      <ZetaFooter lang={'lang' in Object.keys(this||{})?undefined:undefined as any} />
     </div>
   );
 }
