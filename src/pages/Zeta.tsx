@@ -245,6 +245,17 @@ export default function Zeta() {
   const currentProfile = PROFILES.find((p) => p.id === profile)!;
   const currentEngine = ENGINES.find((e) => e.id === engineVersion)!;
 
+  useEffect(() => {
+    const title = lang === "pl" ? "Zeta-Core DSP — Diagnostyka maszyn" : "Zeta-Core DSP — Machine Diagnostics";
+    const desc = lang === "pl"
+      ? "Silnik diagnostyki predykcyjnej Zeta-Core DSP: analiza drgań, koherencja fazowa, raporty PDF, monitoring 24/7."
+      : "Zeta-Core DSP predictive diagnostics engine: vibration analysis, phase coherence, PDF reports, 24/7 monitoring.";
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", desc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", desc);
+  }, [lang]);
+
   // File mode
   const [file, setFile] = useState<File | null>(null);
   const [csvSampleRate, setCsvSampleRate] = useState(1000);
