@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import ZetaFooter from "@/components/ZetaFooter";
 
 type Lang = "pl" | "en";
 
@@ -31,7 +32,7 @@ const T = {
       { q: "Jaka jest długość obsługiwanego pliku?", a: "Bez limitu — długie sygnały są automatycznie okienkowane (windowing) i uśredniane." },
       { q: "Czy działa 24/7?", a: "Tak. Tryb Live w /zeta uruchamia pętlę pomiarową z alarmami i eksportem CSV." },
       { q: "Jakie są kody dostępu?", a: "Portal demonstracyjny: ZETA-2026. Instrukcja publiczna: /zeta/integration (bez hasła)." },
-      { q: "Jak zamówić pilotaż?", a: "Napisz na bramadna718@gmail.com — pierwszy raport diagnostyczny wykonujemy bez opłaty wstępnej." },
+      { q: "Jak zamówić pilotaż?", a: "Napisz na contact@zeta-core-dns.com — pierwszy raport diagnostyczny wykonujemy bez opłaty wstępnej." },
     ],
     components: [
       { name: "Silniki v1.0 / v1.1 / v2.0 (edge function)", status: "ok" },
@@ -68,7 +69,7 @@ const T = {
       { q: "What file lengths are supported?", a: "No hard limit — long signals are automatically windowed and averaged." },
       { q: "Does it run 24/7?", a: "Yes. Live mode in /zeta runs a continuous measurement loop with alerts and CSV export." },
       { q: "What are the access codes?", a: "Demo portal: ZETA-2026. Public integration guide: /zeta/integration (no password)." },
-      { q: "How do I request a pilot?", a: "Email bramadna718@gmail.com — the first diagnostic report is delivered with no upfront fee." },
+      { q: "How do I request a pilot?", a: "Email contact@zeta-core-dns.com — the first diagnostic report is delivered with no upfront fee." },
     ],
     components: [
       { name: "Engines v1.0 / v1.1 / v2.0 (edge function)", status: "ok" },
@@ -184,6 +185,7 @@ export default function ZetaFAQ() {
           </CardContent>
         </Card>
       </div>
+      <ZetaFooter lang={lang} />
     </div>
   );
 }
