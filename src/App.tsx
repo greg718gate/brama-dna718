@@ -21,6 +21,7 @@ import MojeStudioWideo from "./pages/MojeStudioWideo";
 import Zeta from "./pages/Zeta";
 import ZetaIntegration from "./pages/ZetaIntegration";
 import ZetaFAQ from "./pages/ZetaFAQ";
+import ZetaLegal from "./pages/ZetaLegal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
