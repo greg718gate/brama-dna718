@@ -55,4 +55,4 @@ print("coherence:", out[0], "Tf:", out[1], "Mc:", out[2], "f_tracked:", out[3])
 - For streaming windows, feed contiguous chunks — bandpass state is preserved.
 
 ===========================================================================================
-SUPPORT: contact@zeta-core-dns.com | REGION: ABERDEEN, UK
+SUPPORT: contact@zeta-core-dsp.com | REGION: ABERDEEN, UK

@@ -9,14 +9,14 @@ export default function ZetaFooter({ lang = "pl" as "pl" | "en" }) {
       <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <div className="font-semibold text-foreground">Zeta Core Ltd</div>
-          <div>London, United Kingdom · <a href="mailto:contact@zeta-core-dns.com" className="underline hover:text-foreground">contact@zeta-core-dns.com</a></div>
+          <div>London, United Kingdom · <a href="mailto:contact@zeta-core-dsp.com" className="underline hover:text-foreground">contact@zeta-core-dsp.com</a></div>
           <div>© {new Date().getFullYear()} Zeta Core Ltd. {t.rights}.</div>
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <Link to="/zeta/legal" className="hover:text-foreground underline">{t.legal}</Link>
           <Link to="/zeta/integration" className="hover:text-foreground underline">{t.integration}</Link>
           <Link to="/zeta/faq" className="hover:text-foreground underline">{t.faq}</Link>
-          <a href="mailto:contact@zeta-core-dns.com" className="hover:text-foreground underline">{t.contact}</a>
+          <a href="mailto:contact@zeta-core-dsp.com" className="hover:text-foreground underline">{t.contact}</a>
         </div>
       </div>
     </footer>

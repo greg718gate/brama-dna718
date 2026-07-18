@@ -4,7 +4,7 @@
 
 Please **do not** open a public GitHub issue for security reports.
 
-Contact: **contact@zeta-core-dns.com**
+Contact: **contact@zeta-core-dsp.com**
 Subject prefix: `[ZETA-CORE SECURITY]`
 
 Include:

@@ -120,4 +120,4 @@ No `.py`, `.pyc`, `.c`, `.h`, or plaintext source of the engine internals is com
 
 ## Licensing & Contact
 
-This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, contact **contact@zeta-core-dns.com**.
+This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, contact **contact@zeta-core-dsp.com**.

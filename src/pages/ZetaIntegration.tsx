@@ -15,7 +15,7 @@ const T = {
     l1Cost: "Koszt: 0 £ · Czas: 2 minuty · Dla kogo: pilot, warsztaty, pierwsze demo",
     l1Steps: [
       "Pracownik podchodzi do maszyny z telefonem (Android/iPhone) lub laptopem.",
-      "Otwiera w przeglądarce: brama-dna718.com/zeta",
+      "Otwiera w przeglądarce: zeta-core-dsp.com/zeta",
       "Wpisuje kod dostępu otrzymany mailem od nas.",
       "Wybiera profil maszyny (np. „Silnik elektryczny 50 Hz\") i wersję silnika (v1.0 / v1.1 / v2.0).",
       "OPCJA A — Plik: nagrywa 10-30 sekund dźwięku maszyny → wgrywa → raport PDF w 10 sekund.",
@@ -28,7 +28,7 @@ const T = {
       "Klient kupuje akcelerometr USB (np. Digiducer 333D01, PCB 356A32).",
       "Mocuje magnesem lub śrubą do obudowy maszyny (najlepiej przy łożysku lub przekładni).",
       "Nagrywa pomiar do pliku CSV (kolumny: X, Y, Z) — darmowym softem producenta czujnika.",
-      "Wgrywa CSV na brama-dna718.com/zeta → wybiera silnik v2.0 Spatial → raport 3-osiowy PDF.",
+      "Wgrywa CSV na zeta-core-dsp.com/zeta → wybiera silnik v2.0 Spatial → raport 3-osiowy PDF.",
     ],
     l2Result: "Wynik: analiza per oś (X, Y, Z) + globalne tarcie topologiczne + wykrywanie usterek łożysk i przekładni.",
     l3Title: "POZIOM 3 — Integracja SCADA / PLC (Fleet v3.0)",
@@ -70,7 +70,7 @@ const T = {
     hmacSecret: "Sekret HMAC (32 bajty) trzymamy tylko my. Bez niego nikt nie wygeneruje ważnego tokenu, nawet jeśli ukradnie plik .so. To standardowy mechanizm używany m.in. przez AWS, Stripe, GitHub.",
     contactTitle: "Kontakt dla klientów",
     contactBody: "Wszystkie zapytania handlowe, prośby o kod dostępu do portalu, wystawienie licencji HMAC lub pilot 3-miesięczny:",
-    contactEmail: "contact@zeta-core-dns.com",
+    contactEmail: "contact@zeta-core-dsp.com",
     contactRegion: "Region: Aberdeen, Szkocja, UK",
     pricingTitle: "Cennik referencyjny",
     pricing: [
@@ -90,7 +90,7 @@ const T = {
     l1Cost: "Cost: £0 · Time: 2 minutes · For: pilot, workshops, first demo",
     l1Steps: [
       "Technician walks up to the machine with a phone (Android/iPhone) or laptop.",
-      "Opens in browser: brama-dna718.com/zeta",
+      "Opens in browser: zeta-core-dsp.com/zeta",
       "Enters the access code we sent by email.",
       "Selects machine profile (e.g. \"Electric motor 50 Hz\") and engine version (v1.0 / v1.1 / v2.0).",
       "OPTION A — File: records 10-30 seconds of machine sound → uploads → PDF report in 10 seconds.",
@@ -103,7 +103,7 @@ const T = {
       "Client buys a USB accelerometer (e.g. Digiducer 333D01, PCB 356A32).",
       "Attaches it with a magnet or bolt to the machine housing (best near a bearing or gearbox).",
       "Records a measurement to CSV (columns: X, Y, Z) using the sensor vendor's free software.",
-      "Uploads the CSV to brama-dna718.com/zeta → selects engine v2.0 Spatial → tri-axial PDF report.",
+      "Uploads the CSV to zeta-core-dsp.com/zeta → selects engine v2.0 Spatial → tri-axial PDF report.",
     ],
     l2Result: "Result: per-axis analysis (X, Y, Z) + global topological friction + bearing/gearbox fault detection.",
     l3Title: "LEVEL 3 — SCADA / PLC integration (Fleet v3.0)",
@@ -145,7 +145,7 @@ const T = {
     hmacSecret: "The HMAC secret (32 bytes) is held only by us. Without it, nobody can mint a valid token, even if the .so file is stolen. This is the standard mechanism used by AWS, Stripe, GitHub and others.",
     contactTitle: "Client contact",
     contactBody: "All commercial enquiries, portal access codes, HMAC licence issuance or 3-month pilots:",
-    contactEmail: "contact@zeta-core-dns.com",
+    contactEmail: "contact@zeta-core-dsp.com",
     contactRegion: "Region: Aberdeen, Scotland, UK",
     pricingTitle: "Reference pricing",
     pricing: [
