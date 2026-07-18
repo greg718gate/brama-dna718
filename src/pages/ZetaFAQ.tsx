@@ -185,7 +185,7 @@ export default function ZetaFAQ() {
           </CardContent>
         </Card>
       </div>
-      <ZetaFooter lang={'lang' in Object.keys(this||{})?undefined:undefined as any} />
+      <ZetaFooter lang={lang} />
     </div>
   );
 }

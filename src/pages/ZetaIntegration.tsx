@@ -277,7 +277,7 @@ export default function ZetaIntegration() {
           <p className="text-xs text-white/50 mt-2">{t.contactRegion}</p>
         </Card>
       </div>
-      <ZetaFooter lang={'lang' in Object.keys(this||{})?undefined:undefined as any} />
+      <ZetaFooter lang={lang} />
     </div>
   );
 }
