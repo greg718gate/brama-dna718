@@ -141,3 +141,22 @@ All three engines are callable from the portal via the engine selector.
 ---
 
 **Business contact:** see the project profile on the platform.
+
+---
+
+## 8. Company & Domain (2026-07-18)
+
+- **Legal entity:** Zeta Core Ltd, London, United Kingdom
+- **Business email:** contact@zeta-core-dns.com
+- **Business domain:** zeta-core-dns.com (Namecheap, Private Email)
+- **Legal page:** `/zeta/legal` — About, Privacy Policy, Terms of Service (PL/EN)
+- **Footer:** professional footer with Ltd info added to `/zeta`, `/zeta/faq`, `/zeta/integration`
+
+**Action required from owner (one-time, ~1 minute):**
+1. Project Settings → Domains → **Connect Domain** → enter `zeta-core-dns.com`.
+2. Follow the automatic DNS setup (Namecheap allows this without leaving the flow).
+3. Once verified, `/zeta` becomes reachable at `https://zeta-core-dns.com/zeta`.
+
+**Email check:** https://privateemail.com (login: `contact@zeta-core-dns.com`) or the "Private Email" mobile app.
+
+**Placeholder to fill:** Companies House number in `src/pages/ZetaLegal.tsx` (`COMPANY.number`) once known.
