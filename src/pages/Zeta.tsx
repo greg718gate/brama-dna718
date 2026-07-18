@@ -536,6 +536,11 @@ export default function Zeta() {
           {LangToggle}
         </header>
 
+        <div className="flex flex-wrap gap-2 mb-4 text-xs">
+          <a href="/zeta/faq" className="px-3 py-1.5 rounded border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10">FAQ & Tests</a>
+          <a href="/zeta/integration" className="px-3 py-1.5 rounded border border-white/20 text-white/80 hover:bg-white/5">{lang === "pl" ? "Instrukcja integracji" : "Integration guide"}</a>
+        </div>
+
         {/* Machine profile selector */}
         <Card className="p-4 bg-black/40 border-white/10 mb-6">
           <label className="text-xs text-white/60 uppercase tracking-wider">{t("machineProfile")}</label>
