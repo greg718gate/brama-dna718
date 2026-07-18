@@ -40,6 +40,12 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hostname.includes("zeta-core-dsp.com")) {
+      navigate("/zeta", { replace: true });
+    }
+  }, [navigate]);
+
   // Navigate from StartGuide to appropriate tab/section
   const handleStartGuideNavigate = (section: string) => {
     if (section === "biometric") {

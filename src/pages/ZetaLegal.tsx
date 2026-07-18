@@ -11,8 +11,8 @@ const COMPANY = {
   name: "Zeta Core Ltd",
   number: "[Companies House No. — to be provided]",
   address: "London, United Kingdom",
-  email: "contact@zeta-core-dns.com",
-  domain: "zeta-core-dns.com",
+  email: "contact@zeta-core-dsp.com",
+  domain: "zeta-core-dsp.com",
 };
 
 const T = {

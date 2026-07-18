@@ -39,4 +39,4 @@ out = (ctypes.c_double * 8)()
 rc  = lib.run_zeta_spatial(buf, out, n, 44100, 150.0, LICENSE)
 
 ===========================================================================================
-SUPPORT: contact@zeta-core-dns.com
+SUPPORT: contact@zeta-core-dsp.com

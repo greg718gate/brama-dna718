@@ -245,6 +245,18 @@ export default function Zeta() {
   const currentProfile = PROFILES.find((p) => p.id === profile)!;
   const currentEngine = ENGINES.find((e) => e.id === engineVersion)!;
 
+  useEffect(() => {
+    const title = lang === "pl" ? "Zeta-Core DSP — Diagnostyka maszyn" : "Zeta-Core DSP — Machine Diagnostics";
+    const desc = lang === "pl"
+      ? "Silnik diagnostyki predykcyjnej Zeta-Core DSP: analiza drgań, koherencja fazowa, raporty PDF, monitoring 24/7."
+      : "Zeta-Core DSP predictive diagnostics engine: vibration analysis, phase coherence, PDF reports, 24/7 monitoring.";
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", desc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", desc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", "https://zeta-core-dsp.com/zeta");
+  }, [lang]);
+
   // File mode
   const [file, setFile] = useState<File | null>(null);
   const [csvSampleRate, setCsvSampleRate] = useState(1000);
@@ -482,7 +494,7 @@ export default function Zeta() {
     }
 
     doc.setFontSize(8); doc.setTextColor(120);
-    doc.text("Zeta-Core Diagnostics \u2014 Confidential. Contact: contact@zeta-core-dns.com", m, 285);
+    doc.text("Zeta-Core Diagnostics \u2014 Confidential. Contact: contact@zeta-core-dsp.com", m, 285);
     doc.save(`ZetaCore_Report_${result.filename.replace(/\.[^.]+$/, "")}.pdf`);
   };
 
@@ -517,7 +529,7 @@ export default function Zeta() {
             className="bg-black/40 border-white/20" placeholder={t("accessCode")} />
           <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">{t("enter")}</Button>
           <p className="text-xs text-white/40 mt-6 text-center">
-            {t("footer")}<br />Contact: contact@zeta-core-dns.com
+            {t("footer")}<br />Contact: contact@zeta-core-dsp.com
           </p>
         </Card>
       </div>
@@ -828,7 +840,7 @@ export default function Zeta() {
         </Tabs>
 
         <footer className="mt-12 text-xs text-white/40 text-center border-t border-white/10 pt-4">
-          {t("footer")} &middot; contact@zeta-core-dns.com
+          {t("footer")} &middot; contact@zeta-core-dsp.com
         </footer>
       </div>
     </div>
