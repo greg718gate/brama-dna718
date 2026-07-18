@@ -20,6 +20,7 @@ import SourceArchive from "./pages/SourceArchive";
 import MojeStudioWideo from "./pages/MojeStudioWideo";
 import Zeta from "./pages/Zeta";
 import ZetaIntegration from "./pages/ZetaIntegration";
+import ZetaFAQ from "./pages/ZetaFAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/moje-studio-wideo/*" element={<MojeStudioWideo />} />
 
               <Route path="/zeta/integration" element={<ZetaIntegration />} />
+              <Route path="/zeta/faq" element={<ZetaFAQ />} />
               <Route path="/zeta" element={<Zeta />} />
               <Route path="/zeta/*" element={<Zeta />} />
 
