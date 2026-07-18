@@ -254,6 +254,7 @@ export default function Zeta() {
     document.querySelector('meta[name="description"]')?.setAttribute("content", desc);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", desc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", "https://zeta-core-dsp.com/zeta");
   }, [lang]);
 
   // File mode
