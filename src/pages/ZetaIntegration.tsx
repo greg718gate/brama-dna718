@@ -69,7 +69,7 @@ const T = {
     hmacSecret: "Sekret HMAC (32 bajty) trzymamy tylko my. Bez niego nikt nie wygeneruje ważnego tokenu, nawet jeśli ukradnie plik .so. To standardowy mechanizm używany m.in. przez AWS, Stripe, GitHub.",
     contactTitle: "Kontakt dla klientów",
     contactBody: "Wszystkie zapytania handlowe, prośby o kod dostępu do portalu, wystawienie licencji HMAC lub pilot 3-miesięczny:",
-    contactEmail: "bramadna718@gmail.com",
+    contactEmail: "contact@zeta-core-dns.com",
     contactRegion: "Region: Aberdeen, Szkocja, UK",
     pricingTitle: "Cennik referencyjny",
     pricing: [
@@ -144,7 +144,7 @@ const T = {
     hmacSecret: "The HMAC secret (32 bytes) is held only by us. Without it, nobody can mint a valid token, even if the .so file is stolen. This is the standard mechanism used by AWS, Stripe, GitHub and others.",
     contactTitle: "Client contact",
     contactBody: "All commercial enquiries, portal access codes, HMAC licence issuance or 3-month pilots:",
-    contactEmail: "bramadna718@gmail.com",
+    contactEmail: "contact@zeta-core-dns.com",
     contactRegion: "Region: Aberdeen, Scotland, UK",
     pricingTitle: "Reference pricing",
     pricing: [

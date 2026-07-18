@@ -482,7 +482,7 @@ export default function Zeta() {
     }
 
     doc.setFontSize(8); doc.setTextColor(120);
-    doc.text("Zeta-Core Diagnostics \u2014 Confidential. Contact: bramadna718@gmail.com", m, 285);
+    doc.text("Zeta-Core Diagnostics \u2014 Confidential. Contact: contact@zeta-core-dns.com", m, 285);
     doc.save(`ZetaCore_Report_${result.filename.replace(/\.[^.]+$/, "")}.pdf`);
   };
 
@@ -517,7 +517,7 @@ export default function Zeta() {
             className="bg-black/40 border-white/20" placeholder={t("accessCode")} />
           <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">{t("enter")}</Button>
           <p className="text-xs text-white/40 mt-6 text-center">
-            {t("footer")}<br />Contact: bramadna718@gmail.com
+            {t("footer")}<br />Contact: contact@zeta-core-dns.com
           </p>
         </Card>
       </div>
@@ -828,7 +828,7 @@ export default function Zeta() {
         </Tabs>
 
         <footer className="mt-12 text-xs text-white/40 text-center border-t border-white/10 pt-4">
-          {t("footer")} &middot; bramadna718@gmail.com
+          {t("footer")} &middot; contact@zeta-core-dns.com
         </footer>
       </div>
     </div>
