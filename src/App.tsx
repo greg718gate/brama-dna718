@@ -74,6 +74,7 @@ const App = () => (
 
               <Route path="/zeta/integration" element={<ZetaIntegration />} />
               <Route path="/zeta/faq" element={<ZetaFAQ />} />
+              <Route path="/zeta/legal" element={<ZetaLegal />} />
               <Route path="/zeta" element={<Zeta />} />
               <Route path="/zeta/*" element={<Zeta />} />
 
