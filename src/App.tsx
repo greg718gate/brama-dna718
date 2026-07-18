@@ -19,6 +19,7 @@ import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
 import SourceArchive from "./pages/SourceArchive";
 import MojeStudioWideo from "./pages/MojeStudioWideo";
 import Zeta from "./pages/Zeta";
+import ZetaIntegration from "./pages/ZetaIntegration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/moje-studio-wideo" element={<MojeStudioWideo />} />
               <Route path="/moje-studio-wideo/*" element={<MojeStudioWideo />} />
 
+              <Route path="/zeta/integration" element={<ZetaIntegration />} />
               <Route path="/zeta" element={<Zeta />} />
               <Route path="/zeta/*" element={<Zeta />} />
 
