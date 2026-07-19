@@ -13,8 +13,8 @@ type Lang = "pl" | "en";
 
 const T = {
   pl: {
-    nav: { services: "Usługi", tech: "Technologia", tests: "Testy", pricing: "Cennik", faq: "FAQ", contact: "Kontakt", portal: "Portal diagnostyczny" },
-    heroBadge: "Zeta Core Ltd · London, UK",
+    nav: { services: "Usługi", tech: "Technologia", why: "Dlaczego lepsze", tests: "Testy", pricing: "Cennik", faq: "FAQ", contact: "Kontakt", portal: "Portal diagnostyczny" },
+    heroBadge: "NovaStream88 Ltd · Londyn (rej.) · Aberdeen (operacyjnie)",
     heroTitle: "Diagnostyka drgań i akustyki maszyn przemysłowych",
     heroSub: "ZETA-CORE to silnik analizy koherencji fazowej i widma FFT, który wykrywa uszkodzenia łożysk, niewyważenie, luzy mechaniczne i kawitację — z pliku audio, CSV z akcelerometru lub strumienia SCADA/MQTT.",
     heroCtaPortal: "Uruchom portal diagnostyczny",
@@ -29,6 +29,32 @@ const T = {
     aboutLead: "Zamieniamy zwykły mikrofon, akcelerometr lub istniejący system SCADA w system predykcyjnej diagnostyki maszyn wirujących.",
     aboutP1: "Analizujemy sygnały drganiowe i akustyczne z silników, pomp, wentylatorów, przekładni i łożysk. Silnik ZETA-CORE liczy koherencję fazową, tarcie topologiczne i kondensację usterki, a następnie zwraca status HEALTHY / WATCH / DEGRADED / CRITICAL wraz z widmem FFT i śladem czasowym.",
     aboutP2: "Wszystko dzieje się w naszej chmurze (edge function) — klient nie musi instalować niczego oprócz dostarczenia pliku pomiarowego lub strumienia. Surowe nagrania nie są przechowywane trwale.",
+    whyTitle: "Dlaczego lepsze niż to, co macie dziś",
+    whySub: "Porównanie z typowymi rozwiązaniami stosowanymi w zakładach: obchody z miernikiem drgań, analizatory FFT od CSI/SKF/Fluke, systemy CBM oparte na uczeniu maszynowym.",
+    whyPoints: [
+      { name: "Wykrywa usterkę o tygodnie wcześniej", desc: "Koherencja fazowa spada zanim RMS drgań przekroczy alarm ISO 10816. Typowo 2–6 tygodni wyprzedzenia względem klasycznego pomiaru poziomu drgań." },
+      { name: "Bez czarnej skrzynki AI", desc: "Progi HEALTHY / WATCH / DEGRADED / CRITICAL są deterministyczne i audytowalne. Konkurencja oparta na ML wymaga miesięcy uczenia i nie tłumaczy decyzji." },
+      { name: "Zero CAPEX na sprzęt", desc: "Startujesz telefonem lub istniejącym akcelerometrem/SCADA. Konkurencja (SKF @ptitude, Emerson AMS) wymaga instalacji czujników za £15–50k na maszynę." },
+      { name: "Trójosiowa analiza X/Y/Z (v2.0)", desc: "Osobne widma dla każdej osi + detekcja osi dominującej — precyzyjnie wskazuje, czy usterka jest w łożysku, przekładni czy fundamencie." },
+      { name: "Wdrożenie w 1 dzień", desc: "Bez integratora, bez PLC, bez przewiertów. Klasyczny system CBM to 3–9 miesięcy wdrożenia i £50–200k opłat integracyjnych." },
+      { name: "Ceny per raport lub per maszyna", desc: "Płacisz za wynik, nie za licencję pływającą. Konkurencja: £8–25k rocznie za stanowisko + koszt inżyniera." },
+    ],
+    savingsTitle: "Ile oszczędza jedna awaria, której uda się uniknąć",
+    savingsSub: "Konserwatywne kalkulacje dla typowych maszyn w UK (dane branżowe: ARC Advisory Group, Deloitte Predictive Maintenance 2023, SKF whitepapers).",
+    savings: [
+      { case: "Silnik 75 kW w pompowni", downtime: "8 h przestoju", cost: "£12,000", note: "Awaryjna wymiana łożyska + utrata produkcji. Wczesna detekcja → planowa wymiana w weekend za £1,200." },
+      { case: "Wentylator przemysłowy 200 kW", downtime: "24 h przestoju", cost: "£45,000", note: "Niewyważenie wirnika → uszkodzenie wału. Wykrycie 4 tygodnie wcześniej → wyważenie na miejscu za £800." },
+      { case: "Przekładnia w linii produkcyjnej", downtime: "72 h + części", cost: "£120,000+", note: "Uszkodzenie zębów → wymiana całej przekładni + kara umowna. Wczesne wykrycie → wymiana oleju i regulacja luzu." },
+      { case: "Sprężarka śrubowa 55 kW", downtime: "12 h", cost: "£8,500", note: "Zatarcie łożyska głównego. Monitoring miesięczny za £400 zwraca się po pierwszej uniknionej awarii." },
+    ],
+    savingsFootnote: "ROI monitoringu miesięcznego typowo 8:1 – 25:1 (Deloitte 2023: średnio 40% redukcja kosztów utrzymania, 70% redukcja przestojów nieplanowanych, 25% wydłużenie żywotności maszyn).",
+    roiTitle: "Szybki rachunek zwrotu",
+    roiRows: [
+      { l: "Koszt monitoringu 10 maszyn / rok", v: "£48,000" },
+      { l: "Średnia liczba uniknionych awarii / rok", v: "2–4" },
+      { l: "Średni koszt jednej awarii", v: "£15,000 – £120,000" },
+      { l: "Szacowany roczny zysk netto", v: "£30,000 – £430,000" },
+    ],
     servicesTitle: "Usługi",
     servicesSub: "Trzy wersje silnika dobierane do rodzaju maszyny.",
     services: [
@@ -75,14 +101,14 @@ const T = {
     faqMore: "Pełne FAQ i wyniki testów",
     contactTitle: "Kontakt",
     contactLead: "Pilotaż lub pierwszy raport diagnostyczny — bez opłaty wstępnej.",
-    contactCompany: "Zeta Core Ltd",
-    contactAddress: "London, United Kingdom",
+    contactCompany: "NovaStream88 Ltd",
+    contactAddress: "Siedziba rejestrowa: Londyn, Wielka Brytania · Operacje: Aberdeen, Szkocja",
     contactEmailLabel: "E-mail biznesowy",
     integrationCta: "Instrukcja integracji krok po kroku",
   },
   en: {
-    nav: { services: "Services", tech: "Technology", tests: "Tests", pricing: "Pricing", faq: "FAQ", contact: "Contact", portal: "Diagnostic portal" },
-    heroBadge: "Zeta Core Ltd · London, UK",
+    nav: { services: "Services", tech: "Technology", why: "Why better", tests: "Tests", pricing: "Pricing", faq: "FAQ", contact: "Contact", portal: "Diagnostic portal" },
+    heroBadge: "NovaStream88 Ltd · London (reg.) · Aberdeen (operations)",
     heroTitle: "Vibration and acoustic diagnostics for industrial machinery",
     heroSub: "ZETA-CORE is a phase-coherence and FFT analytics engine that detects bearing damage, imbalance, mechanical looseness and cavitation — from an audio file, an accelerometer CSV, or a live SCADA/MQTT stream.",
     heroCtaPortal: "Open diagnostic portal",
@@ -97,6 +123,32 @@ const T = {
     aboutLead: "We turn a plain microphone, an accelerometer or an existing SCADA stream into predictive diagnostics for rotating machinery.",
     aboutP1: "We analyse vibration and acoustic signals from motors, pumps, fans, gearboxes and bearings. The ZETA-CORE engine computes phase coherence, topological friction and fault condensation, and returns a HEALTHY / WATCH / DEGRADED / CRITICAL status together with the FFT spectrum and a time trace.",
     aboutP2: "Everything runs in our cloud edge function — the client does not need to install anything beyond providing a measurement file or stream. Raw recordings are not stored persistently.",
+    whyTitle: "Why it beats what you have today",
+    whySub: "Compared with what plants typically use: hand-held vibration meters on walk-around routes, CSI/SKF/Fluke FFT analysers, and ML-based CBM platforms.",
+    whyPoints: [
+      { name: "Catches faults weeks earlier", desc: "Phase coherence drops before vibration RMS crosses the ISO 10816 alarm — typically 2–6 weeks of lead time over classical amplitude-only monitoring." },
+      { name: "No black-box AI", desc: "HEALTHY / WATCH / DEGRADED / CRITICAL thresholds are deterministic and auditable. ML-based competitors need months of training and can't explain their calls." },
+      { name: "Zero hardware CAPEX", desc: "Start with a phone or an existing accelerometer / SCADA tag. Competitors (SKF @ptitude, Emerson AMS) need £15–50k per machine in installed sensors." },
+      { name: "Tri-axial X/Y/Z analysis (v2.0)", desc: "Separate spectra per axis + dominant-axis detection — pinpoints whether the fault sits in the bearing, gearbox or foundation." },
+      { name: "One-day deployment", desc: "No integrator, no PLC, no drilling. A traditional CBM roll-out is 3–9 months and £50–200k in integration fees." },
+      { name: "Per-report or per-machine pricing", desc: "You pay for the answer, not a floating licence. Competitors: £8–25k per seat per year plus engineer time." },
+    ],
+    savingsTitle: "What one avoided failure is worth",
+    savingsSub: "Conservative estimates for typical UK industrial machines (industry sources: ARC Advisory Group, Deloitte Predictive Maintenance 2023, SKF whitepapers).",
+    savings: [
+      { case: "75 kW pump-house motor", downtime: "8 h downtime", cost: "£12,000", note: "Emergency bearing swap + lost throughput. Early detection → planned weekend swap for £1,200." },
+      { case: "200 kW industrial fan", downtime: "24 h downtime", cost: "£45,000", note: "Rotor imbalance → shaft damage. Detected 4 weeks earlier → on-site balancing for £800." },
+      { case: "Production-line gearbox", downtime: "72 h + parts", cost: "£120,000+", note: "Tooth damage → full gearbox swap + contractual penalty. Early detection → oil change and backlash adjustment." },
+      { case: "55 kW screw compressor", downtime: "12 h", cost: "£8,500", note: "Main bearing seizure. £400/month monitoring pays for itself after the first avoided failure." },
+    ],
+    savingsFootnote: "Monthly-monitoring ROI is typically 8:1 – 25:1 (Deloitte 2023: 40% average reduction in maintenance cost, 70% reduction in unplanned downtime, 25% longer machine life).",
+    roiTitle: "Quick payback calculation",
+    roiRows: [
+      { l: "Monitoring cost, 10 machines / year", v: "£48,000" },
+      { l: "Avoided failures per year (typical)", v: "2–4" },
+      { l: "Average cost of one failure", v: "£15,000 – £120,000" },
+      { l: "Estimated annual net saving", v: "£30,000 – £430,000" },
+    ],
     servicesTitle: "Services",
     servicesSub: "Three engine versions matched to the type of machine.",
     services: [
@@ -143,8 +195,8 @@ const T = {
     faqMore: "Full FAQ and test results",
     contactTitle: "Contact",
     contactLead: "Pilot or first diagnostic report — no upfront fee.",
-    contactCompany: "Zeta Core Ltd",
-    contactAddress: "London, United Kingdom",
+    contactCompany: "NovaStream88 Ltd",
+    contactAddress: "Registered office: London, United Kingdom · Operations: Aberdeen, Scotland",
     contactEmailLabel: "Business e-mail",
     integrationCta: "Step-by-step integration guide",
   },
@@ -168,8 +220,8 @@ export default function Zeta() {
       ? "ZETA-CORE · Diagnostyka drgań maszyn przemysłowych"
       : "ZETA-CORE · Industrial machine vibration diagnostics";
     const desc = lang === "pl"
-      ? "Silnik analizy koherencji fazowej i FFT dla silników, pomp, wentylatorów i łożysk. Raporty diagnostyczne, monitoring 24/7, Fleet API. Zeta Core Ltd, Londyn."
-      : "Phase-coherence and FFT analytics engine for motors, pumps, fans and bearings. Diagnostic reports, 24/7 monitoring, Fleet API. Zeta Core Ltd, London.";
+      ? "Silnik analizy koherencji fazowej i FFT dla silników, pomp, wentylatorów i łożysk. Raporty diagnostyczne, monitoring 24/7, Fleet API. NovaStream88 Ltd — Londyn / Aberdeen."
+      : "Phase-coherence and FFT analytics engine for motors, pumps, fans and bearings. Diagnostic reports, 24/7 monitoring, Fleet API. NovaStream88 Ltd — London / Aberdeen.";
     let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
     meta.content = desc;
@@ -192,6 +244,7 @@ export default function Zeta() {
           <div className="hidden md:flex items-center gap-5 text-sm text-white/70">
             <a href="#services" className="hover:text-white">{t.nav.services}</a>
             <a href="#tech" className="hover:text-white">{t.nav.tech}</a>
+            <a href="#why" className="hover:text-white">{t.nav.why}</a>
             <a href="#tests" className="hover:text-white">{t.nav.tests}</a>
             <a href="#pricing" className="hover:text-white">{t.nav.pricing}</a>
             <a href="#faq" className="hover:text-white">{t.nav.faq}</a>
@@ -259,6 +312,66 @@ export default function Zeta() {
           </div>
         </div>
       </section>
+
+      {/* Why better + Savings */}
+      <section id="why" className="border-t border-white/10 bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.whyTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-2 max-w-3xl">{t.whySub}</h2>
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {t.whyPoints.map((p, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-black/40 p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <h3 className="font-medium">{p.name}</h3>
+                </div>
+                <p className="text-sm text-white/65 leading-relaxed">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14">
+            <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.savingsTitle}</div>
+            <h3 className="text-xl md:text-2xl font-semibold mb-6 max-w-3xl text-white/90">{t.savingsSub}</h3>
+            <div className="overflow-x-auto rounded-lg border border-white/10">
+              <table className="w-full text-sm">
+                <thead className="bg-white/[0.04] text-white/60 text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Maszyna" : "Machine"}</th>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Przestój" : "Downtime"}</th>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Koszt awarii" : "Failure cost"}</th>
+                    <th className="text-left px-4 py-3 hidden md:table-cell">{lang === "pl" ? "Komentarz" : "Note"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {t.savings.map((s, i) => (
+                    <tr key={i} className="bg-black/30">
+                      <td className="px-4 py-3 font-medium text-white/90">{s.case}</td>
+                      <td className="px-4 py-3 text-white/70">{s.downtime}</td>
+                      <td className="px-4 py-3 text-cyan-300 font-semibold">{s.cost}</td>
+                      <td className="px-4 py-3 text-white/60 hidden md:table-cell">{s.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-xs text-white/50 max-w-3xl leading-relaxed">{t.savingsFootnote}</p>
+
+            <div className="mt-8 rounded-lg border border-cyan-500/30 bg-cyan-500/[0.04] p-5 max-w-2xl">
+              <div className="text-xs uppercase tracking-widest text-cyan-400 mb-3">{t.roiTitle}</div>
+              <dl className="space-y-2 text-sm">
+                {t.roiRows.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between gap-4 border-b border-white/5 pb-2 last:border-0">
+                    <dt className="text-white/70">{r.l}</dt>
+                    <dd className="text-white font-semibold">{r.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* Services */}
       <section id="services" className="border-t border-white/10 bg-white/[0.015]">

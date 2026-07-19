@@ -8,9 +8,10 @@ type Lang = "pl" | "en";
 
 // Company data — update when Companies House number is provided
 const COMPANY = {
-  name: "Zeta Core Ltd",
+  name: "NovaStream88 Ltd",
   number: "[Companies House No. — to be provided]",
-  address: "London, United Kingdom",
+  address: "Registered office: London, United Kingdom",
+  operations: "Operations: Aberdeen, Scotland, United Kingdom",
   email: "contact@zeta-core-dsp.com",
   domain: "zeta-core-dsp.com",
 };
@@ -22,8 +23,8 @@ const T = {
     back: "← Powrót do /zeta",
     aboutTitle: "O firmie",
     about: [
-      `${COMPANY.name} to brytyjska spółka z siedzibą w Londynie, dostarczająca oprogramowanie diagnostyczne ZETA-CORE — silnik analizy koherencji fazowej dla maszyn wirujących (silniki, pompy, wentylatory, łożyska, przekładnie).`,
-      `Numer w Companies House: ${COMPANY.number}. Siedziba: ${COMPANY.address}. Kontakt biznesowy: ${COMPANY.email}.`,
+      `${COMPANY.name} to brytyjska spółka z ograniczoną odpowiedzialnością z siedzibą rejestrową w Londynie, prowadząca działalność operacyjną z Aberdeen w Szkocji. Dostarczamy oprogramowanie diagnostyczne ZETA-CORE — silnik analizy koherencji fazowej dla maszyn wirujących (silniki, pompy, wentylatory, łożyska, przekładnie).`,
+      `Numer w Companies House: ${COMPANY.number}. ${COMPANY.address}. ${COMPANY.operations}. Kontakt biznesowy: ${COMPANY.email}.`,
       `Model działalności: raporty diagnostyczne na żądanie, subskrypcja miesięcznego monitoringu floty, integracja Fleet API v3.0 dla klientów korporacyjnych.`,
     ],
     privacyTitle: "Polityka prywatności",
@@ -54,8 +55,8 @@ const T = {
     back: "← Back to /zeta",
     aboutTitle: "About the company",
     about: [
-      `${COMPANY.name} is a UK-registered company based in London, providing the ZETA-CORE diagnostic software — a phase-coherence analytics engine for rotating machinery (motors, pumps, fans, bearings, gearboxes).`,
-      `Companies House number: ${COMPANY.number}. Registered address: ${COMPANY.address}. Business contact: ${COMPANY.email}.`,
+      `${COMPANY.name} is a UK private limited company with its registered office in London and day-to-day operations run from Aberdeen, Scotland. We provide the ZETA-CORE diagnostic software — a phase-coherence analytics engine for rotating machinery (motors, pumps, fans, bearings, gearboxes).`,
+      `Companies House number: ${COMPANY.number}. ${COMPANY.address}. ${COMPANY.operations}. Business contact: ${COMPANY.email}.`,
       `Business model: on-demand diagnostic reports, monthly fleet-monitoring subscriptions, and Fleet API v3.0 integrations for enterprise customers.`,
     ],
     privacyTitle: "Privacy Policy",
