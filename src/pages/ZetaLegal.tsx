@@ -23,8 +23,8 @@ const T = {
     back: "← Powrót do /zeta",
     aboutTitle: "O firmie",
     about: [
-      `${COMPANY.name} to brytyjska spółka z siedzibą w Londynie, dostarczająca oprogramowanie diagnostyczne ZETA-CORE — silnik analizy koherencji fazowej dla maszyn wirujących (silniki, pompy, wentylatory, łożyska, przekładnie).`,
-      `Numer w Companies House: ${COMPANY.number}. Siedziba: ${COMPANY.address}. Kontakt biznesowy: ${COMPANY.email}.`,
+      `${COMPANY.name} to brytyjska spółka z ograniczoną odpowiedzialnością z siedzibą rejestrową w Londynie, prowadząca działalność operacyjną z Aberdeen w Szkocji. Dostarczamy oprogramowanie diagnostyczne ZETA-CORE — silnik analizy koherencji fazowej dla maszyn wirujących (silniki, pompy, wentylatory, łożyska, przekładnie).`,
+      `Numer w Companies House: ${COMPANY.number}. ${COMPANY.address}. ${COMPANY.operations}. Kontakt biznesowy: ${COMPANY.email}.`,
       `Model działalności: raporty diagnostyczne na żądanie, subskrypcja miesięcznego monitoringu floty, integracja Fleet API v3.0 dla klientów korporacyjnych.`,
     ],
     privacyTitle: "Polityka prywatności",
