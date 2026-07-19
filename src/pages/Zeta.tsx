@@ -13,7 +13,7 @@ type Lang = "pl" | "en";
 
 const T = {
   pl: {
-    nav: { services: "Usługi", tech: "Technologia", tests: "Testy", pricing: "Cennik", faq: "FAQ", contact: "Kontakt", portal: "Portal diagnostyczny" },
+    nav: { services: "Usługi", tech: "Technologia", why: "Dlaczego lepsze", tests: "Testy", pricing: "Cennik", faq: "FAQ", contact: "Kontakt", portal: "Portal diagnostyczny" },
     heroBadge: "NovaStream88 Ltd · Londyn (rej.) · Aberdeen (operacyjnie)",
     heroTitle: "Diagnostyka drgań i akustyki maszyn przemysłowych",
     heroSub: "ZETA-CORE to silnik analizy koherencji fazowej i widma FFT, który wykrywa uszkodzenia łożysk, niewyważenie, luzy mechaniczne i kawitację — z pliku audio, CSV z akcelerometru lub strumienia SCADA/MQTT.",
