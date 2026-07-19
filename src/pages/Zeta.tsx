@@ -82,7 +82,7 @@ const T = {
   },
   en: {
     nav: { services: "Services", tech: "Technology", tests: "Tests", pricing: "Pricing", faq: "FAQ", contact: "Contact", portal: "Diagnostic portal" },
-    heroBadge: "Zeta Core Ltd · London, UK",
+    heroBadge: "NovaStream88 Ltd · London (reg.) · Aberdeen (operations)",
     heroTitle: "Vibration and acoustic diagnostics for industrial machinery",
     heroSub: "ZETA-CORE is a phase-coherence and FFT analytics engine that detects bearing damage, imbalance, mechanical looseness and cavitation — from an audio file, an accelerometer CSV, or a live SCADA/MQTT stream.",
     heroCtaPortal: "Open diagnostic portal",
