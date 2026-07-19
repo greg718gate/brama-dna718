@@ -313,6 +313,66 @@ export default function Zeta() {
         </div>
       </section>
 
+      {/* Why better + Savings */}
+      <section id="why" className="border-t border-white/10 bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.whyTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-2 max-w-3xl">{t.whySub}</h2>
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {t.whyPoints.map((p, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-black/40 p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <h3 className="font-medium">{p.name}</h3>
+                </div>
+                <p className="text-sm text-white/65 leading-relaxed">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14">
+            <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.savingsTitle}</div>
+            <h3 className="text-xl md:text-2xl font-semibold mb-6 max-w-3xl text-white/90">{t.savingsSub}</h3>
+            <div className="overflow-x-auto rounded-lg border border-white/10">
+              <table className="w-full text-sm">
+                <thead className="bg-white/[0.04] text-white/60 text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Maszyna" : "Machine"}</th>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Przestój" : "Downtime"}</th>
+                    <th className="text-left px-4 py-3">{lang === "pl" ? "Koszt awarii" : "Failure cost"}</th>
+                    <th className="text-left px-4 py-3 hidden md:table-cell">{lang === "pl" ? "Komentarz" : "Note"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {t.savings.map((s, i) => (
+                    <tr key={i} className="bg-black/30">
+                      <td className="px-4 py-3 font-medium text-white/90">{s.case}</td>
+                      <td className="px-4 py-3 text-white/70">{s.downtime}</td>
+                      <td className="px-4 py-3 text-cyan-300 font-semibold">{s.cost}</td>
+                      <td className="px-4 py-3 text-white/60 hidden md:table-cell">{s.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-xs text-white/50 max-w-3xl leading-relaxed">{t.savingsFootnote}</p>
+
+            <div className="mt-8 rounded-lg border border-cyan-500/30 bg-cyan-500/[0.04] p-5 max-w-2xl">
+              <div className="text-xs uppercase tracking-widest text-cyan-400 mb-3">{t.roiTitle}</div>
+              <dl className="space-y-2 text-sm">
+                {t.roiRows.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between gap-4 border-b border-white/5 pb-2 last:border-0">
+                    <dt className="text-white/70">{r.l}</dt>
+                    <dd className="text-white font-semibold">{r.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       {/* Services */}
       <section id="services" className="border-t border-white/10 bg-white/[0.015]">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
