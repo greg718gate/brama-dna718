@@ -27,6 +27,13 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// On the zeta-core-dsp.com domain, "/" should render the Zeta landing directly
+// (no /zeta suffix in the URL). On brama-dna718.com "/" keeps the Brama Index.
+const isZetaDomain =
+  typeof window !== "undefined" &&
+  window.location.hostname.indexOf("zeta-core-dsp.com") !== -1;
+const RootPage = isZetaDomain ? Zeta : Index;
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
