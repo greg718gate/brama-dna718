@@ -1,858 +1,454 @@
-import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine } from "recharts";
-import { Upload, FileAudio, Download, Lock, Activity, AlertTriangle, CheckCircle2, Mic, Square, Radio } from "lucide-react";
-import jsPDF from "jspdf";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Activity, Waves, Cpu, ShieldCheck, CheckCircle2, ArrowRight, Mail,
+  Building2, LineChart, Radio, FileText, Layers, Gauge, Factory,
+} from "lucide-react";
+import ZetaFooter from "@/components/ZetaFooter";
 
-const ACCESS_CODE = "ZETA-2026";
-
-// ---------- Machine profiles + engine variants ----------
-type ProfileId = "auto" | "motor50" | "motor60" | "pump" | "fan" | "bearing" | "gearbox";
-type EngineVersion = "v1.0" | "v1.1" | "v2.0";
-type Profile = {
-  id: ProfileId;
-  name: string;
-  desc: string;
-  targetFreq?: number; // Hz nominal
-};
-const PROFILES: Profile[] = [
-  { id: "auto",    name: "Auto / Nieznana maszyna",       desc: "Engine picks dominant frequency automatically." },
-  { id: "motor50", name: "Electric motor · 50 Hz / Silnik 50 Hz",  desc: "3-phase motor, EU/UK grid.",  targetFreq: 50 },
-  { id: "motor60", name: "Electric motor · 60 Hz / Silnik 60 Hz",  desc: "3-phase motor, US/Asia grid.", targetFreq: 60 },
-  { id: "pump",    name: "Pump / compressor / Pompa",            desc: "Rotational 20–60 Hz.",         targetFreq: 30 },
-  { id: "fan",     name: "Fan / blower / Wentylator",                 desc: "Rotational 10–30 Hz.",         targetFreq: 20 },
-  { id: "bearing", name: "Bearing / Łożysko",         desc: "Ball/roller bearing 100–500 Hz.", targetFreq: 200 },
-  { id: "gearbox", name: "Gearbox / Przekładnia",            desc: "Gear-mesh 200–2000 Hz.",       targetFreq: 500 },
-];
-
-const ENGINES: { id: EngineVersion; name: string; desc: string; bestFor: string }[] = [
-  { id: "v1.0", name: "v1.0 Standard Core", desc: "Stałe obroty / stable RPM", bestFor: "silnik, pompa, wentylator" },
-  { id: "v1.1", name: "v1.1 Adaptive Engine", desc: "Zmienny sygnał / adaptive tracker", bestFor: "dłuższe pliki, falowniki, różne RPM" },
-  { id: "v2.0", name: "v2.0 Spatial Multi-Axis", desc: "3 osie X/Y/Z / tri-axial", bestFor: "łożyska, przekładnie, czujniki 3-osiowe" },
-];
-
-type AxisSamples = { x: number[]; y: number[]; z: number[] };
-
-type ZetaResult = {
-  phaseCoherence: number;
-  topologicalFriction: number;
-  faultCondensation: number;
-  trackedFrequencyHz: number;
-  sampleRateHz: number;
-  nSamples: number;
-  status: "HEALTHY" | "WATCH" | "DEGRADED" | "CRITICAL";
-  spectrum: number[];
-  freqAxis: number[];
-  latencyMs: number;
-  filename: string;
-  timestampUtc: string;
-  engine: string;
-  engineVersion?: EngineVersion;
-  spatial?: {
-    axisCoherence: { x: number; y: number; z: number };
-    axisTf: { x: number; y: number; z: number };
-    axisMc: { x: number; y: number; z: number };
-    axisFrequencyHz: { x: number; y: number; z: number };
-    globalSpatialFriction: number;
-  } | null;
-};
-
-type TimelineEntry = {
-  t: number;             // seconds from start (file) or unix ms (live)
-  label: string;
-  status: ZetaResult["status"];
-  tf: number;
-  mc: number;
-  freq: number;
-  coh: number;
-};
-
-const statusColor: Record<string, string> = {
-  HEALTHY: "text-emerald-400 border-emerald-400",
-  WATCH: "text-yellow-400 border-yellow-400",
-  DEGRADED: "text-orange-400 border-orange-400",
-  CRITICAL: "text-red-500 border-red-500",
-};
-const statusBg: Record<string, string> = {
-  HEALTHY: "bg-emerald-500/10",
-  WATCH: "bg-yellow-500/10",
-  DEGRADED: "bg-orange-500/15",
-  CRITICAL: "bg-red-500/20",
-};
-const statusTextEn: Record<string, string> = {
-  HEALTHY: "Machine operating within normal parameters.",
-  WATCH: "Minor spectral anomalies detected. Continue monitoring.",
-  DEGRADED: "Significant fault signature detected. Schedule inspection.",
-  CRITICAL: "Severe fault detected. Immediate action recommended.",
-};
-const statusTextPl: Record<string, string> = {
-  HEALTHY: "Maszyna pracuje w normalnych parametrach.",
-  WATCH: "Wykryto drobne anomalie widmowe. Kontynuuj monitorowanie.",
-  DEGRADED: "Wykryto znaczącą sygnaturę usterki. Zaplanuj inspekcję.",
-  CRITICAL: "Poważna usterka. Zalecane natychmiastowe działanie.",
-};
-
-// ---------- Bilingual UI strings ----------
 type Lang = "pl" | "en";
+
 const T = {
-  header:            { pl: "Silnik Diagnostyki Kondycji Maszyn",       en: "Machine Health Diagnostic Engine" },
-  accessCode:        { pl: "Kod dostępu",                               en: "Access code" },
-  enter:             { pl: "Wejdź",                                     en: "Enter" },
-  invalidCode:       { pl: "Nieprawidłowy kod dostępu",                 en: "Invalid access code" },
-  accessGranted:     { pl: "Dostęp przyznany",                          en: "Access granted" },
-  machineProfile:    { pl: "Profil maszyny",                            en: "Machine profile" },
-  engineVersion:     { pl: "Wersja silnika",                            en: "Engine version" },
-  activeLabel:       { pl: "Aktywny",                                   en: "Active" },
-  activeNote:        { pl: "v2.0 przyjmuje CSV z 3 kolumnami X,Y,Z; audio/mikrofon działa jako mono na wszystkich osiach.", en: "v2.0 accepts CSV with 3 columns X,Y,Z; audio/microphone runs as mono fallback on all axes." },
-  tabFile:           { pl: "Analiza pliku",                             en: "File analysis" },
-  tabLive:           { pl: "Monitoring 24/7",                           en: "Live monitoring (24/7)" },
-  upload:            { pl: "Wgraj sygnał z maszyny",                    en: "Upload machine signal" },
-  uploadDesc:        { pl: "Dowolna długość — audio (WAV, MP3, M4A, OGG, FLAC) lub CSV/TXT z wartościami czujnika. Długie nagrania są automatycznie dzielone na okna 2–10 s i analizowane jako oś czasu.", en: "Any length — audio (WAV, MP3, M4A, OGG, FLAC) or CSV/TXT with sensor values. Long recordings are automatically split into 2–10 s windows and analysed as a timeline." },
-  chooseFile:        { pl: "Wybierz plik",                              en: "Choose file" },
-  csvSr:             { pl: "Częstotliwość próbkowania CSV (Hz):",       en: "CSV sample rate (Hz):" },
-  runDiag:           { pl: "Uruchom diagnostykę",                       en: "Run diagnostic" },
-  analysing:         { pl: "Analizuję…",                                en: "Analysing…" },
-  decoding:          { pl: "Dekoduję sygnał…",                          en: "Decoding signal…" },
-  complete:          { pl: "Zakończono",                                en: "Complete" },
-  worstStatus:       { pl: "Status najgorszego okna · przeanalizowanych okien:", en: "Worst-window status · windows analysed:" },
-  pdfReport:         { pl: "Raport PDF",                                en: "PDF report" },
-  metricsWorst:      { pl: "Metryki (najgorsze okno)",                  en: "Metrics (worst window)" },
-  phaseCoh:          { pl: "Koherencja fazy",                           en: "Phase Coherence" },
-  topoFric:          { pl: "Tarcie topologiczne",                       en: "Topological Friction" },
-  faultCond:         { pl: "Kondensacja usterki",                       en: "Fault Condensation" },
-  trackedFreq:       { pl: "Śledzona częstotliwość",                    en: "Tracked Frequency" },
-  hintCoh:           { pl: "0 = chaos · 1 = czysty ton",                en: "0 = chaotic · 1 = pure tone" },
-  hintTf:            { pl: "Tf · indeks nieporządku",                   en: "Tf · disorder index" },
-  hintMc:            { pl: "Mc · energia wstęg bocznych",               en: "Mc · sideband energy" },
-  hintFreq:          { pl: "Dominujący pik",                            en: "Dominant peak" },
-  spatialHead:       { pl: "v2.0 Spatial Multi-Axis · 3 osie X-Y-Z",    en: "v2.0 Spatial Multi-Axis · X-Y-Z" },
-  spatialGlobal:     { pl: "Globalne tarcie przestrzenne:",             en: "Global Spatial Friction:" },
-  timelineHead:      { pl: "Oś czasu · tarcie topologiczne",            en: "Timeline · Topological Friction over time" },
-  spectrumHead:      { pl: "Widmo częstotliwości (najgorsze okno)",     en: "Frequency spectrum (worst window)" },
-  liveHead:          { pl: "Monitoring 24/7",                           en: "Live 24/7 monitoring" },
-  liveDesc:          { pl: "Używa mikrofonu urządzenia lub podłączonego czujnika. Silnik analizuje okno 5 s co 5 s i uruchamia alert przy statusie DEGRADED/CRITICAL. Zostaw kartę otwartą na telefonie/tablecie/PC obok maszyny. Działa non-stop.", en: "Uses the device microphone or a connected sensor input. The engine analyses a 5-second window every 5 seconds and triggers an alert on DEGRADED or CRITICAL status. Leave the browser tab open on a phone, tablet or industrial PC placed near the machine. Runs continuously." },
-  startMon:          { pl: "Start monitoringu",                         en: "Start monitoring" },
-  stop:              { pl: "Stop",                                      en: "Stop" },
-  monitoring:        { pl: "Monitoring",                                en: "Monitoring" },
-  monStarted:        { pl: "Monitoring uruchomiony",                    en: "Live monitoring started" },
-  monStopped:        { pl: "Monitoring zatrzymany",                     en: "Live monitoring stopped" },
-  micDenied:         { pl: "Odmowa dostępu do mikrofonu: ",             en: "Microphone access denied: " },
-  currentStatus:     { pl: "Bieżący status",                            en: "Current status" },
-  liveTrend:         { pl: "Trend Tf (bieżący)",                        en: "Live Tf trend (rolling)" },
-  eventLog:          { pl: "Dziennik zdarzeń",                          en: "Event log" },
-  selectFileFirst:   { pl: "Najpierw wybierz plik",                     en: "Select a file first" },
-  analysisComplete:  { pl: "Analiza zakończona",                        en: "Analysis complete" },
-  analysisFailed:    { pl: "Analiza nie powiodła się",                  en: "Analysis failed" },
-  unsupported:       { pl: "Nieobsługiwany plik. Użyj WAV/MP3/M4A/OGG/FLAC lub CSV/TXT.", en: "Unsupported file. Use WAV/MP3/M4A/OGG/FLAC or CSV/TXT." },
-  footer:            { pl: "Zeta-Core Diagnostics — Aberdeen, UK",       en: "Zeta-Core Diagnostics — Aberdeen, UK" },
+  pl: {
+    nav: { services: "Usługi", tech: "Technologia", tests: "Testy", pricing: "Cennik", faq: "FAQ", contact: "Kontakt", portal: "Portal diagnostyczny" },
+    heroBadge: "Zeta Core Ltd · London, UK",
+    heroTitle: "Diagnostyka drgań i akustyki maszyn przemysłowych",
+    heroSub: "ZETA-CORE to silnik analizy koherencji fazowej i widma FFT, który wykrywa uszkodzenia łożysk, niewyważenie, luzy mechaniczne i kawitację — z pliku audio, CSV z akcelerometru lub strumienia SCADA/MQTT.",
+    heroCtaPortal: "Uruchom portal diagnostyczny",
+    heroCtaContact: "Zamów raport pilotażowy",
+    heroStat1: "14/14",
+    heroStat1Label: "testów jednostkowych zdanych",
+    heroStat2: "3 wersje",
+    heroStat2Label: "silnika (v1.0 / v1.1 / v2.0)",
+    heroStat3: "24/7",
+    heroStat3Label: "tryb monitoringu na żywo",
+    aboutTitle: "Co robimy",
+    aboutLead: "Zamieniamy zwykły mikrofon, akcelerometr lub istniejący system SCADA w system predykcyjnej diagnostyki maszyn wirujących.",
+    aboutP1: "Analizujemy sygnały drganiowe i akustyczne z silników, pomp, wentylatorów, przekładni i łożysk. Silnik ZETA-CORE liczy koherencję fazową, tarcie topologiczne i kondensację usterki, a następnie zwraca status HEALTHY / WATCH / DEGRADED / CRITICAL wraz z widmem FFT i śladem czasowym.",
+    aboutP2: "Wszystko dzieje się w naszej chmurze (edge function) — klient nie musi instalować niczego oprócz dostarczenia pliku pomiarowego lub strumienia. Surowe nagrania nie są przechowywane trwale.",
+    servicesTitle: "Usługi",
+    servicesSub: "Trzy wersje silnika dobierane do rodzaju maszyny.",
+    services: [
+      { icon: "gauge", tag: "v1.0", name: "Standard Core", desc: "Analiza koherencji fazowej dla maszyn o stałej prędkości obrotowej.", bullets: ["Silniki elektryczne 50/60 Hz", "Pompy, sprężarki, wentylatory", "Pojedynczy kanał audio lub CSV"] },
+      { icon: "waves", tag: "v1.1", name: "Adaptive Engine", desc: "Śledzenie zmiennej częstotliwości — dla napędów z falownikami i różnymi trybami pracy.", bullets: ["Zmienne RPM", "Długie nagrania (>10 min)", "Automatyczne okienkowanie"] },
+      { icon: "layers", tag: "v2.0", name: "Spatial Multi-Axis", desc: "Trójosiowa analiza X/Y/Z z akcelerometru — do łożysk, przekładni i wibracji strukturalnych.", bullets: ["3 osie równolegle", "Detekcja osi dominującej", "Import CSV 3-kolumnowego"] },
+    ],
+    techTitle: "Technologia",
+    techSub: "Konkretne metody, bez marketingu.",
+    tech: [
+      { name: "Koherencja fazowa", desc: "Mierzy stabilność fazy w oknie widmowym — spadek koherencji poprzedza mechaniczną usterkę zanim pojawi się słyszalny hałas." },
+      { name: "Analiza FFT + okienkowanie", desc: "Windowing 2–10 s z uśrednianiem, aby obsłużyć długie sygnały i wyciszyć szum pomiarowy." },
+      { name: "Tarcie topologiczne", desc: "Miara asymetrii widma wskazująca na niewyważenie, luzy lub rezonanse konstrukcyjne." },
+      { name: "Klasyfikacja statusu", desc: "Progi zdefiniowane deterministycznie: HEALTHY / WATCH / DEGRADED / CRITICAL — bez uczenia maszynowego czarnej skrzynki." },
+      { name: "Tryb Live 24/7", desc: "Pętla mikrofonowa lub strumień SCADA/MQTT z alarmami i eksportem CSV." },
+      { name: "Bezpieczeństwo", desc: "Analiza w pamięci funkcji brzegowej. Brak trwałego składowania nagrań. Licencjonowanie binarne HMAC-SHA256." },
+    ],
+    testsTitle: "Testy i walidacja",
+    testsSub: "Silnik ma pokrycie testami jednostkowymi w Vitest.",
+    testGroups: [
+      { name: "Funkcje bazowe", items: ["computeMean — poprawnie liczy średnią", "computeStd — poprawnie liczy odchylenie", "classifyStatus — poprawnie klasyfikuje 3 progi"] },
+      { name: "Koherencja fazowa v1.0", items: ["Wysoka koherencja dla czystej sinusoidy", "Niska koherencja dla białego szumu"] },
+      { name: "Adaptive v1.1", items: ["Śledzenie okna zmiennego RPM"] },
+      { name: "Spatial v2.0", items: ["Agregacja amplitudy X/Y/Z", "Detekcja osi dominującej"] },
+      { name: "UI Portal", items: ["Renderuje branding portalu", "Przełącznik języka PL/EN działa"] },
+    ],
+    testsAllPass: "14/14 zdanych · Vitest",
+    testsCta: "Zobacz szczegóły i FAQ",
+    pricingTitle: "Cennik",
+    pricingSub: "Modele współpracy dostępne dziś.",
+    pricing: [
+      { name: "Pojedynczy raport diagnostyczny", price: "£200 – £800", period: "za maszynę", desc: "Klient przesyła plik pomiarowy — otrzymuje raport PDF PL/EN z wynikiem, widmem i rekomendacją.", cta: "Zamów raport", featured: false },
+      { name: "Monitoring miesięczny floty", price: "od £400", period: "za maszynę / mies.", desc: "Cykliczne pomiary, alarmy, raport miesięczny. Pilotaż 3-miesięczny bez opłaty aktywacyjnej.", cta: "Rozpocznij pilotaż", featured: true },
+      { name: "Fleet API v3.0 (integracja)", price: "od £2,500", period: "wdrożenie + subskrypcja", desc: "REST / WebSocket / MQTT — bezpośrednia integracja z SCADA, historian, systemami CMMS.", cta: "Zapytaj o wdrożenie", featured: false },
+    ],
+    faqTitle: "Najczęstsze pytania",
+    faqSub: "Skrócona lista — pełny FAQ na osobnej stronie.",
+    faq: [
+      { q: "Czy potrzebuję specjalnego sprzętu?", a: "Nie w wersji startowej. Wystarczy telefon lub laptop z mikrofonem albo eksport CSV z istniejącego akcelerometru. Dla trybu 3-osiowego v2.0 potrzebny jest akcelerometr X/Y/Z." },
+      { q: "Jak długi plik można wgrać?", a: "Bez limitu — długie sygnały są automatycznie dzielone na okna 2–10 s i analizowane jako oś czasu." },
+      { q: "Co z bezpieczeństwem danych?", a: "Analiza odbywa się w pamięci funkcji brzegowej. Surowe nagrania nie są przechowywane. Zgodność z UK GDPR." },
+      { q: "Czy raport zastępuje inspekcję inżyniera?", a: "Nie. Raport jest opinią techniczną wspierającą decyzje serwisowe i planowanie przeglądów — nie zastępuje formalnej inspekcji uprawnionego inżyniera." },
+    ],
+    faqMore: "Pełne FAQ i wyniki testów",
+    contactTitle: "Kontakt",
+    contactLead: "Pilotaż lub pierwszy raport diagnostyczny — bez opłaty wstępnej.",
+    contactCompany: "Zeta Core Ltd",
+    contactAddress: "London, United Kingdom",
+    contactEmailLabel: "E-mail biznesowy",
+    integrationCta: "Instrukcja integracji krok po kroku",
+  },
+  en: {
+    nav: { services: "Services", tech: "Technology", tests: "Tests", pricing: "Pricing", faq: "FAQ", contact: "Contact", portal: "Diagnostic portal" },
+    heroBadge: "Zeta Core Ltd · London, UK",
+    heroTitle: "Vibration and acoustic diagnostics for industrial machinery",
+    heroSub: "ZETA-CORE is a phase-coherence and FFT analytics engine that detects bearing damage, imbalance, mechanical looseness and cavitation — from an audio file, an accelerometer CSV, or a live SCADA/MQTT stream.",
+    heroCtaPortal: "Open diagnostic portal",
+    heroCtaContact: "Request a pilot report",
+    heroStat1: "14/14",
+    heroStat1Label: "unit tests passing",
+    heroStat2: "3 engines",
+    heroStat2Label: "(v1.0 / v1.1 / v2.0)",
+    heroStat3: "24/7",
+    heroStat3Label: "live monitoring mode",
+    aboutTitle: "What we do",
+    aboutLead: "We turn a plain microphone, an accelerometer or an existing SCADA stream into predictive diagnostics for rotating machinery.",
+    aboutP1: "We analyse vibration and acoustic signals from motors, pumps, fans, gearboxes and bearings. The ZETA-CORE engine computes phase coherence, topological friction and fault condensation, and returns a HEALTHY / WATCH / DEGRADED / CRITICAL status together with the FFT spectrum and a time trace.",
+    aboutP2: "Everything runs in our cloud edge function — the client does not need to install anything beyond providing a measurement file or stream. Raw recordings are not stored persistently.",
+    servicesTitle: "Services",
+    servicesSub: "Three engine versions matched to the type of machine.",
+    services: [
+      { icon: "gauge", tag: "v1.0", name: "Standard Core", desc: "Phase-coherence analysis for machines running at stable RPM.", bullets: ["Electric motors 50/60 Hz", "Pumps, compressors, fans", "Single-channel audio or CSV"] },
+      { icon: "waves", tag: "v1.1", name: "Adaptive Engine", desc: "Variable-frequency tracking — for VFD drives and mixed operating modes.", bullets: ["Variable RPM", "Long recordings (>10 min)", "Automatic windowing"] },
+      { icon: "layers", tag: "v2.0", name: "Spatial Multi-Axis", desc: "Tri-axial X/Y/Z accelerometer analysis — for bearings, gearboxes and structural vibration.", bullets: ["3 axes analysed in parallel", "Dominant-axis detection", "3-column CSV import"] },
+    ],
+    techTitle: "Technology",
+    techSub: "Concrete methods, no marketing.",
+    tech: [
+      { name: "Phase coherence", desc: "Measures phase stability inside a spectral window — a drop in coherence precedes a mechanical fault well before audible noise appears." },
+      { name: "FFT + windowing", desc: "2–10 s windowing with averaging to handle long signals and suppress measurement noise." },
+      { name: "Topological friction", desc: "A measure of spectrum asymmetry that indicates imbalance, looseness or structural resonance." },
+      { name: "Status classification", desc: "Deterministic thresholds: HEALTHY / WATCH / DEGRADED / CRITICAL — no black-box machine learning." },
+      { name: "Live 24/7 mode", desc: "Microphone loop or SCADA/MQTT stream with alerts and CSV export." },
+      { name: "Security", desc: "In-memory analysis inside an edge function. No persistent recording storage. HMAC-SHA256 binary licensing." },
+    ],
+    testsTitle: "Tests and validation",
+    testsSub: "The engine ships with a Vitest unit-test suite.",
+    testGroups: [
+      { name: "Core functions", items: ["computeMean — correct arithmetic mean", "computeStd — correct standard deviation", "classifyStatus — correctly classifies 3 thresholds"] },
+      { name: "Phase coherence v1.0", items: ["High coherence for a pure sine wave", "Low coherence for white noise"] },
+      { name: "Adaptive v1.1", items: ["Tracks a variable-RPM window"] },
+      { name: "Spatial v2.0", items: ["Aggregates X/Y/Z magnitude", "Detects the dominant axis"] },
+      { name: "Portal UI", items: ["Renders portal branding", "PL/EN language toggle works"] },
+    ],
+    testsAllPass: "14/14 passing · Vitest",
+    testsCta: "See detailed test log and FAQ",
+    pricingTitle: "Pricing",
+    pricingSub: "Engagement models available today.",
+    pricing: [
+      { name: "Single diagnostic report", price: "£200 – £800", period: "per machine", desc: "Client uploads a measurement file — receives a PDF report (PL/EN) with the verdict, spectrum and recommendation.", cta: "Order a report", featured: false },
+      { name: "Monthly fleet monitoring", price: "from £400", period: "per machine / month", desc: "Recurring measurements, alerts, monthly report. 3-month pilot with no activation fee.", cta: "Start a pilot", featured: true },
+      { name: "Fleet API v3.0 (integration)", price: "from £2,500", period: "onboarding + subscription", desc: "REST / WebSocket / MQTT — direct integration with SCADA, historians and CMMS systems.", cta: "Ask about integration", featured: false },
+    ],
+    faqTitle: "Frequently asked questions",
+    faqSub: "Short list — the full FAQ lives on a dedicated page.",
+    faq: [
+      { q: "Do I need special hardware?", a: "Not to start. A phone or laptop microphone is enough, or a CSV export from an existing accelerometer. For the 3-axis v2.0 mode an X/Y/Z accelerometer is required." },
+      { q: "How long a file can I upload?", a: "There is no hard limit — long signals are split automatically into 2–10 s windows and analysed as a timeline." },
+      { q: "What about data security?", a: "Analysis runs in-memory inside an edge function. Raw recordings are not persisted. UK GDPR compliant." },
+      { q: "Does a report replace an engineer's inspection?", a: "No. The report is a technical opinion supporting service decisions and inspection planning — it does not replace a formal inspection by a certified engineer." },
+    ],
+    faqMore: "Full FAQ and test results",
+    contactTitle: "Contact",
+    contactLead: "Pilot or first diagnostic report — no upfront fee.",
+    contactCompany: "Zeta Core Ltd",
+    contactAddress: "London, United Kingdom",
+    contactEmailLabel: "Business e-mail",
+    integrationCta: "Step-by-step integration guide",
+  },
 };
 
-// ---------- Audio decoding ----------
-async function decodeAudioFull(file: File): Promise<{ channel: Float32Array; sampleRate: number; axes?: undefined }> {
-  const buf = await file.arrayBuffer();
-  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-  const ctx = new AudioCtx();
-  const audio = await ctx.decodeAudioData(buf);
-  const ch = audio.getChannelData(0);
-  // Copy because ctx will be closed
-  const out = new Float32Array(ch.length);
-  out.set(ch);
-  ctx.close();
-  return { channel: out, sampleRate: audio.sampleRate };
-}
-
-async function decodeCsv(file: File, sampleRate: number): Promise<{ channel: Float32Array; sampleRate: number; axes?: { x: Float32Array; y: Float32Array; z: Float32Array } }> {
-  const text = await file.text();
-  const lines = text.split(/\r?\n/);
-  const samples: number[] = [];
-  const ax: number[] = [];
-  const ay: number[] = [];
-  const az: number[] = [];
-  for (const line of lines) {
-    if (!line.trim() || line.startsWith("#")) continue;
-    const nums = line.split(/[,;\s\t]+/).filter(Boolean).map((part) => parseFloat(part)).filter((num) => Number.isFinite(num));
-    if (nums.length === 0) continue;
-    samples.push(nums[nums.length - 1]);
-    if (nums.length >= 3) {
-      ax.push(nums[nums.length - 3]);
-      ay.push(nums[nums.length - 2]);
-      az.push(nums[nums.length - 1]);
-    }
-  }
-  if (samples.length < 512) throw new Error(`CSV too short: ${samples.length} samples (need 512+)`);
-  const axes = ax.length >= 512 && ax.length === ay.length && ay.length === az.length
-    ? { x: Float32Array.from(ax), y: Float32Array.from(ay), z: Float32Array.from(az) }
-    : undefined;
-  return { channel: Float32Array.from(samples), sampleRate, axes };
-}
-
-// Downsample if > 22050 Hz to keep payloads small (spectral content < 11 kHz preserved)
-function maybeDownsample(ch: Float32Array, sr: number): { ch: Float32Array; sr: number } {
-  if (sr <= 22050) return { ch, sr };
-  const factor = Math.floor(sr / 22050);
-  const newSr = Math.round(sr / factor);
-  const outLen = Math.floor(ch.length / factor);
-  const out = new Float32Array(outLen);
-  for (let i = 0; i < outLen; i++) {
-    let s = 0;
-    for (let k = 0; k < factor; k++) s += ch[i * factor + k];
-    out[i] = s / factor;
-  }
-  return { ch: out, sr: newSr };
-}
-
-function maybeDownsampleAxes(axes: { x: Float32Array; y: Float32Array; z: Float32Array } | undefined, sr: number, targetSr: number) {
-  if (!axes) return undefined;
-  const factor = Math.max(1, Math.round(sr / targetSr));
-  const down = (input: Float32Array) => {
-    if (factor <= 1) return input;
-    const outLen = Math.floor(input.length / factor);
-    const out = new Float32Array(outLen);
-    for (let i = 0; i < outLen; i++) {
-      let s = 0;
-      for (let k = 0; k < factor; k++) s += input[i * factor + k];
-      out[i] = s / factor;
-    }
-    return out;
-  };
-  return { x: down(axes.x), y: down(axes.y), z: down(axes.z) };
-}
-
-async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string, engineVersion: EngineVersion, axes?: AxisSamples): Promise<ZetaResult> {
-  const { data, error } = await supabase.functions.invoke("zeta-analyze", {
-    body: { samples, axes, sampleRate, targetFreq, filename, engineVersion },
-    headers: { "x-zeta-key": ACCESS_CODE },
-  });
-  if (error) throw new Error(error.message);
-  if ((data as any)?.error) throw new Error((data as any).error);
-  return data as ZetaResult;
-}
+const iconFor = (id: string) => {
+  const cls = "w-6 h-6";
+  if (id === "gauge") return <Gauge className={cls} />;
+  if (id === "waves") return <Waves className={cls} />;
+  if (id === "layers") return <Layers className={cls} />;
+  return <Cpu className={cls} />;
+};
 
 export default function Zeta() {
-  const [lang, setLang] = useState<Lang>(() => (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("pl") ? "pl" : "en"));
-  const t = (k: keyof typeof T) => T[k][lang];
-  const statusText = lang === "pl" ? statusTextPl : statusTextEn;
-  const [code, setCode] = useState("");
-  const [authed, setAuthed] = useState(true);
-  const [profile, setProfile] = useState<ProfileId>("auto");
-  const [engineVersion, setEngineVersion] = useState<EngineVersion>("v1.1");
-  const currentProfile = PROFILES.find((p) => p.id === profile)!;
-  const currentEngine = ENGINES.find((e) => e.id === engineVersion)!;
+  const [lang, setLang] = useState<Lang>("pl");
+  const t = T[lang];
 
   useEffect(() => {
-    const title = lang === "pl" ? "Zeta-Core DSP — Diagnostyka maszyn" : "Zeta-Core DSP — Machine Diagnostics";
+    const isZeta = typeof window !== "undefined" && window.location.hostname.includes("zeta-core-dsp.com");
+    document.title = lang === "pl"
+      ? "ZETA-CORE · Diagnostyka drgań maszyn przemysłowych"
+      : "ZETA-CORE · Industrial machine vibration diagnostics";
     const desc = lang === "pl"
-      ? "Silnik diagnostyki predykcyjnej Zeta-Core DSP: analiza drgań, koherencja fazowa, raporty PDF, monitoring 24/7."
-      : "Zeta-Core DSP predictive diagnostics engine: vibration analysis, phase coherence, PDF reports, 24/7 monitoring.";
-    document.title = title;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", desc);
-    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
-    document.querySelector('meta[property="og:description"]')?.setAttribute("content", desc);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", "https://zeta-core-dsp.com/zeta");
+      ? "Silnik analizy koherencji fazowej i FFT dla silników, pomp, wentylatorów i łożysk. Raporty diagnostyczne, monitoring 24/7, Fleet API. Zeta Core Ltd, Londyn."
+      : "Phase-coherence and FFT analytics engine for motors, pumps, fans and bearings. Diagnostic reports, 24/7 monitoring, Fleet API. Zeta Core Ltd, London.";
+    let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = desc;
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (isZeta) {
+      if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
+      canonical.href = "https://zeta-core-dsp.com/";
+    }
   }, [lang]);
 
-  // File mode
-  const [file, setFile] = useState<File | null>(null);
-  const [csvSampleRate, setCsvSampleRate] = useState(1000);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressLabel, setProgressLabel] = useState("");
-  const [result, setResult] = useState<ZetaResult | null>(null);
-  const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
-  const fileInput = useRef<HTMLInputElement>(null);
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white antialiased">
+      {/* Nav */}
+      <nav className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 md:px-6 h-14">
+          <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight">
+            <Activity className="w-5 h-5 text-cyan-400" />
+            <span>ZETA-CORE</span>
+          </a>
+          <div className="hidden md:flex items-center gap-5 text-sm text-white/70">
+            <a href="#services" className="hover:text-white">{t.nav.services}</a>
+            <a href="#tech" className="hover:text-white">{t.nav.tech}</a>
+            <a href="#tests" className="hover:text-white">{t.nav.tests}</a>
+            <a href="#pricing" className="hover:text-white">{t.nav.pricing}</a>
+            <a href="#faq" className="hover:text-white">{t.nav.faq}</a>
+            <a href="#contact" className="hover:text-white">{t.nav.contact}</a>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex text-xs rounded border border-white/15 overflow-hidden">
+              <button onClick={() => setLang("pl")} className={`px-2 py-1 ${lang === "pl" ? "bg-white/10" : ""}`}>PL</button>
+              <button onClick={() => setLang("en")} className={`px-2 py-1 ${lang === "en" ? "bg-white/10" : ""}`}>EN</button>
+            </div>
+            <Link to="/zeta/portal" className="hidden sm:inline-flex">
+              <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500 text-white h-8">{t.nav.portal}</Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-  // Live mode
-  const [liveOn, setLiveOn] = useState(false);
-  const [liveLog, setLiveLog] = useState<TimelineEntry[]>([]);
-  const [liveLatest, setLiveLatest] = useState<ZetaResult | null>(null);
-  const [liveDuration, setLiveDuration] = useState(0);
-  const liveCtxRef = useRef<AudioContext | null>(null);
-  const liveStreamRef = useRef<MediaStream | null>(null);
-  const liveBufferRef = useRef<number[]>([]);
-  const liveStartRef = useRef<number>(0);
-  const liveTickRef = useRef<number | null>(null);
-  const CHUNK_SECONDS = 5;
+      {/* Hero */}
+      <section id="top" className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_60%)]" />
+        <div className="relative max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
+          <Badge className="bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/15 border border-cyan-500/30 mb-6">{t.heroBadge}</Badge>
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] max-w-4xl">
+            {t.heroTitle}
+          </h1>
+          <p className="mt-5 text-base md:text-lg text-white/70 max-w-3xl leading-relaxed">{t.heroSub}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/zeta/portal">
+              <Button size="lg" className="bg-cyan-600 hover:bg-cyan-500">
+                {t.heroCtaPortal}<ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+            <a href="#contact">
+              <Button size="lg" variant="outline" className="border-white/20 text-white bg-white/5 hover:bg-white/10">
+                {t.heroCtaContact}
+              </Button>
+            </a>
+          </div>
 
-  const handleAuth = () => {
-    if (code.trim() === ACCESS_CODE) {
-      setAuthed(true);
-      toast.success(t("accessGranted"));
-    } else toast.error(t("invalidCode"));
-  };
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
+            {[
+              { v: t.heroStat1, l: t.heroStat1Label, icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" /> },
+              { v: t.heroStat2, l: t.heroStat2Label, icon: <Cpu className="w-4 h-4 text-cyan-400" /> },
+              { v: t.heroStat3, l: t.heroStat3Label, icon: <Radio className="w-4 h-4 text-amber-400" /> },
+            ].map((s, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex items-center gap-2 text-xs text-white/60">{s.icon}<span>{s.l}</span></div>
+                <div className="mt-1 text-2xl font-semibold">{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-  // ---------- FILE ANALYSIS (long files → windowed timeline) ----------
-  const handleAnalyze = async () => {
-    if (!file) return toast.error(t("selectFileFirst"));
-    setAnalyzing(true);
-    setProgress(5);
-    setProgressLabel(t("decoding"));
-    setResult(null);
-    setTimeline([]);
+      {/* About */}
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 grid md:grid-cols-3 gap-10">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-cyan-400 mb-3">{t.aboutTitle}</div>
+            <h2 className="text-2xl md:text-3xl font-semibold leading-tight">{t.aboutLead}</h2>
+          </div>
+          <div className="md:col-span-2 space-y-4 text-white/75 leading-relaxed">
+            <p>{t.aboutP1}</p>
+            <p>{t.aboutP2}</p>
+          </div>
+        </div>
+      </section>
 
-    try {
-      const isAudio = /\.(wav|mp3|m4a|ogg|webm|flac)$/i.test(file.name);
-      const isCsv = /\.(csv|txt|tsv)$/i.test(file.name);
-      if (!isAudio && !isCsv) throw new Error(T.unsupported[lang]);
+      {/* Services */}
+      <section id="services" className="border-t border-white/10 bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.servicesTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-2">{t.servicesSub}</h2>
+          <div className="mt-8 grid md:grid-cols-3 gap-4">
+            {t.services.map((s) => (
+              <Card key={s.tag} className="bg-black/40 border-white/10">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-md bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
+                      {iconFor(s.icon)}
+                    </div>
+                    <Badge variant="outline" className="border-white/15 text-white/70">{s.tag}</Badge>
+                  </div>
+                  <CardTitle className="text-lg mt-3 text-white">{s.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70 space-y-3">
+                  <p>{s.desc}</p>
+                  <ul className="space-y-1.5">
+                    {s.bullets.map((b, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      const decoded = isAudio ? await decodeAudioFull(file) : await decodeCsv(file, csvSampleRate);
-      const { ch, sr } = maybeDownsample(decoded.channel, decoded.sampleRate);
-      const axesDownsampled = maybeDownsampleAxes(decoded.axes, decoded.sampleRate, sr);
-      const totalSec = ch.length / sr;
+      {/* Technology */}
+      <section id="tech" className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.techTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-2">{t.techSub}</h2>
+          <div className="mt-8 grid md:grid-cols-2 gap-4">
+            {t.tech.map((x, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                  <h3 className="font-medium">{x.name}</h3>
+                </div>
+                <p className="text-sm text-white/65 leading-relaxed">{x.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      // Chunk length: 10s per window (min 2s), enough for stable spectrum
-      const windowSec = Math.min(10, Math.max(2, Math.floor(totalSec / 24)));
-      const windowLen = Math.floor(windowSec * sr);
-      const nChunks = Math.max(1, Math.floor(ch.length / windowLen));
+      {/* Tests */}
+      <section id="tests" className="border-t border-white/10 bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+            <div>
+              <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.testsTitle}</div>
+              <h2 className="text-2xl md:text-3xl font-semibold">{t.testsSub}</h2>
+            </div>
+            <Badge className="bg-emerald-600 hover:bg-emerald-600">{t.testsAllPass}</Badge>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {t.testGroups.map((g, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-black/30 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <LineChart className="w-4 h-4 text-cyan-400" />
+                  <h3 className="font-medium text-sm">{g.name}</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-white/70">
+                  {g.items.map((it, j) => (
+                    <li key={j} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Link to="/zeta/faq" className="inline-flex items-center gap-1 text-sm text-cyan-300 hover:text-cyan-200">
+              {t.testsCta} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      setProgressLabel(`${t("analysing")} ${totalSec.toFixed(0)}s · ${nChunks} × ${windowSec}s`);
+      {/* Pricing */}
+      <section id="pricing" className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.pricingTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-2">{t.pricingSub}</h2>
+          <div className="mt-8 grid md:grid-cols-3 gap-4">
+            {t.pricing.map((p, i) => (
+              <Card key={i} className={`bg-black/40 ${p.featured ? "border-cyan-500/60 shadow-[0_0_0_1px_rgba(6,182,212,0.4)]" : "border-white/10"}`}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base text-white flex items-center gap-2">
+                    <Factory className="w-4 h-4 text-cyan-400" />
+                    {p.name}
+                  </CardTitle>
+                  <div className="mt-3">
+                    <div className="text-3xl font-semibold">{p.price}</div>
+                    <div className="text-xs text-white/50">{p.period}</div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm text-white/70">
+                  <p>{p.desc}</p>
+                  <a href="#contact">
+                    <Button className={`w-full ${p.featured ? "bg-cyan-600 hover:bg-cyan-500" : "bg-white/10 hover:bg-white/15"}`}>
+                      {p.cta}
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      const timelineOut: TimelineEntry[] = [];
-      let worst: ZetaResult | null = null;
+      {/* FAQ */}
+      <section id="faq" className="border-t border-white/10 bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+          <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.faqTitle}</div>
+          <h2 className="text-2xl md:text-3xl font-semibold mb-6">{t.faqSub}</h2>
+          <div className="space-y-3 max-w-4xl">
+            {t.faq.map((f, i) => (
+              <details key={i} className="group rounded-lg border border-white/10 bg-black/30 p-4 open:bg-black/40">
+                <summary className="cursor-pointer flex items-center justify-between gap-4 text-sm font-medium">
+                  <span>{f.q}</span>
+                  <ArrowRight className="w-4 h-4 text-white/40 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-3 text-sm text-white/65 leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/zeta/faq">
+              <Button variant="outline" className="border-white/20 text-white bg-white/5 hover:bg-white/10">
+                <FileText className="w-4 h-4 mr-2" />{t.faqMore}
+              </Button>
+            </Link>
+            <Link to="/zeta/integration">
+              <Button variant="outline" className="border-white/20 text-white bg-white/5 hover:bg-white/10">
+                {t.integrationCta}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      for (let i = 0; i < nChunks; i++) {
-        const seg = ch.subarray(i * windowLen, (i + 1) * windowLen);
-        const samples = Array.from(seg);
-        const axisChunk = axesDownsampled ? {
-          x: Array.from(axesDownsampled.x.subarray(i * windowLen, (i + 1) * windowLen)),
-          y: Array.from(axesDownsampled.y.subarray(i * windowLen, (i + 1) * windowLen)),
-          z: Array.from(axesDownsampled.z.subarray(i * windowLen, (i + 1) * windowLen)),
-        } : undefined;
-        const r = await analyzeChunk(samples, sr, currentProfile.targetFreq, file.name, engineVersion, axisChunk);
-        const tStart = i * windowSec;
-        timelineOut.push({
-          t: tStart,
-          label: `${tStart.toFixed(0)}s`,
-          status: r.status,
-          tf: r.topologicalFriction,
-          mc: r.faultCondensation,
-          freq: r.trackedFrequencyHz,
-          coh: r.phaseCoherence,
-        });
-        setTimeline([...timelineOut]);
-
-        // Keep the "worst" chunk as headline result
-        const sev = (s: string) => ["HEALTHY", "WATCH", "DEGRADED", "CRITICAL"].indexOf(s);
-        if (!worst || sev(r.status) > sev(worst.status)) worst = r;
-
-        setProgress(5 + Math.round(((i + 1) / nChunks) * 90));
-      }
-
-      setResult(worst);
-      setProgress(100);
-      setProgressLabel(t("complete"));
-      toast.success(`${t("analysisComplete")}: ${nChunks} × ${totalSec.toFixed(0)}s`);
-    } catch (e: any) {
-      toast.error(e.message || T.analysisFailed[lang]);
-    } finally {
-      setAnalyzing(false);
-      setTimeout(() => setProgress(0), 1000);
-    }
-  };
-
-  // ---------- LIVE MODE (microphone → rolling monitor) ----------
-  const startLive = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-      });
-      liveStreamRef.current = stream;
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx: AudioContext = new AudioCtx();
-      liveCtxRef.current = ctx;
-      const src = ctx.createMediaStreamSource(stream);
-      const processor = ctx.createScriptProcessor(4096, 1, 1);
-      liveBufferRef.current = [];
-      liveStartRef.current = Date.now();
-      setLiveLog([]);
-      setLiveLatest(null);
-      setLiveDuration(0);
-
-      processor.onaudioprocess = (ev) => {
-        const input = ev.inputBuffer.getChannelData(0);
-        const buf = liveBufferRef.current;
-        for (let i = 0; i < input.length; i++) buf.push(input[i]);
-      };
-      src.connect(processor);
-      processor.connect(ctx.destination);
-
-      setLiveOn(true);
-      toast.success(t("monStarted"));
-
-      // Every CHUNK_SECONDS, analyse the accumulated buffer
-      const tick = window.setInterval(async () => {
-        const sr = ctx.sampleRate;
-        const needed = sr * CHUNK_SECONDS;
-        const buf = liveBufferRef.current;
-        if (buf.length < needed) return;
-        const chunk = buf.splice(0, needed);
-        const { ch, sr: dsr } = maybeDownsample(Float32Array.from(chunk), sr);
-        try {
-          const r = await analyzeChunk(Array.from(ch), dsr, currentProfile.targetFreq, "live-mic", engineVersion);
-          setLiveLatest(r);
-          const entry: TimelineEntry = {
-            t: Date.now(),
-            label: new Date().toLocaleTimeString(),
-            status: r.status,
-            tf: r.topologicalFriction,
-            mc: r.faultCondensation,
-            freq: r.trackedFrequencyHz,
-            coh: r.phaseCoherence,
-          };
-          setLiveLog((prev) => [entry, ...prev].slice(0, 500));
-          setLiveDuration(Math.floor((Date.now() - liveStartRef.current) / 1000));
-          if (r.status === "DEGRADED" || r.status === "CRITICAL") {
-            toast.error(`⚠ ${r.status} · Tf=${r.topologicalFriction.toFixed(2)} · ${r.trackedFrequencyHz.toFixed(0)} Hz`);
-          }
-        } catch (e: any) {
-          console.error("live chunk failed:", e);
-        }
-      }, CHUNK_SECONDS * 1000);
-      liveTickRef.current = tick;
-    } catch (e: any) {
-      toast.error(t("micDenied") + (e.message || e));
-    }
-  };
-
-  const stopLive = () => {
-    if (liveTickRef.current) window.clearInterval(liveTickRef.current);
-    liveTickRef.current = null;
-    liveStreamRef.current?.getTracks().forEach((t) => t.stop());
-    liveStreamRef.current = null;
-    liveCtxRef.current?.close();
-    liveCtxRef.current = null;
-    liveBufferRef.current = [];
-    setLiveOn(false);
-    toast.info(t("monStopped"));
-  };
-
-  useEffect(() => () => { if (liveOn) stopLive(); }, []); // cleanup on unmount
-
-  // ---------- PDF ----------
-  const downloadPdf = () => {
-    if (!result) return;
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const w = 210, m = 15;
-    let y = 20;
-
-    doc.setFontSize(18); doc.setFont("helvetica", "bold");
-    doc.text("ZETA-CORE", m, y);
-    doc.setFontSize(11); doc.setFont("helvetica", "normal");
-    doc.text("Machine Health Diagnostic Report", m, y + 6);
-    doc.setFontSize(9);
-    doc.text("Zeta-Core Diagnostics  \u2014  Aberdeen, UK", m, y + 12);
-    doc.setDrawColor(180); doc.line(m, y + 16, w - m, y + 16);
-    y += 24;
-
-    doc.setFontSize(10);
-    doc.text(`File: ${result.filename}`, m, y); y += 5;
-    doc.text(`Machine profile: ${currentProfile.name}`, m, y); y += 5;
-    doc.text(`Engine: ${result.engine}`, m, y); y += 5;
-    doc.text(`Analysed: ${new Date(result.timestampUtc).toUTCString()}`, m, y); y += 5;
-    doc.text(`Samples: ${result.nSamples.toLocaleString()} @ ${result.sampleRateHz} Hz`, m, y); y += 10;
-
-    doc.setFontSize(14); doc.setFont("helvetica", "bold");
-    doc.text(`Worst-window status: ${result.status}`, m, y); y += 7;
-    doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    const statusLines = doc.splitTextToSize(statusText[result.status], w - 2 * m);
-    doc.text(statusLines, m, y); y += statusLines.length * 5 + 5;
-
-    doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    doc.text("Diagnostic Metrics (worst window)", m, y); y += 6;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    const rows: [string, string][] = [
-      ["Phase Coherence", result.phaseCoherence.toFixed(4)],
-      ["Topological Friction (Tf)", result.topologicalFriction.toFixed(4)],
-      ["Fault Condensation (Mc)", result.faultCondensation.toFixed(4)],
-      ["Tracked Frequency", result.trackedFrequencyHz.toFixed(2) + " Hz"],
-    ];
-    if (result.spatial) {
-      rows.push(["Spatial Friction X/Y/Z", `${result.spatial.axisTf.x.toFixed(3)} / ${result.spatial.axisTf.y.toFixed(3)} / ${result.spatial.axisTf.z.toFixed(3)}`]);
-    }
-    for (const [k, v] of rows) {
-      doc.setFont("helvetica", "bold"); doc.text(k + ":", m, y);
-      doc.setFont("helvetica", "normal"); doc.text(v, m + 60, y);
-      y += 6;
-    }
-    y += 4;
-
-    if (timeline.length > 1) {
-      doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-      doc.text(`Timeline (${timeline.length} windows)`, m, y); y += 6;
-      doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      for (const e of timeline.slice(0, 30)) {
-        doc.text(`${e.label.padEnd(8)}  ${e.status.padEnd(10)}  Tf=${e.tf.toFixed(3)}  Mc=${e.mc.toFixed(3)}  f=${e.freq.toFixed(1)} Hz`, m, y);
-        y += 4;
-        if (y > 270) { doc.addPage(); y = 20; }
-      }
-      y += 4;
-    }
-
-    doc.setFontSize(8); doc.setTextColor(120);
-    doc.text("Zeta-Core Diagnostics \u2014 Confidential. Contact: contact@zeta-core-dsp.com", m, 285);
-    doc.save(`ZetaCore_Report_${result.filename.replace(/\.[^.]+$/, "")}.pdf`);
-  };
-
-  // ---------- Auth gate ----------
-  const LangToggle = (
-    <button
-      onClick={() => setLang(lang === "pl" ? "en" : "pl")}
-      className="text-xs px-2 py-1 rounded border border-white/20 text-white/70 hover:border-cyan-400 hover:text-cyan-300 transition font-mono"
-      aria-label="Toggle language"
-    >
-      {lang === "pl" ? "EN" : "PL"}
-    </button>
-  );
-
-  if (!authed) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 bg-black/60 border-cyan-500/30">
-          <div className="flex items-center justify-between gap-3 mb-6">
-            <div className="flex items-center gap-3">
-              <Lock className="w-6 h-6 text-cyan-400" />
-              <div>
-                <h1 className="text-xl font-bold">ZETA-CORE</h1>
-                <p className="text-xs text-white/60">{t("header")}</p>
+      {/* Contact */}
+      <section id="contact" className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-cyan-400 mb-2">{t.contactTitle}</div>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-3">{t.contactLead}</h2>
+            <div className="space-y-2 text-sm text-white/75 mt-6">
+              <div className="flex items-center gap-2"><Building2 className="w-4 h-4 text-cyan-400" />{t.contactCompany}</div>
+              <div className="flex items-center gap-2 pl-6 text-white/55">{t.contactAddress}</div>
+              <div className="flex items-center gap-2 mt-3"><Mail className="w-4 h-4 text-cyan-400" />
+                <a href="mailto:contact@zeta-core-dsp.com" className="hover:text-white underline decoration-white/20">contact@zeta-core-dsp.com</a>
               </div>
             </div>
-            {LangToggle}
           </div>
-          <label className="text-sm text-white/70 block mb-2">{t("accessCode")}</label>
-          <Input type="password" value={code} onChange={(e) => setCode(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-            className="bg-black/40 border-white/20" placeholder={t("accessCode")} />
-          <Button onClick={handleAuth} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500">{t("enter")}</Button>
-          <p className="text-xs text-white/40 mt-6 text-center">
-            {t("footer")}<br />Contact: contact@zeta-core-dsp.com
-          </p>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <div className="max-w-5xl mx-auto p-4 md:p-8">
-        <header className="mb-6 border-b border-white/10 pb-4 flex items-center gap-3">
-          <Activity className="w-7 h-7 text-cyan-400" />
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight">ZETA-CORE</h1>
-            <p className="text-sm text-white/60">{t("header")}</p>
-          </div>
-          {LangToggle}
-        </header>
-
-        <div className="flex flex-wrap gap-2 mb-4 text-xs">
-          <a href="/zeta/faq" className="px-3 py-1.5 rounded border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10">FAQ & Tests</a>
-          <a href="/zeta/integration" className="px-3 py-1.5 rounded border border-white/20 text-white/80 hover:bg-white/5">{lang === "pl" ? "Instrukcja integracji" : "Integration guide"}</a>
+          <Card className="bg-black/40 border-white/10">
+            <CardContent className="p-6 space-y-4">
+              <p className="text-sm text-white/70">
+                {lang === "pl"
+                  ? "Napisz na e-mail biznesowy z krótkim opisem maszyny (typ, moc, RPM) i preferowaną formą pomiaru (audio z mikrofonu / CSV z akcelerometru / strumień SCADA). Odpowiadamy w ciągu 1 dnia roboczego."
+                  : "Email the business address with a short description of the machine (type, power, RPM) and your preferred measurement method (microphone audio / accelerometer CSV / SCADA stream). We reply within 1 working day."}
+              </p>
+              <a href="mailto:contact@zeta-core-dsp.com?subject=ZETA-CORE%20pilot%20request">
+                <Button className="w-full bg-cyan-600 hover:bg-cyan-500">
+                  <Mail className="w-4 h-4 mr-2" />contact@zeta-core-dsp.com
+                </Button>
+              </a>
+              <Link to="/zeta/portal">
+                <Button variant="outline" className="w-full border-white/20 text-white bg-white/5 hover:bg-white/10">
+                  {t.nav.portal}<ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
+      </section>
 
-        {/* Machine profile selector */}
-        <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">{t("machineProfile")}</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-            {PROFILES.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  setProfile(p.id);
-                  if (p.id === "bearing" || p.id === "gearbox") setEngineVersion("v2.0");
-                }}
-                className={`text-left p-3 rounded border transition ${
-                  profile === p.id
-                    ? "border-cyan-400 bg-cyan-500/10"
-                    : "border-white/10 bg-black/40 hover:border-white/30"
-                }`}
-              >
-                <div className="text-sm font-semibold">{p.name}</div>
-                <div className="text-xs text-white/50 mt-0.5">{p.desc}</div>
-                <div className="text-[10px] text-cyan-300/70 mt-1 font-mono">
-                  {p.targetFreq ? `target ≈ ${p.targetFreq} Hz` : "no prior"}
-                </div>
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-4 bg-black/40 border-white/10 mb-6">
-          <label className="text-xs text-white/60 uppercase tracking-wider">{t("engineVersion")}</label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
-            {ENGINES.map((engine) => (
-              <button
-                key={engine.id}
-                onClick={() => setEngineVersion(engine.id)}
-                className={`text-left p-3 rounded border transition ${
-                  engineVersion === engine.id
-                    ? "border-cyan-400 bg-cyan-500/10"
-                    : "border-white/10 bg-black/40 hover:border-white/30"
-                }`}
-              >
-                <div className="text-sm font-semibold">{engine.name}</div>
-                <div className="text-xs text-white/50 mt-0.5">{engine.desc}</div>
-                <div className="text-[10px] text-cyan-300/70 mt-1">{engine.bestFor}</div>
-              </button>
-            ))}
-          </div>
-          <p className="mt-3 text-xs text-white/50">
-            {t("activeLabel")}: <span className="text-cyan-300">{currentEngine.name}</span>. {t("activeNote")}</p>
-        </Card>
-
-        <Tabs defaultValue="file">
-          <TabsList className="bg-black/40 border border-white/10">
-            <TabsTrigger value="file"><FileAudio className="w-4 h-4 mr-2" />{t("tabFile")}</TabsTrigger>
-            <TabsTrigger value="live"><Radio className="w-4 h-4 mr-2" />{t("tabLive")}</TabsTrigger>
-          </TabsList>
-
-          {/* -------------------- FILE TAB -------------------- */}
-          <TabsContent value="file" className="mt-4">
-            <Card className="p-6 bg-black/40 border-white/10 mb-6">
-              <h2 className="text-lg font-semibold mb-2">{t("upload")}</h2>
-              <p className="text-sm text-white/60 mb-4">{t("uploadDesc")}</p>
-
-              <div className="flex flex-col md:flex-row gap-3">
-                <input ref={fileInput} type="file"
-                  accept=".wav,.mp3,.m4a,.ogg,.webm,.flac,.csv,.txt,.tsv"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="hidden" />
-                <Button variant="outline" onClick={() => fileInput.current?.click()}
-                  className="border-white/20 bg-black/40">
-                  <Upload className="w-4 h-4 mr-2" />
-                  {file ? file.name : t("chooseFile")}
-                </Button>
-
-                {file && /\.(csv|txt|tsv)$/i.test(file.name) && (
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-white/70">{t("csvSr")}</label>
-                    <Input type="number" value={csvSampleRate}
-                      onChange={(e) => setCsvSampleRate(parseInt(e.target.value) || 1000)}
-                      className="w-28 bg-black/40 border-white/20" />
-                  </div>
-                )}
-
-                <Button onClick={handleAnalyze} disabled={!file || analyzing}
-                  className="bg-cyan-600 hover:bg-cyan-500 md:ml-auto">
-                  {analyzing ? t("analysing") : t("runDiag")}
-                </Button>
-              </div>
-
-              {progress > 0 && (
-                <div className="mt-4">
-                  <Progress value={progress} className="h-1" />
-                  <p className="text-xs text-white/50 mt-1">{progressLabel}</p>
-                </div>
-              )}
-            </Card>
-
-            {result && (
-              <>
-                <Card className={`p-6 bg-black/40 border-2 mb-6 ${statusColor[result.status]}`}>
-                  <div className="flex items-start gap-4">
-                    {result.status === "HEALTHY"
-                      ? <CheckCircle2 className="w-10 h-10 shrink-0" />
-                      : <AlertTriangle className="w-10 h-10 shrink-0" />}
-                    <div className="flex-1">
-                      <div className="text-xs uppercase tracking-widest opacity-70">
-                        {t("worstStatus")} {timeline.length}
-                      </div>
-                      <div className="text-3xl font-bold mt-1">{result.status}</div>
-                      <p className="text-sm mt-2 text-white/70">{statusText[result.status]}</p>
-                    </div>
-                    <Button onClick={downloadPdf} variant="outline" className="border-white/20 text-white">
-                      <Download className="w-4 h-4 mr-2" />{t("pdfReport")}
-                    </Button>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                  <h2 className="text-lg font-semibold mb-4">{t("metricsWorst")}</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Metric label={t("phaseCoh")} value={result.phaseCoherence.toFixed(4)} hint={t("hintCoh")} />
-                    <Metric label={t("topoFric")} value={result.topologicalFriction.toFixed(4)} hint={t("hintTf")} />
-                    <Metric label={t("faultCond")} value={result.faultCondensation.toFixed(4)} hint={t("hintMc")} />
-                    <Metric label={t("trackedFreq")} value={result.trackedFrequencyHz.toFixed(1) + " Hz"} hint={t("hintFreq")} />
-                  </div>
-                  <div className="mt-4 text-xs text-white/50 font-mono">{result.engine}</div>
-                </Card>
-
-                {result.spatial && (
-                  <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                    <h2 className="text-lg font-semibold mb-4">v2.0 Spatial Multi-Axis / 3 osie X-Y-Z</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Metric label="Axis X" value={`Tf ${result.spatial.axisTf.x.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.x.toFixed(3)} · ${result.spatial.axisFrequencyHz.x.toFixed(1)} Hz`} />
-                      <Metric label="Axis Y" value={`Tf ${result.spatial.axisTf.y.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.y.toFixed(3)} · ${result.spatial.axisFrequencyHz.y.toFixed(1)} Hz`} />
-                      <Metric label="Axis Z" value={`Tf ${result.spatial.axisTf.z.toFixed(3)}`} hint={`C=${result.spatial.axisCoherence.z.toFixed(3)} · ${result.spatial.axisFrequencyHz.z.toFixed(1)} Hz`} />
-                    </div>
-                    <p className="mt-4 text-xs text-white/50">
-                      Global Spatial Friction: <span className="text-cyan-300 font-mono">{result.spatial.globalSpatialFriction.toFixed(4)}</span>
-                    </p>
-                  </Card>
-                )}
-
-                {timeline.length > 1 && (
-                  <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                    <h2 className="text-lg font-semibold mb-2">{t("timelineHead")}</h2>
-                    <div className="h-56">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={timeline}>
-                          <XAxis dataKey="label" stroke="#666" fontSize={10} />
-                          <YAxis domain={[0, 1]} stroke="#666" fontSize={10} />
-                          <Tooltip contentStyle={{ background: "#000", border: "1px solid #333" }} />
-                          <ReferenceLine y={0.35} stroke="#10b981" strokeDasharray="3 3" />
-                          <ReferenceLine y={0.55} stroke="#eab308" strokeDasharray="3 3" />
-                          <ReferenceLine y={0.75} stroke="#ef4444" strokeDasharray="3 3" />
-                          <Line type="monotone" dataKey="tf" stroke="#00CED1" dot strokeWidth={1.5} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="mt-4 max-h-48 overflow-auto text-xs font-mono">
-                      {timeline.map((e, i) => (
-                        <div key={i} className={`flex justify-between py-1 border-b border-white/5 px-2 ${statusBg[e.status]}`}>
-                          <span className="w-16 text-white/60">{e.label}</span>
-                          <span className={`w-24 ${statusColor[e.status].split(" ")[0]}`}>{e.status}</span>
-                          <span className="w-24 text-white/60">Tf={e.tf.toFixed(3)}</span>
-                          <span className="w-24 text-white/60">Mc={e.mc.toFixed(3)}</span>
-                          <span className="w-24 text-white/60">{e.freq.toFixed(1)} Hz</span>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-
-                <Card className="p-6 bg-black/40 border-white/10">
-                  <h2 className="text-lg font-semibold mb-4">{t("spectrumHead")}</h2>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={result.spectrum.map((v, i) => ({ f: result.freqAxis[i]?.toFixed(0), v }))}>
-                        <XAxis dataKey="f" stroke="#666" fontSize={10} label={{ value: "Hz", position: "insideBottom", offset: -2, fill: "#888" }} />
-                        <YAxis stroke="#666" fontSize={10} />
-                        <Tooltip contentStyle={{ background: "#000", border: "1px solid #333" }} />
-                        <Line type="monotone" dataKey="v" stroke="#00CED1" dot={false} strokeWidth={1.5} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </Card>
-              </>
-            )}
-          </TabsContent>
-
-          {/* -------------------- LIVE TAB -------------------- */}
-          <TabsContent value="live" className="mt-4">
-            <Card className="p-6 bg-black/40 border-white/10 mb-6">
-              <h2 className="text-lg font-semibold mb-2">{t("liveHead")}</h2>
-              <p className="text-sm text-white/60 mb-4">{t("liveDesc")}</p>
-
-              <div className="flex items-center gap-3">
-                {!liveOn ? (
-                  <Button onClick={startLive} className="bg-red-600 hover:bg-red-500">
-                    <Mic className="w-4 h-4 mr-2" />{t("startMon")}
-                  </Button>
-                ) : (
-                  <Button onClick={stopLive} variant="outline" className="border-red-400 text-red-400">
-                    <Square className="w-4 h-4 mr-2" />{t("stop")}
-                  </Button>
-                )}
-                {liveOn && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-white/70">{t("monitoring")} · {Math.floor(liveDuration / 60)}m {liveDuration % 60}s · {currentProfile.name}</span>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {liveLatest && (
-              <Card className={`p-6 bg-black/40 border-2 mb-6 ${statusColor[liveLatest.status]}`}>
-                <div className="flex items-start gap-4">
-                  {liveLatest.status === "HEALTHY"
-                    ? <CheckCircle2 className="w-10 h-10 shrink-0" />
-                    : <AlertTriangle className="w-10 h-10 shrink-0" />}
-                  <div className="flex-1">
-                    <div className="text-xs uppercase tracking-widest opacity-70">{t("currentStatus")}</div>
-                    <div className="text-3xl font-bold mt-1">{liveLatest.status}</div>
-                    <p className="text-sm mt-2 text-white/70">{statusText[liveLatest.status]}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-                  <Metric label="Coherence" value={liveLatest.phaseCoherence.toFixed(3)} hint="frequency stability" />
-                  <Metric label="Tf" value={liveLatest.topologicalFriction.toFixed(3)} hint="disorder" />
-                  <Metric label="Mc" value={liveLatest.faultCondensation.toFixed(3)} hint="sidebands" />
-                  <Metric label="Freq" value={liveLatest.trackedFrequencyHz.toFixed(1) + " Hz"} hint="tracked" />
-                </div>
-              </Card>
-            )}
-
-            {liveLog.length > 1 && (
-              <Card className="p-6 bg-black/40 border-white/10 mb-6">
-                <h2 className="text-lg font-semibold mb-2">{t("liveTrend")}</h2>
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={[...liveLog].reverse()}>
-                      <XAxis dataKey="label" stroke="#666" fontSize={9} />
-                      <YAxis domain={[0, 1]} stroke="#666" fontSize={10} />
-                      <Tooltip contentStyle={{ background: "#000", border: "1px solid #333" }} />
-                      <ReferenceLine y={0.35} stroke="#10b981" strokeDasharray="3 3" />
-                      <ReferenceLine y={0.55} stroke="#eab308" strokeDasharray="3 3" />
-                      <ReferenceLine y={0.75} stroke="#ef4444" strokeDasharray="3 3" />
-                      <Line type="monotone" dataKey="tf" stroke="#00CED1" dot={false} strokeWidth={1.5} isAnimationActive={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-            )}
-
-            {liveLog.length > 0 && (
-              <Card className="p-6 bg-black/40 border-white/10">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold">{t("eventLog")}</h2>
-                  <Button variant="outline" size="sm" className="border-white/20"
-                    onClick={() => {
-                      const csv = "time,status,tf,mc,frequency_hz,coherence\n" +
-                        liveLog.map(e => `${e.label},${e.status},${e.tf.toFixed(4)},${e.mc.toFixed(4)},${e.freq.toFixed(2)},${e.coh.toFixed(4)}`).join("\n");
-                      const blob = new Blob([csv], { type: "text/csv" });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement("a");
-                      a.href = url; a.download = `zeta_live_log_${Date.now()}.csv`; a.click();
-                      URL.revokeObjectURL(url);
-                    }}>
-                    <Download className="w-3 h-3 mr-1" />CSV
-                  </Button>
-                </div>
-                <div className="max-h-96 overflow-auto text-xs font-mono">
-                  {liveLog.map((e, i) => (
-                    <div key={i} className={`flex justify-between py-1 border-b border-white/5 px-2 ${statusBg[e.status]}`}>
-                      <span className="w-20 text-white/60">{e.label}</span>
-                      <span className={`w-24 ${statusColor[e.status].split(" ")[0]}`}>{e.status}</span>
-                      <span className="w-24 text-white/60">Tf={e.tf.toFixed(3)}</span>
-                      <span className="w-24 text-white/60">Mc={e.mc.toFixed(3)}</span>
-                      <span className="w-24 text-white/60">{e.freq.toFixed(1)} Hz</span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        <footer className="mt-12 text-xs text-white/40 text-center border-t border-white/10 pt-4">
-          {t("footer")} &middot; contact@zeta-core-dsp.com
-        </footer>
-      </div>
-    </div>
-  );
-}
-
-function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
-  return (
-    <div className="bg-black/40 border border-white/10 rounded-lg p-4">
-      <div className="text-xs text-white/50 uppercase tracking-wider">{label}</div>
-      <div className="text-2xl font-bold text-cyan-300 mt-1 font-mono">{value}</div>
-      <div className="text-[10px] text-white/40 mt-1">{hint}</div>
+      <ZetaFooter lang={lang} />
     </div>
   );
 }
