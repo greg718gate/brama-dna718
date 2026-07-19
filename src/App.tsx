@@ -43,7 +43,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<RootPage />} />
               {/* Accept trailing slashes and any nested path */}
               <Route path="/vault" element={<ResearchVault />} />
               <Route path="/vault/*" element={<ResearchVault />} />
