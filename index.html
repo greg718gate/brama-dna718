@@ -11,9 +11,8 @@
           var style = document.createElement('style');
           style.textContent = '#seo-content{display:none !important}';
           document.documentElement.appendChild(style);
-          if (window.location.pathname === '/' || window.location.pathname === '') {
-            window.location.replace('/zeta');
-          }
+          // NOTE: no redirect to /zeta — routing is handled in React (App.tsx)
+          // so the URL stays clean at zeta-core-dsp.com/
         }
       })();
     </script>
