@@ -239,7 +239,7 @@ export default function Zeta() {
   const t = (k: keyof typeof T) => T[k][lang];
   const statusText = lang === "pl" ? statusTextPl : statusTextEn;
   const [code, setCode] = useState("");
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(true);
   const [profile, setProfile] = useState<ProfileId>("auto");
   const [engineVersion, setEngineVersion] = useState<EngineVersion>("v1.1");
   const currentProfile = PROFILES.find((p) => p.id === profile)!;
