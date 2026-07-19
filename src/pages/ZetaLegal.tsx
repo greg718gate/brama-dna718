@@ -8,9 +8,10 @@ type Lang = "pl" | "en";
 
 // Company data — update when Companies House number is provided
 const COMPANY = {
-  name: "Zeta Core Ltd",
+  name: "NovaStream88 Ltd",
   number: "[Companies House No. — to be provided]",
-  address: "London, United Kingdom",
+  address: "Registered office: London, United Kingdom",
+  operations: "Operations: Aberdeen, Scotland, United Kingdom",
   email: "contact@zeta-core-dsp.com",
   domain: "zeta-core-dsp.com",
 };
