@@ -244,6 +244,7 @@ export default function Zeta() {
           <div className="hidden md:flex items-center gap-5 text-sm text-white/70">
             <a href="#services" className="hover:text-white">{t.nav.services}</a>
             <a href="#tech" className="hover:text-white">{t.nav.tech}</a>
+            <a href="#why" className="hover:text-white">{t.nav.why}</a>
             <a href="#tests" className="hover:text-white">{t.nav.tests}</a>
             <a href="#pricing" className="hover:text-white">{t.nav.pricing}</a>
             <a href="#faq" className="hover:text-white">{t.nav.faq}</a>
