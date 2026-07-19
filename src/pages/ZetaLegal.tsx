@@ -55,8 +55,8 @@ const T = {
     back: "← Back to /zeta",
     aboutTitle: "About the company",
     about: [
-      `${COMPANY.name} is a UK-registered company based in London, providing the ZETA-CORE diagnostic software — a phase-coherence analytics engine for rotating machinery (motors, pumps, fans, bearings, gearboxes).`,
-      `Companies House number: ${COMPANY.number}. Registered address: ${COMPANY.address}. Business contact: ${COMPANY.email}.`,
+      `${COMPANY.name} is a UK private limited company with its registered office in London and day-to-day operations run from Aberdeen, Scotland. We provide the ZETA-CORE diagnostic software — a phase-coherence analytics engine for rotating machinery (motors, pumps, fans, bearings, gearboxes).`,
+      `Companies House number: ${COMPANY.number}. ${COMPANY.address}. ${COMPANY.operations}. Business contact: ${COMPANY.email}.`,
       `Business model: on-demand diagnostic reports, monthly fleet-monitoring subscriptions, and Fleet API v3.0 integrations for enterprise customers.`,
     ],
     privacyTitle: "Privacy Policy",
