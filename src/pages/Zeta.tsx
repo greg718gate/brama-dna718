@@ -168,8 +168,8 @@ export default function Zeta() {
       ? "ZETA-CORE · Diagnostyka drgań maszyn przemysłowych"
       : "ZETA-CORE · Industrial machine vibration diagnostics";
     const desc = lang === "pl"
-      ? "Silnik analizy koherencji fazowej i FFT dla silników, pomp, wentylatorów i łożysk. Raporty diagnostyczne, monitoring 24/7, Fleet API. Zeta Core Ltd, Londyn."
-      : "Phase-coherence and FFT analytics engine for motors, pumps, fans and bearings. Diagnostic reports, 24/7 monitoring, Fleet API. Zeta Core Ltd, London.";
+      ? "Silnik analizy koherencji fazowej i FFT dla silników, pomp, wentylatorów i łożysk. Raporty diagnostyczne, monitoring 24/7, Fleet API. NovaStream88 Ltd — Londyn / Aberdeen."
+      : "Phase-coherence and FFT analytics engine for motors, pumps, fans and bearings. Diagnostic reports, 24/7 monitoring, Fleet API. NovaStream88 Ltd — London / Aberdeen.";
     let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
     meta.content = desc;
