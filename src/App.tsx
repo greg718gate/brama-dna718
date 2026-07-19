@@ -19,6 +19,7 @@ import QuantumFilterDashboard from "./pages/QuantumFilterDashboard";
 import SourceArchive from "./pages/SourceArchive";
 import MojeStudioWideo from "./pages/MojeStudioWideo";
 import Zeta from "./pages/Zeta";
+import ZetaPortal from "./pages/ZetaPortal";
 import ZetaIntegration from "./pages/ZetaIntegration";
 import ZetaFAQ from "./pages/ZetaFAQ";
 import ZetaLegal from "./pages/ZetaLegal";
@@ -75,6 +76,8 @@ const App = () => (
               <Route path="/zeta/integration" element={<ZetaIntegration />} />
               <Route path="/zeta/faq" element={<ZetaFAQ />} />
               <Route path="/zeta/legal" element={<ZetaLegal />} />
+              <Route path="/zeta/portal" element={<ZetaPortal />} />
+              <Route path="/zeta/portal/*" element={<ZetaPortal />} />
               <Route path="/zeta" element={<Zeta />} />
               <Route path="/zeta/*" element={<Zeta />} />
 
