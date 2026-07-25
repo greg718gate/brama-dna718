@@ -228,7 +228,7 @@ export default function Zeta() {
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (isZeta) {
       if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
-      canonical.href = "https://zeta-core-dsp.com/";
+      canonical.href = "https://www.zeta-core-dsp.com/";
     }
   }, [lang]);
 
