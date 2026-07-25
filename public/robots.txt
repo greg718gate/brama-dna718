@@ -41,5 +41,4 @@ User-agent: facebookexternalhit
 Allow: /
 
 # Sitemaps
-Sitemap: https://brama-dna718.com/sitemap.xml
-Sitemap: https://zeta-core-dsp.com/sitemap.xml
+Sitemap: https://www.zeta-core-dsp.com/sitemap.xml
