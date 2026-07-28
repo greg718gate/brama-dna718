@@ -451,7 +451,7 @@ export default function Zeta() {
 
     doc.setFontSize(10);
     doc.text(`File: ${result.filename}`, m, y); y += 5;
-    doc.text(`Machine profile: ${currentProfile.name}`, m, y); y += 5;
+    doc.text(`Machine profile: ${currentProfile.name.split(" / ")[0]}`, m, y); y += 5;
     doc.text(`Engine: ${result.engine}`, m, y); y += 5;
     doc.text(`Analysed: ${new Date(result.timestampUtc).toUTCString()}`, m, y); y += 5;
     doc.text(`Samples: ${result.nSamples.toLocaleString()} @ ${result.sampleRateHz} Hz`, m, y); y += 10;
