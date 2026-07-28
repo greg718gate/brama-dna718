@@ -459,7 +459,7 @@ export default function Zeta() {
     doc.setFontSize(14); doc.setFont("helvetica", "bold");
     doc.text(`Worst-window status: ${result.status}`, m, y); y += 7;
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    const statusLines = doc.splitTextToSize(statusText[result.status], w - 2 * m);
+    const statusLines = doc.splitTextToSize(statusTextEn[result.status], w - 2 * m);
     doc.text(statusLines, m, y); y += statusLines.length * 5 + 5;
 
     doc.setFontSize(11); doc.setFont("helvetica", "bold");
