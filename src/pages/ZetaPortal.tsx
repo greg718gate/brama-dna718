@@ -451,7 +451,7 @@ export default function Zeta() {
 
     doc.setFontSize(10);
     doc.text(`File: ${result.filename}`, m, y); y += 5;
-    doc.text(`Machine profile: ${currentProfile.name}`, m, y); y += 5;
+    doc.text(`Machine profile: ${currentProfile.name.split(" / ")[0]}`, m, y); y += 5;
     doc.text(`Engine: ${result.engine}`, m, y); y += 5;
     doc.text(`Analysed: ${new Date(result.timestampUtc).toUTCString()}`, m, y); y += 5;
     doc.text(`Samples: ${result.nSamples.toLocaleString()} @ ${result.sampleRateHz} Hz`, m, y); y += 10;
@@ -459,7 +459,7 @@ export default function Zeta() {
     doc.setFontSize(14); doc.setFont("helvetica", "bold");
     doc.text(`Worst-window status: ${result.status}`, m, y); y += 7;
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    const statusLines = doc.splitTextToSize(statusText[result.status], w - 2 * m);
+    const statusLines = doc.splitTextToSize(statusTextEn[result.status], w - 2 * m);
     doc.text(statusLines, m, y); y += statusLines.length * 5 + 5;
 
     doc.setFontSize(11); doc.setFont("helvetica", "bold");
