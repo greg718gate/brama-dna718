@@ -85,6 +85,8 @@ SYMBOL_CCXT = "BTC/USDT"
 ORDER_QUOTE_SIZE = 20.0         # ile USDT na jedno wejście (testnet/live)
 MODE = os.environ.get("GATCA_MODE", "paper").lower()   # paper | testnet | live
 LOG_FILE = "most_gatca_v3_log.csv"
+PERF_LOG_FILE = "gatca_performance_log.csv"      # pełny log wydajności (każdy tick)
+RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
 
 
 # ═════════════════════════════════════════════════════════════════
