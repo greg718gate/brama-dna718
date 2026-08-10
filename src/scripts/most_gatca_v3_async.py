@@ -273,6 +273,44 @@ def log_event(kind: str, note: str, price=None, pnl_pct=None):
         ])
 
 
+PERF_HEADER = [
+    "timestamp_utc", "price", "decision", "reason", "confidence_pct",
+    "composite", "l1_correlation", "l2_harmonic", "l3_phase",
+    "expected_move_pct", "required_move_pct", "gate",
+    "position", "entry_price", "wins", "losses", "net_pct",
+]
+
+
+def init_perf_log():
+    if not os.path.exists(PERF_LOG_FILE) or os.path.getsize(PERF_LOG_FILE) == 0:
+        with open(PERF_LOG_FILE, "a", newline="") as f:
+            csv.writer(f).writerow(PERF_HEADER)
+
+
+def log_performance(price: float, sig: dict):
+    layers = sig.get("layers", {})
+    with open(PERF_LOG_FILE, "a", newline="") as f:
+        csv.writer(f).writerow([
+            datetime.now(timezone.utc).isoformat(),
+            f"{price:.2f}",
+            sig.get("decision", ""),
+            sig.get("reason") or "",
+            f"{sig.get('confidence', 0):.4f}",
+            f"{sig.get('composite', 0):.8f}",
+            f"{layers.get('correlation', 0):.8f}",
+            f"{layers.get('harmonic', 0):.8f}",
+            f"{layers.get('phase', 0):.8f}",
+            f"{sig.get('expected_move_pct', 0):.5f}",
+            f"{sig.get('required_move_pct', 0):.5f}",
+            sig.get("gate", ""),
+            "LONG" if position else "NONE",
+            f"{position['entry']:.2f}" if position else "",
+            stats["wins"], stats["losses"], f"{stats['net_pct']:.4f}",
+        ])
+
+
+
+
 async def open_position(executor, price, gate):
     global position
     position = {"side": "LONG", "entry": price, "time": datetime.now(timezone.utc).isoformat()}
