@@ -348,14 +348,21 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
     if websockets is None:
         raise RuntimeError("Brak biblioteki websockets: pip install websockets")
 
+    init_perf_log()
+    start = datetime.now(timezone.utc)
+    deadline = start.timestamp() + RUN_HOURS * 3600
+
     print(f"[SYSTEM] GATCA-718 v3 | tryb={MODE.upper()} | okno={WINDOW_SIZE} "
           f"| próg={MIN_CONFIDENCE}% | min. ruch={MIN_PROFITABLE_MOVE*100:.2f}%")
+    print(f"[SYSTEM] Sesja: {RUN_HOURS:.0f} h | log wydajności: {PERF_LOG_FILE}")
 
-    while True:  # auto-reconnect
+    while datetime.now(timezone.utc).timestamp() < deadline:  # auto-reconnect
         try:
             async with websockets.connect(WS_URL, ping_interval=20) as ws:
                 print("[SYSTEM] Połączono z BINANCE_LIVE (kline_1m)")
                 async for raw in ws:
+                    if datetime.now(timezone.utc).timestamp() >= deadline:
+                        break
                     k = json.loads(raw).get("k", {})
                     price = float(k.get("c", 0) or 0)
                     if price <= 0:
@@ -365,7 +372,8 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                     sig = filter_engine.compute_composite_signal()
 
                     tag = sig["decision"] if sig["decision"] != "WAIT" else f"WAIT({sig['reason']})"
-                    print(f"| Price: ${price:,.2f} | {tag} | Pewność: {sig['confidence']:.2f}% "
+                    elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                    print(f"| {elapsed_h:6.2f}h | Price: ${price:,.2f} | {tag} | Pewność: {sig['confidence']:.2f}% "
                           f"| ruch {sig['expected_move_pct']:.3f}%/{sig['required_move_pct']:.2f}% "
                           f"| {sig['gate']} | BINANCE_LIVE")
 
@@ -380,11 +388,16 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                     elif sig["decision"] == "BUY":
                         await open_position(executor, price, sig["gate"])
 
+                    log_performance(price, sig)
+
         except asyncio.CancelledError:
             raise
         except Exception as e:  # sieć / rozłączenie
             print(f"[WARN] Strumień przerwany ({type(e).__name__}: {e}) — reconnect za 5 s")
             await asyncio.sleep(5)
+
+    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {stats['net_pct']:+.3f}% "
+          f"| W/L={stats['wins']}/{stats['losses']} | dane: {PERF_LOG_FILE}")
 
 
 if __name__ == "__main__":
@@ -394,3 +407,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {stats['net_pct']:+.3f}% "
               f"| W/L={stats['wins']}/{stats['losses']}")
+
