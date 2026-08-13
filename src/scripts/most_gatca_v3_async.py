@@ -349,6 +349,8 @@ PERF_HEADER = [
     "timestamp_utc", "price", "decision", "reason", "confidence_pct",
     "composite", "l1_correlation", "l2_harmonic", "l3_phase",
     "expected_move_pct", "required_move_pct", "gate",
+    "unification_status", "mc_wir", "tf_tarcie", "turbine_note",
+
     "position", "entry_price", "wins", "losses", "net_pct",
 ]
 
