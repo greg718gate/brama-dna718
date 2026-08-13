@@ -77,15 +77,19 @@ SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
 
-TAKE_PROFIT_PCT = 0.0035        # 0.35%
-STOP_LOSS_PCT = 0.0020          # 0.20%
+TAKE_PROFIT_PCT = 0.0090        # 0.90% — SOL ma ~3x większą zmienność niż BTC
+STOP_LOSS_PCT = 0.0050          # 0.50%
 
-SYMBOL_WS = "btcusdt"
-SYMBOL_CCXT = "BTC/USDT"
+# ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
+# Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
+# więc sygnał 98% ma realną szansę pokryć prowizje i wygenerować zysk.
+SYMBOL_WS = os.environ.get("GATCA_SYMBOL_WS", "solusdt").lower()
+SYMBOL_CCXT = os.environ.get("GATCA_SYMBOL", "SOL/USDT").upper()
 ORDER_QUOTE_SIZE = 20.0         # ile USDT na jedno wejście (testnet/live)
 MODE = os.environ.get("GATCA_MODE", "paper").lower()   # paper | testnet | live
 LOG_FILE = "most_gatca_v3_log.csv"
 PERF_LOG_FILE = "gatca_performance_log.csv"      # pełny log wydajności (każdy tick)
+
 RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
 
 
