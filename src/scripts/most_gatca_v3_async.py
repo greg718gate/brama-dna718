@@ -129,12 +129,69 @@ def deterministic_seed(prices) -> int:
 
 
 # ═════════════════════════════════════════════════════════════════
+# PROFIL UNIFIKACJI v1.3 — TARCIE TOPOLOGICZNE (Tf) I KONDENSACJA MASY (Mc)
+# Znoszenie blokady MOVE_BELOW_FEES przy wykryciu wiru magnetycznego turbiny
+# ═════════════════════════════════════════════════════════════════
+DYSTANS_TURBINY_BP = 1644        # dystans genetyczny B11 -> B12 (Syntaza ATP)
+PROG_WIRU_MC = 25.0              # próg aktywacji wiru dla mikro-świec 1m
+PROG_RESET_PORTU = 50.0          # poniżej = Brama Zero (B18 -> B1)
+
+
+class GatcaZetaCoreUnifiedEngine:
+    """Idealna harmonia (100%) przesyła bezmasową informację.
+    Kontrolowane zaburzenie (Tarcie Topologiczne) buduje fizyczny impuls (masę)."""
+
+    def __init__(self):
+        self.PHI = PHI
+        self.GAMMA_INV_PHI = GAMMA_INV_PHI
+        self.EULER_MASCHERONI = EULER_MASCHERONI
+        self.CARRIER_FREQ = CARRIER_FREQ
+        self.SCHUMANN = SCHUMANN
+        self.FILTR_PROWIZJI = MIN_PROFITABLE_MOVE
+        self.PROG_PEWNOSCI = MIN_CONFIDENCE
+
+    def oblicz_dynamiczne_tarcie_i_mase(self, pewnosc_g15: float, dynamiczny_ruch_rynku: float):
+        koherencja = pewnosc_g15 / 100.0
+        tarcie_tf = 1.0 - koherencja
+        wskaznik_mc = DYSTANS_TURBINY_BP * tarcie_tf
+
+        # Port Resetu Fazy / Brama Zero
+        if pewnosc_g15 < PROG_RESET_PORTU:
+            return "WAIT(RESET_PORT)", wskaznik_mc, "[BRAMA_ZERO] Całkowite załamanie rezonansu. Reset fazy."
+
+        if pewnosc_g15 >= self.PROG_PEWNOSCI:
+            # Ścieżka A: zmienność już się zmaterializowała
+            if dynamiczny_ruch_rynku >= self.FILTR_PROWIZJI:
+                return "EXECUTE", wskaznik_mc, "[IMPULS_RYNKOWY] Ruch ceny pokrywa prowizje."
+            # Ścieżka B: asymetryczny wir magnetyczny (turbina 150 Hz)
+            elif wskaznik_mc >= PROG_WIRU_MC:
+                return "EXECUTE", wskaznik_mc, "[TURBINA_ATP] Wykryto tarcie topologiczne. Zniesienie blokady opłat."
+            # Ścieżka C: czysta bezmasowa informacja
+            else:
+                return "WAIT(MOVE_BELOW_FEES)", wskaznik_mc, "[STAZ_INFORMACYJNY] Pełna koherencja bez masy rynkowej."
+
+        return "WAIT", wskaznik_mc, "[SZUM] Brak dopasowania do matrycy rCRS."
+
+
+def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny, gate="G15:11915:50"):
+    """Rozszerzony format logu zawierający wskaźnik masy Mc."""
+    print(
+        f"Price: ${cena:,.2f} | {status_unifikacji:<22} | "
+        f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
+        f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
+    )
+
+
+
+# ═════════════════════════════════════════════════════════════════
 # FILTR REZONANSOWY 3-WARSTWOWY
 # ═════════════════════════════════════════════════════════════════
 class GatcaResonanceFilter:
     def __init__(self, window_size: int = WINDOW_SIZE):
         self.window_size = window_size
         self.price_history = []          # wyłącznie RAM (In-Memory)
+        self.unified = GatcaZetaCoreUnifiedEngine()
+
 
     # ── bufor kołowy ──
     def update_market_data(self, current_price: float) -> None:
@@ -184,7 +241,11 @@ class GatcaResonanceFilter:
     def compute_composite_signal(self):
         if not self.ready:
             return {"decision": "WAIT", "confidence": 0.0, "reason": "WARMUP",
-                    "composite": 0.0, "gate": "-", "expected_move_pct": 0.0}
+                    "composite": 0.0, "gate": "-", "expected_move_pct": 0.0,
+                    "required_move_pct": MIN_PROFITABLE_MOVE * 100,
+                    "unification_status": "WAIT(WARMUP)", "mc": 0.0, "tf": 1.0,
+                    "turbine_note": "[WARMUP] Zbieranie okna cen."}
+
 
         prng = Gatca718Prng(deterministic_seed(self.price_history))
         entropy = prng.vector(len(self.price_history))
@@ -196,21 +257,23 @@ class GatcaResonanceFilter:
         composite = (l1 + abs(l2) + abs(l3)) / (PHI + EULER_MASCHERONI + 1)
         confidence = math.tanh(abs(composite) * AMPLIFIER) * 100
 
-        conf_ok = confidence >= MIN_CONFIDENCE
         move = self.expected_move(composite)
-        profit_ok = move >= MIN_PROFITABLE_MOVE
 
-        if conf_ok and profit_ok:
+        # ── UNIFIKACJA v1.3: Tarcie Topologiczne + Kondensacja Masy ──
+        status_unifikacji, wskaznik_mc, opis_turbiny = \
+            self.unified.oblicz_dynamiczne_tarcie_i_mase(confidence, move)
+
+        if status_unifikacji == "EXECUTE":
             decision = "BUY" if composite > 0 else "SELL"
             reason = None
         else:
             decision = "WAIT"
-            if not conf_ok and not profit_ok:
-                reason = "LOW_CONFIDENCE_AND_UNPROFITABLE"
-            elif not conf_ok:
-                reason = "LOW_CONFIDENCE"
-            else:
+            if status_unifikacji == "WAIT(RESET_PORT)":
+                reason = "RESET_PORT"
+            elif status_unifikacji == "WAIT(MOVE_BELOW_FEES)":
                 reason = "MOVE_BELOW_FEES"
+            else:
+                reason = "LOW_CONFIDENCE"
 
         return {
             "decision": decision,
@@ -221,7 +284,12 @@ class GatcaResonanceFilter:
             "required_move_pct": MIN_PROFITABLE_MOVE * 100,
             "reason": reason,
             "gate": prng.gate_signature,
+            "unification_status": status_unifikacji,
+            "mc": wskaznik_mc,
+            "tf": 1.0 - confidence / 100.0,
+            "turbine_note": opis_turbiny,
         }
+
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -281,6 +349,8 @@ PERF_HEADER = [
     "timestamp_utc", "price", "decision", "reason", "confidence_pct",
     "composite", "l1_correlation", "l2_harmonic", "l3_phase",
     "expected_move_pct", "required_move_pct", "gate",
+    "unification_status", "mc_wir", "tf_tarcie", "turbine_note",
+
     "position", "entry_price", "wins", "losses", "net_pct",
 ]
 
@@ -307,6 +377,11 @@ def log_performance(price: float, sig: dict):
             f"{sig.get('expected_move_pct', 0):.5f}",
             f"{sig.get('required_move_pct', 0):.5f}",
             sig.get("gate", ""),
+            sig.get("unification_status", ""),
+            f"{sig.get('mc', 0):.4f}",
+            f"{sig.get('tf', 0):.6f}",
+            sig.get("turbine_note", ""),
+
             "LONG" if position else "NONE",
             f"{position['entry']:.2f}" if position else "",
             stats["wins"], stats["losses"], f"{stats['net_pct']:.4f}",
@@ -375,11 +450,18 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                     filter_engine.update_market_data(price)
                     sig = filter_engine.compute_composite_signal()
 
-                    tag = sig["decision"] if sig["decision"] != "WAIT" else f"WAIT({sig['reason']})"
+                    tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                        "unification_status", f"WAIT({sig['reason']})")
                     elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                    print(f"| {elapsed_h:6.2f}h | Price: ${price:,.2f} | {tag} | Pewność: {sig['confidence']:.2f}% "
-                          f"| ruch {sig['expected_move_pct']:.3f}%/{sig['required_move_pct']:.2f}% "
-                          f"| {sig['gate']} | BINANCE_LIVE")
+                    print(f"| {elapsed_h:6.2f}h ", end="")
+                    generuj_nowy_log_konsoli(
+                        price, tag, sig["confidence"],
+                        sig["expected_move_pct"] / 100.0,
+                        sig.get("mc", 0.0),
+                        sig.get("turbine_note", ""),
+                        sig["gate"],
+                    )
+
 
                     if position:
                         entry = position["entry"]
