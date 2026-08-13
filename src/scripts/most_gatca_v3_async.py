@@ -77,15 +77,19 @@ SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
 
-TAKE_PROFIT_PCT = 0.0035        # 0.35%
-STOP_LOSS_PCT = 0.0020          # 0.20%
+TAKE_PROFIT_PCT = 0.0090        # 0.90% — SOL ma ~3x większą zmienność niż BTC
+STOP_LOSS_PCT = 0.0050          # 0.50%
 
-SYMBOL_WS = "btcusdt"
-SYMBOL_CCXT = "BTC/USDT"
+# ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
+# Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
+# więc sygnał 98% ma realną szansę pokryć prowizje i wygenerować zysk.
+SYMBOL_WS = os.environ.get("GATCA_SYMBOL_WS", "solusdt").lower()
+SYMBOL_CCXT = os.environ.get("GATCA_SYMBOL", "SOL/USDT").upper()
 ORDER_QUOTE_SIZE = 20.0         # ile USDT na jedno wejście (testnet/live)
 MODE = os.environ.get("GATCA_MODE", "paper").lower()   # paper | testnet | live
 LOG_FILE = "most_gatca_v3_log.csv"
 PERF_LOG_FILE = "gatca_performance_log.csv"      # pełny log wydajności (każdy tick)
+
 RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
 
 
@@ -246,7 +250,7 @@ class Executor:
                 self.exchange.set_sandbox_mode(True)
 
     async def market_order(self, side: str, price: float):
-        amount = round(ORDER_QUOTE_SIZE / price, 6)
+        amount = round(ORDER_QUOTE_SIZE / price, 3)   # SOL: krok ilości 0.001
         if self.mode == "paper" or self.exchange is None:
             print(f"   [PAPER] {side} {amount} {SYMBOL_CCXT} @ {price:,.2f} (brak realnego zlecenia)")
             return {"paper": True, "side": side, "amount": amount, "price": price}
@@ -352,7 +356,7 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
-    print(f"[SYSTEM] GATCA-718 v3 | tryb={MODE.upper()} | okno={WINDOW_SIZE} "
+    print(f"[SYSTEM] GATCA-718 v3 | {SYMBOL_CCXT} | tryb={MODE.upper()} | okno={WINDOW_SIZE} "
           f"| próg={MIN_CONFIDENCE}% | min. ruch={MIN_PROFITABLE_MOVE*100:.2f}%")
     print(f"[SYSTEM] Sesja: {RUN_HOURS:.0f} h | log wydajności: {PERF_LOG_FILE}")
 
