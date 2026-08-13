@@ -377,6 +377,11 @@ def log_performance(price: float, sig: dict):
             f"{sig.get('expected_move_pct', 0):.5f}",
             f"{sig.get('required_move_pct', 0):.5f}",
             sig.get("gate", ""),
+            sig.get("unification_status", ""),
+            f"{sig.get('mc', 0):.4f}",
+            f"{sig.get('tf', 0):.6f}",
+            sig.get("turbine_note", ""),
+
             "LONG" if position else "NONE",
             f"{position['entry']:.2f}" if position else "",
             stats["wins"], stats["losses"], f"{stats['net_pct']:.4f}",
