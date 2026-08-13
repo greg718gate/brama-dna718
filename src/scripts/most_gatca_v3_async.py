@@ -450,11 +450,18 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                     filter_engine.update_market_data(price)
                     sig = filter_engine.compute_composite_signal()
 
-                    tag = sig["decision"] if sig["decision"] != "WAIT" else f"WAIT({sig['reason']})"
+                    tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                        "unification_status", f"WAIT({sig['reason']})")
                     elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                    print(f"| {elapsed_h:6.2f}h | Price: ${price:,.2f} | {tag} | Pewność: {sig['confidence']:.2f}% "
-                          f"| ruch {sig['expected_move_pct']:.3f}%/{sig['required_move_pct']:.2f}% "
-                          f"| {sig['gate']} | BINANCE_LIVE")
+                    print(f"| {elapsed_h:6.2f}h ", end="")
+                    generuj_nowy_log_konsoli(
+                        price, tag, sig["confidence"],
+                        sig["expected_move_pct"] / 100.0,
+                        sig.get("mc", 0.0),
+                        sig.get("turbine_note", ""),
+                        sig["gate"],
+                    )
+
 
                     if position:
                         entry = position["entry"]
