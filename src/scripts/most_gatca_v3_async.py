@@ -129,6 +129,61 @@ def deterministic_seed(prices) -> int:
 
 
 # ═════════════════════════════════════════════════════════════════
+# PROFIL UNIFIKACJI v1.3 — TARCIE TOPOLOGICZNE (Tf) I KONDENSACJA MASY (Mc)
+# Znoszenie blokady MOVE_BELOW_FEES przy wykryciu wiru magnetycznego turbiny
+# ═════════════════════════════════════════════════════════════════
+DYSTANS_TURBINY_BP = 1644        # dystans genetyczny B11 -> B12 (Syntaza ATP)
+PROG_WIRU_MC = 25.0              # próg aktywacji wiru dla mikro-świec 1m
+PROG_RESET_PORTU = 50.0          # poniżej = Brama Zero (B18 -> B1)
+
+
+class GatcaZetaCoreUnifiedEngine:
+    """Idealna harmonia (100%) przesyła bezmasową informację.
+    Kontrolowane zaburzenie (Tarcie Topologiczne) buduje fizyczny impuls (masę)."""
+
+    def __init__(self):
+        self.PHI = PHI
+        self.GAMMA_INV_PHI = GAMMA_INV_PHI
+        self.EULER_MASCHERONI = EULER_MASCHERONI
+        self.CARRIER_FREQ = CARRIER_FREQ
+        self.SCHUMANN = SCHUMANN
+        self.FILTR_PROWIZJI = MIN_PROFITABLE_MOVE
+        self.PROG_PEWNOSCI = MIN_CONFIDENCE
+
+    def oblicz_dynamiczne_tarcie_i_mase(self, pewnosc_g15: float, dynamiczny_ruch_rynku: float):
+        koherencja = pewnosc_g15 / 100.0
+        tarcie_tf = 1.0 - koherencja
+        wskaznik_mc = DYSTANS_TURBINY_BP * tarcie_tf
+
+        # Port Resetu Fazy / Brama Zero
+        if pewnosc_g15 < PROG_RESET_PORTU:
+            return "WAIT(RESET_PORT)", wskaznik_mc, "[BRAMA_ZERO] Całkowite załamanie rezonansu. Reset fazy."
+
+        if pewnosc_g15 >= self.PROG_PEWNOSCI:
+            # Ścieżka A: zmienność już się zmaterializowała
+            if dynamiczny_ruch_rynku >= self.FILTR_PROWIZJI:
+                return "EXECUTE", wskaznik_mc, "[IMPULS_RYNKOWY] Ruch ceny pokrywa prowizje."
+            # Ścieżka B: asymetryczny wir magnetyczny (turbina 150 Hz)
+            elif wskaznik_mc >= PROG_WIRU_MC:
+                return "EXECUTE", wskaznik_mc, "[TURBINA_ATP] Wykryto tarcie topologiczne. Zniesienie blokady opłat."
+            # Ścieżka C: czysta bezmasowa informacja
+            else:
+                return "WAIT(MOVE_BELOW_FEES)", wskaznik_mc, "[STAZ_INFORMACYJNY] Pełna koherencja bez masy rynkowej."
+
+        return "WAIT", wskaznik_mc, "[SZUM] Brak dopasowania do matrycy rCRS."
+
+
+def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny, gate="G15:11915:50"):
+    """Rozszerzony format logu zawierający wskaźnik masy Mc."""
+    print(
+        f"Price: ${cena:,.2f} | {status_unifikacji:<22} | "
+        f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
+        f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
+    )
+
+
+
+# ═════════════════════════════════════════════════════════════════
 # FILTR REZONANSOWY 3-WARSTWOWY
 # ═════════════════════════════════════════════════════════════════
 class GatcaResonanceFilter:
