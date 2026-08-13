@@ -190,6 +190,8 @@ class GatcaResonanceFilter:
     def __init__(self, window_size: int = WINDOW_SIZE):
         self.window_size = window_size
         self.price_history = []          # wyłącznie RAM (In-Memory)
+        self.unified = GatcaZetaCoreUnifiedEngine()
+
 
     # ── bufor kołowy ──
     def update_market_data(self, current_price: float) -> None:
