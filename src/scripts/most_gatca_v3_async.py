@@ -241,7 +241,11 @@ class GatcaResonanceFilter:
     def compute_composite_signal(self):
         if not self.ready:
             return {"decision": "WAIT", "confidence": 0.0, "reason": "WARMUP",
-                    "composite": 0.0, "gate": "-", "expected_move_pct": 0.0}
+                    "composite": 0.0, "gate": "-", "expected_move_pct": 0.0,
+                    "required_move_pct": MIN_PROFITABLE_MOVE * 100,
+                    "unification_status": "WAIT(WARMUP)", "mc": 0.0, "tf": 1.0,
+                    "turbine_note": "[WARMUP] Zbieranie okna cen."}
+
 
         prng = Gatca718Prng(deterministic_seed(self.price_history))
         entropy = prng.vector(len(self.price_history))
