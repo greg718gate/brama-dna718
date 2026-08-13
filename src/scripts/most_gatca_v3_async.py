@@ -251,21 +251,23 @@ class GatcaResonanceFilter:
         composite = (l1 + abs(l2) + abs(l3)) / (PHI + EULER_MASCHERONI + 1)
         confidence = math.tanh(abs(composite) * AMPLIFIER) * 100
 
-        conf_ok = confidence >= MIN_CONFIDENCE
         move = self.expected_move(composite)
-        profit_ok = move >= MIN_PROFITABLE_MOVE
 
-        if conf_ok and profit_ok:
+        # ── UNIFIKACJA v1.3: Tarcie Topologiczne + Kondensacja Masy ──
+        status_unifikacji, wskaznik_mc, opis_turbiny = \
+            self.unified.oblicz_dynamiczne_tarcie_i_mase(confidence, move)
+
+        if status_unifikacji == "EXECUTE":
             decision = "BUY" if composite > 0 else "SELL"
             reason = None
         else:
             decision = "WAIT"
-            if not conf_ok and not profit_ok:
-                reason = "LOW_CONFIDENCE_AND_UNPROFITABLE"
-            elif not conf_ok:
-                reason = "LOW_CONFIDENCE"
-            else:
+            if status_unifikacji == "WAIT(RESET_PORT)":
+                reason = "RESET_PORT"
+            elif status_unifikacji == "WAIT(MOVE_BELOW_FEES)":
                 reason = "MOVE_BELOW_FEES"
+            else:
+                reason = "LOW_CONFIDENCE"
 
         return {
             "decision": decision,
@@ -276,7 +278,12 @@ class GatcaResonanceFilter:
             "required_move_pct": MIN_PROFITABLE_MOVE * 100,
             "reason": reason,
             "gate": prng.gate_signature,
+            "unification_status": status_unifikacji,
+            "mc": wskaznik_mc,
+            "tf": 1.0 - confidence / 100.0,
+            "turbine_note": opis_turbiny,
         }
+
 
 
 # ═════════════════════════════════════════════════════════════════
