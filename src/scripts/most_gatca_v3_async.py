@@ -44,7 +44,18 @@ import hashlib
 import json
 import math
 import os
+import sys
 from datetime import datetime, timezone
+
+# ─── KONSOLA WINDOWS: wymuszenie UTF-8 ────────────────────────────
+# Bez tego polskie znaki (ł, ń, ś) wywalają cp1250/charmap
+# (UnicodeEncodeError) w środku pętli WebSocket → fałszywy reconnect.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # pragma: no cover — starsze Pythony / dziwne terminale
+        pass
+
 
 try:
     import websockets
@@ -69,7 +80,10 @@ GATCA_POSITIONS = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
 
 # ─── PARAMETRY DECYZYJNE ─────────────────────────────────────────
 WINDOW_SIZE = 50
-AMPLIFIER = 30                  # wzmocnienie przed tanh
+# Wzmocnienie przed tanh. Kalibracja 14.08.2026: przy 30 tanh saturował się
+# i KAŻDY tick pokazywał 100.00% pewności (wskaźnik bez wartości informacyjnej,
+# tarcie Tf = 0 → wir Mc = 0 → wieczne WAIT(MOVE_BELOW_FEES)).
+AMPLIFIER = 6
 MIN_CONFIDENCE = 98.0           # % — próg wejścia w pozycję
 
 FEE_PER_SIDE = 0.001            # 0.10% Binance Spot na każdą stronę
@@ -337,7 +351,7 @@ stats = {"wins": 0, "losses": 0, "net_pct": 0.0}
 
 
 def log_event(kind: str, note: str, price=None, pnl_pct=None):
-    with open(LOG_FILE, "a", newline="") as f:
+    with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(), kind, note,
             f"{price:.2f}" if price is not None else "",
@@ -357,13 +371,13 @@ PERF_HEADER = [
 
 def init_perf_log():
     if not os.path.exists(PERF_LOG_FILE) or os.path.getsize(PERF_LOG_FILE) == 0:
-        with open(PERF_LOG_FILE, "a", newline="") as f:
+        with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
             csv.writer(f).writerow(PERF_HEADER)
 
 
 def log_performance(price: float, sig: dict):
     layers = sig.get("layers", {})
-    with open(PERF_LOG_FILE, "a", newline="") as f:
+    with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(),
             f"{price:.2f}",
@@ -442,39 +456,48 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                 async for raw in ws:
                     if datetime.now(timezone.utc).timestamp() >= deadline:
                         break
-                    k = json.loads(raw).get("k", {})
-                    price = float(k.get("c", 0) or 0)
-                    if price <= 0:
+                    # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
+                    # kodowanie znaków) NIE może zrywać połączenia z Binance.
+                    try:
+                        k = json.loads(raw).get("k", {})
+                        price = float(k.get("c", 0) or 0)
+                        if price <= 0:
+                            continue
+
+                        filter_engine.update_market_data(price)
+                        sig = filter_engine.compute_composite_signal()
+
+                        tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                            "unification_status", f"WAIT({sig['reason']})")
+                        elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                        print(f"| {elapsed_h:6.2f}h ", end="")
+                        generuj_nowy_log_konsoli(
+                            price, tag, sig["confidence"],
+                            sig["expected_move_pct"] / 100.0,
+                            sig.get("mc", 0.0),
+                            sig.get("turbine_note", ""),
+                            sig["gate"],
+                        )
+
+                        if position:
+                            entry = position["entry"]
+                            if price >= entry * (1 + TAKE_PROFIT_PCT):
+                                await close_position(executor, price, "TAKE_PROFIT")
+                            elif price <= entry * (1 - STOP_LOSS_PCT):
+                                await close_position(executor, price, "STOP_LOSS")
+                            elif sig["decision"] == "SELL":
+                                await close_position(executor, price, "OPPOSITE_SIGNAL")
+                        elif sig["decision"] == "BUY":
+                            await open_position(executor, price, sig["gate"])
+
+                        log_performance(price, sig)
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception as tick_err:
+                        print(f"[TICK-ERR] {type(tick_err).__name__}: {tick_err} "
+                              f"— pomijam ten tick, polaczenie utrzymane")
                         continue
 
-                    filter_engine.update_market_data(price)
-                    sig = filter_engine.compute_composite_signal()
-
-                    tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                        "unification_status", f"WAIT({sig['reason']})")
-                    elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                    print(f"| {elapsed_h:6.2f}h ", end="")
-                    generuj_nowy_log_konsoli(
-                        price, tag, sig["confidence"],
-                        sig["expected_move_pct"] / 100.0,
-                        sig.get("mc", 0.0),
-                        sig.get("turbine_note", ""),
-                        sig["gate"],
-                    )
-
-
-                    if position:
-                        entry = position["entry"]
-                        if price >= entry * (1 + TAKE_PROFIT_PCT):
-                            await close_position(executor, price, "TAKE_PROFIT")
-                        elif price <= entry * (1 - STOP_LOSS_PCT):
-                            await close_position(executor, price, "STOP_LOSS")
-                        elif sig["decision"] == "SELL":
-                            await close_position(executor, price, "OPPOSITE_SIGNAL")
-                    elif sig["decision"] == "BUY":
-                        await open_position(executor, price, sig["gate"])
-
-                    log_performance(price, sig)
 
         except asyncio.CancelledError:
             raise
