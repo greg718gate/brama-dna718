@@ -80,7 +80,10 @@ GATCA_POSITIONS = [1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
 
 # ─── PARAMETRY DECYZYJNE ─────────────────────────────────────────
 WINDOW_SIZE = 50
-AMPLIFIER = 30                  # wzmocnienie przed tanh
+# Wzmocnienie przed tanh. Kalibracja 14.08.2026: przy 30 tanh saturował się
+# i KAŻDY tick pokazywał 100.00% pewności (wskaźnik bez wartości informacyjnej,
+# tarcie Tf = 0 → wir Mc = 0 → wieczne WAIT(MOVE_BELOW_FEES)).
+AMPLIFIER = 6
 MIN_CONFIDENCE = 98.0           # % — próg wejścia w pozycję
 
 FEE_PER_SIDE = 0.001            # 0.10% Binance Spot na każdą stronę
@@ -348,7 +351,7 @@ stats = {"wins": 0, "losses": 0, "net_pct": 0.0}
 
 
 def log_event(kind: str, note: str, price=None, pnl_pct=None):
-    with open(LOG_FILE, "a", newline="") as f:
+    with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(), kind, note,
             f"{price:.2f}" if price is not None else "",
@@ -368,13 +371,13 @@ PERF_HEADER = [
 
 def init_perf_log():
     if not os.path.exists(PERF_LOG_FILE) or os.path.getsize(PERF_LOG_FILE) == 0:
-        with open(PERF_LOG_FILE, "a", newline="") as f:
+        with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
             csv.writer(f).writerow(PERF_HEADER)
 
 
 def log_performance(price: float, sig: dict):
     layers = sig.get("layers", {})
-    with open(PERF_LOG_FILE, "a", newline="") as f:
+    with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(),
             f"{price:.2f}",
