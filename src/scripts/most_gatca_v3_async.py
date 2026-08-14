@@ -456,39 +456,48 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                 async for raw in ws:
                     if datetime.now(timezone.utc).timestamp() >= deadline:
                         break
-                    k = json.loads(raw).get("k", {})
-                    price = float(k.get("c", 0) or 0)
-                    if price <= 0:
+                    # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
+                    # kodowanie znaków) NIE może zrywać połączenia z Binance.
+                    try:
+                        k = json.loads(raw).get("k", {})
+                        price = float(k.get("c", 0) or 0)
+                        if price <= 0:
+                            continue
+
+                        filter_engine.update_market_data(price)
+                        sig = filter_engine.compute_composite_signal()
+
+                        tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                            "unification_status", f"WAIT({sig['reason']})")
+                        elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                        print(f"| {elapsed_h:6.2f}h ", end="")
+                        generuj_nowy_log_konsoli(
+                            price, tag, sig["confidence"],
+                            sig["expected_move_pct"] / 100.0,
+                            sig.get("mc", 0.0),
+                            sig.get("turbine_note", ""),
+                            sig["gate"],
+                        )
+
+                        if position:
+                            entry = position["entry"]
+                            if price >= entry * (1 + TAKE_PROFIT_PCT):
+                                await close_position(executor, price, "TAKE_PROFIT")
+                            elif price <= entry * (1 - STOP_LOSS_PCT):
+                                await close_position(executor, price, "STOP_LOSS")
+                            elif sig["decision"] == "SELL":
+                                await close_position(executor, price, "OPPOSITE_SIGNAL")
+                        elif sig["decision"] == "BUY":
+                            await open_position(executor, price, sig["gate"])
+
+                        log_performance(price, sig)
+                    except asyncio.CancelledError:
+                        raise
+                    except Exception as tick_err:
+                        print(f"[TICK-ERR] {type(tick_err).__name__}: {tick_err} "
+                              f"— pomijam ten tick, polaczenie utrzymane")
                         continue
 
-                    filter_engine.update_market_data(price)
-                    sig = filter_engine.compute_composite_signal()
-
-                    tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                        "unification_status", f"WAIT({sig['reason']})")
-                    elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                    print(f"| {elapsed_h:6.2f}h ", end="")
-                    generuj_nowy_log_konsoli(
-                        price, tag, sig["confidence"],
-                        sig["expected_move_pct"] / 100.0,
-                        sig.get("mc", 0.0),
-                        sig.get("turbine_note", ""),
-                        sig["gate"],
-                    )
-
-
-                    if position:
-                        entry = position["entry"]
-                        if price >= entry * (1 + TAKE_PROFIT_PCT):
-                            await close_position(executor, price, "TAKE_PROFIT")
-                        elif price <= entry * (1 - STOP_LOSS_PCT):
-                            await close_position(executor, price, "STOP_LOSS")
-                        elif sig["decision"] == "SELL":
-                            await close_position(executor, price, "OPPOSITE_SIGNAL")
-                    elif sig["decision"] == "BUY":
-                        await open_position(executor, price, sig["gate"])
-
-                    log_performance(price, sig)
 
         except asyncio.CancelledError:
             raise
