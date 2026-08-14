@@ -44,7 +44,18 @@ import hashlib
 import json
 import math
 import os
+import sys
 from datetime import datetime, timezone
+
+# ─── KONSOLA WINDOWS: wymuszenie UTF-8 ────────────────────────────
+# Bez tego polskie znaki (ł, ń, ś) wywalają cp1250/charmap
+# (UnicodeEncodeError) w środku pętli WebSocket → fałszywy reconnect.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # pragma: no cover — starsze Pythony / dziwne terminale
+        pass
+
 
 try:
     import websockets
