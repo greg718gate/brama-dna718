@@ -93,6 +93,10 @@ MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27
 
 TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
 STOP_LOSS_PCT = 0.0040          # 0.40%
+# Ile domkniętych świec 1m musi minąć po zamknięciu pozycji, zanim bot
+# może wejść ponownie (blokada serii natychmiastowych re-entry).
+COOLDOWN_BARS_AFTER_EXIT = 2
+
 
 # ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
 # Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
