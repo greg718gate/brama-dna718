@@ -187,13 +187,17 @@ class GatcaZetaCoreUnifiedEngine:
         return "WAIT", wskaznik_mc, "[SZUM] Brak dopasowania do matrycy rCRS."
 
 
-def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny, gate="G15:11915:50"):
-    """Rozszerzony format logu zawierający wskaźnik masy Mc."""
+def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny,
+                             gate="G15:11915:50", pozycja="NONE"):
+    """Rozszerzony format logu zawierający wskaźnik masy Mc oraz STAN POZYCJI.
+    Gdy pozycja jest otwarta, sygnał BUY jest raportowany jako HOLD_LONG —
+    bot fizycznie nie może kupić drugi raz."""
     print(
-        f"Price: ${cena:,.2f} | {status_unifikacji:<22} | "
+        f"Price: ${cena:,.2f} | POS:{pozycja:<4} | {status_unifikacji:<22} | "
         f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
         f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
     )
+
 
 
 
