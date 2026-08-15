@@ -517,6 +517,8 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
 
     init_perf_log()
     manager = GatcaExecutionManager(executor)
+    last_sig = None                     # ostatni sygnał z DOMKNIĘTEJ świecy
+
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
