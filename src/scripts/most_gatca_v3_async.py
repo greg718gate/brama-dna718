@@ -548,15 +548,22 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
             print(f"[WARN] Strumień przerwany ({type(e).__name__}: {e}) — reconnect za 5 s")
             await asyncio.sleep(5)
 
-    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {stats['net_pct']:+.3f}% "
-          f"| W/L={stats['wins']}/{stats['losses']} | dane: {PERF_LOG_FILE}")
+    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {manager.net_pct:+.3f}% "
+          f"| W/L={manager.wins}/{manager.losses} | dane: {PERF_LOG_FILE}")
+    return manager
 
 
 if __name__ == "__main__":
     engine = GatcaResonanceFilter()
+    manager = None
     try:
-        asyncio.run(binance_websocket_stream(engine, Executor()))
+        manager = asyncio.run(binance_websocket_stream(engine, Executor()))
     except KeyboardInterrupt:
-        print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {stats['net_pct']:+.3f}% "
-              f"| W/L={stats['wins']}/{stats['losses']}")
+        pass
+    finally:
+        if manager:
+            print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {manager.net_pct:+.3f}% "
+                  f"| W/L={manager.wins}/{manager.losses}")
+        else:
+            print("\n[SYSTEM] Zatrzymano przed inicjalizacją pozycji.")
 
