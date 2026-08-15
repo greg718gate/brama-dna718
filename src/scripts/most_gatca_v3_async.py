@@ -388,10 +388,16 @@ class GatcaExecutionManager:
         self.wins = 0
         self.losses = 0
         self.net_pct = 0.0
+        # Bramka jednoczesności: nawet gdyby dwa ticki weszły równolegle,
+        # tylko jeden może zmienić stan pozycji.
+        self.lock = asyncio.Lock()
+        # Blokada natychmiastowego ponownego wejścia po zamknięciu pozycji.
+        self.cooldown_bars = 0
 
     @property
     def position_label(self) -> str:
         return "LONG" if self.is_in_position else "NONE"
+
 
     async def open_long(self, price: float, gate: str):
         if self.is_in_position:
