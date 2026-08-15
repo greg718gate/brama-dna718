@@ -425,6 +425,8 @@ class GatcaExecutionManager:
         await self.executor.market_order("SELL", price)
         self.is_in_position = False
         self.entry_price = 0.0
+        self.cooldown_bars = COOLDOWN_BARS_AFTER_EXIT
+
 
     async def process(self, status_unifikacji: str, decision: str, price: float,
                       gate: str, bar_closed: bool = True):
