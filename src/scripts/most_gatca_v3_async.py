@@ -426,36 +426,50 @@ class GatcaExecutionManager:
         self.is_in_position = False
         self.entry_price = 0.0
 
-    async def process(self, status_unifikacji: str, decision: str, price: float, gate: str):
-        """Jedna iteracja = jedna decyzja. Zawsze zwraca etykietę akcji."""
+    async def process(self, status_unifikacji: str, decision: str, price: float,
+                      gate: str, bar_closed: bool = True):
+        """Jedna iteracja = jedna decyzja. Zawsze zwraca etykietę akcji.
 
-        # --- SCENARIUSZ 1: SZUKAMY WEJŚCIA (POZA RYNKIEM) ---
-        if not self.is_in_position:
-            if status_unifikacji == "EXECUTE" and decision == "BUY":
-                await self.open_long(price, gate)
-                return "LIVE_ACTION: EXECUTE_BUY"
-            return "LIVE_ACTION: HOLD_AND_WAIT"
+        WEJŚCIE (BUY) jest dozwolone WYŁĄCZNIE gdy:
+          • nie ma otwartej pozycji (is_in_position == False),
+          • świeca 1m została DOMKNIĘTA (bar_closed == True) — nie na każdym ticku,
+          • wygasł cooldown po ostatnim zamknięciu.
+        WYJŚCIE (TP/SL/rewers) sprawdzane jest na każdym ticku.
+        """
+        async with self.lock:
+            # --- SCENARIUSZ 1: POZA RYNKIEM → szukamy wejścia ---
+            if not self.is_in_position:
+                if not bar_closed:
+                    return "LIVE_ACTION: HOLD_AND_WAIT"
+                if self.cooldown_bars > 0:
+                    self.cooldown_bars -= 1
+                    return "LIVE_ACTION: COOLDOWN"
+                if status_unifikacji == "EXECUTE" and decision == "BUY":
+                    await self.open_long(price, gate)
+                    return "LIVE_ACTION: EXECUTE_BUY"
+                return "LIVE_ACTION: HOLD_AND_WAIT"
 
-        # --- SCENARIUSZ 2: PILNUJEMY OTWARTEJ POZYCJI (SZUKAMY WYJŚCIA) ---
-        change_pct = (price - self.entry_price) / self.entry_price
+            # --- SCENARIUSZ 2: POZYCJA OTWARTA → tylko wyjście, nigdy dokupienie ---
+            change_pct = (price - self.entry_price) / self.entry_price
 
-        if change_pct >= TAKE_PROFIT_PCT:
-            await self.close_long(price, "TAKE_PROFIT")
-            return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
+            if change_pct >= TAKE_PROFIT_PCT:
+                await self.close_long(price, "TAKE_PROFIT")
+                return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
 
-        if change_pct <= -STOP_LOSS_PCT:
-            await self.close_long(price, "STOP_LOSS")
-            return "LIVE_ACTION: CLOSE_STOP_LOSS"
+            if change_pct <= -STOP_LOSS_PCT:
+                await self.close_long(price, "STOP_LOSS")
+                return "LIVE_ACTION: CLOSE_STOP_LOSS"
 
-        if status_unifikacji == "WAIT(RESET_PORT)":
-            await self.close_long(price, "CLOSE_ON_REVERSAL")
-            return "LIVE_ACTION: CLOSE_ON_REVERSAL"
+            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)":
+                await self.close_long(price, "CLOSE_ON_REVERSAL")
+                return "LIVE_ACTION: CLOSE_ON_REVERSAL"
 
-        if decision == "SELL":
-            await self.close_long(price, "OPPOSITE_SIGNAL")
-            return "LIVE_ACTION: CLOSE_OPPOSITE_SIGNAL"
+            if bar_closed and decision == "SELL":
+                await self.close_long(price, "OPPOSITE_SIGNAL")
+                return "LIVE_ACTION: CLOSE_OPPOSITE_SIGNAL"
 
-        return "LIVE_ACTION: HOLD_AND_WAIT"
+            return "LIVE_ACTION: HOLD_LONG"
+
 
 
 def log_performance(price: float, sig: dict, manager: GatcaExecutionManager):
