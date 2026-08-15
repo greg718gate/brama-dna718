@@ -486,6 +486,7 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
         raise RuntimeError("Brak biblioteki websockets: pip install websockets")
 
     init_perf_log()
+    manager = GatcaExecutionManager(executor)
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
@@ -523,18 +524,16 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                             sig["gate"],
                         )
 
-                        if position:
-                            entry = position["entry"]
-                            if price >= entry * (1 + TAKE_PROFIT_PCT):
-                                await close_position(executor, price, "TAKE_PROFIT")
-                            elif price <= entry * (1 - STOP_LOSS_PCT):
-                                await close_position(executor, price, "STOP_LOSS")
-                            elif sig["decision"] == "SELL":
-                                await close_position(executor, price, "OPPOSITE_SIGNAL")
-                        elif sig["decision"] == "BUY":
-                            await open_position(executor, price, sig["gate"])
+                        action = await manager.process(
+                            sig.get("unification_status", "WAIT"),
+                            sig["decision"],
+                            price,
+                            sig["gate"],
+                        )
+                        if action != "LIVE_ACTION: HOLD_AND_WAIT":
+                            print(f"   -> {action}")
 
-                        log_performance(price, sig)
+                        log_performance(price, sig, manager)
                     except asyncio.CancelledError:
                         raise
                     except Exception as tick_err:
