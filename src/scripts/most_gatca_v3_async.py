@@ -93,6 +93,10 @@ MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27
 
 TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
 STOP_LOSS_PCT = 0.0040          # 0.40%
+# Ile domkniętych świec 1m musi minąć po zamknięciu pozycji, zanim bot
+# może wejść ponownie (blokada serii natychmiastowych re-entry).
+COOLDOWN_BARS_AFTER_EXIT = 2
+
 
 # ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
 # Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
@@ -187,13 +191,17 @@ class GatcaZetaCoreUnifiedEngine:
         return "WAIT", wskaznik_mc, "[SZUM] Brak dopasowania do matrycy rCRS."
 
 
-def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny, gate="G15:11915:50"):
-    """Rozszerzony format logu zawierający wskaźnik masy Mc."""
+def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny,
+                             gate="G15:11915:50", pozycja="NONE"):
+    """Rozszerzony format logu zawierający wskaźnik masy Mc oraz STAN POZYCJI.
+    Gdy pozycja jest otwarta, sygnał BUY jest raportowany jako HOLD_LONG —
+    bot fizycznie nie może kupić drugi raz."""
     print(
-        f"Price: ${cena:,.2f} | {status_unifikacji:<22} | "
+        f"Price: ${cena:,.2f} | POS:{pozycja:<4} | {status_unifikacji:<22} | "
         f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
         f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
     )
+
 
 
 
@@ -384,10 +392,16 @@ class GatcaExecutionManager:
         self.wins = 0
         self.losses = 0
         self.net_pct = 0.0
+        # Bramka jednoczesności: nawet gdyby dwa ticki weszły równolegle,
+        # tylko jeden może zmienić stan pozycji.
+        self.lock = asyncio.Lock()
+        # Blokada natychmiastowego ponownego wejścia po zamknięciu pozycji.
+        self.cooldown_bars = 0
 
     @property
     def position_label(self) -> str:
         return "LONG" if self.is_in_position else "NONE"
+
 
     async def open_long(self, price: float, gate: str):
         if self.is_in_position:
@@ -415,37 +429,53 @@ class GatcaExecutionManager:
         await self.executor.market_order("SELL", price)
         self.is_in_position = False
         self.entry_price = 0.0
+        self.cooldown_bars = COOLDOWN_BARS_AFTER_EXIT
 
-    async def process(self, status_unifikacji: str, decision: str, price: float, gate: str):
-        """Jedna iteracja = jedna decyzja. Zawsze zwraca etykietę akcji."""
 
-        # --- SCENARIUSZ 1: SZUKAMY WEJŚCIA (POZA RYNKIEM) ---
-        if not self.is_in_position:
-            if status_unifikacji == "EXECUTE" and decision == "BUY":
-                await self.open_long(price, gate)
-                return "LIVE_ACTION: EXECUTE_BUY"
-            return "LIVE_ACTION: HOLD_AND_WAIT"
+    async def process(self, status_unifikacji: str, decision: str, price: float,
+                      gate: str, bar_closed: bool = True):
+        """Jedna iteracja = jedna decyzja. Zawsze zwraca etykietę akcji.
 
-        # --- SCENARIUSZ 2: PILNUJEMY OTWARTEJ POZYCJI (SZUKAMY WYJŚCIA) ---
-        change_pct = (price - self.entry_price) / self.entry_price
+        WEJŚCIE (BUY) jest dozwolone WYŁĄCZNIE gdy:
+          • nie ma otwartej pozycji (is_in_position == False),
+          • świeca 1m została DOMKNIĘTA (bar_closed == True) — nie na każdym ticku,
+          • wygasł cooldown po ostatnim zamknięciu.
+        WYJŚCIE (TP/SL/rewers) sprawdzane jest na każdym ticku.
+        """
+        async with self.lock:
+            # --- SCENARIUSZ 1: POZA RYNKIEM → szukamy wejścia ---
+            if not self.is_in_position:
+                if not bar_closed:
+                    return "LIVE_ACTION: HOLD_AND_WAIT"
+                if self.cooldown_bars > 0:
+                    self.cooldown_bars -= 1
+                    return "LIVE_ACTION: COOLDOWN"
+                if status_unifikacji == "EXECUTE" and decision == "BUY":
+                    await self.open_long(price, gate)
+                    return "LIVE_ACTION: EXECUTE_BUY"
+                return "LIVE_ACTION: HOLD_AND_WAIT"
 
-        if change_pct >= TAKE_PROFIT_PCT:
-            await self.close_long(price, "TAKE_PROFIT")
-            return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
+            # --- SCENARIUSZ 2: POZYCJA OTWARTA → tylko wyjście, nigdy dokupienie ---
+            change_pct = (price - self.entry_price) / self.entry_price
 
-        if change_pct <= -STOP_LOSS_PCT:
-            await self.close_long(price, "STOP_LOSS")
-            return "LIVE_ACTION: CLOSE_STOP_LOSS"
+            if change_pct >= TAKE_PROFIT_PCT:
+                await self.close_long(price, "TAKE_PROFIT")
+                return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
 
-        if status_unifikacji == "WAIT(RESET_PORT)":
-            await self.close_long(price, "CLOSE_ON_REVERSAL")
-            return "LIVE_ACTION: CLOSE_ON_REVERSAL"
+            if change_pct <= -STOP_LOSS_PCT:
+                await self.close_long(price, "STOP_LOSS")
+                return "LIVE_ACTION: CLOSE_STOP_LOSS"
 
-        if decision == "SELL":
-            await self.close_long(price, "OPPOSITE_SIGNAL")
-            return "LIVE_ACTION: CLOSE_OPPOSITE_SIGNAL"
+            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)":
+                await self.close_long(price, "CLOSE_ON_REVERSAL")
+                return "LIVE_ACTION: CLOSE_ON_REVERSAL"
 
-        return "LIVE_ACTION: HOLD_AND_WAIT"
+            if bar_closed and decision == "SELL":
+                await self.close_long(price, "OPPOSITE_SIGNAL")
+                return "LIVE_ACTION: CLOSE_OPPOSITE_SIGNAL"
+
+            return "LIVE_ACTION: HOLD_LONG"
+
 
 
 def log_performance(price: float, sig: dict, manager: GatcaExecutionManager):
@@ -487,6 +517,8 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
 
     init_perf_log()
     manager = GatcaExecutionManager(executor)
+    last_sig = None                     # ostatni sygnał z DOMKNIĘTEJ świecy
+
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
@@ -508,32 +540,50 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                         price = float(k.get("c", 0) or 0)
                         if price <= 0:
                             continue
+                        # Binance wysyła aktualizację ~1×/s; tylko k["x"] == True
+                        # oznacza DOMKNIĘTĄ świecę 1m. Sygnał liczymy raz na świecę,
+                        # a nie na każdym ticku (to było źródłem lawiny BUY).
+                        bar_closed = bool(k.get("x", False))
 
-                        filter_engine.update_market_data(price)
-                        sig = filter_engine.compute_composite_signal()
+                        if bar_closed:
+                            filter_engine.update_market_data(price)
+                            last_sig = filter_engine.compute_composite_signal()
 
-                        tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                            "unification_status", f"WAIT({sig['reason']})")
-                        elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                        print(f"| {elapsed_h:6.2f}h ", end="")
-                        generuj_nowy_log_konsoli(
-                            price, tag, sig["confidence"],
-                            sig["expected_move_pct"] / 100.0,
-                            sig.get("mc", 0.0),
-                            sig.get("turbine_note", ""),
-                            sig["gate"],
-                        )
+                        if last_sig is None:
+                            continue
+                        sig = last_sig
 
                         action = await manager.process(
                             sig.get("unification_status", "WAIT"),
                             sig["decision"],
                             price,
                             sig["gate"],
+                            bar_closed,
                         )
-                        if action != "LIVE_ACTION: HOLD_AND_WAIT":
-                            print(f"   -> {action}")
 
-                        log_performance(price, sig, manager)
+                        if bar_closed:
+                            tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                                "unification_status", f"WAIT({sig['reason']})")
+                            if manager.is_in_position and tag == "BUY":
+                                tag = "HOLD_LONG(BLOCKED_BUY)"
+                            elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                            print(f"| {elapsed_h:6.2f}h ", end="")
+                            generuj_nowy_log_konsoli(
+                                price, tag, sig["confidence"],
+                                sig["expected_move_pct"] / 100.0,
+                                sig.get("mc", 0.0),
+                                sig.get("turbine_note", ""),
+                                sig["gate"],
+                                manager.position_label,
+                            )
+                            if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
+                                print(f"   -> {action}")
+                            log_performance(price, sig, manager)
+                        elif action.startswith("LIVE_ACTION: CLOSE"):
+                            # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
+                            print(f"   -> {action} (intra-bar @ ${price:,.2f})")
+                            log_performance(price, sig, manager)
+
                     except asyncio.CancelledError:
                         raise
                     except Exception as tick_err:
