@@ -538,32 +538,50 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                         price = float(k.get("c", 0) or 0)
                         if price <= 0:
                             continue
+                        # Binance wysyła aktualizację ~1×/s; tylko k["x"] == True
+                        # oznacza DOMKNIĘTĄ świecę 1m. Sygnał liczymy raz na świecę,
+                        # a nie na każdym ticku (to było źródłem lawiny BUY).
+                        bar_closed = bool(k.get("x", False))
 
-                        filter_engine.update_market_data(price)
-                        sig = filter_engine.compute_composite_signal()
+                        if bar_closed:
+                            filter_engine.update_market_data(price)
+                            last_sig = filter_engine.compute_composite_signal()
 
-                        tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                            "unification_status", f"WAIT({sig['reason']})")
-                        elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                        print(f"| {elapsed_h:6.2f}h ", end="")
-                        generuj_nowy_log_konsoli(
-                            price, tag, sig["confidence"],
-                            sig["expected_move_pct"] / 100.0,
-                            sig.get("mc", 0.0),
-                            sig.get("turbine_note", ""),
-                            sig["gate"],
-                        )
+                        if last_sig is None:
+                            continue
+                        sig = last_sig
 
                         action = await manager.process(
                             sig.get("unification_status", "WAIT"),
                             sig["decision"],
                             price,
                             sig["gate"],
+                            bar_closed,
                         )
-                        if action != "LIVE_ACTION: HOLD_AND_WAIT":
-                            print(f"   -> {action}")
 
-                        log_performance(price, sig, manager)
+                        if bar_closed:
+                            tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                                "unification_status", f"WAIT({sig['reason']})")
+                            if manager.is_in_position and tag == "BUY":
+                                tag = "HOLD_LONG(BLOCKED_BUY)"
+                            elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                            print(f"| {elapsed_h:6.2f}h ", end="")
+                            generuj_nowy_log_konsoli(
+                                price, tag, sig["confidence"],
+                                sig["expected_move_pct"] / 100.0,
+                                sig.get("mc", 0.0),
+                                sig.get("turbine_note", ""),
+                                sig["gate"],
+                                manager.position_label,
+                            )
+                            if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
+                                print(f"   -> {action}")
+                            log_performance(price, sig, manager)
+                        elif action.startswith("LIVE_ACTION: CLOSE"):
+                            # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
+                            print(f"   -> {action} (intra-bar @ ${price:,.2f})")
+                            log_performance(price, sig, manager)
+
                     except asyncio.CancelledError:
                         raise
                     except Exception as tick_err:
