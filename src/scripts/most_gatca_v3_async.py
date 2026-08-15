@@ -91,8 +91,8 @@ SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
 
-TAKE_PROFIT_PCT = 0.0090        # 0.90% — SOL ma ~3x większą zmienność niż BTC
-STOP_LOSS_PCT = 0.0050          # 0.50%
+TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
+STOP_LOSS_PCT = 0.0040          # 0.40%
 
 # ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
 # Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
