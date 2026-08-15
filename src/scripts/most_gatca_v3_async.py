@@ -91,8 +91,8 @@ SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
 
-TAKE_PROFIT_PCT = 0.0090        # 0.90% — SOL ma ~3x większą zmienność niż BTC
-STOP_LOSS_PCT = 0.0050          # 0.50%
+TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
+STOP_LOSS_PCT = 0.0040          # 0.40%
 
 # ─── INSTRUMENT: SOLANA (SOL/USDT) ───────────────────────────────
 # Zmiana z BTC na SOL: ruch 1-minutowy SOL jest wielokrotnie większy,
@@ -346,10 +346,6 @@ class Executor:
 # ═════════════════════════════════════════════════════════════════
 # ZARZĄDZANIE POZYCJĄ + LOG
 # ═════════════════════════════════════════════════════════════════
-position = None
-stats = {"wins": 0, "losses": 0, "net_pct": 0.0}
-
-
 def log_event(kind: str, note: str, price=None, pnl_pct=None):
     with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
@@ -375,7 +371,84 @@ def init_perf_log():
             csv.writer(f).writerow(PERF_HEADER)
 
 
-def log_performance(price: float, sig: dict):
+class GatcaExecutionManager:
+    """
+    Maszyna stanów pozycji — zabezpieczenie przed niekontrolowanym
+    ponownym kupowaniem (over-buying). Tylko jedna pozycja LONG na raz.
+    """
+
+    def __init__(self, executor: Executor):
+        self.executor = executor
+        self.is_in_position = False
+        self.entry_price = 0.0
+        self.wins = 0
+        self.losses = 0
+        self.net_pct = 0.0
+
+    @property
+    def position_label(self) -> str:
+        return "LONG" if self.is_in_position else "NONE"
+
+    async def open_long(self, price: float, gate: str):
+        if self.is_in_position:
+            return  # blokada over-buying
+        self.is_in_position = True
+        self.entry_price = price
+        print(f"   [OPEN LONG] entry={price:,.2f} TP={price*(1+TAKE_PROFIT_PCT):,.2f} "
+              f"SL={price*(1-STOP_LOSS_PCT):,.2f} | {gate}")
+        log_event("OPEN", f"LONG {gate}", price)
+        await self.executor.market_order("BUY", price)
+
+    async def close_long(self, price: float, why: str):
+        if not self.is_in_position:
+            return
+        gross = (price - self.entry_price) / self.entry_price
+        net = gross - FEE_PER_SIDE * 2
+        self.net_pct += net * 100
+        if net > 0:
+            self.wins += 1
+        else:
+            self.losses += 1
+        print(f"   [CLOSE {why}] exit={price:,.2f} netto={net*100:+.3f}% "
+              f"| bilans={self.net_pct:+.3f}% | W/L={self.wins}/{self.losses}")
+        log_event("CLOSE", why, price, net * 100)
+        await self.executor.market_order("SELL", price)
+        self.is_in_position = False
+        self.entry_price = 0.0
+
+    async def process(self, status_unifikacji: str, decision: str, price: float, gate: str):
+        """Jedna iteracja = jedna decyzja. Zawsze zwraca etykietę akcji."""
+
+        # --- SCENARIUSZ 1: SZUKAMY WEJŚCIA (POZA RYNKIEM) ---
+        if not self.is_in_position:
+            if status_unifikacji == "EXECUTE" and decision == "BUY":
+                await self.open_long(price, gate)
+                return "LIVE_ACTION: EXECUTE_BUY"
+            return "LIVE_ACTION: HOLD_AND_WAIT"
+
+        # --- SCENARIUSZ 2: PILNUJEMY OTWARTEJ POZYCJI (SZUKAMY WYJŚCIA) ---
+        change_pct = (price - self.entry_price) / self.entry_price
+
+        if change_pct >= TAKE_PROFIT_PCT:
+            await self.close_long(price, "TAKE_PROFIT")
+            return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
+
+        if change_pct <= -STOP_LOSS_PCT:
+            await self.close_long(price, "STOP_LOSS")
+            return "LIVE_ACTION: CLOSE_STOP_LOSS"
+
+        if status_unifikacji == "WAIT(RESET_PORT)":
+            await self.close_long(price, "CLOSE_ON_REVERSAL")
+            return "LIVE_ACTION: CLOSE_ON_REVERSAL"
+
+        if decision == "SELL":
+            await self.close_long(price, "OPPOSITE_SIGNAL")
+            return "LIVE_ACTION: CLOSE_OPPOSITE_SIGNAL"
+
+        return "LIVE_ACTION: HOLD_AND_WAIT"
+
+
+def log_performance(price: float, sig: dict, manager: GatcaExecutionManager):
     layers = sig.get("layers", {})
     with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
@@ -396,39 +469,10 @@ def log_performance(price: float, sig: dict):
             f"{sig.get('tf', 0):.6f}",
             sig.get("turbine_note", ""),
 
-            "LONG" if position else "NONE",
-            f"{position['entry']:.2f}" if position else "",
-            stats["wins"], stats["losses"], f"{stats['net_pct']:.4f}",
+            manager.position_label,
+            f"{manager.entry_price:.2f}" if manager.is_in_position else "",
+            manager.wins, manager.losses, f"{manager.net_pct:.4f}",
         ])
-
-
-
-
-async def open_position(executor, price, gate):
-    global position
-    position = {"side": "LONG", "entry": price, "time": datetime.now(timezone.utc).isoformat()}
-    print(f"   [OPEN LONG] entry={price:,.2f} TP={price*(1+TAKE_PROFIT_PCT):,.2f} "
-          f"SL={price*(1-STOP_LOSS_PCT):,.2f} | {gate}")
-    log_event("OPEN", f"LONG {gate}", price)
-    await executor.market_order("BUY", price)
-
-
-async def close_position(executor, price, why):
-    global position
-    if not position:
-        return
-    gross = (price - position["entry"]) / position["entry"]
-    net = gross - FEE_PER_SIDE * 2
-    stats["net_pct"] += net * 100
-    if net > 0:
-        stats["wins"] += 1
-    else:
-        stats["losses"] += 1
-    print(f"   [CLOSE {why}] exit={price:,.2f} netto={net*100:+.3f}% "
-          f"| bilans={stats['net_pct']:+.3f}% | W/L={stats['wins']}/{stats['losses']}")
-    log_event("CLOSE", why, price, net * 100)
-    await executor.market_order("SELL", price)
-    position = None
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -442,6 +486,7 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
         raise RuntimeError("Brak biblioteki websockets: pip install websockets")
 
     init_perf_log()
+    manager = GatcaExecutionManager(executor)
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
@@ -479,18 +524,16 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                             sig["gate"],
                         )
 
-                        if position:
-                            entry = position["entry"]
-                            if price >= entry * (1 + TAKE_PROFIT_PCT):
-                                await close_position(executor, price, "TAKE_PROFIT")
-                            elif price <= entry * (1 - STOP_LOSS_PCT):
-                                await close_position(executor, price, "STOP_LOSS")
-                            elif sig["decision"] == "SELL":
-                                await close_position(executor, price, "OPPOSITE_SIGNAL")
-                        elif sig["decision"] == "BUY":
-                            await open_position(executor, price, sig["gate"])
+                        action = await manager.process(
+                            sig.get("unification_status", "WAIT"),
+                            sig["decision"],
+                            price,
+                            sig["gate"],
+                        )
+                        if action != "LIVE_ACTION: HOLD_AND_WAIT":
+                            print(f"   -> {action}")
 
-                        log_performance(price, sig)
+                        log_performance(price, sig, manager)
                     except asyncio.CancelledError:
                         raise
                     except Exception as tick_err:
@@ -505,15 +548,22 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
             print(f"[WARN] Strumień przerwany ({type(e).__name__}: {e}) — reconnect za 5 s")
             await asyncio.sleep(5)
 
-    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {stats['net_pct']:+.3f}% "
-          f"| W/L={stats['wins']}/{stats['losses']} | dane: {PERF_LOG_FILE}")
+    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {manager.net_pct:+.3f}% "
+          f"| W/L={manager.wins}/{manager.losses} | dane: {PERF_LOG_FILE}")
+    return manager
 
 
 if __name__ == "__main__":
     engine = GatcaResonanceFilter()
+    manager = None
     try:
-        asyncio.run(binance_websocket_stream(engine, Executor()))
+        manager = asyncio.run(binance_websocket_stream(engine, Executor()))
     except KeyboardInterrupt:
-        print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {stats['net_pct']:+.3f}% "
-              f"| W/L={stats['wins']}/{stats['losses']}")
+        pass
+    finally:
+        if manager:
+            print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {manager.net_pct:+.3f}% "
+                  f"| W/L={manager.wins}/{manager.losses}")
+        else:
+            print("\n[SYSTEM] Zatrzymano przed inicjalizacją pozycji.")
 
