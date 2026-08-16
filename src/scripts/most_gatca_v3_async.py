@@ -284,7 +284,10 @@ class GatcaResonanceFilter:
         l2 = self.calculate_l2_harmonic_resonance()
         l3 = self.calculate_l3_phase_coherence()
 
-        composite = (l1 + abs(l2) + abs(l3)) / (PHI + EULER_MASCHERONI + 1)
+        # Zachowujemy znaki wszystkich warstw. Poprzednie abs(l2)+abs(l3)
+        # sztucznie przesuwało wynik powyżej zera, więc SELL był niemal
+        # nieosiągalny niezależnie od kierunku rezonansu harmonicznego/fazy.
+        composite = (l1 + l2 + l3) / (PHI + EULER_MASCHERONI + 1)
         confidence = math.tanh(abs(composite) * AMPLIFIER) * 100
 
         move = self.expected_move(composite)
@@ -309,7 +312,7 @@ class GatcaResonanceFilter:
             "decision": decision,
             "confidence": confidence,
             "composite": composite,
-            "layers": {"correlation": l1, "harmonic": abs(l2), "phase": abs(l3)},
+            "layers": {"correlation": l1, "harmonic": l2, "phase": l3},
             "expected_move_pct": move * 100,
             "required_move_pct": MIN_PROFITABLE_MOVE * 100,
             "reason": reason,
