@@ -399,16 +399,48 @@ class Executor:
             })
             if mode == "testnet":
                 self.exchange.set_sandbox_mode(True)
+            # exchangeInfo (cache w RAM) — bez tego amount może naruszać
+            # stepSize / minQty / minNotional i Binance odrzuci zlecenie.
+            self.exchange.load_markets()
+            if SYMBOL_CCXT not in self.exchange.markets:
+                raise RuntimeError(f"Symbol {SYMBOL_CCXT} nie istnieje na tym rynku")
+            self.market = self.exchange.markets[SYMBOL_CCXT]
+
+    def _sized_amount(self, price: float):
+        """Zwraca (amount, blad). amount zgodny ze stepSize/minQty/minNotional."""
+        raw = ORDER_QUOTE_SIZE / price
+        if self.exchange is None:
+            return round(raw, 3), None
+        amount = float(self.exchange.amount_to_precision(SYMBOL_CCXT, raw))
+        limits = (self.market or {}).get("limits", {})
+        min_qty = (limits.get("amount") or {}).get("min")
+        min_cost = (limits.get("cost") or {}).get("min")
+        if min_qty and amount < float(min_qty):
+            return amount, f"amount {amount} < minQty {min_qty}"
+        if min_cost and amount * price < float(min_cost):
+            return amount, f"notional {amount * price:.2f} < minNotional {min_cost}"
+        if amount <= 0:
+            return amount, "amount = 0 po zaokrągleniu do stepSize"
+        return amount, None
 
     async def market_order(self, side: str, price: float):
-        amount = round(ORDER_QUOTE_SIZE / price, 3)   # SOL: krok ilości 0.001
+        amount, err = self._sized_amount(price)
+        if err:
+            log.error("   [ODRZUCONE] %s %s: %s", side, SYMBOL_CCXT, err)
+            return None
         if self.mode == "paper" or self.exchange is None:
-            print(f"   [PAPER] {side} {amount} {SYMBOL_CCXT} @ {price:,.2f} (brak realnego zlecenia)")
+            log.info("   [PAPER] %s %s %s @ %.2f (brak realnego zlecenia)",
+                     side, amount, SYMBOL_CCXT, price)
             return {"paper": True, "side": side, "amount": amount, "price": price}
         loop = asyncio.get_running_loop()
         fn = self.exchange.create_market_buy_order if side == "BUY" else self.exchange.create_market_sell_order
-        order = await loop.run_in_executor(None, lambda: fn(SYMBOL_CCXT, amount))
-        print(f"   [{self.mode.upper()}] zlecenie {side} id={order.get('id')} amount={amount}")
+        try:
+            order = await loop.run_in_executor(None, lambda: fn(SYMBOL_CCXT, amount))
+        except Exception as err_exec:
+            log.error("   [ODRZUCONE] %s %s: %s", side, SYMBOL_CCXT, err_exec)
+            return None
+        log.info("   [%s] zlecenie %s id=%s amount=%s",
+                 self.mode.upper(), side, order.get("id"), amount)
         return order
 
 
