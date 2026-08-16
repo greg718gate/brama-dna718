@@ -94,6 +94,11 @@ FEE_PER_SIDE = 0.001            # 0.10% Binance Spot na każdą stronę
 SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
+# Ostrożnościowe ścięcie oczekiwanego ruchu (zmienność jest endogeniczna —
+# liczona z tego samego okna, z którego powstał sygnał).
+MOVE_HAIRCUT = float(os.environ.get("GATCA_MOVE_HAIRCUT", "0.7"))
+# Koszt wyjścia awaryjnego (RESET_PORT): prowizja + poślizg/spread.
+EXIT_COST_PCT = FEE_PER_SIDE + SPREAD_ESTIMATE
 
 TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
 STOP_LOSS_PCT = 0.0040          # 0.40%
