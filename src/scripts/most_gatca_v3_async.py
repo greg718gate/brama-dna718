@@ -165,10 +165,18 @@ class Gatca718Prng:
                         for i in range(18)]
 
     def next_raw(self) -> float:
+        """Zwraca liczbę z przedziału [0, 1).
+
+        Audytowalnie: bierzemy część ułamkową sinusa przeskalowanego o 10 000.
+        `math.modf(x)[0]` daje ułamek ze ZNAKIEM, dlatego bierzemy jego moduł —
+        wcześniejsze `x - floor(x)` działało, ale było nieoczywiste dla liczb
+        ujemnych i trudne do zweryfikowania w audycie.
+        """
         self.counter += 1
         gate_entropy = self.entropy[self.counter % 18]
-        x = math.sin(self.counter * PHI + gate_entropy * CARRIER_FREQ) * 10000
-        return x - math.floor(x)
+        x = math.sin(self.counter * PHI + gate_entropy * CARRIER_FREQ) * 10000.0
+        frac = abs(math.modf(x)[0])
+        return frac if frac < 1.0 else 0.0
 
     def vector(self, size: int):
         return [self.next_raw() for _ in range(size)]
