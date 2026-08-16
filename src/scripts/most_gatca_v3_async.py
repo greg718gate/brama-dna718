@@ -509,13 +509,16 @@ class GatcaExecutionManager:
                 return "LIVE_ACTION: HOLD_AND_WAIT"
 
             # --- SCENARIUSZ 2: POZYCJA OTWARTA → tylko wyjście, nigdy dokupienie ---
-            change_pct = (price - self.entry_price) / self.entry_price
+            # Porównanie cen docelowych zamiast ilorazu float zapobiega sytuacji,
+            # w której dokładnie +0.80% zostaje zapisane jako 0.0079999999.
+            take_profit_price = self.entry_price * (1.0 + TAKE_PROFIT_PCT)
+            stop_loss_price = self.entry_price * (1.0 - STOP_LOSS_PCT)
 
-            if change_pct >= TAKE_PROFIT_PCT:
+            if price >= take_profit_price:
                 await self.close_long(price, "TAKE_PROFIT")
                 return "LIVE_ACTION: CLOSE_TAKE_PROFIT"
 
-            if change_pct <= -STOP_LOSS_PCT:
+            if price <= stop_loss_price:
                 await self.close_long(price, "STOP_LOSS")
                 return "LIVE_ACTION: CLOSE_STOP_LOSS"
 
@@ -621,7 +624,9 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                         if bar_closed:
                             tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
                                 "unification_status", f"WAIT({sig['reason']})")
-                            if manager.is_in_position and tag == "BUY":
+                            if action == "LIVE_ACTION: EXECUTE_BUY":
+                                tag = "EXECUTE_BUY"
+                            elif manager.is_in_position and tag == "BUY":
                                 tag = "HOLD_LONG(BLOCKED_BUY)"
                             elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
                             print(f"| {elapsed_h:6.2f}h ", end="")
