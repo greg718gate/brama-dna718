@@ -300,7 +300,10 @@ class GatcaResonanceFilter:
 
     # ── oczekiwany ruch ceny (zmienność realizowana × siła sygnału × φ) ──
     def expected_move(self, composite: float) -> float:
-        data = self.price_history
+        """UWAGA (endogeniczność): zmienność liczona jest z TEGO SAMEGO okna,
+        z którego powstał sygnał, więc próg ruchu może być optymistyczny.
+        Dlatego wynik jest mnożony przez współczynnik ostrożności < 1."""
+        data = list(self.price_history)
         if len(data) < 2:
             return 0.0
         rets = [(data[i] - data[i - 1]) / data[i - 1]
@@ -309,7 +312,7 @@ class GatcaResonanceFilter:
             return 0.0
         mean = sum(rets) / len(rets)
         var = sum((r - mean) ** 2 for r in rets) / len(rets)
-        return math.sqrt(var) * abs(composite) * PHI
+        return math.sqrt(var) * abs(composite) * PHI * MOVE_HAIRCUT
 
     # ── agregacja ──
     def compute_composite_signal(self):
@@ -324,9 +327,7 @@ class GatcaResonanceFilter:
         prng = Gatca718Prng(deterministic_seed(self.price_history))
         entropy = prng.vector(len(self.price_history))
 
-        l1 = self.calculate_l1_gatca_correlation(entropy)
-        l2 = self.calculate_l2_harmonic_resonance()
-        l3 = self.calculate_l3_phase_coherence()
+        l1, l2, l3 = self.calculate_layers(entropy)
 
         # Zachowujemy znaki wszystkich warstw. Poprzednie abs(l2)+abs(l3)
         # sztucznie przesuwało wynik powyżej zera, więc SELL był niemal
