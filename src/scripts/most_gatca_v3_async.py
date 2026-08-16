@@ -691,8 +691,7 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                                 log_performance(price, sig, manager, action)
                             elif action.startswith("LIVE_ACTION: CLOSE"):
                                 # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
-                                log.info("   -> %s (intra-bar @ $%,.2f)".replace("%,.2f", "%.2f"),
-                                         action, price)
+                                log.info("   -> %s (intra-bar @ $%.2f)", action, price)
                                 log_performance(price, sig, manager, action)
 
                         except asyncio.CancelledError:
