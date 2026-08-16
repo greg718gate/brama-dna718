@@ -105,8 +105,16 @@ SYMBOL_WS = os.environ.get("GATCA_SYMBOL_WS", "solusdt").lower()
 SYMBOL_CCXT = os.environ.get("GATCA_SYMBOL", "SOL/USDT").upper()
 ORDER_QUOTE_SIZE = 20.0         # ile USDT na jedno wejście (testnet/live)
 MODE = os.environ.get("GATCA_MODE", "paper").lower()   # paper | testnet | live
-LOG_FILE = "most_gatca_v3_log.csv"
-PERF_LOG_FILE = "gatca_performance_log.csv"      # pełny log wydajności (każdy tick)
+SESSION_ID = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+# Każde uruchomienie dostaje osobny plik. Dzięki temu analiza nowej sesji nie
+# wczytuje ponownie starych danych BTC/SOL z jednego, stale dopisywanego CSV.
+LOG_FILE = os.environ.get("GATCA_TRADE_LOG", f"most_gatca_v3_trades_{SESSION_ID}.csv")
+PERF_LOG_FILE = os.environ.get(
+    "GATCA_PERF_LOG", f"gatca_performance_{SYMBOL_WS}_{SESSION_ID}.csv"
+)
+POSITION_STATE_FILE = os.environ.get(
+    "GATCA_STATE_FILE", f"gatca_position_{SYMBOL_WS}_{MODE}.json"
+)
 
 RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
 
@@ -364,7 +372,8 @@ def log_event(kind: str, note: str, price=None, pnl_pct=None):
 
 
 PERF_HEADER = [
-    "timestamp_utc", "price", "decision", "reason", "confidence_pct",
+    "timestamp_utc", "session_id", "symbol", "mode", "price",
+    "signal", "action", "reason", "confidence_pct",
     "composite", "l1_correlation", "l2_harmonic", "l3_phase",
     "expected_move_pct", "required_move_pct", "gate",
     "unification_status", "mc_wir", "tf_tarcie", "turbine_note",
@@ -397,6 +406,47 @@ class GatcaExecutionManager:
         self.lock = asyncio.Lock()
         # Blokada natychmiastowego ponownego wejścia po zamknięciu pozycji.
         self.cooldown_bars = 0
+        self._restore_state()
+
+    def _restore_state(self):
+        """Odtwarza otwartą pozycję po restarcie, aby restart nie pozwalał kupić drugi raz."""
+        if os.environ.get("GATCA_RESET_POSITION") == "1":
+            if os.path.exists(POSITION_STATE_FILE):
+                os.remove(POSITION_STATE_FILE)
+            return
+        if not os.path.exists(POSITION_STATE_FILE):
+            return
+        try:
+            with open(POSITION_STATE_FILE, "r", encoding="utf-8") as f:
+                state = json.load(f)
+            self.is_in_position = bool(state.get("is_in_position", False))
+            self.entry_price = float(state.get("entry_price", 0.0) or 0.0)
+            self.wins = int(state.get("wins", 0) or 0)
+            self.losses = int(state.get("losses", 0) or 0)
+            self.net_pct = float(state.get("net_pct", 0.0) or 0.0)
+            self.cooldown_bars = int(state.get("cooldown_bars", 0) or 0)
+            if self.is_in_position and self.entry_price <= 0:
+                raise ValueError("otwarta pozycja bez poprawnej ceny wejścia")
+            print(f"[STATE] Odtworzono POS:{self.position_label} entry={self.entry_price:.2f}")
+        except (OSError, ValueError, TypeError, json.JSONDecodeError) as err:
+            raise RuntimeError(f"Nie można bezpiecznie odtworzyć stanu pozycji: {err}") from err
+
+    def _save_state(self):
+        state = {
+            "symbol": SYMBOL_CCXT,
+            "mode": MODE,
+            "is_in_position": self.is_in_position,
+            "entry_price": self.entry_price,
+            "wins": self.wins,
+            "losses": self.losses,
+            "net_pct": self.net_pct,
+            "cooldown_bars": self.cooldown_bars,
+            "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        temp_file = POSITION_STATE_FILE + ".tmp"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        os.replace(temp_file, POSITION_STATE_FILE)
 
     @property
     def position_label(self) -> str:
@@ -406,18 +456,20 @@ class GatcaExecutionManager:
     async def open_long(self, price: float, gate: str):
         if self.is_in_position:
             return  # blokada over-buying
+        await self.executor.market_order("BUY", price)
         self.is_in_position = True
         self.entry_price = price
+        self._save_state()
         print(f"   [OPEN LONG] entry={price:,.2f} TP={price*(1+TAKE_PROFIT_PCT):,.2f} "
               f"SL={price*(1-STOP_LOSS_PCT):,.2f} | {gate}")
         log_event("OPEN", f"LONG {gate}", price)
-        await self.executor.market_order("BUY", price)
 
     async def close_long(self, price: float, why: str):
         if not self.is_in_position:
             return
         gross = (price - self.entry_price) / self.entry_price
         net = gross - FEE_PER_SIDE * 2
+        await self.executor.market_order("SELL", price)
         self.net_pct += net * 100
         if net > 0:
             self.wins += 1
@@ -426,10 +478,10 @@ class GatcaExecutionManager:
         print(f"   [CLOSE {why}] exit={price:,.2f} netto={net*100:+.3f}% "
               f"| bilans={self.net_pct:+.3f}% | W/L={self.wins}/{self.losses}")
         log_event("CLOSE", why, price, net * 100)
-        await self.executor.market_order("SELL", price)
         self.is_in_position = False
         self.entry_price = 0.0
         self.cooldown_bars = COOLDOWN_BARS_AFTER_EXIT
+        self._save_state()
 
 
     async def process(self, status_unifikacji: str, decision: str, price: float,
@@ -449,6 +501,7 @@ class GatcaExecutionManager:
                     return "LIVE_ACTION: HOLD_AND_WAIT"
                 if self.cooldown_bars > 0:
                     self.cooldown_bars -= 1
+                    self._save_state()
                     return "LIVE_ACTION: COOLDOWN"
                 if status_unifikacji == "EXECUTE" and decision == "BUY":
                     await self.open_long(price, gate)
@@ -478,13 +531,17 @@ class GatcaExecutionManager:
 
 
 
-def log_performance(price: float, sig: dict, manager: GatcaExecutionManager):
+def log_performance(price: float, sig: dict, manager: GatcaExecutionManager, action: str):
     layers = sig.get("layers", {})
     with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(),
+            SESSION_ID,
+            SYMBOL_CCXT,
+            MODE,
             f"{price:.2f}",
             sig.get("decision", ""),
+            action.removeprefix("LIVE_ACTION: "),
             sig.get("reason") or "",
             f"{sig.get('confidence', 0):.4f}",
             f"{sig.get('composite', 0):.8f}",
@@ -578,11 +635,11 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
                             )
                             if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
                                 print(f"   -> {action}")
-                            log_performance(price, sig, manager)
+                            log_performance(price, sig, manager, action)
                         elif action.startswith("LIVE_ACTION: CLOSE"):
                             # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
                             print(f"   -> {action} (intra-bar @ ${price:,.2f})")
-                            log_performance(price, sig, manager)
+                            log_performance(price, sig, manager, action)
 
                     except asyncio.CancelledError:
                         raise
