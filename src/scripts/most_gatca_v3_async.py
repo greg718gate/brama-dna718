@@ -239,59 +239,64 @@ class GatcaZetaCoreUnifiedEngine:
 
 
 def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny,
-                             gate="G15:11915:50", pozycja="NONE"):
+                             gate="G15:11915:50", pozycja="NONE", elapsed_h=None):
     """Rozszerzony format logu zawierający wskaźnik masy Mc oraz STAN POZYCJI.
     Gdy pozycja jest otwarta, sygnał BUY jest raportowany jako HOLD_LONG —
     bot fizycznie nie może kupić drugi raz."""
-    print(
-        f"Price: ${cena:,.2f} | POS:{pozycja:<4} | {status_unifikacji:<22} | "
-        f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
-        f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
+    prefix = f"| {elapsed_h:6.2f}h " if elapsed_h is not None else ""
+    log.info(
+        "%sPrice: $%,.2f | POS:%-4s | %-22s | Pewnosc: %6.2f%% | ruch %.3f%%/%.2f%% | "
+        "Wir_Mc: %6.2f | %s | %s | SPOT_UK".replace("%,.2f", "%.2f"),
+        prefix, cena, pozycja, status_unifikacji, pewnosc,
+        ruch * 100, MIN_PROFITABLE_MOVE * 100, mc, opis_turbiny, gate,
     )
 
 
 
 
 # ═════════════════════════════════════════════════════════════════
-# FILTR REZONANSOWY 3-WARSTWOWY
+# FILTR REZONANSOWY 3-WARSTWOWY (ocena rynku — BEZ egzekucji)
 # ═════════════════════════════════════════════════════════════════
 class GatcaResonanceFilter:
+    """Czysty analizator: zwraca OCENĘ rynku. Nie wie nic o pozycji ani
+    o zleceniach — decyzje wykonawcze podejmuje GatcaExecutionManager."""
+
     def __init__(self, window_size: int = WINDOW_SIZE):
         self.window_size = window_size
-        self.price_history = []          # wyłącznie RAM (In-Memory)
+        # deque(maxlen=...) sam usuwa najstarszy element w O(1) — bez pop(0).
+        self.price_history = deque(maxlen=window_size)   # wyłącznie RAM (In-Memory)
         self.unified = GatcaZetaCoreUnifiedEngine()
-
 
     # ── bufor kołowy ──
     def update_market_data(self, current_price: float) -> None:
         self.price_history.append(float(current_price))
-        if len(self.price_history) > self.window_size:
-            self.price_history.pop(0)
 
     @property
     def ready(self) -> bool:
         return len(self.price_history) >= self.window_size
 
-    # ── Warstwa 1: korelacja cen z wektorem entropii DNA (waga φ) ──
+    # ── Wszystkie 3 warstwy w JEDNYM przejściu po oknie (mniej CPU) ──
+    def calculate_layers(self, entropy):
+        data = list(self.price_history)
+        n = len(data)
+        corr = harm = phase = 0.0
+        for i, p in enumerate(data):
+            corr += math.sin(p * entropy[i])
+            harm += math.cos(p / PHI)
+            phase += math.cos((p % SCHUMANN) / SCHUMANN * 2 * math.pi)
+        return ((corr / n) * PHI, (harm / n) * EULER_MASCHERONI, phase / n)
+
+    # ── zgodność wstecz: pojedyncze warstwy (używane w backteście/testach) ──
     def calculate_l1_gatca_correlation(self, entropy) -> float:
-        data = self.price_history
-        s = sum(math.sin(data[i] * entropy[i]) for i in range(len(data)))
-        return (s / len(data)) * PHI
+        return self.calculate_layers(entropy)[0]
 
-    # ── Warstwa 2: rezonans harmoniczny wobec nośnej / φ (waga γ Eulera) ──
     def calculate_l2_harmonic_resonance(self) -> float:
-        data = self.price_history
-        s = sum(math.cos(p / PHI) for p in data)
-        return (s / len(data)) * EULER_MASCHERONI
+        data = list(self.price_history)
+        return (sum(math.cos(p / PHI) for p in data) / len(data)) * EULER_MASCHERONI
 
-    # ── Warstwa 3: koherencja fazowa z rezonansem Schumanna 7.83 Hz ──
     def calculate_l3_phase_coherence(self) -> float:
-        data = self.price_history
-        s = 0.0
-        for p in data:
-            phase = (p % SCHUMANN) / SCHUMANN * 2 * math.pi
-            s += math.cos(phase)
-        return s / len(data)
+        data = list(self.price_history)
+        return sum(math.cos((p % SCHUMANN) / SCHUMANN * 2 * math.pi) for p in data) / len(data)
 
     # ── oczekiwany ruch ceny (zmienność realizowana × siła sygnału × φ) ──
     def expected_move(self, composite: float) -> float:
