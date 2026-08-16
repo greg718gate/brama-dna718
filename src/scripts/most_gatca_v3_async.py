@@ -42,10 +42,14 @@ import asyncio
 import csv
 import hashlib
 import json
+import logging
+import logging.handlers
 import math
 import os
 import sys
-from datetime import datetime, timezone
+import threading
+from collections import deque
+from datetime import datetime, timedelta, timezone
 
 # ─── KONSOLA WINDOWS: wymuszenie UTF-8 ────────────────────────────
 # Bez tego polskie znaki (ł, ń, ś) wywalają cp1250/charmap
@@ -90,6 +94,11 @@ FEE_PER_SIDE = 0.001            # 0.10% Binance Spot na każdą stronę
 SPREAD_ESTIMATE = 0.0002        # 0.02%
 SAFETY_BUFFER = 0.0005          # 0.05%
 MIN_PROFITABLE_MOVE = FEE_PER_SIDE * 2 + SPREAD_ESTIMATE + SAFETY_BUFFER  # 0.27%
+# Ostrożnościowe ścięcie oczekiwanego ruchu (zmienność jest endogeniczna —
+# liczona z tego samego okna, z którego powstał sygnał).
+MOVE_HAIRCUT = float(os.environ.get("GATCA_MOVE_HAIRCUT", "0.7"))
+# Koszt wyjścia awaryjnego (RESET_PORT): prowizja + poślizg/spread.
+EXIT_COST_PCT = FEE_PER_SIDE + SPREAD_ESTIMATE
 
 TAKE_PROFIT_PCT = 0.0080        # 0.80% — dopasowany do zmienności SOL/USDT
 STOP_LOSS_PCT = 0.0040          # 0.40%
@@ -115,8 +124,36 @@ PERF_LOG_FILE = os.environ.get(
 POSITION_STATE_FILE = os.environ.get(
     "GATCA_STATE_FILE", f"gatca_position_{SYMBOL_WS}_{MODE}.json"
 )
+TEXT_LOG_FILE = os.environ.get("GATCA_TEXT_LOG", f"gatca_run_{SYMBOL_WS}_{MODE}.log")
 
 RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
+
+# Reconnect: backoff wykładniczy 1 → 2 → 4 … do 60 s (zamiast sztywnych 5 s).
+RECONNECT_BACKOFF_MAX = 60.0
+# Stan pozycji starszy niż to uznajemy za nieaktualny (rynek uciekł).
+STATE_MAX_AGE_HOURS = float(os.environ.get("GATCA_STATE_MAX_AGE_H", "12"))
+# Bezpieczne zatrzymanie procesu (Ctrl+C / sygnał) bez zerwania zapisu stanu.
+STOP_EVENT = threading.Event()
+
+
+# ─── LOGGING Z ROTACJĄ (zamiast print) ────────────────────────────
+log = logging.getLogger("gatca718")
+if not log.handlers:
+    log.setLevel(getattr(logging, os.environ.get("GATCA_LOG_LEVEL", "INFO").upper(), logging.INFO))
+    _fmt = logging.Formatter("%(asctime)sZ %(levelname)-7s %(message)s", "%Y-%m-%dT%H:%M:%S")
+    _console = logging.StreamHandler(sys.stdout)
+    _console.setFormatter(_fmt)
+    _file = logging.handlers.RotatingFileHandler(
+        TEXT_LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    _file.setFormatter(_fmt)
+    log.addHandler(_console)
+    log.addHandler(_file)
+    log.propagate = False
+
+# Zapisy CSV mogą przyjść z różnych zadań asynchronicznych/wątków wykonawcy —
+# jeden lock chroni oba pliki przed przeplotem wierszy.
+CSV_LOCK = threading.Lock()
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -133,10 +170,17 @@ class Gatca718Prng:
                         for i in range(18)]
 
     def next_raw(self) -> float:
+        """Zwraca liczbę z przedziału [0, 1).
+
+        Audytowalnie: `x % 1.0` w Pythonie to dokładnie ta sama wartość co
+        `x - floor(x)` (także dla x < 0), ale zapis jest jednoznaczny i nie
+        wymaga rozumowania o zaokrągleniach — wynik zawsze mieści się w [0, 1).
+        Determinizm wobec backendu Quantum Filter pozostaje zachowany.
+        """
         self.counter += 1
         gate_entropy = self.entropy[self.counter % 18]
-        x = math.sin(self.counter * PHI + gate_entropy * CARRIER_FREQ) * 10000
-        return x - math.floor(x)
+        x = math.sin(self.counter * PHI + gate_entropy * CARRIER_FREQ) * 10000.0
+        return x % 1.0
 
     def vector(self, size: int):
         return [self.next_raw() for _ in range(size)]
@@ -200,63 +244,71 @@ class GatcaZetaCoreUnifiedEngine:
 
 
 def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_turbiny,
-                             gate="G15:11915:50", pozycja="NONE"):
+                             gate="G15:11915:50", pozycja="NONE", elapsed_h=None):
     """Rozszerzony format logu zawierający wskaźnik masy Mc oraz STAN POZYCJI.
     Gdy pozycja jest otwarta, sygnał BUY jest raportowany jako HOLD_LONG —
     bot fizycznie nie może kupić drugi raz."""
-    print(
-        f"Price: ${cena:,.2f} | POS:{pozycja:<4} | {status_unifikacji:<22} | "
-        f"Pewność: {pewnosc:6.2f}% | ruch {ruch*100:.3f}%/{MIN_PROFITABLE_MOVE*100:.2f}% | "
-        f"Wir_Mc: {mc:6.2f} | {opis_turbiny} | {gate} | SPOT_UK"
+    prefix = f"| {elapsed_h:6.2f}h " if elapsed_h is not None else ""
+    log.info(
+        "%sPrice: $%.2f | POS:%-4s | %-22s | Pewnosc: %6.2f%% | ruch %.3f%%/%.2f%% | "
+        "Wir_Mc: %6.2f | %s | %s | SPOT_UK",
+        prefix, cena, pozycja, status_unifikacji, pewnosc,
+        ruch * 100, MIN_PROFITABLE_MOVE * 100, mc, opis_turbiny, gate,
     )
 
 
 
 
 # ═════════════════════════════════════════════════════════════════
-# FILTR REZONANSOWY 3-WARSTWOWY
+# FILTR REZONANSOWY 3-WARSTWOWY (ocena rynku — BEZ egzekucji)
 # ═════════════════════════════════════════════════════════════════
 class GatcaResonanceFilter:
+    """Czysty analizator: zwraca OCENĘ rynku. Nie wie nic o pozycji ani
+    o zleceniach — decyzje wykonawcze podejmuje GatcaExecutionManager."""
+
     def __init__(self, window_size: int = WINDOW_SIZE):
         self.window_size = window_size
-        self.price_history = []          # wyłącznie RAM (In-Memory)
+        # deque(maxlen=...) sam usuwa najstarszy element w O(1) — bez pop(0).
+        self.price_history = deque(maxlen=window_size)   # wyłącznie RAM (In-Memory)
         self.unified = GatcaZetaCoreUnifiedEngine()
-
 
     # ── bufor kołowy ──
     def update_market_data(self, current_price: float) -> None:
         self.price_history.append(float(current_price))
-        if len(self.price_history) > self.window_size:
-            self.price_history.pop(0)
 
     @property
     def ready(self) -> bool:
         return len(self.price_history) >= self.window_size
 
-    # ── Warstwa 1: korelacja cen z wektorem entropii DNA (waga φ) ──
+    # ── Wszystkie 3 warstwy w JEDNYM przejściu po oknie (mniej CPU) ──
+    def calculate_layers(self, entropy):
+        data = list(self.price_history)
+        n = len(data)
+        corr = harm = phase = 0.0
+        for i, p in enumerate(data):
+            corr += math.sin(p * entropy[i])
+            harm += math.cos(p / PHI)
+            phase += math.cos((p % SCHUMANN) / SCHUMANN * 2 * math.pi)
+        return ((corr / n) * PHI, (harm / n) * EULER_MASCHERONI, phase / n)
+
+    # ── zgodność wstecz: pojedyncze warstwy (używane w backteście/testach) ──
     def calculate_l1_gatca_correlation(self, entropy) -> float:
-        data = self.price_history
-        s = sum(math.sin(data[i] * entropy[i]) for i in range(len(data)))
-        return (s / len(data)) * PHI
+        return self.calculate_layers(entropy)[0]
 
-    # ── Warstwa 2: rezonans harmoniczny wobec nośnej / φ (waga γ Eulera) ──
     def calculate_l2_harmonic_resonance(self) -> float:
-        data = self.price_history
-        s = sum(math.cos(p / PHI) for p in data)
-        return (s / len(data)) * EULER_MASCHERONI
+        data = list(self.price_history)
+        return (sum(math.cos(p / PHI) for p in data) / len(data)) * EULER_MASCHERONI
 
-    # ── Warstwa 3: koherencja fazowa z rezonansem Schumanna 7.83 Hz ──
     def calculate_l3_phase_coherence(self) -> float:
-        data = self.price_history
-        s = 0.0
-        for p in data:
-            phase = (p % SCHUMANN) / SCHUMANN * 2 * math.pi
-            s += math.cos(phase)
-        return s / len(data)
+        data = list(self.price_history)
+        return sum(math.cos((p % SCHUMANN) / SCHUMANN * 2 * math.pi) for p in data) / len(data)
 
     # ── oczekiwany ruch ceny (zmienność realizowana × siła sygnału × φ) ──
     def expected_move(self, composite: float) -> float:
-        data = self.price_history
+        """UWAGA (endogeniczność): zmienność liczona jest z TEGO SAMEGO okna,
+        z którego powstał sygnał, więc próg ruchu może być optymistyczny.
+        Dlatego wynik jest mnożony przez współczynnik ostrożności < 1."""
+        data = list(self.price_history)
         if len(data) < 2:
             return 0.0
         rets = [(data[i] - data[i - 1]) / data[i - 1]
@@ -265,7 +317,7 @@ class GatcaResonanceFilter:
             return 0.0
         mean = sum(rets) / len(rets)
         var = sum((r - mean) ** 2 for r in rets) / len(rets)
-        return math.sqrt(var) * abs(composite) * PHI
+        return math.sqrt(var) * abs(composite) * PHI * MOVE_HAIRCUT
 
     # ── agregacja ──
     def compute_composite_signal(self):
@@ -280,9 +332,7 @@ class GatcaResonanceFilter:
         prng = Gatca718Prng(deterministic_seed(self.price_history))
         entropy = prng.vector(len(self.price_history))
 
-        l1 = self.calculate_l1_gatca_correlation(entropy)
-        l2 = self.calculate_l2_harmonic_resonance()
-        l3 = self.calculate_l3_phase_coherence()
+        l1, l2, l3 = self.calculate_layers(entropy)
 
         # Zachowujemy znaki wszystkich warstw. Poprzednie abs(l2)+abs(l3)
         # sztucznie przesuwało wynik powyżej zera, więc SELL był niemal
@@ -334,6 +384,7 @@ class Executor:
     def __init__(self, mode: str = MODE):
         self.mode = mode
         self.exchange = None
+        self.market = None
         if mode in ("testnet", "live"):
             if ccxt is None:
                 raise RuntimeError("Brak biblioteki ccxt: pip install ccxt")
@@ -349,16 +400,48 @@ class Executor:
             })
             if mode == "testnet":
                 self.exchange.set_sandbox_mode(True)
+            # exchangeInfo (cache w RAM) — bez tego amount może naruszać
+            # stepSize / minQty / minNotional i Binance odrzuci zlecenie.
+            self.exchange.load_markets()
+            if SYMBOL_CCXT not in self.exchange.markets:
+                raise RuntimeError(f"Symbol {SYMBOL_CCXT} nie istnieje na tym rynku")
+            self.market = self.exchange.markets[SYMBOL_CCXT]
+
+    def _sized_amount(self, price: float):
+        """Zwraca (amount, blad). amount zgodny ze stepSize/minQty/minNotional."""
+        raw = ORDER_QUOTE_SIZE / price
+        if self.exchange is None:
+            return round(raw, 3), None
+        amount = float(self.exchange.amount_to_precision(SYMBOL_CCXT, raw))
+        limits = (self.market or {}).get("limits", {})
+        min_qty = (limits.get("amount") or {}).get("min")
+        min_cost = (limits.get("cost") or {}).get("min")
+        if min_qty and amount < float(min_qty):
+            return amount, f"amount {amount} < minQty {min_qty}"
+        if min_cost and amount * price < float(min_cost):
+            return amount, f"notional {amount * price:.2f} < minNotional {min_cost}"
+        if amount <= 0:
+            return amount, "amount = 0 po zaokrągleniu do stepSize"
+        return amount, None
 
     async def market_order(self, side: str, price: float):
-        amount = round(ORDER_QUOTE_SIZE / price, 3)   # SOL: krok ilości 0.001
+        amount, err = self._sized_amount(price)
+        if err:
+            log.error("   [ODRZUCONE] %s %s: %s", side, SYMBOL_CCXT, err)
+            return None
         if self.mode == "paper" or self.exchange is None:
-            print(f"   [PAPER] {side} {amount} {SYMBOL_CCXT} @ {price:,.2f} (brak realnego zlecenia)")
+            log.info("   [PAPER] %s %s %s @ %.2f (brak realnego zlecenia)",
+                     side, amount, SYMBOL_CCXT, price)
             return {"paper": True, "side": side, "amount": amount, "price": price}
         loop = asyncio.get_running_loop()
         fn = self.exchange.create_market_buy_order if side == "BUY" else self.exchange.create_market_sell_order
-        order = await loop.run_in_executor(None, lambda: fn(SYMBOL_CCXT, amount))
-        print(f"   [{self.mode.upper()}] zlecenie {side} id={order.get('id')} amount={amount}")
+        try:
+            order = await loop.run_in_executor(None, lambda: fn(SYMBOL_CCXT, amount))
+        except Exception as err_exec:
+            log.error("   [ODRZUCONE] %s %s: %s", side, SYMBOL_CCXT, err_exec)
+            return None
+        log.info("   [%s] zlecenie %s id=%s amount=%s",
+                 self.mode.upper(), side, order.get("id"), amount)
         return order
 
 
@@ -366,6 +449,7 @@ class Executor:
 # ZARZĄDZANIE POZYCJĄ + LOG
 # ═════════════════════════════════════════════════════════════════
 def log_event(kind: str, note: str, price=None, pnl_pct=None):
+  with CSV_LOCK:
     with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(), kind, note,
@@ -428,13 +512,23 @@ class GatcaExecutionManager:
             self.losses = int(state.get("losses", 0) or 0)
             self.net_pct = float(state.get("net_pct", 0.0) or 0.0)
             self.cooldown_bars = int(state.get("cooldown_bars", 0) or 0)
+            if state.get("symbol") and state["symbol"] != SYMBOL_CCXT:
+                raise ValueError(f"stan dotyczy innego symbolu ({state['symbol']})")
+            if state.get("mode") and state["mode"] != MODE:
+                raise ValueError(f"stan dotyczy innego trybu ({state['mode']})")
+            updated = state.get("updated_at_utc")
+            if self.is_in_position and updated:
+                age = datetime.now(timezone.utc) - datetime.fromisoformat(updated)
+                if age > timedelta(hours=STATE_MAX_AGE_HOURS):
+                    raise ValueError(
+                        f"stan pozycji jest przestarzaly ({age}); uruchom z GATCA_RESET_POSITION=1")
             if self.is_in_position and self.entry_price <= 0:
                 raise ValueError("otwarta pozycja bez poprawnej ceny wejścia")
-            print(f"[STATE] Odtworzono POS:{self.position_label} entry={self.entry_price:.2f}")
+            log.info("[STATE] Odtworzono POS:%s entry=%.2f", self.position_label, self.entry_price)
         except (OSError, ValueError, TypeError, json.JSONDecodeError) as err:
             raise RuntimeError(f"Nie można bezpiecznie odtworzyć stanu pozycji: {err}") from err
 
-    def _save_state(self):
+    def save_state(self):
         state = {
             "symbol": SYMBOL_CCXT,
             "mode": MODE,
@@ -459,12 +553,14 @@ class GatcaExecutionManager:
     async def open_long(self, price: float, gate: str):
         if self.is_in_position:
             return  # blokada over-buying
-        await self.executor.market_order("BUY", price)
+        order = await self.executor.market_order("BUY", price)
+        if order is None:
+            return "REJECTED"
         self.is_in_position = True
         self.entry_price = price
-        self._save_state()
-        print(f"   [OPEN LONG] entry={price:,.2f} TP={price*(1+TAKE_PROFIT_PCT):,.2f} "
-              f"SL={price*(1-STOP_LOSS_PCT):,.2f} | {gate}")
+        self.save_state()
+        log.info("   [OPEN LONG] entry=%.2f TP=%.2f SL=%.2f | %s", price,
+                 price * (1 + TAKE_PROFIT_PCT), price * (1 - STOP_LOSS_PCT), gate)
         log_event("OPEN", f"LONG {gate}", price)
 
     async def close_long(self, price: float, why: str):
@@ -478,13 +574,13 @@ class GatcaExecutionManager:
             self.wins += 1
         else:
             self.losses += 1
-        print(f"   [CLOSE {why}] exit={price:,.2f} netto={net*100:+.3f}% "
-              f"| bilans={self.net_pct:+.3f}% | W/L={self.wins}/{self.losses}")
+        log.info("   [CLOSE %s] exit=%.2f netto=%+.3f%% | bilans=%+.3f%% | W/L=%d/%d",
+                 why, price, net * 100, self.net_pct, self.wins, self.losses)
         log_event("CLOSE", why, price, net * 100)
         self.is_in_position = False
         self.entry_price = 0.0
         self.cooldown_bars = COOLDOWN_BARS_AFTER_EXIT
-        self._save_state()
+        self.save_state()
 
 
     async def process(self, status_unifikacji: str, decision: str, price: float,
@@ -504,10 +600,11 @@ class GatcaExecutionManager:
                     return "LIVE_ACTION: HOLD_AND_WAIT"
                 if self.cooldown_bars > 0:
                     self.cooldown_bars -= 1
-                    self._save_state()
+                    self.save_state()
                     return "LIVE_ACTION: COOLDOWN"
                 if status_unifikacji == "EXECUTE" and decision == "BUY":
-                    await self.open_long(price, gate)
+                    if await self.open_long(price, gate) == "REJECTED":
+                        return "LIVE_ACTION: ORDER_REJECTED"
                     return "LIVE_ACTION: EXECUTE_BUY"
                 return "LIVE_ACTION: HOLD_AND_WAIT"
 
@@ -525,7 +622,10 @@ class GatcaExecutionManager:
                 await self.close_long(price, "STOP_LOSS")
                 return "LIVE_ACTION: CLOSE_STOP_LOSS"
 
-            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)":
+            # Wyjście awaryjne tylko gdy strata nie pogłębia się o same koszty:
+            # przy mikro-ruchu poniżej kosztu wyjścia trzymamy pozycję do TP/SL.
+            reset_worth_it = abs((price - self.entry_price) / self.entry_price) >= EXIT_COST_PCT
+            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)" and reset_worth_it:
                 await self.close_long(price, "CLOSE_ON_REVERSAL")
                 return "LIVE_ACTION: CLOSE_ON_REVERSAL"
 
@@ -539,7 +639,8 @@ class GatcaExecutionManager:
 
 def log_performance(price: float, sig: dict, manager: GatcaExecutionManager, action: str):
     layers = sig.get("layers", {})
-    with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
+    with CSV_LOCK:
+     with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(),
             SESSION_ID,
@@ -567,11 +668,37 @@ def log_performance(price: float, sig: dict, manager: GatcaExecutionManager, act
             manager.wins, manager.losses, f"{manager.net_pct:.4f}",
         ])
 
-
 # ═════════════════════════════════════════════════════════════════
 # STRUMIEŃ BINANCE (WebSocket, in-memory parsing)
 # ═════════════════════════════════════════════════════════════════
-WS_URL = f"wss://stream.binance.com:9443/ws/{SYMBOL_WS}@kline_1m"
+# Testnet ma WŁASNY endpoint strumienia — używanie produkcyjnego WS w trybie
+# testnet dawało ceny z innego rynku niż ten, na którym składane są zlecenia.
+WS_HOST = ("wss://stream.testnet.binance.vision/ws"
+           if MODE == "testnet" else "wss://stream.binance.com:9443/ws")
+WS_URL = f"{WS_HOST}/{SYMBOL_WS}@kline_1m"
+
+
+def parse_kline_payload(raw: str):
+    """Walidacja payloadu → (cena, czy_swieca_domknieta) albo None.
+
+    Wydzielone z pętli, aby przy wielu symbolach dało się to testować
+    i rozszerzać bez ruszania logiki sesji.
+    """
+    try:
+        payload = json.loads(raw)
+    except (TypeError, ValueError):
+        return None
+    k = payload.get("k") if isinstance(payload, dict) else None
+    if not isinstance(k, dict):
+        return None
+    try:
+        price = float(k.get("c", 0) or 0)
+    except (TypeError, ValueError):
+        return None
+    if price <= 0:
+        return None
+    # Uwaga: k["x"] == True oznacza DOMKNIĘCIE świecy 1m (nie „ostatni tick rynku”).
+    return price, bool(k.get("x", False))
 
 
 async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor: Executor):
@@ -585,86 +712,112 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
-    print(f"[SYSTEM] GATCA-718 v3 | {SYMBOL_CCXT} | tryb={MODE.upper()} | okno={WINDOW_SIZE} "
-          f"| próg={MIN_CONFIDENCE}% | min. ruch={MIN_PROFITABLE_MOVE*100:.2f}%")
-    print(f"[SYSTEM] Sesja: {RUN_HOURS:.0f} h | log wydajności: {PERF_LOG_FILE}")
+    log.info("[SYSTEM] GATCA-718 v3 | %s | tryb=%s | okno=%d | prog=%.1f%% | min. ruch=%.2f%%",
+             SYMBOL_CCXT, MODE.upper(), WINDOW_SIZE, MIN_CONFIDENCE, MIN_PROFITABLE_MOVE * 100)
+    log.info("[SYSTEM] Sesja: %.0f h | log wydajnosci: %s | log tekstowy: %s",
+             RUN_HOURS, PERF_LOG_FILE, TEXT_LOG_FILE)
 
-    while datetime.now(timezone.utc).timestamp() < deadline:  # auto-reconnect
-        try:
-            async with websockets.connect(WS_URL, ping_interval=20) as ws:
-                print("[SYSTEM] Połączono z BINANCE_LIVE (kline_1m)")
-                async for raw in ws:
-                    if datetime.now(timezone.utc).timestamp() >= deadline:
-                        break
-                    # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
-                    # kodowanie znaków) NIE może zrywać połączenia z Binance.
-                    try:
-                        k = json.loads(raw).get("k", {})
-                        price = float(k.get("c", 0) or 0)
-                        if price <= 0:
-                            continue
-                        # Binance wysyła aktualizację ~1×/s; tylko k["x"] == True
-                        # oznacza DOMKNIĘTĄ świecę 1m. Sygnał liczymy raz na świecę,
-                        # a nie na każdym ticku (to było źródłem lawiny BUY).
-                        bar_closed = bool(k.get("x", False))
+    backoff = 1.0
+    metrics = {"ticks": 0, "reconnects": 0, "rejected_orders": 0,
+               "fee_filtered": 0, "last_tick_ts": None, "tick_gap_sum": 0.0,
+               "tick_gap_count": 0}
 
-                        if bar_closed:
-                            filter_engine.update_market_data(price)
-                            last_sig = filter_engine.compute_composite_signal()
+    try:
+        while datetime.now(timezone.utc).timestamp() < deadline and not STOP_EVENT.is_set():
+            try:
+                async with websockets.connect(WS_URL, ping_interval=20) as ws:
+                    log.info("[SYSTEM] Polaczono ze strumieniem %s (kline_1m)", WS_URL)
+                    backoff = 1.0          # udane połączenie → reset backoffu
+                    async for raw in ws:
+                        if datetime.now(timezone.utc).timestamp() >= deadline or STOP_EVENT.is_set():
+                            break
+                        # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
+                        # kodowanie znaków) NIE może zrywać połączenia z Binance.
+                        try:
+                            now_ts = datetime.now(timezone.utc).timestamp()
+                            if metrics["last_tick_ts"] is not None:
+                                metrics["tick_gap_sum"] += now_ts - metrics["last_tick_ts"]
+                                metrics["tick_gap_count"] += 1
+                            metrics["last_tick_ts"] = now_ts
+                            metrics["ticks"] += 1
 
-                        if last_sig is None:
-                            continue
-                        sig = last_sig
+                            k = parse_kline_payload(raw)
+                            if k is None:
+                                continue
+                            price, bar_closed = k
 
-                        action = await manager.process(
-                            sig.get("unification_status", "WAIT"),
-                            sig["decision"],
-                            price,
-                            sig["gate"],
-                            bar_closed,
-                        )
+                            if bar_closed:
+                                filter_engine.update_market_data(price)
+                                last_sig = filter_engine.compute_composite_signal()
+                                if last_sig.get("reason") == "MOVE_BELOW_FEES":
+                                    metrics["fee_filtered"] += 1
 
-                        if bar_closed:
-                            tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                                "unification_status", f"WAIT({sig['reason']})")
-                            if action == "LIVE_ACTION: EXECUTE_BUY":
-                                tag = "EXECUTE_BUY"
-                            elif manager.is_in_position and tag == "BUY":
-                                tag = "HOLD_LONG(BLOCKED_BUY)"
-                            elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                            print(f"| {elapsed_h:6.2f}h ", end="")
-                            generuj_nowy_log_konsoli(
-                                price, tag, sig["confidence"],
-                                sig["expected_move_pct"] / 100.0,
-                                sig.get("mc", 0.0),
-                                sig.get("turbine_note", ""),
+                            if last_sig is None:
+                                continue
+                            sig = last_sig
+
+                            action = await manager.process(
+                                sig.get("unification_status", "WAIT"),
+                                sig["decision"],
+                                price,
                                 sig["gate"],
-                                manager.position_label,
+                                bar_closed,
                             )
-                            if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
-                                print(f"   -> {action}")
-                            log_performance(price, sig, manager, action)
-                        elif action.startswith("LIVE_ACTION: CLOSE"):
-                            # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
-                            print(f"   -> {action} (intra-bar @ ${price:,.2f})")
-                            log_performance(price, sig, manager, action)
+                            if action == "LIVE_ACTION: ORDER_REJECTED":
+                                metrics["rejected_orders"] += 1
 
-                    except asyncio.CancelledError:
-                        raise
-                    except Exception as tick_err:
-                        print(f"[TICK-ERR] {type(tick_err).__name__}: {tick_err} "
-                              f"— pomijam ten tick, polaczenie utrzymane")
-                        continue
+                            if bar_closed:
+                                tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                                    "unification_status", f"WAIT({sig['reason']})")
+                                if action == "LIVE_ACTION: EXECUTE_BUY":
+                                    tag = "EXECUTE_BUY"
+                                elif manager.is_in_position and tag == "BUY":
+                                    tag = "HOLD_LONG(BLOCKED_BUY)"
+                                elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                                generuj_nowy_log_konsoli(
+                                    price, tag, sig["confidence"],
+                                    sig["expected_move_pct"] / 100.0,
+                                    sig.get("mc", 0.0),
+                                    sig.get("turbine_note", ""),
+                                    sig["gate"],
+                                    manager.position_label,
+                                    elapsed_h,
+                                )
+                                if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
+                                    log.info("   -> %s", action)
+                                log_performance(price, sig, manager, action)
+                            elif action.startswith("LIVE_ACTION: CLOSE"):
+                                # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
+                                log.info("   -> %s (intra-bar @ $%.2f)", action, price)
+                                log_performance(price, sig, manager, action)
 
+                        except asyncio.CancelledError:
+                            raise
+                        except Exception as tick_err:
+                            log.warning("[TICK-ERR] %s: %s — pomijam ten tick, polaczenie utrzymane",
+                                        type(tick_err).__name__, tick_err)
+                            continue
 
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:  # sieć / rozłączenie
-            print(f"[WARN] Strumień przerwany ({type(e).__name__}: {e}) — reconnect za 5 s")
-            await asyncio.sleep(5)
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:  # sieć / rozłączenie
+                metrics["reconnects"] += 1
+                log.warning("[WARN] Strumien przerwany (%s: %s) — reconnect za %.1f s "
+                            "(backoff wykladniczy)", type(e).__name__, e, backoff)
+                await asyncio.sleep(backoff)
+                backoff = min(backoff * 2, RECONNECT_BACKOFF_MAX)
+    finally:
+        # Stan sesji zapisywany ZAWSZE — także po Ctrl+C i po wyjątku sieciowym.
+        manager.save_state()
+        avg_gap = (metrics["tick_gap_sum"] / metrics["tick_gap_count"]
+                   if metrics["tick_gap_count"] else 0.0)
+        log.info("[METRYKI] ticki=%d | sr. odstep=%.2fs | reconnecty=%d | "
+                 "odrzucone zlecenia=%d | sygnaly odfiltrowane przez fee=%d",
+                 metrics["ticks"], avg_gap, metrics["reconnects"],
+                 metrics["rejected_orders"], metrics["fee_filtered"])
 
-    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {manager.net_pct:+.3f}% "
-          f"| W/L={manager.wins}/{manager.losses} | dane: {PERF_LOG_FILE}")
+    log.info("[SYSTEM] Koniec sesji %.0f h. Bilans netto: %+.3f%% | W/L=%d/%d | dane: %s",
+             RUN_HOURS, manager.net_pct, manager.wins, manager.losses, PERF_LOG_FILE)
     return manager
 
 
@@ -674,11 +827,11 @@ if __name__ == "__main__":
     try:
         manager = asyncio.run(binance_websocket_stream(engine, Executor()))
     except KeyboardInterrupt:
-        pass
+        STOP_EVENT.set()
     finally:
         if manager:
-            print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {manager.net_pct:+.3f}% "
-                  f"| W/L={manager.wins}/{manager.losses}")
+            log.info("[SYSTEM] Zatrzymano. Bilans netto: %+.3f%% | W/L=%d/%d",
+                     manager.net_pct, manager.wins, manager.losses)
         else:
-            print("\n[SYSTEM] Zatrzymano przed inicjalizacją pozycji.")
+            log.info("[SYSTEM] Zatrzymano przed inicjalizacja pozycji.")
 
