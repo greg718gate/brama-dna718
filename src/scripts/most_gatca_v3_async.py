@@ -571,11 +571,37 @@ def log_performance(price: float, sig: dict, manager: GatcaExecutionManager, act
             manager.wins, manager.losses, f"{manager.net_pct:.4f}",
         ])
 
-
 # ═════════════════════════════════════════════════════════════════
 # STRUMIEŃ BINANCE (WebSocket, in-memory parsing)
 # ═════════════════════════════════════════════════════════════════
-WS_URL = f"wss://stream.binance.com:9443/ws/{SYMBOL_WS}@kline_1m"
+# Testnet ma WŁASNY endpoint strumienia — używanie produkcyjnego WS w trybie
+# testnet dawało ceny z innego rynku niż ten, na którym składane są zlecenia.
+WS_HOST = ("wss://stream.testnet.binance.vision/ws"
+           if MODE == "testnet" else "wss://stream.binance.com:9443/ws")
+WS_URL = f"{WS_HOST}/{SYMBOL_WS}@kline_1m"
+
+
+def parse_kline_payload(raw: str):
+    """Walidacja payloadu → (cena, czy_swieca_domknieta) albo None.
+
+    Wydzielone z pętli, aby przy wielu symbolach dało się to testować
+    i rozszerzać bez ruszania logiki sesji.
+    """
+    try:
+        payload = json.loads(raw)
+    except (TypeError, ValueError):
+        return None
+    k = payload.get("k") if isinstance(payload, dict) else None
+    if not isinstance(k, dict):
+        return None
+    try:
+        price = float(k.get("c", 0) or 0)
+    except (TypeError, ValueError):
+        return None
+    if price <= 0:
+        return None
+    # Uwaga: k["x"] == True oznacza DOMKNIĘCIE świecy 1m (nie „ostatni tick rynku”).
+    return price, bool(k.get("x", False))
 
 
 async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor: Executor):
@@ -589,9 +615,10 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
     start = datetime.now(timezone.utc)
     deadline = start.timestamp() + RUN_HOURS * 3600
 
-    print(f"[SYSTEM] GATCA-718 v3 | {SYMBOL_CCXT} | tryb={MODE.upper()} | okno={WINDOW_SIZE} "
-          f"| próg={MIN_CONFIDENCE}% | min. ruch={MIN_PROFITABLE_MOVE*100:.2f}%")
-    print(f"[SYSTEM] Sesja: {RUN_HOURS:.0f} h | log wydajności: {PERF_LOG_FILE}")
+    log.info("[SYSTEM] GATCA-718 v3 | %s | tryb=%s | okno=%d | prog=%.1f%% | min. ruch=%.2f%%",
+             SYMBOL_CCXT, MODE.upper(), WINDOW_SIZE, MIN_CONFIDENCE, MIN_PROFITABLE_MOVE * 100)
+    log.info("[SYSTEM] Sesja: %.0f h | log wydajnosci: %s | log tekstowy: %s",
+             RUN_HOURS, PERF_LOG_FILE, TEXT_LOG_FILE)
 
     backoff = 1.0
     metrics = {"ticks": 0, "reconnects": 0, "rejected_orders": 0,
