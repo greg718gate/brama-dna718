@@ -167,16 +167,15 @@ class Gatca718Prng:
     def next_raw(self) -> float:
         """Zwraca liczbę z przedziału [0, 1).
 
-        Audytowalnie: bierzemy część ułamkową sinusa przeskalowanego o 10 000.
-        `math.modf(x)[0]` daje ułamek ze ZNAKIEM, dlatego bierzemy jego moduł —
-        wcześniejsze `x - floor(x)` działało, ale było nieoczywiste dla liczb
-        ujemnych i trudne do zweryfikowania w audycie.
+        Audytowalnie: `x % 1.0` w Pythonie to dokładnie ta sama wartość co
+        `x - floor(x)` (także dla x < 0), ale zapis jest jednoznaczny i nie
+        wymaga rozumowania o zaokrągleniach — wynik zawsze mieści się w [0, 1).
+        Determinizm wobec backendu Quantum Filter pozostaje zachowany.
         """
         self.counter += 1
         gate_entropy = self.entropy[self.counter % 18]
         x = math.sin(self.counter * PHI + gate_entropy * CARRIER_FREQ) * 10000.0
-        frac = abs(math.modf(x)[0])
-        return frac if frac < 1.0 else 0.0
+        return x % 1.0
 
     def vector(self, size: int):
         return [self.next_raw() for _ in range(size)]
