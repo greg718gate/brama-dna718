@@ -119,8 +119,36 @@ PERF_LOG_FILE = os.environ.get(
 POSITION_STATE_FILE = os.environ.get(
     "GATCA_STATE_FILE", f"gatca_position_{SYMBOL_WS}_{MODE}.json"
 )
+TEXT_LOG_FILE = os.environ.get("GATCA_TEXT_LOG", f"gatca_run_{SYMBOL_WS}_{MODE}.log")
 
 RUN_HOURS = float(os.environ.get("GATCA_RUN_HOURS", "72"))   # czas pracy sesji [h]
+
+# Reconnect: backoff wykładniczy 1 → 2 → 4 … do 60 s (zamiast sztywnych 5 s).
+RECONNECT_BACKOFF_MAX = 60.0
+# Stan pozycji starszy niż to uznajemy za nieaktualny (rynek uciekł).
+STATE_MAX_AGE_HOURS = float(os.environ.get("GATCA_STATE_MAX_AGE_H", "12"))
+# Bezpieczne zatrzymanie procesu (Ctrl+C / sygnał) bez zerwania zapisu stanu.
+STOP_EVENT = threading.Event()
+
+
+# ─── LOGGING Z ROTACJĄ (zamiast print) ────────────────────────────
+log = logging.getLogger("gatca718")
+if not log.handlers:
+    log.setLevel(getattr(logging, os.environ.get("GATCA_LOG_LEVEL", "INFO").upper(), logging.INFO))
+    _fmt = logging.Formatter("%(asctime)sZ %(levelname)-7s %(message)s", "%Y-%m-%dT%H:%M:%S")
+    _console = logging.StreamHandler(sys.stdout)
+    _console.setFormatter(_fmt)
+    _file = logging.handlers.RotatingFileHandler(
+        TEXT_LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    _file.setFormatter(_fmt)
+    log.addHandler(_console)
+    log.addHandler(_file)
+    log.propagate = False
+
+# Zapisy CSV mogą przyjść z różnych zadań asynchronicznych/wątków wykonawcy —
+# jeden lock chroni oba pliki przed przeplotem wierszy.
+CSV_LOCK = threading.Lock()
 
 
 # ═════════════════════════════════════════════════════════════════
