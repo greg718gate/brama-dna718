@@ -384,6 +384,7 @@ class Executor:
     def __init__(self, mode: str = MODE):
         self.mode = mode
         self.exchange = None
+        self.market = None
         if mode in ("testnet", "live"):
             if ccxt is None:
                 raise RuntimeError("Brak biblioteki ccxt: pip install ccxt")
@@ -448,6 +449,7 @@ class Executor:
 # ZARZĄDZANIE POZYCJĄ + LOG
 # ═════════════════════════════════════════════════════════════════
 def log_event(kind: str, note: str, price=None, pnl_pct=None):
+  with CSV_LOCK:
     with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(), kind, note,
@@ -510,13 +512,23 @@ class GatcaExecutionManager:
             self.losses = int(state.get("losses", 0) or 0)
             self.net_pct = float(state.get("net_pct", 0.0) or 0.0)
             self.cooldown_bars = int(state.get("cooldown_bars", 0) or 0)
+            if state.get("symbol") and state["symbol"] != SYMBOL_CCXT:
+                raise ValueError(f"stan dotyczy innego symbolu ({state['symbol']})")
+            if state.get("mode") and state["mode"] != MODE:
+                raise ValueError(f"stan dotyczy innego trybu ({state['mode']})")
+            updated = state.get("updated_at_utc")
+            if self.is_in_position and updated:
+                age = datetime.now(timezone.utc) - datetime.fromisoformat(updated)
+                if age > timedelta(hours=STATE_MAX_AGE_HOURS):
+                    raise ValueError(
+                        f"stan pozycji jest przestarzaly ({age}); uruchom z GATCA_RESET_POSITION=1")
             if self.is_in_position and self.entry_price <= 0:
                 raise ValueError("otwarta pozycja bez poprawnej ceny wejścia")
-            print(f"[STATE] Odtworzono POS:{self.position_label} entry={self.entry_price:.2f}")
+            log.info("[STATE] Odtworzono POS:%s entry=%.2f", self.position_label, self.entry_price)
         except (OSError, ValueError, TypeError, json.JSONDecodeError) as err:
             raise RuntimeError(f"Nie można bezpiecznie odtworzyć stanu pozycji: {err}") from err
 
-    def _save_state(self):
+    def save_state(self):
         state = {
             "symbol": SYMBOL_CCXT,
             "mode": MODE,
@@ -541,12 +553,14 @@ class GatcaExecutionManager:
     async def open_long(self, price: float, gate: str):
         if self.is_in_position:
             return  # blokada over-buying
-        await self.executor.market_order("BUY", price)
+        order = await self.executor.market_order("BUY", price)
+        if order is None:
+            return "REJECTED"
         self.is_in_position = True
         self.entry_price = price
-        self._save_state()
-        print(f"   [OPEN LONG] entry={price:,.2f} TP={price*(1+TAKE_PROFIT_PCT):,.2f} "
-              f"SL={price*(1-STOP_LOSS_PCT):,.2f} | {gate}")
+        self.save_state()
+        log.info("   [OPEN LONG] entry=%.2f TP=%.2f SL=%.2f | %s", price,
+                 price * (1 + TAKE_PROFIT_PCT), price * (1 - STOP_LOSS_PCT), gate)
         log_event("OPEN", f"LONG {gate}", price)
 
     async def close_long(self, price: float, why: str):
@@ -560,13 +574,13 @@ class GatcaExecutionManager:
             self.wins += 1
         else:
             self.losses += 1
-        print(f"   [CLOSE {why}] exit={price:,.2f} netto={net*100:+.3f}% "
-              f"| bilans={self.net_pct:+.3f}% | W/L={self.wins}/{self.losses}")
+        log.info("   [CLOSE %s] exit=%.2f netto=%+.3f%% | bilans=%+.3f%% | W/L=%d/%d",
+                 why, price, net * 100, self.net_pct, self.wins, self.losses)
         log_event("CLOSE", why, price, net * 100)
         self.is_in_position = False
         self.entry_price = 0.0
         self.cooldown_bars = COOLDOWN_BARS_AFTER_EXIT
-        self._save_state()
+        self.save_state()
 
 
     async def process(self, status_unifikacji: str, decision: str, price: float,
@@ -586,10 +600,11 @@ class GatcaExecutionManager:
                     return "LIVE_ACTION: HOLD_AND_WAIT"
                 if self.cooldown_bars > 0:
                     self.cooldown_bars -= 1
-                    self._save_state()
+                    self.save_state()
                     return "LIVE_ACTION: COOLDOWN"
                 if status_unifikacji == "EXECUTE" and decision == "BUY":
-                    await self.open_long(price, gate)
+                    if await self.open_long(price, gate) == "REJECTED":
+                        return "LIVE_ACTION: ORDER_REJECTED"
                     return "LIVE_ACTION: EXECUTE_BUY"
                 return "LIVE_ACTION: HOLD_AND_WAIT"
 
@@ -607,7 +622,10 @@ class GatcaExecutionManager:
                 await self.close_long(price, "STOP_LOSS")
                 return "LIVE_ACTION: CLOSE_STOP_LOSS"
 
-            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)":
+            # Wyjście awaryjne tylko gdy strata nie pogłębia się o same koszty:
+            # przy mikro-ruchu poniżej kosztu wyjścia trzymamy pozycję do TP/SL.
+            reset_worth_it = abs((price - self.entry_price) / self.entry_price) >= EXIT_COST_PCT
+            if bar_closed and status_unifikacji == "WAIT(RESET_PORT)" and reset_worth_it:
                 await self.close_long(price, "CLOSE_ON_REVERSAL")
                 return "LIVE_ACTION: CLOSE_ON_REVERSAL"
 
@@ -621,7 +639,8 @@ class GatcaExecutionManager:
 
 def log_performance(price: float, sig: dict, manager: GatcaExecutionManager, action: str):
     layers = sig.get("layers", {})
-    with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
+    with CSV_LOCK:
+     with open(PERF_LOG_FILE, "a", newline="", encoding="utf-8") as f:
         csv.writer(f).writerow([
             datetime.now(timezone.utc).isoformat(),
             SESSION_ID,
@@ -808,11 +827,11 @@ if __name__ == "__main__":
     try:
         manager = asyncio.run(binance_websocket_stream(engine, Executor()))
     except KeyboardInterrupt:
-        pass
+        STOP_EVENT.set()
     finally:
         if manager:
-            print(f"\n[SYSTEM] Zatrzymano. Bilans netto: {manager.net_pct:+.3f}% "
-                  f"| W/L={manager.wins}/{manager.losses}")
+            log.info("[SYSTEM] Zatrzymano. Bilans netto: %+.3f%% | W/L=%d/%d",
+                     manager.net_pct, manager.wins, manager.losses)
         else:
-            print("\n[SYSTEM] Zatrzymano przed inicjalizacją pozycji.")
+            log.info("[SYSTEM] Zatrzymano przed inicjalizacja pozycji.")
 
