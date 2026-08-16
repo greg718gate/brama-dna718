@@ -42,10 +42,14 @@ import asyncio
 import csv
 import hashlib
 import json
+import logging
+import logging.handlers
 import math
 import os
 import sys
-from datetime import datetime, timezone
+import threading
+from collections import deque
+from datetime import datetime, timedelta, timezone
 
 # ─── KONSOLA WINDOWS: wymuszenie UTF-8 ────────────────────────────
 # Bez tego polskie znaki (ł, ń, ś) wywalają cp1250/charmap
