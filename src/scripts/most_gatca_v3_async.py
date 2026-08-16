@@ -245,8 +245,8 @@ def generuj_nowy_log_konsoli(cena, status_unifikacji, pewnosc, ruch, mc, opis_tu
     bot fizycznie nie może kupić drugi raz."""
     prefix = f"| {elapsed_h:6.2f}h " if elapsed_h is not None else ""
     log.info(
-        "%sPrice: $%,.2f | POS:%-4s | %-22s | Pewnosc: %6.2f%% | ruch %.3f%%/%.2f%% | "
-        "Wir_Mc: %6.2f | %s | %s | SPOT_UK".replace("%,.2f", "%.2f"),
+        "%sPrice: $%.2f | POS:%-4s | %-22s | Pewnosc: %6.2f%% | ruch %.3f%%/%.2f%% | "
+        "Wir_Mc: %6.2f | %s | %s | SPOT_UK",
         prefix, cena, pozycja, status_unifikacji, pewnosc,
         ruch * 100, MIN_PROFITABLE_MOVE * 100, mc, opis_turbiny, gate,
     )
