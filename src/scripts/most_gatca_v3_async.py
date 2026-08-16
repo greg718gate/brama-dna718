@@ -593,82 +593,108 @@ async def binance_websocket_stream(filter_engine: GatcaResonanceFilter, executor
           f"| próg={MIN_CONFIDENCE}% | min. ruch={MIN_PROFITABLE_MOVE*100:.2f}%")
     print(f"[SYSTEM] Sesja: {RUN_HOURS:.0f} h | log wydajności: {PERF_LOG_FILE}")
 
-    while datetime.now(timezone.utc).timestamp() < deadline:  # auto-reconnect
-        try:
-            async with websockets.connect(WS_URL, ping_interval=20) as ws:
-                print("[SYSTEM] Połączono z BINANCE_LIVE (kline_1m)")
-                async for raw in ws:
-                    if datetime.now(timezone.utc).timestamp() >= deadline:
-                        break
-                    # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
-                    # kodowanie znaków) NIE może zrywać połączenia z Binance.
-                    try:
-                        k = json.loads(raw).get("k", {})
-                        price = float(k.get("c", 0) or 0)
-                        if price <= 0:
-                            continue
-                        # Binance wysyła aktualizację ~1×/s; tylko k["x"] == True
-                        # oznacza DOMKNIĘTĄ świecę 1m. Sygnał liczymy raz na świecę,
-                        # a nie na każdym ticku (to było źródłem lawiny BUY).
-                        bar_closed = bool(k.get("x", False))
+    backoff = 1.0
+    metrics = {"ticks": 0, "reconnects": 0, "rejected_orders": 0,
+               "fee_filtered": 0, "last_tick_ts": None, "tick_gap_sum": 0.0,
+               "tick_gap_count": 0}
 
-                        if bar_closed:
-                            filter_engine.update_market_data(price)
-                            last_sig = filter_engine.compute_composite_signal()
+    try:
+        while datetime.now(timezone.utc).timestamp() < deadline and not STOP_EVENT.is_set():
+            try:
+                async with websockets.connect(WS_URL, ping_interval=20) as ws:
+                    log.info("[SYSTEM] Polaczono ze strumieniem %s (kline_1m)", WS_URL)
+                    backoff = 1.0          # udane połączenie → reset backoffu
+                    async for raw in ws:
+                        if datetime.now(timezone.utc).timestamp() >= deadline or STOP_EVENT.is_set():
+                            break
+                        # Błąd przetwarzania JEDNEGO ticku (parsowanie, zapis CSV,
+                        # kodowanie znaków) NIE może zrywać połączenia z Binance.
+                        try:
+                            now_ts = datetime.now(timezone.utc).timestamp()
+                            if metrics["last_tick_ts"] is not None:
+                                metrics["tick_gap_sum"] += now_ts - metrics["last_tick_ts"]
+                                metrics["tick_gap_count"] += 1
+                            metrics["last_tick_ts"] = now_ts
+                            metrics["ticks"] += 1
 
-                        if last_sig is None:
-                            continue
-                        sig = last_sig
+                            k = parse_kline_payload(raw)
+                            if k is None:
+                                continue
+                            price, bar_closed = k
 
-                        action = await manager.process(
-                            sig.get("unification_status", "WAIT"),
-                            sig["decision"],
-                            price,
-                            sig["gate"],
-                            bar_closed,
-                        )
+                            if bar_closed:
+                                filter_engine.update_market_data(price)
+                                last_sig = filter_engine.compute_composite_signal()
+                                if last_sig.get("reason") == "MOVE_BELOW_FEES":
+                                    metrics["fee_filtered"] += 1
 
-                        if bar_closed:
-                            tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
-                                "unification_status", f"WAIT({sig['reason']})")
-                            if action == "LIVE_ACTION: EXECUTE_BUY":
-                                tag = "EXECUTE_BUY"
-                            elif manager.is_in_position and tag == "BUY":
-                                tag = "HOLD_LONG(BLOCKED_BUY)"
-                            elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
-                            print(f"| {elapsed_h:6.2f}h ", end="")
-                            generuj_nowy_log_konsoli(
-                                price, tag, sig["confidence"],
-                                sig["expected_move_pct"] / 100.0,
-                                sig.get("mc", 0.0),
-                                sig.get("turbine_note", ""),
+                            if last_sig is None:
+                                continue
+                            sig = last_sig
+
+                            action = await manager.process(
+                                sig.get("unification_status", "WAIT"),
+                                sig["decision"],
+                                price,
                                 sig["gate"],
-                                manager.position_label,
+                                bar_closed,
                             )
-                            if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
-                                print(f"   -> {action}")
-                            log_performance(price, sig, manager, action)
-                        elif action.startswith("LIVE_ACTION: CLOSE"):
-                            # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
-                            print(f"   -> {action} (intra-bar @ ${price:,.2f})")
-                            log_performance(price, sig, manager, action)
+                            if action == "LIVE_ACTION: ORDER_REJECTED":
+                                metrics["rejected_orders"] += 1
 
-                    except asyncio.CancelledError:
-                        raise
-                    except Exception as tick_err:
-                        print(f"[TICK-ERR] {type(tick_err).__name__}: {tick_err} "
-                              f"— pomijam ten tick, polaczenie utrzymane")
-                        continue
+                            if bar_closed:
+                                tag = sig["decision"] if sig["decision"] != "WAIT" else sig.get(
+                                    "unification_status", f"WAIT({sig['reason']})")
+                                if action == "LIVE_ACTION: EXECUTE_BUY":
+                                    tag = "EXECUTE_BUY"
+                                elif manager.is_in_position and tag == "BUY":
+                                    tag = "HOLD_LONG(BLOCKED_BUY)"
+                                elapsed_h = (datetime.now(timezone.utc) - start).total_seconds() / 3600
+                                generuj_nowy_log_konsoli(
+                                    price, tag, sig["confidence"],
+                                    sig["expected_move_pct"] / 100.0,
+                                    sig.get("mc", 0.0),
+                                    sig.get("turbine_note", ""),
+                                    sig["gate"],
+                                    manager.position_label,
+                                    elapsed_h,
+                                )
+                                if action not in ("LIVE_ACTION: HOLD_AND_WAIT", "LIVE_ACTION: HOLD_LONG"):
+                                    log.info("   -> %s", action)
+                                log_performance(price, sig, manager, action)
+                            elif action.startswith("LIVE_ACTION: CLOSE"):
+                                # Wyjście śródsesyjne (TP/SL) też musi trafić do logu.
+                                log.info("   -> %s (intra-bar @ $%,.2f)".replace("%,.2f", "%.2f"),
+                                         action, price)
+                                log_performance(price, sig, manager, action)
 
+                        except asyncio.CancelledError:
+                            raise
+                        except Exception as tick_err:
+                            log.warning("[TICK-ERR] %s: %s — pomijam ten tick, polaczenie utrzymane",
+                                        type(tick_err).__name__, tick_err)
+                            continue
 
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:  # sieć / rozłączenie
-            print(f"[WARN] Strumień przerwany ({type(e).__name__}: {e}) — reconnect za 5 s")
-            await asyncio.sleep(5)
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:  # sieć / rozłączenie
+                metrics["reconnects"] += 1
+                log.warning("[WARN] Strumien przerwany (%s: %s) — reconnect za %.1f s "
+                            "(backoff wykladniczy)", type(e).__name__, e, backoff)
+                await asyncio.sleep(backoff)
+                backoff = min(backoff * 2, RECONNECT_BACKOFF_MAX)
+    finally:
+        # Stan sesji zapisywany ZAWSZE — także po Ctrl+C i po wyjątku sieciowym.
+        manager.save_state()
+        avg_gap = (metrics["tick_gap_sum"] / metrics["tick_gap_count"]
+                   if metrics["tick_gap_count"] else 0.0)
+        log.info("[METRYKI] ticki=%d | sr. odstep=%.2fs | reconnecty=%d | "
+                 "odrzucone zlecenia=%d | sygnaly odfiltrowane przez fee=%d",
+                 metrics["ticks"], avg_gap, metrics["reconnects"],
+                 metrics["rejected_orders"], metrics["fee_filtered"])
 
-    print(f"[SYSTEM] Koniec sesji {RUN_HOURS:.0f} h. Bilans netto: {manager.net_pct:+.3f}% "
-          f"| W/L={manager.wins}/{manager.losses} | dane: {PERF_LOG_FILE}")
+    log.info("[SYSTEM] Koniec sesji %.0f h. Bilans netto: %+.3f%% | W/L=%d/%d | dane: %s",
+             RUN_HOURS, manager.net_pct, manager.wins, manager.losses, PERF_LOG_FILE)
     return manager
 
 
