@@ -103,10 +103,11 @@ const Index = () => {
         <Button
           onClick={() => navigate("/decoder")}
           variant="secondary"
-          className="gap-2 shadow-lg"
+          className="gap-2 shadow-lg border-primary/60 bg-primary/10"
+          title="Dekoder biblijny / Bible Decoder"
         >
           <BookOpen className="w-4 h-4" />
-          Ψ Decoder
+          {t("nav.decoder") !== "nav.decoder" ? t("nav.decoder") : "Dekoder biblijny"}
         </Button>
         <Button
           onClick={() => navigate("/archive")}
