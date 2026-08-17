@@ -16,6 +16,7 @@ export const translations = {
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
     'nav.archive': 'Archiwum Źródłowe',
+    'nav.decoder': 'Dekoder biblijny',
     
     // Equation of Exit
     'exit.title': 'RÓWNANIE WYJŚCIA',
@@ -895,6 +896,7 @@ export const translations = {
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
     'nav.archive': 'Source Archive',
+    'nav.decoder': 'Bible Decoder',
     
     // Equation of Exit
     'exit.title': 'EQUATION OF EXIT',
