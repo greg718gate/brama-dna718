@@ -16,6 +16,7 @@ export const translations = {
     'header.wavefunction': 'JESTEŚ FUNKCJĄ FALOWĄ.',
     'vault.button': 'Skarbiec Odkryć',
     'nav.archive': 'Archiwum Źródłowe',
+    'nav.decoder': 'Dekoder biblijny',
     
     // Equation of Exit
     'exit.title': 'RÓWNANIE WYJŚCIA',
@@ -895,6 +896,7 @@ export const translations = {
     'header.wavefunction': 'YOU ARE A WAVE FUNCTION.',
     'vault.button': 'Discovery Vault',
     'nav.archive': 'Source Archive',
+    'nav.decoder': 'Bible Decoder',
     
     // Equation of Exit
     'exit.title': 'EQUATION OF EXIT',
@@ -1777,6 +1779,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "pl" || saved === "en") return saved;
+
+    // The Biblical Decoder app (also served inside Pi Browser) defaults to English.
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/decoder")) {
+      return "en";
+    }
 
     const nav = (navigator.language || "").toLowerCase();
     return nav.startsWith("pl") ? "pl" : "en";
