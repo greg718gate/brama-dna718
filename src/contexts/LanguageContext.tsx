@@ -1778,6 +1778,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "pl" || saved === "en") return saved;
 
+    // The Biblical Decoder app (also served inside Pi Browser) defaults to English.
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/decoder")) {
+      return "en";
+    }
+
     const nav = (navigator.language || "").toLowerCase();
     return nav.startsWith("pl") ? "pl" : "en";
   });
