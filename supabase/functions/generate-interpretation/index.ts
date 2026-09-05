@@ -185,6 +185,68 @@ CRITICAL: The "hebrewText" field MUST contain actual Hebrew/Greek/Arabic charact
       });
     }
 
+    // MODE 2b: Quantum translation (scripture -> physics pseudocode bridge)
+    if (mode === "quantum_translation") {
+      const qtPrompt = `You translate a sacred text passage into the language of modern physics, in the style of a "quantum translation" card.
+
+Reference: "${reference}"
+Text: "${text}"
+Ψ-718 analysis: gematria Σ=${gematriaTotal}, coherence=${coherence}%, DNA gate "${gateName}" at mtDNA position ${gatePosition}.
+
+Write ALL text fields in ${langLabel}. Keep the pseudocode itself in English Python-like syntax.
+
+Return ONLY this JSON object:
+{
+  "title": "Short headline in ${langLabel}, e.g. the theme of the passage mapped to physics (uppercase)",
+  "subtitle": "One short line, e.g. '${reference} meets quantum physics' in ${langLabel}",
+  "scriptureQuote": "The verse text, trimmed to its essential clause",
+  "pseudocode": "6-10 lines of Python-like pseudocode modelling the event described in the verse. Use real physics vocabulary (vacuum_energy, inflation_field, electromagnetic_spectrum, wavefunction.collapse, particle_factory.create). Include a comment line quoting a fragment of the verse. Use \\n between lines.",
+  "bridge": "2-3 sentences in ${langLabel} explaining how the scriptural and physical descriptions are the same sequence.",
+  "sourceCode": [
+    { "label": "short phrase from the verse = physical concept", "explanation": "2-3 sentences in ${langLabel}" },
+    { "label": "...", "explanation": "..." },
+    { "label": "...", "explanation": "..." }
+  ],
+  "closing": "One sentence in ${langLabel}: the same program written in two languages."
+}
+
+Rules: exactly 3 items in sourceCode. No markdown, no code fences, JSON only. Be specific to THIS verse.`;
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Lovable-API-Key": apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: AI_MODEL,
+          messages: [{ role: "user", content: qtPrompt }],
+          temperature: 0.6,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("AI Gateway error:", response.status, errorText);
+        throw new Error(`AI Gateway returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+      if (!content) throw new Error("No content in AI response");
+
+      const parsed = extractJsonObject(content);
+      if (!parsed) {
+        console.error("Failed to parse quantum_translation response:", content);
+        throw new Error("Failed to parse AI response");
+      }
+
+      return new Response(JSON.stringify(parsed), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // MODE 3: Full interpretation (text already provided)
     const prompt = `You are a biblical scholar and theologian who explains Bible verses in clear, accessible language.
 
