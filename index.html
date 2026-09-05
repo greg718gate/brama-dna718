@@ -7,14 +7,24 @@
     <link rel="apple-touch-icon" href="/favicon.png" />
     <script>
       (function () {
-        var isZeta = window.location.hostname.indexOf('zeta-core-dsp.com') !== -1;
-        if (isZeta) {
-          // Hide legacy BRAMA-DNA SEO block on the Zeta-Core domain
-          var style = document.createElement('style');
-          style.textContent = '#seo-content{display:none !important}';
-          document.documentElement.appendChild(style);
-          // NOTE: no redirect to /zeta — routing is handled in React (App.tsx)
-          // so the URL stays clean at zeta-core-dsp.com/
+        var host = window.location.hostname;
+        var isZeta = host.indexOf('zeta-core-dsp.com') !== -1;
+        var style = document.createElement('style');
+        // Show only the SEO block that matches the domain.
+        style.textContent = isZeta
+          ? '#seo-brama{display:none !important}'
+          : '#seo-content{display:none !important}';
+        document.documentElement.appendChild(style);
+
+        if (!isZeta) {
+          // BRAMA-DNA 718 identity for every non-Zeta host
+          document.addEventListener('DOMContentLoaded', function () {
+            document.title = 'BRAMA DNA 718 · Rezonans, Symfonia i Obliczenia';
+            var d = document.querySelector('meta[name="description"]');
+            if (d) d.setAttribute('content', 'BRAMA DNA 718: symfonia 718.57 Hz, 18 Bram DNA, dekoder biblijny i obliczenia rezonansowe.');
+            var c = document.querySelector('link[rel="canonical"]');
+            if (c) c.setAttribute('href', 'https://brama-dna718.com/');
+          });
         }
       })();
     </script>
@@ -22,6 +32,7 @@
     <meta name="description" content="ZETA-CORE by NovaStream88 Ltd: industrial vibration and acoustic diagnostics for motors, pumps, fans, gearboxes and bearings using FFT and phase-coherence analysis." />
     <meta name="author" content="NovaStream88 Ltd" />
     <meta name="google-site-verification" content="d3UwyDbFWD9EFQrKs8ei6zxkc3zhNHAqT8BnfsocK8U" />
+
 
     <!-- Open Graph -->
     <meta property="og:title" content="ZETA-CORE · Industrial Machine Diagnostics" />
