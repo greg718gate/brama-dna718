@@ -6,6 +6,7 @@ import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
 import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
 import { WillPowerController } from "@/components/WillPowerController";
+import { QuantumTranslationCard } from "@/components/QuantumTranslationCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -535,7 +536,18 @@ const BiblicalDecoder = () => {
                       <p className="text-base leading-relaxed text-foreground">{verbalInterpretation.plainMeaning}</p>
                     </CardContent>
                   </Card>
-                )}
+                 )}
+
+                {/* ═══ TŁUMACZENIE KWANTOWE / QUANTUM TRANSLATION ═══ */}
+                <QuantumTranslationCard
+                  reference={result.reference}
+                  text={result.text}
+                  gematriaTotal={result.gematriaTotal}
+                  gateName={result.gateName}
+                  gatePosition={result.gatePosition}
+                  coherence={result.psi.coherence}
+                />
+
 
                 {/* ═══ MKP-94: RAPORT PRAWDY OBIEKTYWNEJ ═══ */}
                 <Card className={`border-2 ${
