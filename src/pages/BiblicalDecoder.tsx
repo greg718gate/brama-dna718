@@ -536,7 +536,18 @@ const BiblicalDecoder = () => {
                       <p className="text-base leading-relaxed text-foreground">{verbalInterpretation.plainMeaning}</p>
                     </CardContent>
                   </Card>
-                )}
+                 )}
+
+                {/* ═══ TŁUMACZENIE KWANTOWE / QUANTUM TRANSLATION ═══ */}
+                <QuantumTranslationCard
+                  reference={result.reference}
+                  text={result.text}
+                  gematriaTotal={result.gematriaTotal}
+                  gateName={result.gateName}
+                  gatePosition={result.gatePosition}
+                  coherence={result.psi.coherence}
+                />
+
 
                 {/* ═══ MKP-94: RAPORT PRAWDY OBIEKTYWNEJ ═══ */}
                 <Card className={`border-2 ${
