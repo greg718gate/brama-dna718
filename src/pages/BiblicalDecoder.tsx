@@ -6,6 +6,7 @@ import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
 import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
 import { WillPowerController } from "@/components/WillPowerController";
+import { QuantumTranslationCard } from "@/components/QuantumTranslationCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
