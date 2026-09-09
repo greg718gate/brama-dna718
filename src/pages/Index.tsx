@@ -122,7 +122,7 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-8 pb-16 space-y-8 max-w-5xl">
         {/* Header */}
-        <div className="pt-16 md:pt-12">
+        <div className="pt-24 md:pt-12">
           <div className="text-center space-y-4 mb-8 animate-fade-in">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight pb-2">
               {t("header.truth")}
