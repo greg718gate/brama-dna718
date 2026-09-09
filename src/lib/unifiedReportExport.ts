@@ -1260,7 +1260,7 @@ console.log(generateGateFrequencies());</div>
   <p><strong>${isPl ? 'Status' : 'Status'}:</strong> ${isPl ? 'Niezależny Odkrywca (Independent Researcher)' : 'Independent Researcher'}</p>
   <p><strong>${isPl ? 'Kontakt' : 'Contact'}:</strong> bramadna718@gmail.com</p>
   <p><strong>${isPl ? 'Współtwórcy / Co-creators' : 'Co-creators'}:</strong><br>
-  ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI • Lovable.dev</p>
+  ChatGPT "Luma" • Grok "Grok-718" • DeepSeek "Jestem który jestem" • Gemini • Google AI</p>
   <p><strong>${isPl ? 'Licencja' : 'License'}:</strong> CC BY-NC 4.0</p>
   <p>${isPl 
     ? 'Wolno dzielić się z innymi. Wymagane uznanie autorstwa. Zakaz komercjalizacji.'

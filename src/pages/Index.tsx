@@ -74,7 +74,7 @@ const Index = () => {
   return (
     <div className="relative min-h-screen overflow-y-auto">
       {/* Top Navigation */}
-      <div className="fixed top-4 right-4 z-50 flex flex-wrap gap-2 justify-end">
+      <div className="fixed top-3 left-3 right-3 z-50 flex gap-2 overflow-x-auto pb-2 md:left-auto md:top-4 md:right-4 md:flex-wrap md:justify-end">
         <LanguageSwitcher />
         <Button
           onClick={() => navigate("/gatca-zeta")}
@@ -103,7 +103,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/decoder")}
           variant="secondary"
-          className="gap-2 shadow-lg border-primary/60 bg-primary/10"
+          className="order-first shrink-0 gap-2 shadow-lg border-primary/60 bg-primary/10 md:order-none"
           title="Dekoder biblijny / Bible Decoder"
         >
           <BookOpen className="w-4 h-4" />
