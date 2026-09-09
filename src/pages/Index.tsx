@@ -79,7 +79,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/gatca-zeta")}
           variant="secondary"
-          className="gap-2 shadow-lg"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2"
         >
           <Sigma className="w-4 h-4" />
           GATCA ζ
@@ -87,7 +87,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/vault")}
           variant="secondary"
-          className="gap-2 shadow-lg"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2"
         >
           <Shield className="w-4 h-4" />
           {t("vault.button")}
@@ -95,7 +95,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/unified")}
           variant="secondary"
-          className="gap-2 shadow-lg bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border-primary/50"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2 bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border-primary/50"
         >
           <Sparkles className="w-4 h-4" />
           UNIFIED
@@ -103,7 +103,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/decoder")}
           variant="secondary"
-          className="order-first shrink-0 gap-2 shadow-lg border-primary/60 bg-primary/10 md:order-none"
+          className="order-first h-9 px-2.5 text-xs gap-1.5 shadow-lg border-primary/60 bg-primary/10 md:order-none md:h-10 md:px-4 md:text-sm md:gap-2"
           title="Dekoder biblijny / Bible Decoder"
         >
           <BookOpen className="w-4 h-4" />
@@ -112,7 +112,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/archive")}
           variant="secondary"
-          className="gap-2 shadow-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border-amber-500/40"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2 bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border-amber-500/40"
           title={t("nav.archive") !== "nav.archive" ? t("nav.archive") : "Archiwum / Archive"}
         >
           <Archive className="w-4 h-4" />
