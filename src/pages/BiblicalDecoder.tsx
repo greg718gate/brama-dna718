@@ -1097,43 +1097,56 @@ const BiblicalDecoder = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* ⚠ SEMANTIC CONTROL MARKERS — lexical manipulation layer */}
-                    {result.manipulationReport.nameSubstitution.detected && (
-                      <div className="rounded-lg border-2 border-destructive/60 bg-destructive/10 p-4 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-destructive font-bold font-mono text-sm">
-                            ⚠ {language === 'pl' ? 'MANIPULACJA SEMANTYCZNA — MARKERY KONTROLI' : 'SEMANTIC MANIPULATION — CONTROL MARKERS'}
+                    {/* ⚠ SEMANTIC CONTROL MARKERS — lexical layer, severity-proportional */}
+                    {result.manipulationReport.nameSubstitution.detected && (() => {
+                      const ns = result.manipulationReport.nameSubstitution;
+                      const sys = ns.severity === 'SYSTEMOWA';
+                      const tone = sys
+                        ? { box: 'border-destructive/60 bg-destructive/10', text: 'text-destructive', soft: 'text-destructive/70', border: 'border-destructive/40', border2: 'border-destructive/30', line: 'border-destructive/20' }
+                        : { box: 'border-amber-500/50 bg-amber-500/5', text: 'text-amber-400', soft: 'text-amber-400/70', border: 'border-amber-500/40', border2: 'border-amber-500/30', line: 'border-amber-500/20' };
+                      return (
+                      <div className={`rounded-lg border-2 p-4 space-y-2 ${tone.box}`}>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`font-bold font-mono text-sm ${tone.text}`}>
+                            {sys ? '⚠' : 'ℹ'} {language === 'pl'
+                              ? (sys ? 'MARKERY KONTROLI — POZIOM SYSTEMOWY' : 'MARKERY SEMANTYCZNE — POZIOM INFORMACYJNY')
+                              : (sys ? 'CONTROL MARKERS — SYSTEMIC LEVEL' : 'SEMANTIC MARKERS — INFORMATIONAL LEVEL')}
                           </span>
-                          <Badge variant="outline" className="border-destructive/60 text-destructive text-[10px] font-mono ml-auto">
-                            {result.manipulationReport.nameSubstitution.severity} · {result.manipulationReport.nameSubstitution.count}× · Σ{result.manipulationReport.nameSubstitution.weightedScore}
+                          <Badge variant="outline" className={`${tone.border} ${tone.text} text-[10px] font-mono ml-auto`}>
+                            {ns.severity} · {ns.count}× · Σ{ns.weightedScore}
                           </Badge>
                         </div>
+                        {!sys && (
+                          <p className="text-xs text-foreground/90 leading-relaxed">
+                            {language === 'pl'
+                              ? 'To NIE jest alarm manipulacji. Skaner znalazł pojedyncze słowa z listy językowej (np. tytuł władzy, pieczęć rytualna, nagroda/kara). Przy niskim IM oznacza to jedynie obecność takiego słownictwa, a nie ingerencję w tekst.'
+                              : 'This is NOT a manipulation alarm. The scanner found isolated words from the lexical list (e.g. authority title, ritual seal, reward/punishment). With a low MI this only signals such vocabulary is present, not that the text was tampered with.'}
+                          </p>
+                        )}
                         <p className="text-xs text-foreground/90 leading-relaxed">
-                          {language === 'pl'
-                            ? result.manipulationReport.nameSubstitution.explanation.pl
-                            : result.manipulationReport.nameSubstitution.explanation.en}
+                          {language === 'pl' ? ns.explanation.pl : ns.explanation.en}
                         </p>
-                        {result.manipulationReport.nameSubstitution.examples.length > 0 && (
+                        {ns.examples.length > 0 && (
                           <div className="space-y-1">
-                            <p className="text-[10px] uppercase tracking-wider text-destructive/70 font-mono">
+                            <p className={`text-[10px] uppercase tracking-wider font-mono ${tone.soft}`}>
                               {language === 'pl' ? 'Wystąpienia w tekście:' : 'Occurrences in text:'}
                             </p>
-                            {result.manipulationReport.nameSubstitution.examples.map((ex, i) => (
-                              <p key={i} className="text-xs font-mono text-foreground/70 italic pl-2 border-l-2 border-destructive/40">
+                            {ns.examples.map((ex, i) => (
+                              <p key={i} className={`text-xs font-mono text-foreground/70 italic pl-2 border-l-2 ${tone.border}`}>
                                 {ex}
                               </p>
                             ))}
                           </div>
                         )}
-                        {result.manipulationReport.nameSubstitution.categories.length > 0 && (
+                        {ns.categories.length > 0 && (
                           <div className="grid gap-2 sm:grid-cols-2">
-                            {result.manipulationReport.nameSubstitution.categories.map((category) => (
-                              <div key={category.id} className="rounded-md border border-destructive/30 bg-background/40 p-2">
+                            {ns.categories.map((category) => (
+                              <div key={category.id} className={`rounded-md border bg-background/40 p-2 ${tone.border2}`}>
                                 <div className="flex items-center justify-between gap-2">
-                                  <p className="text-[10px] uppercase text-destructive font-mono">
+                                  <p className={`text-[10px] uppercase font-mono ${tone.text}`}>
                                     {language === 'pl' ? category.label.pl : category.label.en}
                                   </p>
-                                  <Badge variant="outline" className="border-destructive/40 text-destructive text-[10px]">
+                                  <Badge variant="outline" className={`${tone.border} ${tone.text} text-[10px]`}>
                                     {category.count}×
                                   </Badge>
                                 </div>
@@ -1147,18 +1160,41 @@ const BiblicalDecoder = () => {
                             ))}
                           </div>
                         )}
-                        <p className="text-[10px] text-muted-foreground font-mono leading-relaxed pt-1 border-t border-destructive/20">
-                          {language === 'pl'
-                            ? result.manipulationReport.nameSubstitution.citation.pl
-                            : result.manipulationReport.nameSubstitution.citation.en}
+                        <p className={`text-[10px] text-muted-foreground font-mono leading-relaxed pt-1 border-t ${tone.line}`}>
+                          {language === 'pl' ? ns.citation.pl : ns.citation.en}
                         </p>
-                        <p className="text-[10px] text-primary/90 font-mono leading-relaxed">
-                          {language === 'pl'
-                            ? 'UWAGA: IM pozostaje wskaźnikiem statystyczno-redakcyjnym. Ten czerwony blok jest oddzielną warstwą semantyczną i ma pierwszeństwo interpretacyjne, gdy tekst niesie język kontroli.'
-                            : 'NOTE: MI remains a statistical/redaction index. This red block is a separate semantic layer and takes interpretive priority when the text carries control language.'}
-                        </p>
+                        {/* HOW TO READ THIS */}
+                        <div className={`rounded-md border bg-background/50 p-2 ${tone.border2}`}>
+                          <p className="text-[10px] uppercase tracking-wider font-mono text-primary mb-1">
+                            {language === 'pl' ? 'Jak to czytać' : 'How to read this'}
+                          </p>
+                          <ul className="text-[11px] text-foreground/80 leading-relaxed space-y-1 list-disc pl-4">
+                            <li>
+                              {language === 'pl'
+                                ? 'IM (%) = czy tekst nosi ślady redakcji, wstawek i cięć. Niski IM = tekst wygląda na spójny i nienaruszony.'
+                                : 'MI (%) = whether the text shows traces of redaction, insertions and cuts. Low MI = the text looks coherent and untouched.'}
+                            </li>
+                            <li>
+                              {language === 'pl'
+                                ? 'Ta ramka = słownik. Liczy słowa należące do języka władzy, rytuału, winy czy nagrody — niezależnie od tego, czy tekst był zmieniany.'
+                                : 'This box = a dictionary count. It counts words belonging to the language of authority, ritual, guilt or reward — regardless of whether the text was altered.'}
+                            </li>
+                            <li>
+                              {language === 'pl'
+                                ? 'Dlatego zielony wynik i ta ramka nie są sprzeczne: tekst może być autentyczny (niski IM) i jednocześnie używać słownictwa hierarchii.'
+                                : 'So a green result and this box are not contradictory: a text can be authentic (low MI) and still use hierarchy vocabulary.'}
+                            </li>
+                            <li>
+                              {language === 'pl'
+                                ? 'Poziom INFORMACYJNY (OBECNA) = pojedyncze słowa, możliwe trafienia przypadkowe (odmiana, homonim). Poziom SYSTEMOWY = wiele kategorii naraz, dopiero wtedy mówimy o wzorcu kontroli.'
+                                : 'INFORMATIONAL level (PRESENT) = isolated words, possible false positives (inflection, homonym). SYSTEMIC level = several categories at once — only then do we speak of a control pattern.'}
+                            </li>
+                          </ul>
+                        </div>
                       </div>
-                    )}
+                      );
+                    })()}
+
 
                     {/* IM Score - big display */}
                     <div className="flex items-center gap-6">
