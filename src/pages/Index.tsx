@@ -102,8 +102,7 @@ const Index = () => {
         </Button>
         <Button
           onClick={() => navigate("/decoder")}
-          variant="secondary"
-          className="order-first h-9 px-2.5 text-xs gap-1.5 shadow-lg border-primary/60 bg-primary/10 md:order-none md:h-10 md:px-4 md:text-sm md:gap-2"
+          className="order-first h-9 px-2.5 text-xs gap-1.5 shadow-lg bg-amber-500 text-black hover:bg-amber-400 border-amber-500 md:order-none md:h-10 md:px-4 md:text-sm md:gap-2"
           title="Dekoder biblijny / Bible Decoder"
         >
           <BookOpen className="w-4 h-4" />
