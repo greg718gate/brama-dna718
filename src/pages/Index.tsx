@@ -74,12 +74,12 @@ const Index = () => {
   return (
     <div className="relative min-h-screen overflow-y-auto">
       {/* Top Navigation */}
-      <div className="fixed top-3 left-3 right-3 z-50 flex gap-2 overflow-x-auto pb-2 md:left-auto md:top-4 md:right-4 md:flex-wrap md:justify-end">
+      <div className="fixed top-2 left-2 right-2 z-50 flex flex-wrap items-center gap-1.5 md:left-auto md:top-4 md:right-4 md:gap-2 md:justify-end">
         <LanguageSwitcher />
         <Button
           onClick={() => navigate("/gatca-zeta")}
           variant="secondary"
-          className="gap-2 shadow-lg"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2"
         >
           <Sigma className="w-4 h-4" />
           GATCA ζ
@@ -87,7 +87,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/vault")}
           variant="secondary"
-          className="gap-2 shadow-lg"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2"
         >
           <Shield className="w-4 h-4" />
           {t("vault.button")}
@@ -95,7 +95,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/unified")}
           variant="secondary"
-          className="gap-2 shadow-lg bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border-primary/50"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2 bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border-primary/50"
         >
           <Sparkles className="w-4 h-4" />
           UNIFIED
@@ -103,7 +103,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/decoder")}
           variant="secondary"
-          className="order-first shrink-0 gap-2 shadow-lg border-primary/60 bg-primary/10 md:order-none"
+          className="order-first h-9 px-2.5 text-xs gap-1.5 shadow-lg border-primary/60 bg-primary/10 md:order-none md:h-10 md:px-4 md:text-sm md:gap-2"
           title="Dekoder biblijny / Bible Decoder"
         >
           <BookOpen className="w-4 h-4" />
@@ -112,7 +112,7 @@ const Index = () => {
         <Button
           onClick={() => navigate("/archive")}
           variant="secondary"
-          className="gap-2 shadow-lg bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border-amber-500/40"
+          className="h-9 px-2.5 text-xs gap-1.5 shadow-lg md:h-10 md:px-4 md:text-sm md:gap-2 bg-gradient-to-r from-amber-500/20 to-cyan-500/20 border-amber-500/40"
           title={t("nav.archive") !== "nav.archive" ? t("nav.archive") : "Archiwum / Archive"}
         >
           <Archive className="w-4 h-4" />
@@ -122,7 +122,7 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-8 pb-16 space-y-8 max-w-5xl">
         {/* Header */}
-        <div className="pt-16 md:pt-12">
+        <div className="pt-24 md:pt-12">
           <div className="text-center space-y-4 mb-8 animate-fade-in">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight pb-2">
               {t("header.truth")}
