@@ -74,7 +74,7 @@ const Index = () => {
   return (
     <div className="relative min-h-screen overflow-y-auto">
       {/* Top Navigation */}
-      <div className="fixed top-3 left-3 right-3 z-50 flex gap-2 overflow-x-auto pb-2 md:left-auto md:top-4 md:right-4 md:flex-wrap md:justify-end">
+      <div className="fixed top-2 left-2 right-2 z-50 flex flex-wrap items-center gap-1.5 md:left-auto md:top-4 md:right-4 md:gap-2 md:justify-end">
         <LanguageSwitcher />
         <Button
           onClick={() => navigate("/gatca-zeta")}
