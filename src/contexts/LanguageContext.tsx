@@ -1603,6 +1603,7 @@ export const translations = {
     'biometric.pro.security1': '• The engine is encrypted (AES-256-GCM) — its code cannot be read on the server or on disk.',
     'biometric.pro.security2': '• A SHA-256 checksum is verified before launch; any modification aborts the start.',
     'biometric.pro.security3': '• The engine runs in memory only, fetched over HTTPS with certificate validation — nothing is stored in plain text.',
+    'biometric.pro.security4': '• The decryption key is no longer inside the downloaded file — it is issued to memory only after your authorization token is verified.',
     'biometric.pro.downloadLocked': 'Downloading the engine requires active PRO access.',
     'biometric.pro.downloadWindows': 'Download for Windows (1 click)',
     'biometric.pro.downloadApple': 'Download for Mac / Linux (1 click)',
