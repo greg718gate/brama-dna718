@@ -494,21 +494,59 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
             <Progress value={coherence * 100} className="h-2" />
           </div>
 
-          <dl className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
-            {[
-              [T.phase, `${phaseError.toFixed(4)} rad`],
-              [T.dpll, `γ=${gamma.toFixed(4)}${dpllStatus ? ` — ${dpllStatus}` : ""}`],
-              [T.lens, `R=${lensRadius.toFixed(3)} — 800 φ — 54.7356°`],
-              [T.buffer, `${beats} ${T.beats} — ${T.window} ${windowSeconds.toFixed(1)}s`],
-              [T.bpm, bpm ? `${bpm} BPM` : "—"],
-              [T.mode, `${BREATH_MODES[modeIndex].name} — ${breathDuration.toFixed(1)}s`],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-md border border-border bg-background/40 p-2">
-                <dt className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{label}</dt>
-                <dd className="break-words font-mono text-foreground/90">{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
+            <div className="rounded-md border border-accent/30 bg-accent/5 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleBpm}</p>
+              <p className="font-mono text-lg font-bold text-accent">{bpm ? `${bpm} BPM` : "—"}</p>
+            </div>
+            <div className="rounded-md border border-secondary/30 bg-secondary/5 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleSync}</p>
+              <p className="break-words text-sm font-semibold text-secondary">{syncState}</p>
+            </div>
+            <div className="rounded-md border border-border bg-background/40 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleRitual}</p>
+              <p className="font-mono text-lg font-bold text-foreground">
+                {Math.min(ritualSeconds, RITUAL_SECONDS)} / {RITUAL_SECONDS}s
+              </p>
+              <Progress value={(Math.min(ritualSeconds, RITUAL_SECONDS) / RITUAL_SECONDS) * 100} className="mt-2 h-1.5" />
+            </div>
+          </div>
+
+          {ritualDone && (
+            <div className="space-y-1 rounded-md border border-purple-500/50 bg-purple-500/10 p-3">
+              <p className="break-words text-sm font-bold text-purple-300">{T.ritualDoneTitle}</p>
+              <p className="break-words text-xs leading-relaxed text-purple-200/80">
+                {saveFailed ? T.ritualSaveFailed : T.ritualDoneText}
+              </p>
+            </div>
+          )}
+
+          <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+            <CollapsibleTrigger asChild>
+              <Button type="button" variant="outline" size="sm" className="w-full justify-between whitespace-normal text-left text-xs">
+                <span className="break-words">{T.advancedTitle}</span>
+                <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <dl className="mt-2 grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+                {[
+                  [T.phase, `${phaseError.toFixed(4)} rad`],
+                  [T.dpll, `γ=${gamma.toFixed(4)}${dpllStatus ? ` — ${dpllStatus}` : ""}`],
+                  [T.lens, `R=${lensRadius.toFixed(3)} — 800 φ — 54.7356°`],
+                  [T.buffer, `${beats} ${T.beats} — ${T.window} ${windowSeconds.toFixed(1)}s`],
+                  [T.bpm, bpm ? `${bpm} BPM` : "—"],
+                  [T.mode, `${BREATH_MODES[modeIndex].name} — ${breathDuration.toFixed(1)}s`],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-md border border-border bg-background/40 p-2">
+                    <dt className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{label}</dt>
+                    <dd className="break-words font-mono text-foreground/90">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </CollapsibleContent>
+          </Collapsible>
+
 
           <div className="space-y-1">
             <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
