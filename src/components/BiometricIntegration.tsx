@@ -233,6 +233,20 @@ export const BiometricIntegration = () => {
     setEngineReady(true);
   };
 
+  const handleDownloadEngine = async () => {
+    const subscribed = await checkSubscription();
+    if (!subscribed) {
+      setIsPaymentModalOpen(true);
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = "/downloads/sentinel_718_scanner.py";
+    link.download = "sentinel_718_scanner.py";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
   const handleCheckout = async () => {
     setIsStartingCheckout(true);
     const { data, error } = await supabase.functions.invoke("create-sentinel-checkout", { body: {} });
