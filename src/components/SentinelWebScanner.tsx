@@ -380,7 +380,9 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     setBpm(null);
     setDpllStatus("");
     phaseErrorRef.current = 0;
+    bpmRef.current = null;
     onPhaseErrorChange?.(0);
+
   }, [onPhaseErrorChange]);
 
   const connect = useCallback(async () => {
@@ -406,7 +408,13 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       await characteristic?.startNotifications();
       characteristic?.addEventListener("characteristicvaluechanged", handleMeasurement);
       pacerStartRef.current = Date.now();
+      maxCoherenceRef.current = 0;
+      savedRef.current = false;
+      setRitualSeconds(0);
+      setRitualDone(false);
+      setSaveFailed(false);
       setConnected(true);
+
     } catch (error) {
       if ((error as DOMException)?.name !== "NotFoundError") setStatusMessage(T.error);
     } finally {
