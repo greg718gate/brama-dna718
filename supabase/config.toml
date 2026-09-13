@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.zeta-analyze]
 verify_jwt = false
+
+[functions.sentinel-license]
+verify_jwt = false
