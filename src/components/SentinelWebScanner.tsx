@@ -21,6 +21,8 @@ const COHERENCE_THRESHOLD = 0.94;
 const MAGIC_ANGLE = (54.7356 * Math.PI) / 180;
 const NUM_PHOTONS = 800;
 const RR_WINDOW_SECONDS = 128;
+const RITUAL_SECONDS = 108;
+
 const HEART_RATE_SERVICE = "heart_rate";
 const HEART_RATE_MEASUREMENT = "heart_rate_measurement";
 
@@ -63,6 +65,20 @@ const TXT = {
     window: "okno",
     error: "Nie udało się połączyć z pasem. Sprawdź, czy jest włączony i nie jest zajęty przez inną aplikację.",
     lost: "Połączenie z pasem przerwane.",
+    simpleBpm: "Puls serca",
+    simpleSync: "Stan synchronizacji",
+    simpleRitual: "Czas rytuału",
+    syncSlow: "Spowolnij wydech — dostrajam pole",
+    syncFast: "Przyspiesz oddech — stabilizuję wektor",
+    syncLocked: "PEŁNY REZONANS (Faza Zablokowana)",
+    syncWaiting: "Oczekiwanie na pierwsze uderzenia serca",
+    advancedTitle: "✦ Zaawansowane Parametry Spektralne (Dla Inżynierów) ✦",
+    ritualDoneTitle: "✦ Rytuał Ukończony ✦",
+    ritualDoneText:
+      "Wynik został pomyślnie zaimplementowany w Twoim profilu. Przejdź do zakładki Historia, aby zobaczyć wykres progresu DNA.",
+    ritualSaveFailed:
+      "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
+
   },
   en: {
     title: "In-browser spectral scanner",
@@ -95,6 +111,20 @@ const TXT = {
     window: "window",
     error: "Could not connect to the belt. Check that it is on and not claimed by another app.",
     lost: "Belt connection lost.",
+    simpleBpm: "Heart pulse",
+    simpleSync: "Synchronisation state",
+    simpleRitual: "Ritual time",
+    syncSlow: "Slow the exhale — tuning the field",
+    syncFast: "Speed up breathing — stabilising the vector",
+    syncLocked: "FULL RESONANCE (Phase Locked)",
+    syncWaiting: "Waiting for the first heartbeats",
+    advancedTitle: "✦ Advanced Spectral Parameters (For Engineers) ✦",
+    ritualDoneTitle: "✦ Ritual Complete ✦",
+    ritualDoneText:
+      "The result has been successfully implemented in your profile. Open the History tab to see your DNA progress chart.",
+    ritualSaveFailed:
+      "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
+
   },
 };
 
