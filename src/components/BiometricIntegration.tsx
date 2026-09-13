@@ -81,6 +81,10 @@ const getCoherenceState = (syncPercentage: number): CoherenceState => {
   return "transitional";
 };
 
+// Sprzedaż dostępu PRO wstrzymana do czasu ukończenia całości systemu.
+// Ustaw na true, aby ponownie włączyć subskrypcję £19/mies.
+const PRO_SALES_ENABLED = false;
+
 export const BiometricIntegration = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
