@@ -20,6 +20,7 @@ import { Progress } from "@/components/ui/progress";
 import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
+import { SentinelWebScanner } from "@/components/SentinelWebScanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -520,6 +521,8 @@ export const BiometricIntegration = () => {
                 {isCheckingSubscription ? <Loader2 className="h-6 w-6 animate-spin" /> : engineReady ? <Check className="h-6 w-6" /> : <ScanLine className="h-6 w-6" />}
                 {engineReady ? t("biometric.pro.engineReady") : t("biometric.pro.startScanner")}
               </Button>
+
+              {engineReady && <SentinelWebScanner />}
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground" role="status">
                 <span className={`h-2 w-2 rounded-full ${isSubscribed || !PRO_SALES_ENABLED ? "bg-secondary" : "bg-accent"}`} />
