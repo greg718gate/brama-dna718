@@ -23,6 +23,7 @@ import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
 import { AudioModeSelector, type AudioStreamMode } from "@/components/AudioModeSelector";
 import { LicenseTokenWidget } from "@/components/LicenseTokenWidget";
+import { SessionHistoryChart } from "@/components/SessionHistoryChart";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -537,12 +538,14 @@ export const BiometricIntegration = () => {
                 <li className="break-words">{t("biometric.pro.security1")}</li>
                 <li className="break-words">{t("biometric.pro.security2")}</li>
                 <li className="break-words">{t("biometric.pro.security3")}</li>
+                <li className="break-words">{t("biometric.pro.security4")}</li>
               </ul>
               <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground/70">
                 SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
               </p>
             </div>
             <LicenseTokenWidget />
+            <SessionHistoryChart />
             {!PRO_SALES_ENABLED && (
               <p className="mt-2 text-xs leading-relaxed text-secondary">
                 {t("biometric.pro.betaOpen")}
