@@ -17,10 +17,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download } from "lucide-react";
+import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download, ShieldCheck } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
+import { AudioModeSelector, type AudioStreamMode } from "@/components/AudioModeSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -119,6 +120,8 @@ export const BiometricIntegration = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [engineReady, setEngineReady] = useState(false);
   const [isSpecOpen, setIsSpecOpen] = useState(false);
+  const [audioMode, setAudioMode] = useState<AudioStreamMode>("static");
+  const [scannerPhaseError, setScannerPhaseError] = useState(0);
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
@@ -466,6 +469,30 @@ export const BiometricIntegration = () => {
             </CollapsibleContent>
           </Collapsible>
 
+          <section className="rounded-lg border border-primary/30 bg-primary/5 p-4 sm:p-5" aria-labelledby="audio-architecture-title">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary" aria-hidden="true">
+                <ShieldCheck className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 space-y-2">
+                <h3 id="audio-architecture-title" className="break-words text-sm font-bold text-primary sm:text-base">
+                  {t("biometric.pro.audioArchitectureTitle")}
+                </h3>
+                <p className="break-words text-xs leading-relaxed text-foreground/80 sm:text-sm">
+                  {t("biometric.pro.audioArchitectureText")}
+                </p>
+                <p className="flex items-center gap-2 text-[0.68rem] text-secondary">
+                  <Lock className="h-3.5 w-3.5 shrink-0" />
+                  {t("biometric.pro.losslessLock")}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div data-audio-mode={audioMode}>
+            <AudioModeSelector onModeChange={setAudioMode} currentPhaseError={scannerPhaseError} />
+          </div>
+
           <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
             <p className="flex items-center gap-2 text-sm font-semibold text-accent">
               <Download className="h-4 w-4" />
@@ -533,7 +560,7 @@ export const BiometricIntegration = () => {
                 {engineReady ? t("biometric.pro.engineReady") : t("biometric.pro.startScanner")}
               </Button>
 
-              {engineReady && <SentinelWebScanner />}
+              {engineReady && <SentinelWebScanner onPhaseErrorChange={setScannerPhaseError} />}
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground" role="status">
                 <span className={`h-2 w-2 rounded-full ${isSubscribed || !PRO_SALES_ENABLED ? "bg-secondary" : "bg-accent"}`} />
