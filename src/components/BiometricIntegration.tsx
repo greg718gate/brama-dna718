@@ -435,6 +435,40 @@ export const BiometricIntegration = () => {
             </CollapsibleContent>
           </Collapsible>
 
+          <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent">
+              <Download className="h-4 w-4" />
+              {t("biometric.pro.downloadTitle")}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+              {t("biometric.pro.downloadDesc")}
+            </p>
+            <ol className="mt-3 space-y-1 text-xs leading-relaxed text-muted-foreground">
+              <li className="break-words">{t("biometric.pro.downloadStep1")}</li>
+              <li className="break-words font-mono">{t("biometric.pro.downloadStep2")}</li>
+              <li className="break-words">{t("biometric.pro.downloadStep3")}</li>
+            </ol>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              {t("biometric.pro.downloadMac")}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3 w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
+              onClick={handleDownloadEngine}
+              disabled={isCheckingSubscription}
+            >
+              <Download className="h-4 w-4" />
+              {t("biometric.pro.downloadButton")}
+            </Button>
+            {!isSubscribed && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {t("biometric.pro.downloadLocked")}
+              </p>
+            )}
+          </div>
+
+
           <Button
             type="button"
             variant={engineReady ? "secondary" : "glow"}
