@@ -10,7 +10,7 @@ interface AudioModeSelectorProps {
   currentPhaseError: number;
 }
 
-const BASE_FREQUENCY = 718.57012515;
+const BASE_FREQUENCY = 718.570125154269;
 const REQUESTED_SAMPLE_RATE = 44_100;
 const MAX_JITTER_SECONDS = 0.008;
 
