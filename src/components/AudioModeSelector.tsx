@@ -93,10 +93,9 @@ export const AudioModeSelector = ({ onModeChange, currentPhaseError }: AudioMode
   const startAudio = useCallback(() => {
     if (audioContextRef.current) return;
 
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
+    if (!window.AudioContext) return;
 
-    const context = new AudioContextClass({ sampleRate: REQUESTED_SAMPLE_RATE });
+    const context = new window.AudioContext({ sampleRate: REQUESTED_SAMPLE_RATE });
     const oscillator = context.createOscillator();
     const delay = context.createDelay(MAX_JITTER_SECONDS);
     const gain = context.createGain();
@@ -156,7 +155,7 @@ export const AudioModeSelector = ({ onModeChange, currentPhaseError }: AudioMode
               role="radio"
               aria-checked={active}
               onClick={() => handleModeSelect(mode)}
-              className={`h-auto min-w-0 whitespace-normal p-3 text-left ${active ? `border-${color}/70 bg-${color}/10` : "border-border bg-transparent"}`}
+              className={`h-auto min-w-0 whitespace-normal p-3 text-left ${active ? (color === "secondary" ? "border-secondary/70 bg-secondary/10" : "border-primary/70 bg-primary/10") : "border-border bg-transparent"}`}
             >
               <span className="flex min-w-0 items-start gap-2">
                 <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${color === "secondary" ? "text-secondary" : "text-primary"}`} />

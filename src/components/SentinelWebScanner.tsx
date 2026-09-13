@@ -97,6 +97,10 @@ const TXT = {
 
 type PhotonBase = { phi: number; theta: number };
 
+interface SentinelWebScannerProps {
+  onPhaseErrorChange?: (phaseError: number) => void;
+}
+
 const buildPhotonBase = (): PhotonBase[] =>
   Array.from({ length: NUM_PHOTONS }, (_, i) => {
     const index = i + 0.5;
@@ -150,7 +154,7 @@ const periodogram = (signal: number[], fs = 4.0) => {
   return { freqs, psd };
 };
 
-export const SentinelWebScanner = () => {
+export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerProps) => {
   const { language } = useLanguage();
   const T = TXT[language === "pl" ? "pl" : "en"];
 
@@ -217,6 +221,7 @@ export const SentinelWebScanner = () => {
     }
     phaseErrorRef.current = err;
     setPhaseError(err);
+    onPhaseErrorChange?.(err);
     const buf = phaseBufferRef.current;
     buf.push(err);
     if (buf.length > 10) buf.shift();
@@ -236,7 +241,7 @@ export const SentinelWebScanner = () => {
     setBeats(rr.length);
     setWindowSeconds(total);
     setBpm(Math.round(60 / (total / rr.length)));
-  }, [T.correction, T.locked]);
+  }, [T.correction, T.locked, onPhaseErrorChange]);
 
   const handleMeasurement = useCallback(
     (event: Event) => {
@@ -287,7 +292,9 @@ export const SentinelWebScanner = () => {
     setWindowSeconds(0);
     setBpm(null);
     setDpllStatus("");
-  }, []);
+    phaseErrorRef.current = 0;
+    onPhaseErrorChange?.(0);
+  }, [onPhaseErrorChange]);
 
   const connect = useCallback(async () => {
     if (!("bluetooth" in navigator)) {
