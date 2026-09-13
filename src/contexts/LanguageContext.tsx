@@ -1607,6 +1607,9 @@ export const translations = {
     'biometric.pro.security2': '• A SHA-256 checksum is verified before launch; any modification aborts the start.',
     'biometric.pro.security3': '• The engine runs in memory only, fetched over HTTPS with certificate validation — nothing is stored in plain text.',
     'biometric.pro.security4': '• The decryption key is no longer inside the downloaded file — it is issued to memory only after your authorization token is verified.',
+    'biometric.pro.certTitle': '✦ Certification and Digital Signature Status ✦',
+    'biometric.pro.certText': 'The binary releases are going through Windows Authenticode certification and Apple Developer ID notarisation. If your operating system (Windows SmartScreen / macOS Gatekeeper) warns about an unknown publisher, click "More info" and "Run anyway". The code runs only in RAM, is fully safe and verified by the SHA-256 signature shown above.',
+
     'biometric.pro.downloadLocked': 'Downloading the engine requires active PRO access.',
     'biometric.pro.downloadWindows': 'Download for Windows (1 click)',
     'biometric.pro.downloadApple': 'Download for Mac / Linux (1 click)',
