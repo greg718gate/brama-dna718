@@ -657,6 +657,9 @@ export const translations = {
     'biometric.pro.securityTitle': '🔒 Zabezpieczenia pobieranego silnika',
     'biometric.pro.security1': '• Silnik jest zaszyfrowany (AES-256-GCM) — nikt nie odczyta jego kodu z serwera ani z dysku.',
     'biometric.pro.security4': '• Klucz deszyfrujący nie znajduje się już w pobieranym pliku — jest wydawany wyłącznie do pamięci po weryfikacji Twojego tokenu autoryzacji.',
+    'biometric.pro.certTitle': '✦ Status Certyfikacji i Sygnatur Cyfrowych ✦',
+    'biometric.pro.certText': 'Wersje binarne są w trakcie procedury certyfikacji Windows Authenticode oraz notaryzacji Apple Developer ID. Jeśli Twój system operacyjny (Windows SmartScreen / macOS Gatekeeper) wyświetli ostrzeżenie o nieznanym wydawcy, kliknij „Więcej informacji" i „Uruchom mimo to". Kod działa wyłącznie w pamięci RAM, jest w 100% bezpieczny i zweryfikowany sygnaturą SHA-256 widoczną powyżej.',
+
     'biometric.pro.security2': '• Przed uruchomieniem sprawdzana jest suma kontrolna SHA-256; przy najmniejszej zmianie pliku start jest przerywany.',
     'biometric.pro.security3': '• Silnik działa tylko w pamięci, pobierany przez HTTPS z weryfikacją certyfikatu — nic nie zapisuje się w czystej postaci.',
     'biometric.pro.downloadLocked': 'Pobieranie silnika wymaga aktywnego dostępu PRO.',
