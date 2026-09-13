@@ -225,26 +225,38 @@ export const BiometricIntegration = () => {
   };
 
   const handleStartScanner = async () => {
-    const subscribed = await checkSubscription();
-    if (!subscribed) {
-      setIsPaymentModalOpen(true);
-      return;
+    if (PRO_SALES_ENABLED) {
+      const subscribed = await checkSubscription();
+      if (!subscribed) {
+        setIsPaymentModalOpen(true);
+        return;
+      }
     }
     setEngineReady(true);
   };
 
-  const handleDownloadEngine = async () => {
-    const subscribed = await checkSubscription();
-    if (!subscribed) {
-      setIsPaymentModalOpen(true);
-      return;
-    }
+  const triggerFileDownload = (href: string, filename: string) => {
     const link = document.createElement("a");
-    link.href = "/downloads/sentinel_718_scanner.py";
-    link.download = "sentinel_718_scanner.py";
+    link.href = href;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
+  };
+
+  const handleDownloadLauncher = async (platform: "windows" | "apple") => {
+    if (PRO_SALES_ENABLED) {
+      const subscribed = await checkSubscription();
+      if (!subscribed) {
+        setIsPaymentModalOpen(true);
+        return;
+      }
+    }
+    if (platform === "windows") {
+      triggerFileDownload("/downloads/START_SENTINEL_718.bat", "START_SENTINEL_718.bat");
+    } else {
+      triggerFileDownload("/downloads/START_SENTINEL_718.command", "START_SENTINEL_718.command");
+    }
   };
 
   const handleCheckout = async () => {
