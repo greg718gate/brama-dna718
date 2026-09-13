@@ -401,13 +401,43 @@ export const BiometricIntegration = () => {
                     </span>
                     <span className="text-xs font-bold text-accent">0{index + 1}</span>
                     <span className="text-sm leading-snug text-foreground/90">{t(key as string)}</span>
-                  </li>
-                ))}
-              </ol>
+              </li>
+            ))}
+          </ol>
 
-              <Button
+          <Collapsible open={isSpecOpen} onOpenChange={setIsSpecOpen} className="rounded-lg border border-secondary/20 bg-background/40">
+            <CollapsibleTrigger asChild>
+              <button
                 type="button"
-                variant={engineReady ? "secondary" : "glow"}
+                className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-secondary/5"
+                aria-expanded={isSpecOpen}
+              >
+                <span className="flex items-center gap-2 text-sm font-semibold text-foreground/90">
+                  <Info className="h-4 w-4 text-secondary" />
+                  {t("biometric.pro.specTitle")}
+                </span>
+                <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isSpecOpen ? "rotate-180" : ""}`} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="px-4 pb-4">
+              <div className="space-y-3 text-sm text-foreground/80">
+                {[
+                  ["biometric.pro.specWhatIsSystem", "biometric.pro.specWhatIsSystemText"],
+                  ["biometric.pro.specMethod", "biometric.pro.specMethodText"],
+                  ["biometric.pro.specGoal", "biometric.pro.specGoalText"],
+                ].map(([labelKey, textKey]) => (
+                  <div key={labelKey as string} className="rounded-md border-l-2 border-secondary/40 bg-secondary/5 p-3">
+                    <p className="mb-1 font-medium text-secondary">{t(labelKey as string)}</p>
+                    <p className="leading-relaxed">{t(textKey as string)}</p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Button
+            type="button"
+            variant={engineReady ? "secondary" : "glow"}
                 size="xl"
                 className={`min-h-20 w-full whitespace-normal px-5 text-center text-base font-bold sm:text-lg ${engineReady ? "" : "animate-pulse"}`}
                 onClick={handleStartScanner}
