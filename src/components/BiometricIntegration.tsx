@@ -22,6 +22,8 @@ import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
 import { AudioModeSelector, type AudioStreamMode } from "@/components/AudioModeSelector";
+import { LicenseTokenWidget } from "@/components/LicenseTokenWidget";
+import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -540,6 +542,7 @@ export const BiometricIntegration = () => {
                 SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
               </p>
             </div>
+            <LicenseTokenWidget />
             {!PRO_SALES_ENABLED && (
               <p className="mt-2 text-xs leading-relaxed text-secondary">
                 {t("biometric.pro.betaOpen")}
@@ -628,9 +631,12 @@ export const BiometricIntegration = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Checkbox id="pro-terms" checked={proTermsAccepted} onCheckedChange={(checked) => setProTermsAccepted(checked === true)} className="mt-0.5" />
-                    <Label htmlFor="pro-terms" className="cursor-pointer text-xs font-normal leading-relaxed text-muted-foreground">
-                      {t("biometric.pro.terms")}
+                    <Checkbox id="pro-terms" checked={proTermsAccepted} onCheckedChange={(checked) => setProTermsAccepted(checked === true)} className="mt-0.5" required />
+                    <Label htmlFor="pro-terms" className="cursor-pointer break-words text-xs font-normal leading-relaxed text-muted-foreground">
+                      {t("biometric.pro.terms")}{" "}
+                      <Link to="/privacy" target="_blank" className="text-secondary underline">
+                        /privacy
+                      </Link>
                     </Label>
                   </div>
                   <Button type="submit" variant="glow" className="w-full" disabled={isRegistering}>
