@@ -113,6 +113,7 @@ export const BiometricIntegration = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [engineReady, setEngineReady] = useState(false);
+  const [isSpecOpen, setIsSpecOpen] = useState(false);
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
