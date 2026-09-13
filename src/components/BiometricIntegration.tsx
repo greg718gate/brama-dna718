@@ -481,19 +481,29 @@ export const BiometricIntegration = () => {
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
               {t("biometric.pro.downloadMac")}
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-3 w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
-              onClick={handleDownloadEngine}
-              disabled={isCheckingSubscription}
-            >
-              <Download className="h-4 w-4" />
-              {t("biometric.pro.downloadButton")}
-            </Button>
-            {!isSubscribed && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                {t("biometric.pro.downloadLocked")}
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
+                onClick={() => void handleDownloadLauncher("windows")}
+              >
+                <Download className="h-4 w-4" />
+                {t("biometric.pro.downloadWindows")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
+                onClick={() => void handleDownloadLauncher("apple")}
+              >
+                <Download className="h-4 w-4" />
+                {t("biometric.pro.downloadApple")}
+              </Button>
+            </div>
+            {!PRO_SALES_ENABLED && (
+              <p className="mt-2 text-xs leading-relaxed text-secondary">
+                {t("biometric.pro.betaOpen")}
               </p>
             )}
           </div>
