@@ -518,7 +518,14 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     return (avg > 0 ? T.hintSlow : T.hintFast).replace("{s}", s);
   }, [phaseError, breathDuration, T.hintOk, T.hintSlow, T.hintFast]);
 
+  const syncState = useMemo(() => {
+    if (!connected || beats <= 10) return T.syncWaiting;
+    if (Math.abs(phaseError) < 0.05) return T.syncLocked;
+    return phaseError < 0 ? T.syncSlow : T.syncFast;
+  }, [connected, beats, phaseError, T.syncWaiting, T.syncLocked, T.syncSlow, T.syncFast]);
+
   const collapsed = coherence >= COHERENCE_THRESHOLD;
+
 
   return (
     <div className="space-y-4 rounded-lg border border-secondary/30 bg-background/50 p-4 sm:p-5">
