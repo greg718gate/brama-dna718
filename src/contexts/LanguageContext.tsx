@@ -657,6 +657,9 @@ export const translations = {
     'biometric.pro.securityTitle': '🔒 Zabezpieczenia pobieranego silnika',
     'biometric.pro.security1': '• Silnik jest zaszyfrowany (AES-256-GCM) — nikt nie odczyta jego kodu z serwera ani z dysku.',
     'biometric.pro.security4': '• Klucz deszyfrujący nie znajduje się już w pobieranym pliku — jest wydawany wyłącznie do pamięci po weryfikacji Twojego tokenu autoryzacji.',
+    'biometric.pro.certTitle': '✦ Status Certyfikacji i Sygnatur Cyfrowych ✦',
+    'biometric.pro.certText': 'Wersje binarne są w trakcie procedury certyfikacji Windows Authenticode oraz notaryzacji Apple Developer ID. Jeśli Twój system operacyjny (Windows SmartScreen / macOS Gatekeeper) wyświetli ostrzeżenie o nieznanym wydawcy, kliknij „Więcej informacji" i „Uruchom mimo to". Kod działa wyłącznie w pamięci RAM, jest w 100% bezpieczny i zweryfikowany sygnaturą SHA-256 widoczną powyżej.',
+
     'biometric.pro.security2': '• Przed uruchomieniem sprawdzana jest suma kontrolna SHA-256; przy najmniejszej zmianie pliku start jest przerywany.',
     'biometric.pro.security3': '• Silnik działa tylko w pamięci, pobierany przez HTTPS z weryfikacją certyfikatu — nic nie zapisuje się w czystej postaci.',
     'biometric.pro.downloadLocked': 'Pobieranie silnika wymaga aktywnego dostępu PRO.',
@@ -1604,6 +1607,9 @@ export const translations = {
     'biometric.pro.security2': '• A SHA-256 checksum is verified before launch; any modification aborts the start.',
     'biometric.pro.security3': '• The engine runs in memory only, fetched over HTTPS with certificate validation — nothing is stored in plain text.',
     'biometric.pro.security4': '• The decryption key is no longer inside the downloaded file — it is issued to memory only after your authorization token is verified.',
+    'biometric.pro.certTitle': '✦ Certification and Digital Signature Status ✦',
+    'biometric.pro.certText': 'The binary releases are going through Windows Authenticode certification and Apple Developer ID notarisation. If your operating system (Windows SmartScreen / macOS Gatekeeper) warns about an unknown publisher, click "More info" and "Run anyway". The code runs only in RAM, is fully safe and verified by the SHA-256 signature shown above.',
+
     'biometric.pro.downloadLocked': 'Downloading the engine requires active PRO access.',
     'biometric.pro.downloadWindows': 'Download for Windows (1 click)',
     'biometric.pro.downloadApple': 'Download for Mac / Linux (1 click)',

@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Bluetooth, BluetoothOff, Heart, Waves, Activity, Sparkles } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Bluetooth, BluetoothOff, Heart, Waves, Activity, Sparkles, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+
 
 /**
  * SENTINEL-718 v3.0 — WEB SPECTRAL SCANNER
@@ -18,6 +21,8 @@ const COHERENCE_THRESHOLD = 0.94;
 const MAGIC_ANGLE = (54.7356 * Math.PI) / 180;
 const NUM_PHOTONS = 800;
 const RR_WINDOW_SECONDS = 128;
+const RITUAL_SECONDS = 108;
+
 const HEART_RATE_SERVICE = "heart_rate";
 const HEART_RATE_MEASUREMENT = "heart_rate_measurement";
 
@@ -60,6 +65,20 @@ const TXT = {
     window: "okno",
     error: "Nie udało się połączyć z pasem. Sprawdź, czy jest włączony i nie jest zajęty przez inną aplikację.",
     lost: "Połączenie z pasem przerwane.",
+    simpleBpm: "Puls serca",
+    simpleSync: "Stan synchronizacji",
+    simpleRitual: "Czas rytuału",
+    syncSlow: "Spowolnij wydech — dostrajam pole",
+    syncFast: "Przyspiesz oddech — stabilizuję wektor",
+    syncLocked: "PEŁNY REZONANS (Faza Zablokowana)",
+    syncWaiting: "Oczekiwanie na pierwsze uderzenia serca",
+    advancedTitle: "✦ Zaawansowane Parametry Spektralne (Dla Inżynierów) ✦",
+    ritualDoneTitle: "✦ Rytuał Ukończony ✦",
+    ritualDoneText:
+      "Wynik został pomyślnie zaimplementowany w Twoim profilu. Przejdź do zakładki Historia, aby zobaczyć wykres progresu DNA.",
+    ritualSaveFailed:
+      "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
+
   },
   en: {
     title: "In-browser spectral scanner",
@@ -92,6 +111,20 @@ const TXT = {
     window: "window",
     error: "Could not connect to the belt. Check that it is on and not claimed by another app.",
     lost: "Belt connection lost.",
+    simpleBpm: "Heart pulse",
+    simpleSync: "Synchronisation state",
+    simpleRitual: "Ritual time",
+    syncSlow: "Slow the exhale — tuning the field",
+    syncFast: "Speed up breathing — stabilising the vector",
+    syncLocked: "FULL RESONANCE (Phase Locked)",
+    syncWaiting: "Waiting for the first heartbeats",
+    advancedTitle: "✦ Advanced Spectral Parameters (For Engineers) ✦",
+    ritualDoneTitle: "✦ Ritual Complete ✦",
+    ritualDoneText:
+      "The result has been successfully implemented in your profile. Open the History tab to see your DNA progress chart.",
+    ritualSaveFailed:
+      "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
+
   },
 };
 
@@ -181,14 +214,64 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const [modeIndex, setModeIndex] = useState(1);
   const [pacerPhase, setPacerPhase] = useState({ inhale: true, percent: 0 });
   const [lensRadius, setLensRadius] = useState(10);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [ritualSeconds, setRitualSeconds] = useState(0);
+  const [ritualDone, setRitualDone] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  const maxCoherenceRef = useRef(0);
+  const bpmRef = useRef<number | null>(null);
+  const savedRef = useRef(false);
 
   const breathDuration = BREATH_MODES[modeIndex].duration;
   const breathDurationRef = useRef(breathDuration);
   breathDurationRef.current = breathDuration;
+  const modeNameRef = useRef(BREATH_MODES[modeIndex].name);
+  modeNameRef.current = BREATH_MODES[modeIndex].name;
 
   useEffect(() => {
     setSupported(typeof navigator !== "undefined" && "bluetooth" in navigator);
   }, []);
+
+  /** Background write of the finished 108 s ritual into the user's session history. */
+  const saveRitual = useCallback(async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (!user) {
+      setSaveFailed(true);
+      return;
+    }
+    const { error } = await supabase.from("sentinel_sessions").insert({
+      user_id: user.id,
+      coherence: Number(maxCoherenceRef.current.toFixed(4)),
+      phase_error: Number(phaseErrorRef.current.toFixed(4)),
+      mean_bpm: bpmRef.current,
+      duration_seconds: RITUAL_SECONDS,
+      breath_mode: modeNameRef.current,
+      source: "web_scanner",
+    });
+    setSaveFailed(Boolean(error));
+    if (!error) window.dispatchEvent(new Event("sentinel-session-saved"));
+  }, []);
+
+  // "CZAS RYTUAŁU" — 0 -> 108 s counter with automatic background save at 108 s.
+  useEffect(() => {
+    if (!connected) return;
+    const timer = window.setInterval(() => {
+      setRitualSeconds((prev) => {
+        const next = prev + 1;
+        if (next >= RITUAL_SECONDS && !savedRef.current) {
+          savedRef.current = true;
+          setRitualDone(true);
+          void saveRitual();
+        }
+        return next;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [connected, saveRitual]);
+
+
 
   const analyse = useCallback(() => {
     const rr = rrRef.current;
@@ -235,12 +318,16 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     if (totalPower > 0) {
       const value = Math.min(1, (narrow / totalPower) * 1.4);
       coherenceRef.current = value;
+      if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
       setCoherence(value);
     }
 
     setBeats(rr.length);
     setWindowSeconds(total);
-    setBpm(Math.round(60 / (total / rr.length)));
+    const nextBpm = Math.round(60 / (total / rr.length));
+    bpmRef.current = nextBpm;
+    setBpm(nextBpm);
+
   }, [T.correction, T.locked, onPhaseErrorChange]);
 
   const handleMeasurement = useCallback(
@@ -293,7 +380,9 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     setBpm(null);
     setDpllStatus("");
     phaseErrorRef.current = 0;
+    bpmRef.current = null;
     onPhaseErrorChange?.(0);
+
   }, [onPhaseErrorChange]);
 
   const connect = useCallback(async () => {
@@ -319,7 +408,13 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       await characteristic?.startNotifications();
       characteristic?.addEventListener("characteristicvaluechanged", handleMeasurement);
       pacerStartRef.current = Date.now();
+      maxCoherenceRef.current = 0;
+      savedRef.current = false;
+      setRitualSeconds(0);
+      setRitualDone(false);
+      setSaveFailed(false);
       setConnected(true);
+
     } catch (error) {
       if ((error as DOMException)?.name !== "NotFoundError") setStatusMessage(T.error);
     } finally {
@@ -423,7 +518,14 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     return (avg > 0 ? T.hintSlow : T.hintFast).replace("{s}", s);
   }, [phaseError, breathDuration, T.hintOk, T.hintSlow, T.hintFast]);
 
+  const syncState = useMemo(() => {
+    if (!connected || beats <= 10) return T.syncWaiting;
+    if (Math.abs(phaseError) < 0.05) return T.syncLocked;
+    return phaseError < 0 ? T.syncSlow : T.syncFast;
+  }, [connected, beats, phaseError, T.syncWaiting, T.syncLocked, T.syncSlow, T.syncFast]);
+
   const collapsed = coherence >= COHERENCE_THRESHOLD;
+
 
   return (
     <div className="space-y-4 rounded-lg border border-secondary/30 bg-background/50 p-4 sm:p-5">
@@ -494,21 +596,59 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
             <Progress value={coherence * 100} className="h-2" />
           </div>
 
-          <dl className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
-            {[
-              [T.phase, `${phaseError.toFixed(4)} rad`],
-              [T.dpll, `γ=${gamma.toFixed(4)}${dpllStatus ? ` — ${dpllStatus}` : ""}`],
-              [T.lens, `R=${lensRadius.toFixed(3)} — 800 φ — 54.7356°`],
-              [T.buffer, `${beats} ${T.beats} — ${T.window} ${windowSeconds.toFixed(1)}s`],
-              [T.bpm, bpm ? `${bpm} BPM` : "—"],
-              [T.mode, `${BREATH_MODES[modeIndex].name} — ${breathDuration.toFixed(1)}s`],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-md border border-border bg-background/40 p-2">
-                <dt className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{label}</dt>
-                <dd className="break-words font-mono text-foreground/90">{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
+            <div className="rounded-md border border-accent/30 bg-accent/5 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleBpm}</p>
+              <p className="font-mono text-lg font-bold text-accent">{bpm ? `${bpm} BPM` : "—"}</p>
+            </div>
+            <div className="rounded-md border border-secondary/30 bg-secondary/5 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleSync}</p>
+              <p className="break-words text-sm font-semibold text-secondary">{syncState}</p>
+            </div>
+            <div className="rounded-md border border-border bg-background/40 p-3">
+              <p className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{T.simpleRitual}</p>
+              <p className="font-mono text-lg font-bold text-foreground">
+                {Math.min(ritualSeconds, RITUAL_SECONDS)} / {RITUAL_SECONDS}s
+              </p>
+              <Progress value={(Math.min(ritualSeconds, RITUAL_SECONDS) / RITUAL_SECONDS) * 100} className="mt-2 h-1.5" />
+            </div>
+          </div>
+
+          {ritualDone && (
+            <div className="space-y-1 rounded-md border border-purple-500/50 bg-purple-500/10 p-3">
+              <p className="break-words text-sm font-bold text-purple-300">{T.ritualDoneTitle}</p>
+              <p className="break-words text-xs leading-relaxed text-purple-200/80">
+                {saveFailed ? T.ritualSaveFailed : T.ritualDoneText}
+              </p>
+            </div>
+          )}
+
+          <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+            <CollapsibleTrigger asChild>
+              <Button type="button" variant="outline" size="sm" className="w-full justify-between whitespace-normal text-left text-xs">
+                <span className="break-words">{T.advancedTitle}</span>
+                <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <dl className="mt-2 grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+                {[
+                  [T.phase, `${phaseError.toFixed(4)} rad`],
+                  [T.dpll, `γ=${gamma.toFixed(4)}${dpllStatus ? ` — ${dpllStatus}` : ""}`],
+                  [T.lens, `R=${lensRadius.toFixed(3)} — 800 φ — 54.7356°`],
+                  [T.buffer, `${beats} ${T.beats} — ${T.window} ${windowSeconds.toFixed(1)}s`],
+                  [T.bpm, bpm ? `${bpm} BPM` : "—"],
+                  [T.mode, `${BREATH_MODES[modeIndex].name} — ${breathDuration.toFixed(1)}s`],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-md border border-border bg-background/40 p-2">
+                    <dt className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{label}</dt>
+                    <dd className="break-words font-mono text-foreground/90">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </CollapsibleContent>
+          </Collapsible>
+
 
           <div className="space-y-1">
             <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">

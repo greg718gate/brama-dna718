@@ -544,6 +544,15 @@ export const BiometricIntegration = () => {
                 SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
               </p>
             </div>
+            <div className="mt-3 rounded-md border border-border bg-background/40 p-3">
+              <p className="break-words text-xs font-semibold text-foreground/90">
+                {t("biometric.pro.certTitle")}
+              </p>
+              <p className="mt-1 break-words text-xs leading-relaxed text-muted-foreground">
+                {t("biometric.pro.certText")}
+              </p>
+            </div>
+
             <LicenseTokenWidget />
             <SessionHistoryChart />
             {!PRO_SALES_ENABLED && (
