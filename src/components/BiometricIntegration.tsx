@@ -20,6 +20,7 @@ import { Progress } from "@/components/ui/progress";
 import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
+import { SentinelWebScanner } from "@/components/SentinelWebScanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
