@@ -502,6 +502,17 @@ export const BiometricIntegration = () => {
                 {t("biometric.pro.downloadApple")}
               </Button>
             </div>
+            <div className="mt-3 rounded-md border border-secondary/30 bg-secondary/5 p-3">
+              <p className="text-xs font-semibold text-secondary">{t("biometric.pro.securityTitle")}</p>
+              <ul className="mt-1 space-y-1 text-xs leading-relaxed text-muted-foreground">
+                <li className="break-words">{t("biometric.pro.security1")}</li>
+                <li className="break-words">{t("biometric.pro.security2")}</li>
+                <li className="break-words">{t("biometric.pro.security3")}</li>
+              </ul>
+              <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground/70">
+                SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
+              </p>
+            </div>
             {!PRO_SALES_ENABLED && (
               <p className="mt-2 text-xs leading-relaxed text-secondary">
                 {t("biometric.pro.betaOpen")}
