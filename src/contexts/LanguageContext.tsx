@@ -656,6 +656,7 @@ export const translations = {
     'biometric.pro.downloadMac': 'Mac: jeśli system zablokuje plik, kliknij go prawym przyciskiem i wybierz „Otwórz”, a następnie zezwól Terminalowi na Bluetooth w Ustawieniach → Prywatność i bezpieczeństwo → Bluetooth.',
     'biometric.pro.securityTitle': '🔒 Zabezpieczenia pobieranego silnika',
     'biometric.pro.security1': '• Silnik jest zaszyfrowany (AES-256-GCM) — nikt nie odczyta jego kodu z serwera ani z dysku.',
+    'biometric.pro.security4': '• Klucz deszyfrujący nie znajduje się już w pobieranym pliku — jest wydawany wyłącznie do pamięci po weryfikacji Twojego tokenu autoryzacji.',
     'biometric.pro.security2': '• Przed uruchomieniem sprawdzana jest suma kontrolna SHA-256; przy najmniejszej zmianie pliku start jest przerywany.',
     'biometric.pro.security3': '• Silnik działa tylko w pamięci, pobierany przez HTTPS z weryfikacją certyfikatu — nic nie zapisuje się w czystej postaci.',
     'biometric.pro.downloadLocked': 'Pobieranie silnika wymaga aktywnego dostępu PRO.',
