@@ -318,12 +318,16 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     if (totalPower > 0) {
       const value = Math.min(1, (narrow / totalPower) * 1.4);
       coherenceRef.current = value;
+      if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
       setCoherence(value);
     }
 
     setBeats(rr.length);
     setWindowSeconds(total);
-    setBpm(Math.round(60 / (total / rr.length)));
+    const nextBpm = Math.round(60 / (total / rr.length));
+    bpmRef.current = nextBpm;
+    setBpm(nextBpm);
+
   }, [T.correction, T.locked, onPhaseErrorChange]);
 
   const handleMeasurement = useCallback(
