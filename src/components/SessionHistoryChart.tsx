@@ -69,8 +69,14 @@ export const SessionHistoryChart = () => {
   useEffect(() => {
     void load();
     const { data } = supabase.auth.onAuthStateChange(() => void load());
-    return () => data.subscription.unsubscribe();
+    const onSaved = () => void load();
+    window.addEventListener("sentinel-session-saved", onSaved);
+    return () => {
+      data.subscription.unsubscribe();
+      window.removeEventListener("sentinel-session-saved", onSaved);
+    };
   }, [load]);
+
 
   const points = rows
     .filter((row) => row.coherence !== null)
