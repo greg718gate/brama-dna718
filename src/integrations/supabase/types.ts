@@ -38,12 +38,87 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          license_token: string
+          subscription_status: string
+          terms_accepted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          license_token?: string
+          subscription_status?: string
+          terms_accepted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          license_token?: string
+          subscription_status?: string
+          terms_accepted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sentinel_sessions: {
+        Row: {
+          audio_mode: string | null
+          breath_mode: string | null
+          coherence: number | null
+          created_at: string
+          duration_seconds: number | null
+          hrv_rmssd: number | null
+          id: string
+          jitter_ms: number | null
+          mean_bpm: number | null
+          phase_error: number | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          audio_mode?: string | null
+          breath_mode?: string | null
+          coherence?: number | null
+          created_at?: string
+          duration_seconds?: number | null
+          hrv_rmssd?: number | null
+          id?: string
+          jitter_ms?: number | null
+          mean_bpm?: number | null
+          phase_error?: number | null
+          source?: string
+          user_id: string
+        }
+        Update: {
+          audio_mode?: string | null
+          breath_mode?: string | null
+          coherence?: number | null
+          created_at?: string
+          duration_seconds?: number | null
+          hrv_rmssd?: number | null
+          id?: string
+          jitter_ms?: number | null
+          mean_bpm?: number | null
+          phase_error?: number | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_license_token: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

@@ -23,6 +23,7 @@ import ZetaPortal from "./pages/ZetaPortal";
 import ZetaIntegration from "./pages/ZetaIntegration";
 import ZetaFAQ from "./pages/ZetaFAQ";
 import ZetaLegal from "./pages/ZetaLegal";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,9 @@ const App = () => (
               <Route path="/gates/*" element={<GatesAtlas />} />
 
               <Route path="/prng" element={<Prng />} />
+
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/privacy/*" element={<Privacy />} />
 
               <Route path="/qf" element={<QuantumFilterDashboard />} />
               <Route path="/qf/*" element={<QuantumFilterDashboard />} />
