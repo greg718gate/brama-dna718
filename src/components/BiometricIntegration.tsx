@@ -538,6 +538,7 @@ export const BiometricIntegration = () => {
                 <li className="break-words">{t("biometric.pro.security1")}</li>
                 <li className="break-words">{t("biometric.pro.security2")}</li>
                 <li className="break-words">{t("biometric.pro.security3")}</li>
+                <li className="break-words">{t("biometric.pro.security4")}</li>
               </ul>
               <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground/70">
                 SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
