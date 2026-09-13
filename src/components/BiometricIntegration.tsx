@@ -522,8 +522,12 @@ export const BiometricIntegration = () => {
               </Button>
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground" role="status">
-                <span className={`h-2 w-2 rounded-full ${isSubscribed ? "bg-secondary" : "bg-accent"}`} />
-                {isSubscribed ? t("biometric.pro.accessActive") : t("biometric.pro.accessCheck")}
+                <span className={`h-2 w-2 rounded-full ${isSubscribed || !PRO_SALES_ENABLED ? "bg-secondary" : "bg-accent"}`} />
+                {!PRO_SALES_ENABLED
+                  ? t("biometric.pro.betaAccess")
+                  : isSubscribed
+                    ? t("biometric.pro.accessActive")
+                    : t("biometric.pro.accessCheck")}
               </div>
             </div>
           </DialogContent>
