@@ -10,7 +10,7 @@ interface AudioModeSelectorProps {
   currentPhaseError: number;
 }
 
-const BASE_FREQUENCY = 718.57012515;
+const BASE_FREQUENCY = 718.570125154269;
 const REQUESTED_SAMPLE_RATE = 44_100;
 const MAX_JITTER_SECONDS = 0.008;
 
@@ -27,6 +27,9 @@ const TEXT = {
     frequency: "Częstotliwość bazowa",
     jitter: "Aktywny jitter fazy",
     format: "Format strumienia",
+    precision: "Dokładność generatora",
+    precisionValue: "±1×10⁻¹² Hz (double-precision Web Audio)",
+    binauralNote: "Najlepiej używać dobrych słuchawek lub wzbudników — to system binauralny.",
     start: "Uruchom czysty strumień",
     stop: "Zatrzymaj strumień",
     active: "Strumień PCM aktywny",
@@ -44,6 +47,9 @@ const TEXT = {
     frequency: "Base frequency",
     jitter: "Active phase jitter",
     format: "Stream format",
+    precision: "Generator precision",
+    precisionValue: "±1×10⁻¹² Hz (double-precision Web Audio)",
+    binauralNote: "Use quality headphones or tactile transducers — this is a binaural system.",
     start: "Start clean stream",
     stop: "Stop stream",
     active: "PCM stream active",
@@ -173,7 +179,11 @@ export const AudioModeSelector = ({ onModeChange, currentPhaseError }: AudioMode
       <dl className="space-y-2 rounded-md border border-border bg-background/60 p-3">
         <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
           <dt className="text-muted-foreground">{text.frequency}:</dt>
-          <dd className="font-bold text-foreground">718.570125 Hz</dd>
+          <dd className="font-bold text-foreground">{BASE_FREQUENCY.toFixed(12)} Hz</dd>
+        </div>
+        <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
+          <dt className="text-muted-foreground">{text.precision}:</dt>
+          <dd className="text-secondary">{text.precisionValue}</dd>
         </div>
         <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
           <dt className="text-muted-foreground">{text.jitter}:</dt>
@@ -184,6 +194,13 @@ export const AudioModeSelector = ({ onModeChange, currentPhaseError }: AudioMode
           <dd className="text-primary">RAW PCM / 44100 Hz</dd>
         </div>
       </dl>
+
+      <div className="rounded-md border border-accent/30 bg-accent/5 p-3">
+        <p className="flex items-start gap-2 text-[0.7rem] leading-relaxed text-accent/90">
+          <AudioLines className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{text.binauralNote}</span>
+        </p>
+      </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant={isPlaying ? "secondary" : "glow"} className="w-full whitespace-normal sm:w-auto" onClick={isPlaying ? stopAudio : startAudio}>
