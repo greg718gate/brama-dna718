@@ -8,8 +8,10 @@
 - [x] Widget "Twój Klucz Autoryzacji Silnika (Token)" w sekcji pobierania
 - [x] Endpoint autoryzacji licencji + zapis raportów sesji z aplikacji lokalnej
 - [x] Weryfikacja 384 px bez poziomego przewijania
+- [x] Klucz AES usunięty z launcherów — wydawany do pamięci po weryfikacji tokenu
+- [x] Wykres historii postępów koherencji na bazie zapisanych sesji
 
 ## Otwarte
-- [ ] Wykres historii postępów użytkownika na bazie zapisanych sesji
-- [ ] Wymiana klucza AES w launcherach na pobieranie przez token (dziś klucz nadal w launcherze)
+- [ ] Test sesji z prawdziwym pasem Polar H10 (wymaga sprzętu użytkownika)
+- [ ] Samodzielne aplikacje .exe / .app z podpisem Authenticode i notaryzacją Apple
 - [ ] Testy płatności przed włączeniem sprzedaży (PRO_SALES_ENABLED = false)
