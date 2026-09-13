@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User } from "lucide-react";
+import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -102,6 +102,12 @@ export const BiometricIntegration = () => {
   const [proTermsAccepted, setProTermsAccepted] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
+  const [isStartingCheckout, setIsStartingCheckout] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [engineReady, setEngineReady] = useState(false);
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
@@ -187,6 +193,63 @@ export const BiometricIntegration = () => {
       description: t("biometric.pro.registrationSuccessText"),
     });
   };
+
+  const checkSubscription = useCallback(async () => {
+    setIsCheckingSubscription(true);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const signedIn = Boolean(sessionData.session);
+    setIsSignedIn(signedIn);
+
+    if (!signedIn) {
+      setIsSubscribed(false);
+      setIsCheckingSubscription(false);
+      return false;
+    }
+
+    const { data, error } = await supabase.functions.invoke("check-sentinel-subscription", { body: {} });
+    const subscribed = !error && data?.subscribed === true;
+    setIsSubscribed(subscribed);
+    setIsCheckingSubscription(false);
+    return subscribed;
+  }, []);
+
+  const openProDashboard = async () => {
+    setIsProModalOpen(true);
+    await checkSubscription();
+  };
+
+  const handleStartScanner = async () => {
+    const subscribed = await checkSubscription();
+    if (!subscribed) {
+      setIsPaymentModalOpen(true);
+      return;
+    }
+    setEngineReady(true);
+  };
+
+  const handleCheckout = async () => {
+    setIsStartingCheckout(true);
+    const { data, error } = await supabase.functions.invoke("create-sentinel-checkout", { body: {} });
+    setIsStartingCheckout(false);
+
+    if (error || !data?.url) {
+      toast({
+        title: t("biometric.pro.paymentError"),
+        description: t("biometric.pro.paymentErrorText"),
+        variant: "destructive",
+      });
+      return;
+    }
+    window.location.assign(data.url);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("sentinel_checkout") === "success") {
+      setIsProModalOpen(true);
+      void checkSubscription();
+    }
+  }, [checkSubscription]);
 
   // Ritual timer effect
   useEffect(() => {
@@ -298,7 +361,7 @@ export const BiometricIntegration = () => {
                   {t("biometric.pro.description")}
                 </p>
               </div>
-              <Button type="button" variant="glow" className="w-full sm:w-auto" onClick={() => setIsProModalOpen(true)}>
+              <Button type="button" variant="glow" className="w-full sm:w-auto" onClick={openProDashboard}>
                 <Crown className="h-4 w-4" />
                 {t("biometric.pro.activate")}
               </Button>
@@ -307,44 +370,83 @@ export const BiometricIntegration = () => {
         </Card>
 
         <Dialog open={isProModalOpen} onOpenChange={setIsProModalOpen}>
-          <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md overflow-y-auto border-secondary/40 bg-card p-0 shadow-[var(--glow-secondary)] sm:rounded-lg">
+          <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto border-secondary/40 bg-card p-0 shadow-[var(--glow-secondary)] sm:rounded-lg">
             <div className="border-b border-border bg-secondary/10 p-6 pr-12">
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl text-foreground sm:text-left">
+                  {t("biometric.pro.dashboardTitle")}
+                </DialogTitle>
+                <DialogDescription className="text-center leading-relaxed sm:text-left">
+                  {t("biometric.pro.dashboardDescription")}
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+
+            <div className="space-y-6 p-5 sm:p-7">
+              <ol className="grid gap-3 sm:grid-cols-3">
+                {[
+                  [Bluetooth, "biometric.pro.stepPolar"],
+                  [Monitor, "biometric.pro.stepEngine"],
+                  [ScanLine, "biometric.pro.stepStart"],
+                ].map(([Icon, key], index) => (
+                  <li key={key as string} className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-md border border-border bg-background/40 p-4 text-center">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-secondary/40 text-secondary">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-xs font-bold text-accent">0{index + 1}</span>
+                    <span className="text-sm leading-snug text-foreground/90">{t(key as string)}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <Button
+                type="button"
+                variant={engineReady ? "secondary" : "glow"}
+                size="xl"
+                className={`min-h-20 w-full whitespace-normal px-5 text-center text-base font-bold sm:text-lg ${engineReady ? "" : "animate-pulse"}`}
+                onClick={handleStartScanner}
+                disabled={isCheckingSubscription || engineReady}
+              >
+                {isCheckingSubscription ? <Loader2 className="h-6 w-6 animate-spin" /> : engineReady ? <Check className="h-6 w-6" /> : <ScanLine className="h-6 w-6" />}
+                {engineReady ? t("biometric.pro.engineReady") : t("biometric.pro.startScanner")}
+              </Button>
+
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground" role="status">
+                <span className={`h-2 w-2 rounded-full ${isSubscribed ? "bg-secondary" : "bg-accent"}`} />
+                {isSubscribed ? t("biometric.pro.accessActive") : t("biometric.pro.accessCheck")}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+          <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md overflow-y-auto border-accent/40 bg-card p-0 shadow-[var(--glow-accent)] sm:rounded-lg">
+            <div className="border-b border-border bg-accent/10 p-6 pr-12">
               <DialogHeader>
                 <div className="mb-2 flex items-center justify-center gap-2 text-accent sm:justify-start">
                   <Crown className="h-5 w-5" />
                   <span className="text-xs font-bold uppercase tracking-widest">BRAMA DNA 718 PRO</span>
                 </div>
-                <DialogTitle className="text-center text-2xl text-foreground sm:text-left">
-                  {t("biometric.pro.modalTitle")}
-                </DialogTitle>
-                <DialogDescription className="text-center leading-relaxed sm:text-left">
-                  {t("biometric.pro.modalDescription")}
-                </DialogDescription>
+                <DialogTitle className="text-center text-2xl text-foreground sm:text-left">{t("biometric.pro.modalTitle")}</DialogTitle>
+                <DialogDescription className="text-center leading-relaxed sm:text-left">{t("biometric.pro.modalDescription")}</DialogDescription>
               </DialogHeader>
             </div>
-
             <div className="space-y-5 p-6">
               <div className="flex items-end justify-center gap-2 rounded-md border border-accent/30 bg-accent/10 p-4">
                 <span className="text-4xl font-bold text-accent">£19</span>
                 <span className="pb-1 text-sm text-muted-foreground">{t("biometric.pro.perMonth")}</span>
               </div>
-
               <ul className="space-y-2 text-sm text-foreground/85">
                 {["biometric.pro.benefitPolar", "biometric.pro.benefitCoherence", "biometric.pro.benefitDecoder"].map((key) => (
-                  <li key={key} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                    <span>{t(key)}</span>
-                  </li>
+                  <li key={key} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-secondary" /><span>{t(key)}</span></li>
                 ))}
               </ul>
-
-              {registrationComplete ? (
-                <div className="space-y-3 rounded-md border border-secondary/40 bg-secondary/10 p-5 text-center" role="status">
-                  <Check className="mx-auto h-8 w-8 text-secondary" />
-                  <h4 className="font-bold text-foreground">{t("biometric.pro.registrationSuccess")}</h4>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{t("biometric.pro.registrationSuccessText")}</p>
-                  <Button type="button" variant="secondary" className="w-full" onClick={() => setIsProModalOpen(false)}>
-                    {t("biometric.pro.close")}
+              {isSignedIn || registrationComplete ? (
+                <div className="space-y-3">
+                  {registrationComplete && <p className="text-center text-sm text-secondary">{t("biometric.pro.registrationSuccessText")}</p>}
+                  <Button type="button" variant="glow" className="w-full" onClick={handleCheckout} disabled={isStartingCheckout || registrationComplete}>
+                    {isStartingCheckout ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
+                    {registrationComplete ? t("biometric.pro.confirmEmail") : t("biometric.pro.payNow")}
                   </Button>
                 </div>
               ) : (
@@ -380,7 +482,6 @@ export const BiometricIntegration = () => {
                     <Crown className="h-4 w-4" />
                     {isRegistering ? t("biometric.pro.registering") : t("biometric.pro.register")}
                   </Button>
-                  <p className="text-center text-xs leading-relaxed text-muted-foreground">{t("biometric.pro.paymentNote")}</p>
                 </form>
               )}
             </div>
