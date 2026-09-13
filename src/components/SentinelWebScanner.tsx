@@ -214,14 +214,64 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const [modeIndex, setModeIndex] = useState(1);
   const [pacerPhase, setPacerPhase] = useState({ inhale: true, percent: 0 });
   const [lensRadius, setLensRadius] = useState(10);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [ritualSeconds, setRitualSeconds] = useState(0);
+  const [ritualDone, setRitualDone] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  const maxCoherenceRef = useRef(0);
+  const bpmRef = useRef<number | null>(null);
+  const savedRef = useRef(false);
 
   const breathDuration = BREATH_MODES[modeIndex].duration;
   const breathDurationRef = useRef(breathDuration);
   breathDurationRef.current = breathDuration;
+  const modeNameRef = useRef(BREATH_MODES[modeIndex].name);
+  modeNameRef.current = BREATH_MODES[modeIndex].name;
 
   useEffect(() => {
     setSupported(typeof navigator !== "undefined" && "bluetooth" in navigator);
   }, []);
+
+  /** Background write of the finished 108 s ritual into the user's session history. */
+  const saveRitual = useCallback(async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (!user) {
+      setSaveFailed(true);
+      return;
+    }
+    const { error } = await supabase.from("sentinel_sessions").insert({
+      user_id: user.id,
+      coherence: Number(maxCoherenceRef.current.toFixed(4)),
+      phase_error: Number(phaseErrorRef.current.toFixed(4)),
+      mean_bpm: bpmRef.current,
+      duration_seconds: RITUAL_SECONDS,
+      breath_mode: modeNameRef.current,
+      source: "web_scanner",
+    });
+    setSaveFailed(Boolean(error));
+    if (!error) window.dispatchEvent(new Event("sentinel-session-saved"));
+  }, []);
+
+  // "CZAS RYTUAŁU" — 0 -> 108 s counter with automatic background save at 108 s.
+  useEffect(() => {
+    if (!connected) return;
+    const timer = window.setInterval(() => {
+      setRitualSeconds((prev) => {
+        const next = prev + 1;
+        if (next >= RITUAL_SECONDS && !savedRef.current) {
+          savedRef.current = true;
+          setRitualDone(true);
+          void saveRitual();
+        }
+        return next;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [connected, saveRitual]);
+
+
 
   const analyse = useCallback(() => {
     const rr = rrRef.current;
