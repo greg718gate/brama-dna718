@@ -69,6 +69,12 @@ const Auth = () => {
           description: tr("Witaj z powrotem!", "Welcome back!"),
         });
       } else {
+        if (!termsAccepted) {
+          throw new Error(tr(
+            "Zaakceptuj Regulamin i Politykę Prywatności danych biometrycznych, aby kontynuować.",
+            "Accept the Terms and Privacy Policy for biometric data to continue.",
+          ));
+        }
         const { error } = await supabase.auth.signUp({
           email: validated.email,
           password: validated.password,
@@ -163,6 +169,29 @@ const Auth = () => {
                 />
               </div>
             </div>
+            {!isLogin && (
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="auth-terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className="mt-0.5"
+                  required
+                />
+                <Label
+                  htmlFor="auth-terms"
+                  className="cursor-pointer break-words text-xs font-normal leading-relaxed text-muted-foreground"
+                >
+                  {tr(
+                    "Akceptuję Regulamin i Politykę Prywatności danych biometrycznych",
+                    "I accept the Terms and Privacy Policy for biometric data",
+                  )}{" "}
+                  <Link to="/privacy" target="_blank" className="text-secondary underline">
+                    /privacy
+                  </Link>
+                </Label>
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading
                 ? tr("Proszę czekać...", "Please wait...")
