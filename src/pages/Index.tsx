@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn, LogOut } from "lucide-react";
+import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn, LogOut, Crown } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { AuthDialog } from "@/components/AuthDialog";
 
@@ -37,6 +37,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("start");
   const [operator, setOperator] = useState<User | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
+  const [pricingRequest, setPricingRequest] = useState(0);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -125,6 +126,15 @@ const Index = () => {
             {language === "pl" ? "Zaloguj się / Rejestracja" : "Sign in / Register"}
           </Button>
         )}
+        <Button
+          type="button"
+          onClick={() => setPricingRequest((request) => request + 1)}
+          variant="outline"
+          className="col-span-2 h-10 w-full animate-premium-pulse border-premium/80 bg-premium/10 px-3 text-xs font-bold text-premium hover:bg-premium/20 hover:text-premium md:w-auto md:text-sm motion-reduce:animate-none"
+        >
+          <Crown className="h-4 w-4" />
+          {language === "pl" ? "✦ AKTYWUJ DOSTĘP PRO ✦" : "✦ ACTIVATE PRO ACCESS ✦"}
+        </Button>
         <Button
           onClick={() => navigate("/decoder")}
           variant="glow"
@@ -225,7 +235,7 @@ const Index = () => {
 
               {/* Biometric Integration */}
               <div id="biometric-section">
-                <BiometricIntegration />
+                <BiometricIntegration pricingRequest={pricingRequest} />
               </div>
 
               {/* Luma's Message */}

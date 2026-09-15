@@ -22,6 +22,7 @@ const MAGIC_ANGLE = (54.7356 * Math.PI) / 180;
 const NUM_PHOTONS = 800;
 const RR_WINDOW_SECONDS = 128;
 const RITUAL_SECONDS = 108;
+const ADAPTATION_SECONDS = 30;
 
 const HEART_RATE_SERVICE = "heart_rate";
 const HEART_RATE_MEASUREMENT = "heart_rate_measurement";
@@ -80,6 +81,7 @@ const TXT = {
       "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
     modeProgress: "Tryb badania",
     switchingMode: "Zapisywanie wyniku i przełączanie trybu…",
+    adapting: "Adaptacja układu autonomicznego — pomiar rozpocznie się za {s} s",
     finalAverage: "Średnia koherencja pełnego badania",
     adviceLow:
       "Twój układ nerwowy wykazuje wysoki poziom szumu stresowego. Zalecane: Skup się na wydłużeniu wydechu w Trybie 2 (Złotym) przez kolejne 7 dni.",
@@ -135,6 +137,7 @@ const TXT = {
       "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
     modeProgress: "Study mode",
     switchingMode: "Saving the result and switching mode…",
+    adapting: "Autonomic adaptation — measurement begins in {s} s",
     finalAverage: "Full-study average coherence",
     adviceLow:
       "Your nervous system shows a high level of stress noise. Recommended: focus on extending the exhale in Mode 2 (Golden) for the next 7 days.",
@@ -243,6 +246,8 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const bpmRef = useRef<number | null>(null);
   const transitionRef = useRef(false);
   const modeCoherencesRef = useRef<number[]>([]);
+  const ritualSecondsRef = useRef(ritualSeconds);
+  ritualSecondsRef.current = ritualSeconds;
 
   const breathDuration = BREATH_MODES[modeIndex].duration;
   const breathDurationRef = useRef(breathDuration);
@@ -408,13 +413,20 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       if (energyPresent) offset += 2;
 
       let added = false;
+      const adapting = ritualSecondsRef.current < ADAPTATION_SECONDS;
       while (rrPresent && value.byteLength >= offset + 2) {
         const rrSeconds = value.getUint16(offset, true) / 1024;
         offset += 2;
-        if (rrSeconds > 0.3 && rrSeconds < 2.0) {
+        if (!adapting && rrSeconds > 0.3 && rrSeconds < 2.0) {
           rrRef.current.push(rrSeconds);
           added = true;
         }
+      }
+
+      const measuredBpm = hrFormat16 ? value.getUint16(1, true) : value.getUint8(1);
+      if (measuredBpm > 0) {
+        bpmRef.current = measuredBpm;
+        setBpm(measuredBpm);
       }
 
       while (rrRef.current.length > 1 && rrRef.current.reduce((s, v) => s + v, 0) > RR_WINDOW_SECONDS) {
@@ -593,6 +605,8 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   }, [connected, beats, phaseError, T.syncWaiting, T.syncLocked, T.syncSlow, T.syncFast]);
 
   const collapsed = coherence >= COHERENCE_THRESHOLD;
+  const isAdapting = connected && ritualSeconds < ADAPTATION_SECONDS;
+  const adaptationRemaining = Math.max(0, ADAPTATION_SECONDS - ritualSeconds);
 
 
   return (
@@ -689,6 +703,12 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
           {switchingMode && (
             <p className="rounded-md border border-secondary/30 bg-secondary/5 p-3 text-xs text-secondary" role="status">
               {T.switchingMode}
+            </p>
+          )}
+
+          {isAdapting && !switchingMode && (
+            <p className="rounded-md border border-premium/40 bg-premium/10 p-3 text-xs font-medium text-premium" role="status">
+              {T.adapting.replace("{s}", String(adaptationRemaining))}
             </p>
           )}
 

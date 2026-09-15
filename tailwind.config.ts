@@ -39,6 +39,10 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        premium: {
+          DEFAULT: "hsl(var(--premium))",
+          foreground: "hsl(var(--premium-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -80,10 +84,15 @@ export default {
             height: "0",
           },
         },
+        "premium-pulse": {
+          "0%, 100%": { boxShadow: "var(--glow-premium)", opacity: "1" },
+          "50%": { boxShadow: "0 0 4px hsl(var(--premium) / 0.35), 0 0 12px hsl(var(--premium) / 0.16)", opacity: "0.92" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "premium-pulse": "premium-pulse 2.4s ease-in-out infinite",
       },
     },
   },

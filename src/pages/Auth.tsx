@@ -17,6 +17,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language, t } = useLanguage();
@@ -75,7 +76,7 @@ const Auth = () => {
             "Accept the Terms and Privacy Policy for biometric data to continue.",
           ));
         }
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: validated.email,
           password: validated.password,
           options: {
@@ -89,12 +90,18 @@ const Auth = () => {
           }
           throw error;
         }
+        if (data.session) {
+          await supabase.auth.signOut();
+        }
 
         toast({
-          title: tr("Konto utworzone", "Account created"),
-          description: tr("Możesz się teraz zalogować", "You can now sign in"),
+          title: tr("✦ Weryfikacja Matrycy ✦", "✦ Matrix Verification ✦"),
+          description: tr(
+            "Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go, aby wygenerować swój Token Autoryzacji Silnika.",
+            "We sent an activation link to your email address. Confirm it to generate your Engine Authorization Token.",
+          ),
         });
-        setIsLogin(true);
+        setVerificationPending(true);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -141,7 +148,17 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {verificationPending ? (
+            <div className="rounded-md border border-premium/50 bg-premium/10 p-4 text-center" role="status">
+              <p className="font-bold text-premium">{tr("✦ Weryfikacja Matrycy ✦", "✦ Matrix Verification ✦")}</p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                {tr(
+                  "Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go, aby wygenerować swój Token Autoryzacji Silnika.",
+                  "We sent an activation link to your email address. Confirm it to generate your Engine Authorization Token.",
+                )}
+              </p>
+            </div>
+          ) : <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
@@ -199,9 +216,9 @@ const Auth = () => {
                 ? tr("Zaloguj się", "Sign in")
                 : tr("Zarejestruj się", "Register")}
             </Button>
-          </form>
+          </form>}
 
-          <div className="mt-4 text-center">
+          {!verificationPending && <div className="mt-4 text-center">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
@@ -211,7 +228,7 @@ const Auth = () => {
                 ? tr("Nie masz konta? Zarejestruj się", "No account? Register")
                 : tr("Masz już konto? Zaloguj się", "Already have an account? Sign in")}
             </button>
-          </div>
+          </div>}
         </CardContent>
       </Card>
     </div>
