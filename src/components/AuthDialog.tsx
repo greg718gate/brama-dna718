@@ -1,0 +1,170 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Mail, Lock, ShieldCheck } from "lucide-react";
+import { z } from "zod";
+
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+interface AuthDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const { language } = useLanguage();
+  const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
+
+  const authSchema = z.object({
+    email: z.string().email(tr("Nieprawidłowy adres email", "Invalid email address")),
+    password: z.string().min(6, tr("Hasło musi mieć minimum 6 znaków", "Password must be at least 6 characters")),
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const validated = authSchema.parse({ email, password });
+
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: validated.email,
+          password: validated.password,
+        });
+        if (error) {
+          if (error.message.includes("Invalid login credentials")) {
+            throw new Error(tr("Nieprawidłowy email lub hasło", "Invalid email or password"));
+          }
+          throw error;
+        }
+        toast({ title: tr("Zalogowano pomyślnie", "Signed in successfully"), description: tr("Witaj z powrotem!", "Welcome back!") });
+        onOpenChange(false);
+      } else {
+        if (!termsAccepted) {
+          throw new Error(tr(
+            "Zaakceptuj Regulamin i Politykę Prywatności danych biometrycznych, aby kontynuować.",
+            "Accept the Terms and Privacy Policy for biometric data to continue.",
+          ));
+        }
+        const { error } = await supabase.auth.signUp({
+          email: validated.email,
+          password: validated.password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+        if (error) throw error;
+        toast({
+          title: tr("Konto utworzone", "Account created"),
+          description: tr("Sprawdź skrzynkę email, aby potwierdzić rejestrację.", "Check your inbox to confirm your registration."),
+        });
+        onOpenChange(false);
+      }
+    } catch (err) {
+      toast({
+        title: tr("Błąd", "Error"),
+        description: err instanceof Error ? err.message : tr("Wystąpił nieznany błąd", "An unknown error occurred"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-sm border-border bg-background/95 backdrop-blur-md">
+        <DialogHeader>
+          <DialogTitle className="text-primary">
+            {isLogin ? tr("Logowanie Operatora", "Operator Sign In") : tr("Rejestracja Operatora", "Operator Registration")}
+          </DialogTitle>
+          <DialogDescription>
+            {isLogin
+              ? tr("Uzyskaj dostęp do panelu SENTINEL-718.", "Access the SENTINEL-718 panel.")
+              : tr("Utwórz konto, aby zapisywać sesje i klucz autoryzacji.", "Create an account to save sessions and your authorization key.")}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="dialog-auth-email">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="dialog-auth-email"
+                type="email"
+                placeholder="operator@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dialog-auth-password">{tr("Hasło", "Password")}</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="dialog-auth-password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+
+          {!isLogin && (
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="dialog-auth-terms"
+                checked={termsAccepted}
+                onCheckedChange={(c) => setTermsAccepted(c === true)}
+              />
+              <Label htmlFor="dialog-auth-terms" className="text-xs font-normal leading-snug text-muted-foreground">
+                {tr("Akceptuję ", "I accept the ")}
+                <Link to="/privacy" className="text-primary underline" onClick={() => onOpenChange(false)}>
+                  {tr("Regulamin i Politykę Prywatności danych biometrycznych", "Terms and Privacy Policy for biometric data")}
+                </Link>
+                .
+              </Label>
+            </div>
+          )}
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            <ShieldCheck className="h-4 w-4" />
+            {loading
+              ? tr("Przetwarzanie…", "Processing…")
+              : isLogin
+                ? tr("Zaloguj się", "Sign in")
+                : tr("Zarejestruj się", "Create account")}
+          </Button>
+        </form>
+
+        <button
+          type="button"
+          onClick={() => setIsLogin((v) => !v)}
+          className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
+        >
+          {isLogin
+            ? tr("Nie masz konta? Zarejestruj się", "No account? Register")
+            : tr("Masz już konto? Zaloguj się", "Already have an account? Sign in")}
+        </button>
+      </DialogContent>
+    </Dialog>
+  );
+};
