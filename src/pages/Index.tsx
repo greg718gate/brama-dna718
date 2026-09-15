@@ -359,6 +359,7 @@ const Index = () => {
           </div>
         </div>
       </div>
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 };
