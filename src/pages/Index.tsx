@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Sparkles, BookOpen, Archive } from "lucide-react";
+import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import PentagramMatrix from "@/components/PentagramMatrix";
 import RiemannMatrixReport from "@/components/RiemannMatrixReport";
 import DnaIntervalAnalysisReport from "@/components/DnaIntervalAnalysisReport";
 import { EditorialNote } from "@/components/EditorialNote";
+import { supabase } from "@/integrations/supabase/client";
 
 // Footer components
 import { Comments } from "@/components/Comments";
@@ -29,9 +31,18 @@ import { DonationButton } from "@/components/DonationButton";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [silenceCounter, setSilenceCounter] = useState(1);
   const [activeTab, setActiveTab] = useState("start");
+  const [operator, setOperator] = useState<User | null>(null);
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => setOperator(data.user));
+    const { data } = supabase.auth.onAuthStateChange((_, session) => {
+      setOperator(session?.user ?? null);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -78,6 +89,26 @@ const Index = () => {
         aria-label={t("nav.main") !== "nav.main" ? t("nav.main") : "Główna nawigacja"}
         className="fixed top-0 left-0 right-0 z-50 grid grid-cols-2 gap-2 border-b border-border bg-background/95 p-2 backdrop-blur-md md:left-auto md:top-4 md:right-4 md:flex md:w-auto md:border-0 md:bg-transparent md:p-0"
       >
+        {operator?.email ? (
+          <div
+            className="col-span-2 flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md border border-secondary/40 bg-secondary/10 px-3 text-center text-xs font-semibold text-secondary md:order-first md:max-w-72"
+            role="status"
+          >
+            <span className="h-2 w-2 shrink-0 rounded-full bg-secondary shadow-[var(--glow-secondary)]" aria-hidden="true" />
+            <span className="min-w-0 break-all">
+              {language === "pl" ? "OPERATOR ZALOGOWANY" : "OPERATOR SIGNED IN"}: {operator.email}
+            </span>
+          </div>
+        ) : (
+          <Button
+            onClick={() => navigate("/auth")}
+            variant="outline"
+            className="col-span-2 h-10 w-full border-secondary/50 bg-background text-xs text-secondary shadow-lg md:order-first md:w-auto md:text-sm"
+          >
+            <LogIn className="h-4 w-4" />
+            {language === "pl" ? "Zaloguj się / Rejestracja" : "Sign in / Register"}
+          </Button>
+        )}
         <Button
           onClick={() => navigate("/decoder")}
           variant="glow"

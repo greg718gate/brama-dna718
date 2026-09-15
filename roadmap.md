@@ -14,12 +14,12 @@
 - [x] Automatyczny zapis sesji po 108 s + odświeżenie wykresu historii
 - [x] Sekcja "Status Certyfikacji i Sygnatur Cyfrowych" w panelu pobierania
 - [x] Runbook podpisywania aplikacji (Zeta-Core/docs/CODE_SIGNING.md)
+- [x] Logowanie/rejestracja na górze strony + status zalogowanego operatora
+- [x] Automatyczna pętla czterech trybów po 108 s z zapisem wyników cząstkowych
+- [x] Końcowa wskazówka na podstawie średniej koherencji całego badania
+- [x] Wykres i statystyki historii wyłącznie z rzeczywistych sesji i trybów oddechu
 
 ## Otwarte
-- [ ] Przenieść logowanie/rejestrację na górę strony i pokazywać status zalogowanego operatora
-- [ ] Uruchomić automatyczną pętlę czterech trybów po 108 s z zapisem wyników cząstkowych
-- [ ] Dodać końcową wskazówkę na podstawie średniej koherencji całego badania
-- [ ] Oprzeć wykres i statystyki historii wyłącznie na rzeczywistych zapisach sesji i trybach oddechu
 - [ ] Test sesji z prawdziwym pasem Polar H10 (wymaga sprzętu użytkownika)
 - [ ] Wykupienie certyfikatów: Windows Authenticode (OV/EV) i Apple Developer ID
 - [ ] Samodzielne aplikacje .exe / .app z podpisem i notaryzacją

@@ -103,12 +103,12 @@ export const Comments = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("comments.title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {user ? (
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("comments.title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
                 placeholder={t("comments.namePlaceholder")}
@@ -129,21 +129,9 @@ export const Comments = () => {
                 {mutation.isPending ? t("comments.sending") : t("comments.submit")}
               </Button>
             </form>
-          ) : (
-            <div className="text-center py-6 space-y-4">
-              <p className="text-muted-foreground">
-                Zaloguj się, aby dodać komentarz
-              </p>
-              <Button 
-                variant="outline" 
-                onClick={() => window.location.href = '/auth'}
-              >
-                Zaloguj się
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">{t("comments.allComments")}</h3>
