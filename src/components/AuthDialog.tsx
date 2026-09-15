@@ -23,6 +23,7 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
   const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
@@ -59,17 +60,23 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
             "Accept the Terms and Privacy Policy for biometric data to continue.",
           ));
         }
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: validated.email,
           password: validated.password,
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        if (data.session) {
+          await supabase.auth.signOut();
+        }
+        setVerificationPending(true);
         toast({
-          title: tr("Konto utworzone", "Account created"),
-          description: tr("Sprawdź skrzynkę email, aby potwierdzić rejestrację.", "Check your inbox to confirm your registration."),
+          title: tr("✦ Weryfikacja Matrycy ✦", "✦ Matrix Verification ✦"),
+          description: tr(
+            "Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go, aby wygenerować swój Token Autoryzacji Silnika.",
+            "We sent an activation link to your email address. Confirm it to generate your Engine Authorization Token.",
+          ),
         });
-        onOpenChange(false);
       }
     } catch (err) {
       toast({
@@ -96,7 +103,17 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {verificationPending ? (
+          <div className="rounded-md border border-premium/50 bg-premium/10 p-4 text-center" role="status">
+            <p className="font-bold text-premium">{tr("✦ Weryfikacja Matrycy ✦", "✦ Matrix Verification ✦")}</p>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+              {tr(
+                "Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go, aby wygenerować swój Token Autoryzacji Silnika.",
+                "We sent an activation link to your email address. Confirm it to generate your Engine Authorization Token.",
+              )}
+            </p>
+          </div>
+        ) : <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="dialog-auth-email">Email</Label>
             <div className="relative">
@@ -153,9 +170,9 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
                 ? tr("Zaloguj się", "Sign in")
                 : tr("Zarejestruj się", "Create account")}
           </Button>
-        </form>
+        </form>}
 
-        <button
+        {!verificationPending && <button
           type="button"
           onClick={() => setIsLogin((v) => !v)}
           className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:text-primary hover:underline"
@@ -163,7 +180,7 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           {isLogin
             ? tr("Nie masz konta? Zarejestruj się", "No account? Register")
             : tr("Masz już konto? Zaloguj się", "Already have an account? Sign in")}
-        </button>
+        </button>}
       </DialogContent>
     </Dialog>
   );

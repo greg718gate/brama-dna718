@@ -57,9 +57,10 @@ export const LicenseTokenWidget = () => {
     setFailed(false);
     const { data: userData } = await supabase.auth.getUser();
     const user = userData.user;
-    setSignedIn(Boolean(user));
+    const emailConfirmed = Boolean(user?.email_confirmed_at);
+    setSignedIn(Boolean(user) && emailConfirmed);
 
-    if (!user) {
+    if (!user || !emailConfirmed) {
       setToken(null);
       setLoading(false);
       return;

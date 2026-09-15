@@ -90,7 +90,11 @@ const getCoherenceState = (syncPercentage: number): CoherenceState => {
 // Ustaw na true, aby ponownie włączyć subskrypcję £19/mies.
 const PRO_SALES_ENABLED = false;
 
-export const BiometricIntegration = () => {
+interface BiometricIntegrationProps {
+  pricingRequest?: number;
+}
+
+export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegrationProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [bpm, setBpm] = useState("");
@@ -125,6 +129,9 @@ export const BiometricIntegration = () => {
   const [isSpecOpen, setIsSpecOpen] = useState(false);
   const [audioMode, setAudioMode] = useState<AudioStreamMode>("static");
   const [scannerPhaseError, setScannerPhaseError] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
@@ -185,7 +192,7 @@ export const BiometricIntegration = () => {
     }
 
     setIsRegistering(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: validation.data.email,
       password: validation.data.password,
       options: {
@@ -204,10 +211,23 @@ export const BiometricIntegration = () => {
       return;
     }
 
+    if (data.session) {
+      await supabase.auth.signOut();
+    }
+
     setRegistrationComplete(true);
     toast({
       title: t("biometric.pro.registrationSuccess"),
       description: t("biometric.pro.registrationSuccessText"),
+    });
+  };
+
+  const handlePromoCode = () => {
+    const valid = promoCode.trim().toUpperCase() === "LAUNCH718";
+    setPromoApplied(valid);
+    toast({
+      title: valid ? t("biometric.pro.promoApplied") : t("biometric.pro.promoInvalid"),
+      variant: valid ? "default" : "destructive",
     });
   };
 
@@ -271,6 +291,10 @@ export const BiometricIntegration = () => {
   };
 
   const handleCheckout = async () => {
+    if (!PRO_SALES_ENABLED) {
+      toast({ title: t("biometric.pro.betaPaymentPaused") });
+      return;
+    }
     setIsStartingCheckout(true);
     const { data, error } = await supabase.functions.invoke("create-sentinel-checkout", { body: {} });
     setIsStartingCheckout(false);
@@ -293,6 +317,10 @@ export const BiometricIntegration = () => {
       void checkSubscription();
     }
   }, [checkSubscription]);
+
+  useEffect(() => {
+    if (pricingRequest > 0) setIsPaymentModalOpen(true);
+  }, [pricingRequest]);
 
   // Ritual timer effect
   useEffect(() => {
@@ -590,7 +618,7 @@ export const BiometricIntegration = () => {
         </Dialog>
 
         <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
-          <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md overflow-y-auto border-accent/40 bg-card p-0 shadow-[var(--glow-accent)] sm:rounded-lg">
+          <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-6xl overflow-y-auto border-premium/40 bg-card p-0 shadow-[var(--glow-premium)] sm:rounded-lg">
             <div className="border-b border-border bg-accent/10 p-6 pr-12">
               <DialogHeader>
                 <div className="mb-2 flex items-center justify-center gap-2 text-accent sm:justify-start">
@@ -601,10 +629,45 @@ export const BiometricIntegration = () => {
                 <DialogDescription className="text-center leading-relaxed sm:text-left">{t("biometric.pro.modalDescription")}</DialogDescription>
               </DialogHeader>
             </div>
-            <div className="space-y-5 p-6">
-              <div className="flex items-end justify-center gap-2 rounded-md border border-accent/30 bg-accent/10 p-4">
-                <span className="text-4xl font-bold text-accent">£19</span>
-                <span className="pb-1 text-sm text-muted-foreground">{t("biometric.pro.perMonth")}</span>
+            <div className="space-y-5 p-4 sm:p-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { id: "monthly", name: t("biometric.pro.planMonth"), price: "£19", period: t("biometric.pro.planMonthPeriod"), detail: t("biometric.pro.planMonthDetail") },
+                  { id: "quarterly", name: t("biometric.pro.planQuarter"), price: "£48", period: t("biometric.pro.planQuarterPeriod"), detail: t("biometric.pro.planQuarterDetail") },
+                  { id: "halfYear", name: t("biometric.pro.planHalfYear"), price: "£84", period: t("biometric.pro.planHalfYearPeriod"), detail: t("biometric.pro.planHalfYearDetail") },
+                  { id: "yearly", name: t("biometric.pro.planYear"), price: "£114", period: t("biometric.pro.planYearPeriod"), detail: t("biometric.pro.planYearDetail"), badge: t("biometric.pro.bestValue") },
+                ].map((plan) => (
+                  <button
+                    key={plan.id}
+                    type="button"
+                    onClick={() => setSelectedPlan(plan.id)}
+                    className={`relative min-h-44 rounded-md border p-4 text-left transition-colors ${selectedPlan === plan.id ? "border-premium bg-premium/10 shadow-[var(--glow-premium)]" : "border-border bg-background/40 hover:border-premium/50"}`}
+                    aria-pressed={selectedPlan === plan.id}
+                  >
+                    {plan.badge && <span className="mb-3 inline-block rounded-sm bg-accent px-2 py-1 text-[0.65rem] font-bold text-accent-foreground">{plan.badge}</span>}
+                    <span className="block text-sm font-bold text-foreground">{plan.name}</span>
+                    <span className="mt-3 block text-3xl font-bold text-premium">{plan.price}</span>
+                    <span className="block text-xs text-muted-foreground">{plan.period}</span>
+                    <span className="mt-3 block text-xs font-medium text-secondary">{plan.detail}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="rounded-md border border-border bg-background/40 p-3">
+                <Label htmlFor="pro-promo" className="text-xs text-foreground">{t("biometric.pro.promoLabel")}</Label>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    id="pro-promo"
+                    value={promoCode}
+                    onChange={(event) => { setPromoCode(event.target.value.slice(0, 24)); setPromoApplied(false); }}
+                    placeholder="LAUNCH718"
+                    className="uppercase"
+                    maxLength={24}
+                  />
+                  <Button type="button" variant="outline" onClick={handlePromoCode}>{t("biometric.pro.applyPromo")}</Button>
+                </div>
+                <p className={`mt-2 text-xs ${promoApplied ? "text-secondary" : "text-muted-foreground"}`}>
+                  {promoApplied ? t("biometric.pro.promoDiscount") : t("biometric.pro.promoNote")}
+                </p>
               </div>
               <ul className="space-y-2 text-sm text-foreground/85">
                 {["biometric.pro.benefitPolar", "biometric.pro.benefitCoherence", "biometric.pro.benefitDecoder"].map((key) => (
@@ -613,10 +676,10 @@ export const BiometricIntegration = () => {
               </ul>
               {isSignedIn || registrationComplete ? (
                 <div className="space-y-3">
-                  {registrationComplete && <p className="text-center text-sm text-secondary">{t("biometric.pro.registrationSuccessText")}</p>}
-                  <Button type="button" variant="glow" className="w-full" onClick={handleCheckout} disabled={isStartingCheckout || registrationComplete}>
+                  {registrationComplete && <p className="rounded-md border border-premium/40 bg-premium/10 p-3 text-center text-sm leading-relaxed text-premium">{t("biometric.pro.registrationSuccessText")}</p>}
+                  <Button type="button" variant="outline" className="w-full border-muted text-muted-foreground" onClick={handleCheckout} disabled={!PRO_SALES_ENABLED || isStartingCheckout || registrationComplete}>
                     {isStartingCheckout ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                    {registrationComplete ? t("biometric.pro.confirmEmail") : t("biometric.pro.payNow")}
+                    {registrationComplete ? t("biometric.pro.confirmEmail") : t("biometric.pro.betaPaymentPaused")}
                   </Button>
                 </div>
               ) : (
