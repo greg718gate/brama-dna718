@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn } from "lucide-react";
+import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn, LogOut } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { AuthDialog } from "@/components/AuthDialog";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,12 @@ const Index = () => {
   const [silenceCounter, setSilenceCounter] = useState(1);
   const [activeTab, setActiveTab] = useState("start");
   const [operator, setOperator] = useState<User | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setOperator(null);
+  };
 
   useEffect(() => {
     void supabase.auth.getUser().then(({ data }) => setOperator(data.user));
