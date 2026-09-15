@@ -1,6 +1,9 @@
 # Roadmap — Brama DNA 718
 
 ## Zrobione
+- [x] Serwerowy bypass subskrypcji PRO dla konta administratora i uproszczony widok zalogowanego operatora
+- [x] Specyfikacja projektu i historia badań nad cennikiem PRO
+- [x] Podgląd hasła w logowaniu i rejestracji
 - [x] Tryby audio (statyczny / dynamiczny jitter) w panelu SENTINEL-718
 - [x] Podstrona /privacy — regulamin i polityka danych biometrycznych (PL/EN)
 - [x] Wymagana zgoda na regulamin w rejestracji konta (panel PRO + /auth)

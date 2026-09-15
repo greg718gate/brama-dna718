@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Lock, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [verificationPending, setVerificationPending] = useState(false);
@@ -135,13 +136,24 @@ export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="dialog-auth-password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
+                className="pl-10 pr-10"
                 required
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowPassword((visible) => !visible)}
+                className="absolute right-1 top-1 h-8 w-8 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? tr("Ukryj hasło", "Hide password") : tr("Pokaż hasło", "Show password")}
+                title={showPassword ? tr("Ukryj hasło", "Hide password") : tr("Pokaż hasło", "Show password")}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
           </div>
 

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, Lock, User } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -15,6 +15,7 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [verificationPending, setVerificationPending] = useState(false);
@@ -176,14 +177,25 @@ const Auth = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder={tr("Hasło (min. 6 znaków)", "Password (min. 6 characters)")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                   required
                   minLength={6}
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute right-1 top-1 h-8 w-8 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? tr("Ukryj hasło", "Hide password") : tr("Pokaż hasło", "Show password")}
+                  title={showPassword ? tr("Ukryj hasło", "Hide password") : tr("Pokaż hasło", "Show password")}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
             {!isLogin && (
