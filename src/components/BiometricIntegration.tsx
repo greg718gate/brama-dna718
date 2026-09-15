@@ -291,6 +291,10 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   };
 
   const handleCheckout = async () => {
+    if (!PRO_SALES_ENABLED) {
+      toast({ title: t("biometric.pro.betaPaymentPaused") });
+      return;
+    }
     setIsStartingCheckout(true);
     const { data, error } = await supabase.functions.invoke("create-sentinel-checkout", { body: {} });
     setIsStartingCheckout(false);

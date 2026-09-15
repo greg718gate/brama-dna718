@@ -55,5 +55,29 @@
 - [x] Oznaczyć fazę adaptacji czytelnym komunikatem PL/EN i nie zapisywać jej jako sesji pomiarowej.
 
 ### Raport zamknięcia produkcyjnego
-- [ ] Po wykonaniu powyższego cyklu wygenerować raport: wdrożone elementy, wyniki testów, pozostałe blokery zewnętrzne i gotowość systemu do uruchomienia.
+- [x] Wygenerowano raport: wdrożone elementy, wyniki testów, pozostałe blokery zewnętrzne i gotowość systemu do uruchomienia.
+
+## Raport wdrożenia — 15.09.2026
+
+### Wdrożone
+- Górny przycisk PRO otwiera modal z każdego stanu operatora; pulsujący kolor premium jest tokenem projektu odpowiadającym `#cc33ff`.
+- Modal zawiera cztery wybieralne pakiety, kod `LAUNCH718` i jednoznaczną blokadę płatności BETA.
+- Rejestracja wymaga potwierdzenia adresu e-mail; aktywna sesja nie jest utrzymywana przed potwierdzeniem, a token jest ukryty dla niepotwierdzonych kont.
+- Każdy tryb skanera zaczyna się 30-sekundową adaptacją: puls jest widoczny, ale RR, faza i koherencja nie są zbierane; zmiana trybu zeruje bufory.
+
+### Wyniki kontroli
+- Kontrola typów: bez błędów.
+- Widok 384 px: brak poziomego przewijania; cztery pakiety układają się pionowo, formularz i kod pozostają czytelne.
+- Widok komputerowy: cztery karty w jednym rzędzie.
+- Kod `LAUNCH718`: walidacja działa i pokazuje cenę £9.50 dla pierwszego okresu miesięcznego.
+- Konsola przeglądarki: brak błędów podczas otwarcia i obsługi cennika.
+
+### Pozostałe blokery zewnętrzne
+- Test pełnego pomiaru wymaga fizycznego pasa Polar H10.
+- Dystrybucja `.exe` i `.app` wymaga certyfikatów Authenticode i Apple Developer ID oraz notaryzacji.
+- Produkty i ceny Stripe oraz testy zakupu/anulowania pozostają niewdrożone celowo; sprzedaż jest nadal zablokowana w fazie BETA.
+
+### Gotowość
+- Warstwa interfejsu, rejestracji i adaptacji jest gotowa do testów BETA.
+- Sprzedaż produkcyjna nie jest gotowa i pozostaje technicznie zablokowana do czasu realizacji powyższych punktów.
 
