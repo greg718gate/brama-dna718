@@ -17,7 +17,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download, ShieldCheck } from "lucide-react";
+import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
@@ -89,6 +89,7 @@ const getCoherenceState = (syncPercentage: number): CoherenceState => {
 // Sprzedaż dostępu PRO wstrzymana do czasu ukończenia całości systemu.
 // Ustaw na true, aby ponownie włączyć subskrypcję £19/mies.
 const PRO_SALES_ENABLED = false;
+const DEVELOPMENT_ADMIN_EMAIL = "grzegorzniepsuj47@gmail.com";
 
 interface BiometricIntegrationProps {
   pricingRequest?: number;
@@ -117,6 +118,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   const [proName, setProName] = useState("");
   const [proEmail, setProEmail] = useState("");
   const [proPassword, setProPassword] = useState("");
+  const [showProPassword, setShowProPassword] = useState(false);
   const [proTermsAccepted, setProTermsAccepted] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -125,6 +127,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [signedInEmail, setSignedInEmail] = useState<string | null>(null);
   const [engineReady, setEngineReady] = useState(false);
   const [isSpecOpen, setIsSpecOpen] = useState(false);
   const [audioMode, setAudioMode] = useState<AudioStreamMode>("static");
@@ -132,6 +135,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
+  const isDevelopmentAdmin = signedInEmail?.toLowerCase() === DEVELOPMENT_ADMIN_EMAIL;
 
   // Animation state for wave
   const [waveSpeed, setWaveSpeed] = useState(1);
@@ -236,6 +240,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
     const { data: sessionData } = await supabase.auth.getSession();
     const signedIn = Boolean(sessionData.session);
     setIsSignedIn(signedIn);
+    setSignedInEmail(sessionData.session?.user.email ?? null);
 
     if (!signedIn) {
       setIsSubscribed(false);
@@ -248,6 +253,18 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
     setIsSubscribed(subscribed);
     setIsCheckingSubscription(false);
     return subscribed;
+  }, []);
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => {
+      setIsSignedIn(Boolean(data.user));
+      setSignedInEmail(data.user?.email ?? null);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsSignedIn(Boolean(session?.user));
+      setSignedInEmail(session?.user.email ?? null);
+    });
+    return () => data.subscription.unsubscribe();
   }, []);
 
   const openProDashboard = async () => {
@@ -630,6 +647,16 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
               </DialogHeader>
             </div>
             <div className="space-y-5 p-4 sm:p-6">
+              <section className="rounded-md border border-secondary/35 bg-secondary/5 p-4 sm:p-5" aria-labelledby="pro-project-specification">
+                <h3 id="pro-project-specification" className="text-center text-base font-bold text-secondary sm:text-left sm:text-lg">
+                  {t("biometric.pro.projectSpecTitle")}
+                </h3>
+                <div className="mt-3 space-y-2 text-xs leading-relaxed text-foreground/85 sm:text-sm">
+                  <p>{t("biometric.pro.projectSpecMatrix")}</p>
+                  <p>{t("biometric.pro.projectSpecResearch")}</p>
+                  <p>{t("biometric.pro.projectSpecPurpose")}</p>
+                </div>
+              </section>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   { id: "monthly", name: t("biometric.pro.planMonth"), price: "£19", period: t("biometric.pro.planMonthPeriod"), detail: t("biometric.pro.planMonthDetail") },
@@ -676,10 +703,15 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
               </ul>
               {isSignedIn || registrationComplete ? (
                 <div className="space-y-3">
+                  {isSignedIn && (
+                    <p className="break-all rounded-md border border-secondary/30 bg-secondary/5 p-3 text-center text-xs text-secondary">
+                      {isDevelopmentAdmin ? t("biometric.pro.adminAccess") : `${t("biometric.pro.signedInAs")}: ${signedInEmail ?? ""}`}
+                    </p>
+                  )}
                   {registrationComplete && <p className="rounded-md border border-premium/40 bg-premium/10 p-3 text-center text-sm leading-relaxed text-premium">{t("biometric.pro.registrationSuccessText")}</p>}
-                  <Button type="button" variant="outline" className="w-full border-muted text-muted-foreground" onClick={handleCheckout} disabled={!PRO_SALES_ENABLED || isStartingCheckout || registrationComplete}>
+                  <Button type="button" variant={isDevelopmentAdmin ? "glow" : "outline"} className="w-full" onClick={isDevelopmentAdmin ? () => { setIsPaymentModalOpen(false); void openProDashboard(); } : handleCheckout} disabled={(!PRO_SALES_ENABLED && !isDevelopmentAdmin) || isStartingCheckout || registrationComplete}>
                     {isStartingCheckout ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                    {registrationComplete ? t("biometric.pro.confirmEmail") : t("biometric.pro.betaPaymentPaused")}
+                    {registrationComplete ? t("biometric.pro.confirmEmail") : isDevelopmentAdmin ? t("biometric.pro.activateAdminAccess") : t("biometric.pro.betaPaymentPaused")}
                   </Button>
                 </div>
               ) : (
@@ -702,7 +734,18 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                     <Label htmlFor="pro-password">{t("biometric.pro.password")}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input id="pro-password" type="password" value={proPassword} onChange={(event) => setProPassword(event.target.value)} className="pl-10" minLength={6} maxLength={72} autoComplete="new-password" required />
+                      <Input id="pro-password" type={showProPassword ? "text" : "password"} value={proPassword} onChange={(event) => setProPassword(event.target.value)} className="pl-10 pr-10" minLength={6} maxLength={72} autoComplete="new-password" required />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowProPassword((visible) => !visible)}
+                        className="absolute right-1 top-1 h-8 w-8 text-muted-foreground hover:text-foreground"
+                        aria-label={showProPassword ? t("biometric.pro.hidePassword") : t("biometric.pro.showPassword")}
+                        title={showProPassword ? t("biometric.pro.hidePassword") : t("biometric.pro.showPassword")}
+                      >
+                        {showProPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">

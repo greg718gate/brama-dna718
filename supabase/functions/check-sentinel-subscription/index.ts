@@ -2,6 +2,8 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 
+const DEVELOPMENT_ADMIN_EMAIL = "grzegorzniepsuj47@gmail.com";
+
 const jsonResponse = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -24,6 +26,14 @@ Deno.serve(async (req) => {
     const token = authHeader.replace(/^Bearer\s+/i, "");
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data.user?.email) return jsonResponse({ error: "Authentication required" }, 401);
+
+    if (data.user.email.toLowerCase() === DEVELOPMENT_ADMIN_EMAIL) {
+      return jsonResponse({
+        subscribed: true,
+        access_source: "development_admin",
+        subscription_end: null,
+      });
+    }
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("Stripe is not configured");
