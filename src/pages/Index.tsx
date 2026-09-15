@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn } from "lucide-react";
+import { Shield, Sigma, Sparkles, BookOpen, Archive, LogIn, LogOut } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { AuthDialog } from "@/components/AuthDialog";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,12 @@ const Index = () => {
   const [silenceCounter, setSilenceCounter] = useState(1);
   const [activeTab, setActiveTab] = useState("start");
   const [operator, setOperator] = useState<User | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setOperator(null);
+  };
 
   useEffect(() => {
     void supabase.auth.getUser().then(({ data }) => setOperator(data.user));
@@ -91,17 +98,26 @@ const Index = () => {
       >
         {operator?.email ? (
           <div
-            className="col-span-2 flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md border border-secondary/40 bg-secondary/10 px-3 text-center text-xs font-semibold text-secondary md:order-first md:max-w-72"
+            className="col-span-2 flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md border border-secondary/40 bg-secondary/10 px-3 text-center text-xs font-semibold text-secondary md:order-first md:max-w-96"
             role="status"
           >
             <span className="h-2 w-2 shrink-0 rounded-full bg-secondary shadow-[var(--glow-secondary)]" aria-hidden="true" />
             <span className="min-w-0 break-all">
               {language === "pl" ? "OPERATOR ZALOGOWANY" : "OPERATOR SIGNED IN"}: {operator.email}
             </span>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              title={language === "pl" ? "Wyloguj się" : "Sign out"}
+              aria-label={language === "pl" ? "Wyloguj się" : "Sign out"}
+              className="ml-1 shrink-0 rounded p-1 text-secondary/80 transition-colors hover:bg-secondary/20 hover:text-secondary"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
           </div>
         ) : (
           <Button
-            onClick={() => navigate("/auth")}
+            onClick={() => setAuthOpen(true)}
             variant="outline"
             className="col-span-2 h-10 w-full border-secondary/50 bg-background text-xs text-secondary shadow-lg md:order-first md:w-auto md:text-sm"
           >
@@ -343,6 +359,7 @@ const Index = () => {
           </div>
         </div>
       </div>
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 };
