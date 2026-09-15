@@ -25,3 +25,35 @@
 - [ ] Samodzielne aplikacje .exe / .app z podpisem i notaryzacją
 - [ ] Testy płatności przed włączeniem sprzedaży (PRO_SALES_ENABLED = false)
 
+## Po zakończeniu fazy BETA — jeden cykl produkcyjny
+
+### 1. Lejek PRO na górze strony
+- [ ] Obok logowania/statusu operatora dodać wyraźny przycisk „✦ AKTYWUJ DOSTĘP PRO ✦” / „WYBIERZ PAKIET PREMIUM”.
+- [ ] Zastosować delikatnie pulsującą neonową ramkę w kolorze fioletowym `#cc33ff`.
+- [ ] Zachować ciemny styl premium, pełne PL/EN i dopasowanie do szerokości 384 px.
+
+### 2. Matryca cenowa i Stripe
+- [ ] Zastąpić pojedynczą ofertę czterema kartami subskrypcji:
+  - 1 miesiąc: £19/miesiąc — pełny dostęp PRO, elastyczna subskrypcja.
+  - 3 miesiące: £48/kwartał — 15% oszczędności, £16/miesiąc.
+  - 6 miesięcy: £84/pół roku — 25% oszczędności, £14/miesiąc.
+  - 1 rok: £114/rok — najlepsza wartość, 50% oszczędności, £9.50/miesiąc, płatność z góry.
+- [ ] Utworzyć stałe produkty/ceny Stripe i powiązać każdą kartę z właściwym procesem płatności.
+- [ ] Zachować pole kodu promocyjnego `LAUNCH718`, dającego 50% zniżki pierwszym operatorom.
+- [ ] Przed uruchomieniem sprzedaży przetestować zakup, anulowanie, powrót do aplikacji i rozpoznawanie aktywnego pakietu.
+
+### 3. Potwierdzanie adresu e-mail
+- [ ] Włączyć obowiązkowe potwierdzanie adresu e-mail dla nowych kont.
+- [ ] Po rejestracji nie traktować użytkownika jako zalogowanego do czasu potwierdzenia linku.
+- [ ] Wyświetlać komunikat: „✦ Weryfikacja Matrycy ✦ Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go, aby wygenerować unikalny Token Autoryzacji Silnika.”
+- [ ] Zweryfikować generowanie i udostępnienie tokenu dopiero po potwierdzeniu adresu.
+
+### 4. Adaptacja i uśrednianie w czterech trybach
+- [ ] Przy każdym automatycznym przejściu 0.11 → 0.10 → 0.085 → 0.075 Hz resetować `current_phase_error` do wartości początkowej.
+- [ ] Po zmianie trybu uruchamiać dokładnie 30 sekund adaptacji bez naliczania próbek do średniej koherencji i historii.
+- [ ] Po adaptacji zbierać dane przez właściwe okno pomiarowe, zachowując poprawny reset bufora i ciągłość pętli.
+- [ ] Oznaczyć fazę adaptacji czytelnym komunikatem PL/EN i nie zapisywać jej jako sesji pomiarowej.
+
+### Raport zamknięcia produkcyjnego
+- [ ] Po wykonaniu powyższego cyklu wygenerować raport: wdrożone elementy, wyniki testów, pozostałe blokery zewnętrzne i gotowość systemu do uruchomienia.
+
