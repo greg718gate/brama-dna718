@@ -78,6 +78,15 @@ const TXT = {
       "Wynik został pomyślnie zaimplementowany w Twoim profilu. Przejdź do zakładki Historia, aby zobaczyć wykres progresu DNA.",
     ritualSaveFailed:
       "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
+    modeProgress: "Tryb badania",
+    switchingMode: "Zapisywanie wyniku i przełączanie trybu…",
+    finalAverage: "Średnia koherencja pełnego badania",
+    adviceLow:
+      "Twój układ nerwowy wykazuje wysoki poziom szumu stresowego. Zalecane: Skup się na wydłużeniu wydechu w Trybie 2 (Złotym) przez kolejne 7 dni.",
+    adviceMid:
+      "Koherencja rozwija się prawidłowo. Kontynuuj pełny cykl czterech trybów, utrzymując spokojny i równomierny wydech.",
+    adviceHigh:
+      "STATUS: WALKS_ON_WATER. Osiągnąłeś barierę nadprzewodnictwa. Wektor intencji zablokowany na 0.0 rad.",
 
   },
   en: {
@@ -124,6 +133,15 @@ const TXT = {
       "The result has been successfully implemented in your profile. Open the History tab to see your DNA progress chart.",
     ritualSaveFailed:
       "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
+    modeProgress: "Study mode",
+    switchingMode: "Saving the result and switching mode…",
+    finalAverage: "Full-study average coherence",
+    adviceLow:
+      "Your nervous system shows a high level of stress noise. Recommended: focus on extending the exhale in Mode 2 (Golden) for the next 7 days.",
+    adviceMid:
+      "Coherence is developing steadily. Continue the full four-mode cycle while maintaining a calm, even exhale.",
+    adviceHigh:
+      "STATUS: WALKS_ON_WATER. You have reached the superconductivity barrier. Intention vector locked at 0.0 rad.",
 
   },
 };
@@ -211,17 +229,20 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const [beats, setBeats] = useState(0);
   const [windowSeconds, setWindowSeconds] = useState(0);
   const [bpm, setBpm] = useState<number | null>(null);
-  const [modeIndex, setModeIndex] = useState(1);
+  const [modeIndex, setModeIndex] = useState(0);
   const [pacerPhase, setPacerPhase] = useState({ inhale: true, percent: 0 });
   const [lensRadius, setLensRadius] = useState(10);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [ritualSeconds, setRitualSeconds] = useState(0);
   const [ritualDone, setRitualDone] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+  const [switchingMode, setSwitchingMode] = useState(false);
+  const [finalAverage, setFinalAverage] = useState<number | null>(null);
 
   const maxCoherenceRef = useRef(0);
   const bpmRef = useRef<number | null>(null);
-  const savedRef = useRef(false);
+  const transitionRef = useRef(false);
+  const modeCoherencesRef = useRef<number[]>([]);
 
   const breathDuration = BREATH_MODES[modeIndex].duration;
   const breathDurationRef = useRef(breathDuration);
@@ -233,43 +254,86 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     setSupported(typeof navigator !== "undefined" && "bluetooth" in navigator);
   }, []);
 
-  /** Background write of the finished 108 s ritual into the user's session history. */
-  const saveRitual = useCallback(async () => {
+  /** Background write of one completed 108 s breath mode into session history. */
+  const saveModeResult = useCallback(async (breathMode: string, modeCoherence: number) => {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData.user;
     if (!user) {
       setSaveFailed(true);
-      return;
+      return false;
     }
     const { error } = await supabase.from("sentinel_sessions").insert({
       user_id: user.id,
-      coherence: Number(maxCoherenceRef.current.toFixed(4)),
+      coherence: Number(modeCoherence.toFixed(4)),
       phase_error: Number(phaseErrorRef.current.toFixed(4)),
       mean_bpm: bpmRef.current,
       duration_seconds: RITUAL_SECONDS,
-      breath_mode: modeNameRef.current,
+      breath_mode: breathMode,
       source: "web_scanner",
     });
-    setSaveFailed(Boolean(error));
     if (!error) window.dispatchEvent(new Event("sentinel-session-saved"));
+    if (error) setSaveFailed(true);
+    return !error;
   }, []);
 
-  // "CZAS RYTUAŁU" — 0 -> 108 s counter with automatic background save at 108 s.
+  const clearModeMeasurement = useCallback(() => {
+    rrRef.current = [];
+    phaseBufferRef.current = [];
+    coherenceRef.current = 0;
+    phaseErrorRef.current = 0;
+    maxCoherenceRef.current = 0;
+    bpmRef.current = null;
+    pacerStartRef.current = Date.now();
+    setCoherence(0);
+    setPhaseError(0);
+    setGamma(GAMMA_GOLD);
+    setDpllStatus("");
+    setBeats(0);
+    setWindowSeconds(0);
+    setBpm(null);
+    onPhaseErrorChange?.(0);
+  }, [onPhaseErrorChange]);
+
+  const completeCurrentMode = useCallback(async () => {
+    if (transitionRef.current || ritualDone) return;
+    transitionRef.current = true;
+    setSwitchingMode(true);
+
+    const completedMode = BREATH_MODES[modeIndex];
+    const modeCoherence = maxCoherenceRef.current;
+    const completedScores = [...modeCoherencesRef.current, modeCoherence];
+    modeCoherencesRef.current = completedScores;
+    await saveModeResult(completedMode.name, modeCoherence);
+
+    if (modeIndex < BREATH_MODES.length - 1) {
+      clearModeMeasurement();
+      setModeIndex(modeIndex + 1);
+      setRitualSeconds(0);
+      setSwitchingMode(false);
+      transitionRef.current = false;
+      return;
+    }
+
+    const average = completedScores.reduce((sum, value) => sum + value, 0) / completedScores.length;
+    setFinalAverage(average);
+    setRitualDone(true);
+    setSwitchingMode(false);
+  }, [clearModeMeasurement, modeIndex, ritualDone, saveModeResult]);
+
+  // Continuous four-mode study: each mode runs for 108 seconds.
   useEffect(() => {
-    if (!connected) return;
+    if (!connected || ritualDone || switchingMode) return;
     const timer = window.setInterval(() => {
-      setRitualSeconds((prev) => {
-        const next = prev + 1;
-        if (next >= RITUAL_SECONDS && !savedRef.current) {
-          savedRef.current = true;
-          setRitualDone(true);
-          void saveRitual();
-        }
-        return next;
-      });
+      setRitualSeconds((prev) => Math.min(prev + 1, RITUAL_SECONDS));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [connected, saveRitual]);
+  }, [connected, ritualDone, switchingMode]);
+
+  useEffect(() => {
+    if (connected && ritualSeconds === RITUAL_SECONDS && !ritualDone) {
+      void completeCurrentMode();
+    }
+  }, [completeCurrentMode, connected, ritualDone, ritualSeconds]);
 
 
 
@@ -409,10 +473,14 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       characteristic?.addEventListener("characteristicvaluechanged", handleMeasurement);
       pacerStartRef.current = Date.now();
       maxCoherenceRef.current = 0;
-      savedRef.current = false;
+      modeCoherencesRef.current = [];
+      transitionRef.current = false;
+      setModeIndex(0);
       setRitualSeconds(0);
       setRitualDone(false);
       setSaveFailed(false);
+      setSwitchingMode(false);
+      setFinalAverage(null);
       setConnected(true);
 
     } catch (error) {
@@ -563,6 +631,7 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
                   variant={index === modeIndex ? "secondary" : "outline"}
                   className="text-xs"
                   onClick={() => setModeIndex(index)}
+                  disabled={connected}
                 >
                   {mode.name}
                 </Button>
@@ -611,15 +680,34 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
                 {Math.min(ritualSeconds, RITUAL_SECONDS)} / {RITUAL_SECONDS}s
               </p>
               <Progress value={(Math.min(ritualSeconds, RITUAL_SECONDS) / RITUAL_SECONDS) * 100} className="mt-2 h-1.5" />
+              <p className="mt-2 text-[0.68rem] text-muted-foreground">
+                {T.modeProgress} {modeIndex + 1}/{BREATH_MODES.length} · {BREATH_MODES[modeIndex].name}
+              </p>
             </div>
           </div>
 
+          {switchingMode && (
+            <p className="rounded-md border border-secondary/30 bg-secondary/5 p-3 text-xs text-secondary" role="status">
+              {T.switchingMode}
+            </p>
+          )}
+
           {ritualDone && (
-            <div className="space-y-1 rounded-md border border-purple-500/50 bg-purple-500/10 p-3">
-              <p className="break-words text-sm font-bold text-purple-300">{T.ritualDoneTitle}</p>
-              <p className="break-words text-xs leading-relaxed text-purple-200/80">
+            <div className="space-y-2 rounded-md border border-primary/50 bg-primary/10 p-3">
+              <p className="break-words text-sm font-bold text-primary">{T.ritualDoneTitle}</p>
+              {finalAverage !== null && (
+                <p className="text-xs text-foreground">
+                  {T.finalAverage}: <span className="font-mono font-bold text-secondary">{(finalAverage * 100).toFixed(1)}%</span>
+                </p>
+              )}
+              <p className="break-words text-xs leading-relaxed text-foreground/80">
                 {saveFailed ? T.ritualSaveFailed : T.ritualDoneText}
               </p>
+              {finalAverage !== null && (
+                <p className="break-words border-t border-primary/30 pt-2 text-xs font-medium leading-relaxed text-primary">
+                  {finalAverage >= COHERENCE_THRESHOLD ? T.adviceHigh : finalAverage < 0.5 ? T.adviceLow : T.adviceMid}
+                </p>
+              )}
             </div>
           )}
 

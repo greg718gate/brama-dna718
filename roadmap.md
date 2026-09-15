@@ -16,10 +16,10 @@
 - [x] Runbook podpisywania aplikacji (Zeta-Core/docs/CODE_SIGNING.md)
 
 ## Otwarte
-- [ ] Przenieść logowanie/rejestrację na górę strony i pokazywać status zalogowanego operatora
-- [ ] Uruchomić automatyczną pętlę czterech trybów po 108 s z zapisem wyników cząstkowych
-- [ ] Dodać końcową wskazówkę na podstawie średniej koherencji całego badania
-- [ ] Oprzeć wykres i statystyki historii wyłącznie na rzeczywistych zapisach sesji i trybach oddechu
+- [x] Przenieść logowanie/rejestrację na górę strony i pokazywać status zalogowanego operatora
+- [x] Uruchomić automatyczną pętlę czterech trybów po 108 s z zapisem wyników cząstkowych
+- [x] Dodać końcową wskazówkę na podstawie średniej koherencji całego badania
+- [x] Oprzeć wykres i statystyki historii wyłącznie na rzeczywistych zapisach sesji i trybach oddechu
 - [ ] Test sesji z prawdziwym pasem Polar H10 (wymaga sprzętu użytkownika)
 - [ ] Wykupienie certyfikatów: Windows Authenticode (OV/EV) i Apple Developer ID
 - [ ] Samodzielne aplikacje .exe / .app z podpisem i notaryzacją

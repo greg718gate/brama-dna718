@@ -10,6 +10,7 @@ type Row = {
   phase_error: number | null;
   mean_bpm: number | null;
   duration_seconds: number | null;
+  breath_mode: string | null;
 };
 
 const TXT = {
@@ -23,6 +24,7 @@ const TXT = {
     avg: "Średnia",
     sessions: "Sesje",
     threshold: "Próg 94%",
+    mode: "Tryb",
   },
   en: {
     title: "Coherence progress history Ψ",
@@ -34,6 +36,7 @@ const TXT = {
     avg: "Average",
     sessions: "Sessions",
     threshold: "94% threshold",
+    mode: "Mode",
   },
 } as const;
 
@@ -58,7 +61,7 @@ export const SessionHistoryChart = () => {
     }
     const { data, error } = await supabase
       .from("sentinel_sessions")
-      .select("created_at, coherence, phase_error, mean_bpm, duration_seconds")
+      .select("created_at, coherence, phase_error, mean_bpm, duration_seconds, breath_mode")
       .order("created_at", { ascending: true })
       .limit(200);
     if (error) setFailed(true);
@@ -79,13 +82,14 @@ export const SessionHistoryChart = () => {
 
 
   const points = rows
-    .filter((row) => row.coherence !== null)
-    .map((row) => ({
-      label: new Date(row.created_at).toLocaleDateString(language === "pl" ? "pl-PL" : "en-GB", {
+    .filter((row) => row.coherence !== null && Number.isFinite(Number(row.coherence)))
+    .map((row, index) => ({
+      label: `${new Date(row.created_at).toLocaleDateString(language === "pl" ? "pl-PL" : "en-GB", {
         day: "2-digit",
         month: "2-digit",
-      }),
-      value: Number(((row.coherence as number) * 100).toFixed(1)),
+      })} · ${index + 1}`,
+      value: Number((Math.min(1, Math.max(0, Number(row.coherence))) * 100).toFixed(1)),
+      mode: row.breath_mode ?? "—",
     }));
 
   const best = points.length ? Math.max(...points.map((p) => p.value)) : 0;
@@ -141,7 +145,10 @@ export const SessionHistoryChart = () => {
                     borderRadius: 8,
                     fontSize: 12,
                   }}
-                  formatter={(value: number) => [`${value}%`, txt.coherence]}
+                  formatter={(value: number, _name, item) => [
+                    `${value}% · ${txt.mode}: ${String(item.payload?.mode ?? "—")}`,
+                    txt.coherence,
+                  ]}
                 />
                 <Line
                   type="monotone"
