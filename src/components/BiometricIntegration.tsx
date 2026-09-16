@@ -96,7 +96,8 @@ interface BiometricIntegrationProps {
 }
 
 export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegrationProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isTestPhase = true; // test_phase — sprzedaż i aktywacja PRO wstrzymane
   const { toast } = useToast();
   const [bpm, setBpm] = useState("");
   const [birthDate, setBirthDate] = useState("");
