@@ -128,12 +128,16 @@ const Index = () => {
         )}
         <Button
           type="button"
-          onClick={() => setPricingRequest((request) => request + 1)}
+          disabled
+          aria-disabled="true"
+          title={language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"}
           variant="outline"
-          className="col-span-2 h-10 w-full animate-premium-pulse border-premium/80 bg-premium/10 px-3 text-xs font-bold text-premium hover:bg-premium/20 hover:text-premium md:w-auto md:text-sm motion-reduce:animate-none"
+          className="col-span-2 h-10 w-full border-premium/80 bg-premium/10 px-3 text-xs font-bold text-premium md:w-auto md:text-sm opacity-80"
         >
           <Crown className="h-4 w-4" />
-          {language === "pl" ? "✦ AKTYWUJ DOSTĘP PRO ✦" : "✦ ACTIVATE PRO ACCESS ✦"}
+          {language === "pl"
+            ? "Faza testowa / W trakcie prac rozwojowych"
+            : "Test phase / Under development"}
         </Button>
         <Button
           onClick={() => navigate("/decoder")}
