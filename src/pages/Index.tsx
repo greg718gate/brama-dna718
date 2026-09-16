@@ -37,7 +37,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("start");
   const [operator, setOperator] = useState<User | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
-  const [pricingRequest, setPricingRequest] = useState(0);
+  const [pricingRequest] = useState(0); // test_phase — aktywacja PRO wyłączona
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
