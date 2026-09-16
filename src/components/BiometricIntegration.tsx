@@ -96,7 +96,8 @@ interface BiometricIntegrationProps {
 }
 
 export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegrationProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isTestPhase = true; // test_phase — sprzedaż i aktywacja PRO wstrzymane
   const { toast } = useToast();
   const [bpm, setBpm] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -449,9 +450,18 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                   {t("biometric.pro.description")}
                 </p>
               </div>
-              <Button type="button" variant="glow" className="w-full sm:w-auto" onClick={openProDashboard}>
+              <Button
+                type="button"
+                variant="glow"
+                className="w-full sm:w-auto"
+                disabled={isTestPhase}
+                aria-disabled={isTestPhase}
+                title={language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"}
+              >
                 <Crown className="h-4 w-4" />
-                {t("biometric.pro.activate")}
+                {language === "pl"
+                  ? "Faza testowa / W trakcie prac rozwojowych"
+                  : "Test phase / Under development"}
               </Button>
             </div>
           </CardContent>
