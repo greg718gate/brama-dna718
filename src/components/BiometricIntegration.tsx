@@ -17,7 +17,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, Download, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { Heart, Calendar, Play, Pause, RotateCcw, Waves, Zap, Sparkles, Activity, Check, Crown, Lock, Mail, User, Bluetooth, Monitor, ScanLine, Loader2, CreditCard, ChevronDown, Info, ShieldCheck, Eye, EyeOff, Github } from "lucide-react";
 import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
@@ -284,30 +284,6 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
     setEngineReady(true);
   };
 
-  const triggerFileDownload = (href: string, filename: string) => {
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  };
-
-  const handleDownloadLauncher = async (platform: "windows" | "apple") => {
-    if (PRO_SALES_ENABLED) {
-      const subscribed = await checkSubscription();
-      if (!subscribed) {
-        setIsPaymentModalOpen(true);
-        return;
-      }
-    }
-    if (platform === "windows") {
-      triggerFileDownload("/downloads/START_SENTINEL_718.bat", "START_SENTINEL_718.bat");
-    } else {
-      triggerFileDownload("/downloads/START_SENTINEL_718.command", "START_SENTINEL_718.command");
-    }
-  };
-
   const handleCheckout = async () => {
     if (!PRO_SALES_ENABLED) {
       toast({ title: t("biometric.pro.betaPaymentPaused") });
@@ -397,6 +373,11 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
       </CardHeader>
 
       <CardContent className="pt-6 space-y-6">
+        <section className="space-y-3 rounded-md border border-secondary/40 bg-secondary/5 p-4" aria-label="test_phase">
+          <p className="flex items-center gap-2 text-sm font-bold text-secondary"><ShieldCheck className="h-4 w-4" />{t("biometric.testPhaseStatus")}</p>
+          <p className="text-xs leading-relaxed text-foreground/85">{t("biometric.testPhaseDisclaimer")}</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{t("biometric.semanticModelDisclaimer")}</p>
+        </section>
         {/* Input Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -552,62 +533,9 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
           </div>
 
           <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-accent">
-              <Download className="h-4 w-4" />
-              {t("biometric.pro.downloadTitle")}
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-foreground/80">
-              {t("biometric.pro.downloadDesc")}
-            </p>
-            <ol className="mt-3 space-y-1 text-xs leading-relaxed text-muted-foreground">
-              <li className="break-words">{t("biometric.pro.downloadStep1")}</li>
-              <li className="break-words font-mono">{t("biometric.pro.downloadStep2")}</li>
-              <li className="break-words">{t("biometric.pro.downloadStep3")}</li>
-            </ol>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              {t("biometric.pro.downloadMac")}
-            </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
-                onClick={() => void handleDownloadLauncher("windows")}
-              >
-                <Download className="h-4 w-4" />
-                {t("biometric.pro.downloadWindows")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full whitespace-normal border-accent/50 text-accent sm:w-auto"
-                onClick={() => void handleDownloadLauncher("apple")}
-              >
-                <Download className="h-4 w-4" />
-                {t("biometric.pro.downloadApple")}
-              </Button>
-            </div>
-            <div className="mt-3 rounded-md border border-secondary/30 bg-secondary/5 p-3">
-              <p className="text-xs font-semibold text-secondary">{t("biometric.pro.securityTitle")}</p>
-              <ul className="mt-1 space-y-1 text-xs leading-relaxed text-muted-foreground">
-                <li className="break-words">{t("biometric.pro.security1")}</li>
-                <li className="break-words">{t("biometric.pro.security2")}</li>
-                <li className="break-words">{t("biometric.pro.security3")}</li>
-                <li className="break-words">{t("biometric.pro.security4")}</li>
-              </ul>
-              <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground/70">
-                SHA-256: 0852b4c54a292f031613c172f7ee74dc0c671eb8cb3ba84b5810e61c3024c02b
-              </p>
-            </div>
-            <div className="mt-3 rounded-md border border-border bg-background/40 p-3">
-              <p className="break-words text-xs font-semibold text-foreground/90">
-                {t("biometric.pro.certTitle")}
-              </p>
-              <p className="mt-1 break-words text-xs leading-relaxed text-muted-foreground">
-                {t("biometric.pro.certText")}
-              </p>
-            </div>
-
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent"><Github className="h-4 w-4" />{t("biometric.pro.openSourceTitle")}</p>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("biometric.pro.openSourceText")}</p>
+            <a href="https://github.com/greg718gate/brama-dna718" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-secondary underline underline-offset-4">github.com/greg718gate/brama-dna718</a>
             <LicenseTokenWidget />
             <SessionHistoryChart />
             {!PRO_SALES_ENABLED && (
