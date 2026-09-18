@@ -1,6 +1,5 @@
 // Zeta-Core reference DSP library — pure functions used by tests.
-// Mirrors the math contract of supabase/functions/zeta-analyze/index.ts
-// so we can validate engine behaviour on synthetic signals without a live backend.
+// Local, open browser DSP core. Called only from the mathematical Web Worker.
 
 export type HealthStatus = "HEALTHY" | "WATCH" | "DEGRADED" | "CRITICAL";
 

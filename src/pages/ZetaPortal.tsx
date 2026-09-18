@@ -151,6 +151,8 @@ const T = {
   analysisFailed:    { pl: "Analiza nie powiodła się",                  en: "Analysis failed" },
   unsupported:       { pl: "Nieobsługiwany plik. Użyj WAV/MP3/M4A/OGG/FLAC lub CSV/TXT.", en: "Unsupported file. Use WAV/MP3/M4A/OGG/FLAC or CSV/TXT." },
   footer:            { pl: "Zeta-Core Diagnostics — Aberdeen, UK",       en: "Zeta-Core Diagnostics — Aberdeen, UK" },
+  testPhase:         { pl: "Status subskrypcji: test_phase / faza testowa — dostęp otwarty, bez opłat", en: "Subscription status: test_phase — open access, no payment" },
+  localOnly:         { pl: "Analiza działa lokalnie w Web Workerze. Surowy sygnał nie opuszcza piaskownicy przeglądarki.", en: "Analysis runs locally in a Web Worker. The raw signal never leaves the browser sandbox." },
 };
 
 // ---------- Audio decoding ----------
@@ -541,6 +543,11 @@ export default function Zeta() {
           </div>
           {LangToggle}
         </header>
+
+        <div className="mb-6 rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-4 text-sm">
+          <p className="font-semibold text-cyan-300">{t("testPhase")}</p>
+          <p className="mt-1 text-white/70">{t("localOnly")}</p>
+        </div>
 
         <div className="flex flex-wrap gap-2 mb-4 text-xs">
           <a href="/zeta/faq" className="px-3 py-1.5 rounded border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10">FAQ & Tests</a>
