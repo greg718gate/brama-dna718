@@ -1711,6 +1711,8 @@ export interface DecoderResult {
   manipulationReport: ManipulationReport;
   /** 12. Decoder version used for this analysis */
   decoderVersion: string;
+  /** 13. Mapowanie oryginalnych znaków źródłowych (do 718) na macierz 18×18 */
+  sourceMatrix: SourceMatrixMapping;
 }
 
 // ═══════════════════════════════════════════════════════════════════
