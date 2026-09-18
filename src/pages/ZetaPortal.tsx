@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { mathWorker } from "@/lib/mathWorkerClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -225,13 +225,7 @@ function maybeDownsampleAxes(axes: { x: Float32Array; y: Float32Array; z: Float3
 }
 
 async function analyzeChunk(samples: number[], sampleRate: number, targetFreq: number | undefined, filename: string, engineVersion: EngineVersion, axes?: AxisSamples): Promise<ZetaResult> {
-  const { data, error } = await supabase.functions.invoke("zeta-analyze", {
-    body: { samples, axes, sampleRate, targetFreq, filename, engineVersion },
-    headers: { "x-zeta-key": ACCESS_CODE },
-  });
-  if (error) throw new Error(error.message);
-  if ((data as any)?.error) throw new Error((data as any).error);
-  return data as ZetaResult;
+  return mathWorker.zetaAnalysis<ZetaResult>({ samples, axes, sampleRate, targetFreq, filename, engineVersion });
 }
 
 export default function Zeta() {

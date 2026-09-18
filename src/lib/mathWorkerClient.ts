@@ -1,11 +1,13 @@
 import type { GATCASequence, UnificationResult } from "@/lib/bramaUnificationEngine";
 import type { HamiltonianEvolutionOutput, IntentionVectorInput, IntentionVectorOutput, RrSpectrumOutput } from "@/lib/browserMathCore";
+import type { ZetaAnalysisInput } from "@/lib/zetaReference";
 
 export type MathWorkerRequest =
   | { id: number; task: "intention-vector"; payload: IntentionVectorInput }
   | { id: number; task: "rr-spectrum"; payload: { rr: number[]; breathDuration: number } }
   | { id: number; task: "hamiltonian-evolution"; payload: { time: number } }
   | { id: number; task: "wavefunction"; payload: { t: number; x: number; energy?: number; terms?: number } }
+  | { id: number; task: "zeta-analysis"; payload: ZetaAnalysisInput }
   | { id: number; task: "unification"; payload: { sequences: GATCASequence[]; t: number; x: number } };
 
 export type MathWorkerResponse = { id: number; ok: true; result: unknown } | { id: number; ok: false; error: string };
@@ -45,5 +47,6 @@ export const mathWorker = {
   analyzeRr: (rr: number[], breathDuration: number) => request<RrSpectrumOutput>({ task: "rr-spectrum", payload: { rr, breathDuration } }),
   hamiltonianEvolution: (time: number) => request<HamiltonianEvolutionOutput>({ task: "hamiltonian-evolution", payload: { time } }),
   wavefunction: (t: number, x: number, energy?: number, terms?: number) => request<{ re: number; im: number; magnitude: number; phase: number }>({ task: "wavefunction", payload: { t, x, energy, terms } }),
+  zetaAnalysis: <T>(payload: ZetaAnalysisInput) => request<T>({ task: "zeta-analysis", payload }),
   unification: (sequences: GATCASequence[], t: number, x: number) => request<UnificationResult>({ task: "unification", payload: { sequences, t, x } }),
 };

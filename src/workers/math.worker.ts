@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { analyzeRrSpectrum, buildHamiltonianAndEvolve, computeIntentionVector, computeUnification, computeWavefunction } from "@/lib/browserMathCore";
 import type { MathWorkerRequest, MathWorkerResponse } from "@/lib/mathWorkerClient";
+import { analyzeZetaSignal } from "@/lib/zetaReference";
 
 self.onmessage = (event: MessageEvent<MathWorkerRequest>) => {
   const { id, task, payload } = event.data;
@@ -10,6 +11,7 @@ self.onmessage = (event: MessageEvent<MathWorkerRequest>) => {
     else if (task === "rr-spectrum") result = analyzeRrSpectrum(payload.rr, payload.breathDuration);
     else if (task === "hamiltonian-evolution") result = buildHamiltonianAndEvolve(payload.time);
     else if (task === "wavefunction") result = computeWavefunction(payload.t, payload.x, payload.energy, payload.terms);
+    else if (task === "zeta-analysis") result = analyzeZetaSignal(payload);
     else result = computeUnification(payload.sequences, payload.t, payload.x);
     self.postMessage({ id, ok: true, result } satisfies MathWorkerResponse);
   } catch (error) {
