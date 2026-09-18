@@ -10,7 +10,7 @@ import {
   type GATCASequence,
   type UnificationResult,
 } from "@/lib/bramaUnificationEngine";
-import { runBramaUnification } from "@/lib/bramaUnificationEngine";
+import { calculatePsi, runBramaUnification } from "@/lib/bramaUnificationEngine";
 
 export type ComplexValue = { re: number; im: number };
 export type IntentionVectorInput = { amplitude: number; duration: number; frequency: number; samplesPerSecond?: number };
@@ -34,20 +34,11 @@ export function computeIntentionVector(input: IntentionVectorInput): IntentionVe
 }
 
 export function computeWavefunction(t: number, x: number, energy = CARRIER_FREQ * H_BAR, terms = 50) {
-  let zr = 0;
-  let zi = 0;
-  const zetaT = energy / H_BAR;
-  for (let n = 1; n <= terms; n += 1) {
-    const magnitude = n ** -0.5;
-    const angle = -zetaT * Math.log(n);
-    zr += magnitude * Math.cos(angle);
-    zi += magnitude * Math.sin(angle);
-  }
-  const carrierAngle = CARRIER_FREQ * t - (2 * Math.PI / CARRIER_FREQ) * x;
-  const cr = Math.cos(carrierAngle);
-  const ci = Math.sin(carrierAngle);
-  const re = (cr * zr - ci * zi) * GAMMA;
-  const im = (cr * zi + ci * zr) * GAMMA;
+  // Keep this adapter numerically identical to the canonical engine. `terms`
+  // remains in the worker protocol for forward-compatible WASM implementations.
+  void terms;
+  const result = calculatePsi(t, x, [energy])[0];
+  const { re, im } = result.psi;
   return { re, im, magnitude: Math.hypot(re, im), phase: Math.atan2(im, re) };
 }
 
