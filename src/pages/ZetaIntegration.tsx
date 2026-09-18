@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Smartphone, Cable, Network, KeyRound, ShieldCheck, Mail } from "lucide-react";
+import { ArrowLeft, Smartphone, Cable, Network, Github, ShieldCheck, Mail } from "lucide-react";
 import ZetaFooter from "@/components/ZetaFooter";
 
 type Lang = "pl" | "en";
@@ -12,11 +12,11 @@ const T = {
     title: "Zeta-Core — Instrukcja integracji",
     subtitle: "Jak podłączyć system do maszyn w Twojej firmie. Krok po kroku.",
     l1Title: "POZIOM 1 — Telefon lub laptop",
-    l1Cost: "Koszt: 0 £ · Czas: 2 minuty · Dla kogo: pilot, warsztaty, pierwsze demo",
+    l1Cost: "Status: test_phase · Dostęp otwarty, bez opłat · Bez instalacji",
     l1Steps: [
       "Pracownik podchodzi do maszyny z telefonem (Android/iPhone) lub laptopem.",
       "Otwiera w przeglądarce: zeta-core-dsp.com/zeta",
-      "Wpisuje kod dostępu otrzymany mailem od nas.",
+      "Kod Open Source może sprawdzić przed rozpoczęciem analizy.",
       "Wybiera profil maszyny (np. „Silnik elektryczny 50 Hz\") i wersję silnika (v1.0 / v1.1 / v2.0).",
       "OPCJA A — Plik: nagrywa 10-30 sekund dźwięku maszyny → wgrywa → raport PDF w 10 sekund.",
       "OPCJA B — LIVE 24h: klika „LIVE Mikrofon\" → telefon leży przy maszynie i analizuje ciągle, alarmuje przy statusie CRITICAL.",
@@ -39,47 +39,41 @@ const T = {
       "Brama zwraca status każdej maszyny w czasie rzeczywistym (REST + WebSocket).",
       "Statusy wyświetlają się w istniejącym dashboardzie klienta (Grafana, Power BI, Ignition).",
     ],
-    l3Result: "Status: specyfikacja API gotowa (Zeta-Core/docs/FLEET_API_SPEC_v3.md). Implementacja uruchamiana pod pierwszego klienta.",
-    hmacTitle: "Licencjonowanie HMAC-SHA256 — jak to działa",
-    hmacIntro: "To jest mechanizm zabezpieczający dla klientów, którzy chcą kupić silnik ON-PREMISE (plik .so na własny serwer, bez chmury). Web demo (poziom 1) tego nie potrzebuje.",
+    l3Result: "Status: specyfikacja API jest transparentnym projektem testowym; aktywne obliczenia pozostają lokalne w przeglądarce.",
+    hmacTitle: "Open Source i lokalny Web Worker",
+    hmacIntro: "Aktywny silnik nie wymaga instalatora, pliku wykonywalnego ani licencji binarnej. Obliczenia działają w piaskownicy przeglądarki, poza głównym wątkiem UI.",
     hmacFlowTitle: "Przepływ w 4 krokach:",
     hmacFlow: [
-      "1. Klient płaci fakturę i podaje: nazwę firmy, ID maszyny (MAC adres serwera), datę wygaśnięcia licencji.",
-      "2. My uruchamiamy narzędzie issue_token.py (mamy je lokalnie, sekret HMAC nigdy nie opuszcza naszego komputera).",
-      "3. Narzędzie generuje token w formacie: ZC1.<payload_base64>.<sygnatura_HMAC> — np. ZC1.eyJjb21wYW55Ijoi...Q.a3f9b2c8e1d47...",
-      "4. Wysyłamy token mailem. Klient wkleja go do swojego kodu jako parametr license_key w funkcji run_zeta_diagnostic().",
+      "1. Otwórz publiczne repozytorium i sprawdź kod obliczeniowy.",
+      "2. Uruchom portal w nowoczesnej przeglądarce — bez pobierania dodatkowych plików.",
+      "3. Dane sygnałowe są przekazywane lokalnie do typowanego Web Workera.",
+      "4. Worker zwraca wyłącznie wynik mapowania do interfejsu.",
     ],
-    hmacVerifyTitle: "Co silnik sprawdza przy każdym uruchomieniu:",
+    hmacVerifyTitle: "Co można zweryfikować:",
     hmacVerify: [
-      "Podpis HMAC-SHA256 — czy token nie został sfałszowany (klient nie może sam wygenerować nowego).",
-      "Data ważności — czy licencja nie wygasła.",
-      "Machine binding — czy token jest przypisany do tego serwera (MAC adres).",
-      "Product ID — czy token jest dla właściwej wersji silnika (v1.1 nie zadziała z tokenem v2.0).",
-      "Feature bits — czy wykupione funkcje są odblokowane (np. SPATIAL wymaga oddzielnego bitu).",
+      "Pełne wzory i stałe matematyczne w źródle TypeScript.",
+      "Protokół wiadomości między interfejsem i Workerem.",
+      "Testy regresyjne wartości VI, Ψ i macierzy 18×18.",
+      "Brak zewnętrznego instalatora i natywnego procesu.",
+      "Lokalne przetwarzanie buforów sygnałowych.",
     ],
-    hmacCodes: "Kody błędów zwracane przez silnik:",
+    hmacCodes: "Stałe zachowane w rdzeniu:",
     hmacErrors: [
-      "0 = OK, wszystko działa",
-      "-2 = token uszkodzony (błąd wklejenia)",
-      "-3 = podpis nieprawidłowy (próba fałszerstwa)",
-      "-4 = licencja wygasła — trzeba odnowić",
-      "-5 = zły serwer (token nie dla tej maszyny)",
-      "-6 = zła wersja silnika",
-      "-7 = brak wykupionej funkcji",
+      "718.5701251542688 Hz — nośna modelu",
+      "7.83 Hz — częstotliwość Schumanna w modelu",
+      "18.6 Hz — modulacja lunarna modelu",
+      "φ = 1.618033988749895 — Złota Proporcja",
     ],
-    hmacSecret: "Sekret HMAC (32 bajty) trzymamy tylko my. Bez niego nikt nie wygeneruje ważnego tokenu, nawet jeśli ukradnie plik .so. To standardowy mechanizm używany m.in. przez AWS, Stripe, GitHub.",
+    hmacSecret: "Kod: github.com/greg718gate/brama-dna718. Platforma działa w fazie testowej; wyniki są mapowaniem numerycznym i nie stanowią oceny medycznej ani klinicznej.",
     contactTitle: "Kontakt dla klientów",
-    contactBody: "Wszystkie zapytania handlowe, prośby o kod dostępu do portalu, wystawienie licencji HMAC lub pilot 3-miesięczny:",
+    contactBody: "Pytania dotyczące otwartego kodu, fazy testowej i integracji:",
     contactEmail: "contact@zeta-core-dsp.com",
     contactRegion: "Region: Aberdeen, Szkocja, UK",
-    pricingTitle: "Cennik referencyjny",
+    pricingTitle: "Status dostępu",
     pricing: [
-      "Pojedynczy raport diagnostyczny — 200 £",
-      "Pakiet 10 raportów — 1 500 £",
-      "Monitoring miesięczny 1 maszyny — 400 £/mies.",
-      "Pilot 3-miesięczny (1 maszyna) — 2 500 £",
-      "Licencja on-premise (silnik .so + HMAC, 1 rok) — od 8 000 £",
-      "Fleet Gateway v3.0 (integracja SCADA, do 50 maszyn) — od 25 000 £",
+      "Portal przeglądarkowy — dostęp otwarty",
+      "Rdzeń Web Worker — Open Source",
+      "Subskrypcja — test_phase / bez opłat",
     ],
   },
   en: {
@@ -87,11 +81,11 @@ const T = {
     title: "Zeta-Core — Integration Guide",
     subtitle: "How to connect the system to your company's machines. Step by step.",
     l1Title: "LEVEL 1 — Phone or laptop",
-    l1Cost: "Cost: £0 · Time: 2 minutes · For: pilot, workshops, first demo",
+    l1Cost: "Status: test_phase · Open access, no payment · No installation",
     l1Steps: [
       "Technician walks up to the machine with a phone (Android/iPhone) or laptop.",
       "Opens in browser: zeta-core-dsp.com/zeta",
-      "Enters the access code we sent by email.",
+      "Reviews the Open Source implementation before starting analysis.",
       "Selects machine profile (e.g. \"Electric motor 50 Hz\") and engine version (v1.0 / v1.1 / v2.0).",
       "OPTION A — File: records 10-30 seconds of machine sound → uploads → PDF report in 10 seconds.",
       "OPTION B — LIVE 24h: taps \"LIVE Microphone\" → phone sits next to the machine, analyses continuously, alerts on CRITICAL status.",
@@ -114,47 +108,41 @@ const T = {
       "The gateway returns each machine's status in real time (REST + WebSocket).",
       "Statuses appear on the client's existing dashboard (Grafana, Power BI, Ignition).",
     ],
-    l3Result: "Status: API spec ready (Zeta-Core/docs/FLEET_API_SPEC_v3.md). Implementation triggered by first paying customer.",
-    hmacTitle: "HMAC-SHA256 licensing — how it works",
-    hmacIntro: "This is the protection mechanism for clients who want to buy the engine ON-PREMISE (a .so file on their own server, no cloud). The web demo (Level 1) does not need this.",
+    l3Result: "Status: the API specification is a transparent test-phase design; active calculations remain local to the browser.",
+    hmacTitle: "Open Source and local Web Worker",
+    hmacIntro: "The active engine needs no installer, executable or binary licence. Calculations run in the browser sandbox, away from the main UI thread.",
     hmacFlowTitle: "The 4-step flow:",
     hmacFlow: [
-      "1. Client pays the invoice and provides: company name, machine ID (server MAC address), licence expiry date.",
-      "2. We run the issue_token.py tool locally (the HMAC secret never leaves our machine).",
-      "3. The tool generates a token in the format: ZC1.<payload_base64>.<HMAC_signature> — e.g. ZC1.eyJjb21wYW55Ijoi...Q.a3f9b2c8e1d47...",
-      "4. We send the token by email. The client pastes it into their code as the license_key parameter of run_zeta_diagnostic().",
+      "1. Open the public repository and review the computational source.",
+      "2. Open the portal in a modern browser with no additional download.",
+      "3. Signal data is sent locally to a typed Web Worker.",
+      "4. The worker returns only the mapped result to the interface.",
     ],
-    hmacVerifyTitle: "What the engine verifies on every call:",
+    hmacVerifyTitle: "What can be verified:",
     hmacVerify: [
-      "HMAC-SHA256 signature — that the token has not been forged (the client cannot mint a new one themselves).",
-      "Expiry date — that the licence has not expired.",
-      "Machine binding — that the token is bound to this server (MAC address).",
-      "Product ID — that the token matches the engine version (v1.1 token won't unlock v2.0).",
-      "Feature bits — that the purchased features are enabled (e.g. SPATIAL needs a separate bit).",
+      "Full formulas and mathematical constants in TypeScript source.",
+      "The message protocol between the interface and Worker.",
+      "Regression tests for VI, Ψ and the 18×18 matrix.",
+      "No external installer or native process.",
+      "Local processing of signal buffers.",
     ],
-    hmacCodes: "Error codes returned by the engine:",
+    hmacCodes: "Constants preserved in the core:",
     hmacErrors: [
-      "0 = OK, working",
-      "-2 = malformed token (paste error)",
-      "-3 = signature mismatch (tampered)",
-      "-4 = licence expired — needs renewal",
-      "-5 = wrong machine (token not for this server)",
-      "-6 = wrong engine version",
-      "-7 = feature not licensed",
+      "718.5701251542688 Hz — model carrier",
+      "7.83 Hz — Schumann model frequency",
+      "18.6 Hz — lunar model modulation",
+      "φ = 1.618033988749895 — Golden Ratio",
     ],
-    hmacSecret: "The HMAC secret (32 bytes) is held only by us. Without it, nobody can mint a valid token, even if the .so file is stolen. This is the standard mechanism used by AWS, Stripe, GitHub and others.",
+    hmacSecret: "Source: github.com/greg718gate/brama-dna718. The platform is in test phase; results are numerical mappings, not medical or clinical assessments.",
     contactTitle: "Client contact",
-    contactBody: "All commercial enquiries, portal access codes, HMAC licence issuance or 3-month pilots:",
+    contactBody: "Questions about the open source, test phase and integrations:",
     contactEmail: "contact@zeta-core-dsp.com",
     contactRegion: "Region: Aberdeen, Scotland, UK",
-    pricingTitle: "Reference pricing",
+    pricingTitle: "Access status",
     pricing: [
-      "Single diagnostic report — £200",
-      "Pack of 10 reports — £1,500",
-      "Monthly monitoring, 1 machine — £400/mo",
-      "3-month pilot (1 machine) — £2,500",
-      "On-premise licence (.so engine + HMAC, 1 year) — from £8,000",
-      "Fleet Gateway v3.0 (SCADA integration, up to 50 machines) — from £25,000",
+      "Browser portal — open access",
+      "Web Worker core — Open Source",
+      "Subscription — test_phase / no payment",
     ],
   },
 };
@@ -224,10 +212,10 @@ export default function ZetaIntegration() {
           <p className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded p-3">{t.l3Result}</p>
         </Card>
 
-        {/* HMAC */}
+        {/* OPEN SOURCE */}
         <Card className="p-6 mb-6 bg-black/60 border-cyan-500/30">
           <div className="flex items-center gap-3 mb-3">
-            <KeyRound className="w-6 h-6 text-cyan-400" />
+            <Github className="w-6 h-6 text-cyan-400" />
             <h2 className="text-xl font-bold text-cyan-400">{t.hmacTitle}</h2>
           </div>
           <p className="text-sm text-white/70 mb-5">{t.hmacIntro}</p>

@@ -84,6 +84,12 @@ const SourceArchive = () => {
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
             {t("Oryginalne fragmenty kodów, wzorów i opisów odnalezione w historii projektu.", "Original code, formula and description fragments found in the project history.")}
           </p>
+          <div className="mx-auto max-w-3xl rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-4 text-left text-xs leading-relaxed text-muted-foreground">
+            {t(
+              "To archiwum opisuje interaktywny model matematyczno-lingwistyczny i artystyczne metafory wizualne. Nie jest narzędziem medycznym ani diagnostycznym. Aktywny kod działa lokalnie w Web Workerze i jest dostępny do weryfikacji na github.com/greg718gate/brama-dna718.",
+              "This archive describes an interactive mathematical-linguistic model and artistic visual metaphors. It is not a medical or diagnostic tool. Active code runs locally in a Web Worker and can be reviewed at github.com/greg718gate/brama-dna718.",
+            )}
+          </div>
         </header>
 
         {/* 1. GATCA 18× */}

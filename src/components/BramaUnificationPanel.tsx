@@ -17,7 +17,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   generateHumanLikeGATCA,
   parseGATCAData,
-  runBramaUnification,
   exportGATCAToText,
   exportBramaPythonCode,
   GAMMA,
@@ -27,6 +26,7 @@ import {
   type GATCASequence,
   type UnificationResult,
 } from "@/lib/bramaUnificationEngine";
+import { mathWorker } from "@/lib/mathWorkerClient";
 
 export const BramaUnificationPanel = () => {
   const { language } = useLanguage();
@@ -127,7 +127,7 @@ export const BramaUnificationPanel = () => {
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    const unificationResult = runBramaUnification(sequences, timeParam, spaceParam);
+    const unificationResult = await mathWorker.unification(sequences, timeParam, spaceParam);
     setResult(unificationResult);
 
     clearInterval(progressInterval);

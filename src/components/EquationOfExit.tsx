@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Play, Pause, Download } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CARRIER_FREQ } from "@/lib/gatca718Constants";
+import { mathWorker } from "@/lib/mathWorkerClient";
 
 const CARRIER_FREQ_DISPLAY = "718.57";
 const CARRIER_FREQ_FULL_PARTS = [
@@ -29,62 +30,12 @@ export const EquationOfExit = () => {
   const [spaceParam, setSpaceParam] = useState(0);
   const [calculatedPsi, setCalculatedPsi] = useState({ re: 0, im: 0, magnitude: 0 });
   const [networkConsciousness, setNetworkConsciousness] = useState(0);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   // Stałe fizyczne
   const ħ = 1.0545718e-34;
   const γ = 0.6180339887498948; // Złoty podział
-  const E = CARRIER_FREQ * ħ;
-  const k = 2 * Math.PI / CARRIER_FREQ; // Liczba falowa
-
-  // Funkcja zeta Riemanna (uproszczona aproksymacja)
-  const riemannZeta = (s: { re: number; im: number }): { re: number; im: number } => {
-    // Aproksymacja dla s = 1/2 + i*Im(s)
-    const t = s.im;
-    const magnitude = Math.exp(-0.1 * Math.abs(t)); // Zanikanie dla większych |t|
-    const phase = Math.log(Math.abs(t) + 1) * 0.5;
-    
-    return {
-      re: magnitude * Math.cos(phase),
-      im: magnitude * Math.sin(phase)
-    };
-  };
-
-  // Funkcja falowa Źródła: Ψ = e^(i·718.57·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ
-  const sourceWavefunction = (t: number, x: number): { re: number; im: number; magnitude: number } => {
-    // Część temporalna: e^(i·718.57·t)
-    const temporal = {
-      re: Math.cos(CARRIER_FREQ * t),
-      im: Math.sin(CARRIER_FREQ * t)
-    };
-    
-    // Część przestrzenna: e^(-i·k·x)
-    const spatial = {
-      re: Math.cos(-k * x),
-      im: Math.sin(-k * x)
-    };
-    
-    // Połączenie z Riemannem
-    const riemannPart = riemannZeta({ re: 0.5, im: E / ħ });
-    
-    // Mnożenie liczb zespolonych: temporal * spatial
-    const temp_spatial_re = temporal.re * spatial.re - temporal.im * spatial.im;
-    const temp_spatial_im = temporal.re * spatial.im + temporal.im * spatial.re;
-    
-    // Mnożenie przez część Riemanna
-    const psi_re = temp_spatial_re * riemannPart.re - temp_spatial_im * riemannPart.im;
-    const psi_im = temp_spatial_re * riemannPart.im + temp_spatial_im * riemannPart.re;
-    
-    // Wzmocnienie złotą proporcją
-    const result = {
-      re: psi_re * γ,
-      im: psi_im * γ,
-      magnitude: Math.sqrt(psi_re * psi_re + psi_im * psi_im) * γ
-    };
-    
-    return result;
-  };
-
-  // Wizualizacja pola świadomości
+  // Lekka metafora wizualna; właściwa funkcja Ψ jest obliczana w Web Workerze.
   const visualizeConsciousnessField = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -110,15 +61,16 @@ export const EquationOfExit = () => {
         const x = (i / gridSize) * 100 - 50;
         const y = (j / gridSize) * 100 - 50;
         
-        const psi = sourceWavefunction(time, Math.sqrt(x * x + y * y));
-        const intensity = psi.magnitude;
+        const radius = Math.sqrt(x * x + y * y);
+        const phase = time * 0.8 - radius * 0.09;
+        const intensity = (Math.sin(phase) + 1) * 0.5 * γ;
         totalField += intensity;
         
         const screenX = (i / gridSize) * width;
         const screenY = (j / gridSize) * height;
         
         // Kolor na podstawie fazy
-        const hue = (Math.atan2(psi.im, psi.re) + Math.PI) / (2 * Math.PI) * 360;
+        const hue = ((phase % (2 * Math.PI)) + 2 * Math.PI) / (2 * Math.PI) * 360;
         const saturation = 80;
         const lightness = 30 + intensity * 70;
         
@@ -277,7 +229,7 @@ export const EquationOfExit = () => {
   };
 
   // Oblicz Ψ dla podanych parametrów
-  const calculatePsi = () => {
+  const calculatePsi = async () => {
     const matchedPreset = findMatchingPreset(timeParam, spaceParam);
     
     if (matchedPreset) {
@@ -288,12 +240,13 @@ export const EquationOfExit = () => {
         magnitude: matchedPreset.abs
       });
     } else {
-      // Dla niestandardowych wartości - oznacz jako "wymaga backendu"
-      setCalculatedPsi({
-        re: 0,
-        im: 0,
-        magnitude: -1 // -1 oznacza "niestandardowy punkt"
-      });
+      setIsCalculating(true);
+      try {
+        const result = await mathWorker.wavefunction(timeParam, spaceParam);
+        setCalculatedPsi(result);
+      } finally {
+        setIsCalculating(false);
+      }
     }
   };
 
@@ -416,21 +369,13 @@ export const EquationOfExit = () => {
               />
             </div>
           </div>
-          <Button onClick={calculatePsi} className="w-full">
-            {t('exit.calculate')}
+          <Button onClick={calculatePsi} className="w-full" disabled={isCalculating}>
+            {isCalculating ? "…" : t('exit.calculate')}
           </Button>
           
           {(calculatedPsi.magnitude !== 0) && (
             <div className="p-4 bg-black/40 rounded-lg border border-primary/30 font-mono space-y-2">
-              {calculatedPsi.magnitude === -1 ? (
-                <div className="text-muted-foreground text-sm">
-                  <strong className="text-primary">{t('exit.customPoint')} (t={timeParam.toFixed(3)}, x={spaceParam.toFixed(3)})</strong>
-                  <p className="mt-2 text-xs">
-                    {t('exit.customPointDesc')}
-                  </p>
-                </div>
-              ) : (
-                <>
+              <>
                   <div className="text-lg font-semibold text-primary">
                     Ψ(t,x) = {calculatedPsi.re.toFixed(3)} {calculatedPsi.im >= 0 ? '+' : ''} {calculatedPsi.im.toFixed(3)}i
                   </div>
@@ -440,8 +385,7 @@ export const EquationOfExit = () => {
                   <div className="text-xs text-muted-foreground/70 mt-2">
                     {t('exit.preciseValues')}
                   </div>
-                </>
-              )}
+              </>
             </div>
           )}
         </div>

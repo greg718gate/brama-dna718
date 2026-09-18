@@ -16,6 +16,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { MOON_MOD_FREQ, PHI, SCHUMANN_FREQ } from "@/lib/gatca718Constants";
+import { mathWorker } from "@/lib/mathWorkerClient";
 
 const DISPLAY_SAMPLES_PER_SECOND = 200;
 const GATE_18_REFERENCE = {
@@ -30,52 +31,6 @@ type ChartPoint = {
   psi: number;
 };
 
-function calculateIntentionVector(
-  amplitudeA: number,
-  timeActivation: number,
-  frequencySignature: number,
-  samplesPerSecond: number = DISPLAY_SAMPLES_PER_SECOND,
-): number {
-  const numPoints = Math.max(1, Math.round(timeActivation * samplesPerSecond));
-  const dt = timeActivation / numPoints;
-
-  let sum = 0;
-  for (let i = 0; i <= numPoints; i++) {
-    const t = (i / numPoints) * timeActivation;
-    const exponentialConsciousness = Math.cos(frequencySignature * t);
-    const harmonics = Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t);
-    const psiTotal = amplitudeA * exponentialConsciousness * harmonics * (PHI ** 2);
-
-    const weight = i === 0 || i === numPoints ? 0.5 : 1.0;
-    sum += weight * psiTotal;
-  }
-
-  return Math.round(sum * dt * 10000) / 10000;
-}
-
-function generateWaveChartData(
-  amplitudeA: number,
-  timeActivation: number,
-  frequencySignature: number,
-): ChartPoint[] {
-  const numPoints = Math.max(1, Math.round(timeActivation * DISPLAY_SAMPLES_PER_SECOND));
-  const data: ChartPoint[] = [];
-
-  for (let i = 0; i <= numPoints; i++) {
-    const t = (i / numPoints) * timeActivation;
-    const psi = amplitudeA * Math.cos(frequencySignature * t) * Math.cos(SCHUMANN_FREQ * t) * Math.sin(MOON_MOD_FREQ * t) * (PHI ** 2);
-
-    if (i % 2 === 0) {
-      data.push({
-        t: Math.round(t * 1000) / 1000,
-        psi: Math.round(psi * 10000) / 10000,
-      });
-    }
-  }
-
-  return data;
-}
-
 export const IntentionVectorCalculator = () => {
   const { language } = useLanguage();
   const [amplitude, setAmplitude] = useState<number>(GATE_18_REFERENCE.amplitude);
@@ -84,18 +39,22 @@ export const IntentionVectorCalculator = () => {
   const [result, setResult] = useState<number | null>(null);
   const [referenceResult, setReferenceResult] = useState<number | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
   const tr = (pl: string, en: string) => (language === "pl" ? pl : en);
 
-  const handleCalculate = () => {
-    setChartData(generateWaveChartData(amplitude, timeActivation, frequency));
-    setResult(calculateIntentionVector(amplitude, timeActivation, frequency));
-    setReferenceResult(
-      calculateIntentionVector(
-        GATE_18_REFERENCE.amplitude,
-        GATE_18_REFERENCE.timeActivation,
-        GATE_18_REFERENCE.frequency,
-      ),
-    );
+  const handleCalculate = async () => {
+    setIsCalculating(true);
+    try {
+      const [current, reference] = await Promise.all([
+        mathWorker.intentionVector({ amplitude, duration: timeActivation, frequency, samplesPerSecond: DISPLAY_SAMPLES_PER_SECOND }),
+        mathWorker.intentionVector({ amplitude: GATE_18_REFERENCE.amplitude, duration: GATE_18_REFERENCE.timeActivation, frequency: GATE_18_REFERENCE.frequency, samplesPerSecond: DISPLAY_SAMPLES_PER_SECOND }),
+      ]);
+      setChartData(current.chart);
+      setResult(current.value);
+      setReferenceResult(reference.value);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   return (
@@ -158,9 +117,9 @@ export const IntentionVectorCalculator = () => {
           </div>
         </div>
 
-        <Button onClick={handleCalculate} className="w-full font-mono font-bold">
+        <Button onClick={() => void handleCalculate()} disabled={isCalculating} className="w-full font-mono font-bold">
           <Zap className="w-4 h-4 mr-2" />
-          {tr("OBLICZ WEKTOR INTENCJI", "CALCULATE INTENTION VECTOR")}
+          {isCalculating ? tr("OBLICZANIE W WORKERZE…", "CALCULATING IN WORKER…") : tr("OBLICZ WEKTOR INTENCJI", "CALCULATE INTENTION VECTOR")}
         </Button>
 
         {result !== null && (

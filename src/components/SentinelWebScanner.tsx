@@ -5,6 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Bluetooth, BluetoothOff, Heart, Waves, Activity, Sparkles, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { mathWorker } from "@/lib/mathWorkerClient";
 
 
 /**
@@ -68,27 +69,27 @@ const TXT = {
     lost: "Połączenie z pasem przerwane.",
     simpleBpm: "Puls serca",
     simpleSync: "Stan synchronizacji",
-    simpleRitual: "Czas rytuału",
+    simpleRitual: "Czas sesji modelu",
     syncSlow: "Spowolnij wydech — dostrajam pole",
     syncFast: "Przyspiesz oddech — stabilizuję wektor",
     syncLocked: "PEŁNY REZONANS (Faza Zablokowana)",
     syncWaiting: "Oczekiwanie na pierwsze uderzenia serca",
     advancedTitle: "✦ Zaawansowane Parametry Spektralne (Dla Inżynierów) ✦",
-    ritualDoneTitle: "✦ Rytuał Ukończony ✦",
+    ritualDoneTitle: "✦ Sesja Modelu Ukończona ✦",
     ritualDoneText:
-      "Wynik został pomyślnie zaimplementowany w Twoim profilu. Przejdź do zakładki Historia, aby zobaczyć wykres progresu DNA.",
+      "Wynik mapowania numerycznego zapisano w profilu. Przejdź do Historii, aby zobaczyć wykres sesji.",
     ritualSaveFailed:
-      "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
+      "Sesja została ukończona, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
     modeProgress: "Tryb badania",
     switchingMode: "Zapisywanie wyniku i przełączanie trybu…",
     adapting: "Adaptacja układu autonomicznego — pomiar rozpocznie się za {s} s",
     finalAverage: "Średnia koherencja pełnego badania",
     adviceLow:
-      "Twój układ nerwowy wykazuje wysoki poziom szumu stresowego. Zalecane: Skup się na wydłużeniu wydechu w Trybie 2 (Złotym) przez kolejne 7 dni.",
+      "W tym modelu wynik jest poniżej 50%. Możesz powtórzyć sesję z dłuższym wydechem w Trybie 2; nie jest to zalecenie medyczne.",
     adviceMid:
       "Koherencja rozwija się prawidłowo. Kontynuuj pełny cykl czterech trybów, utrzymując spokojny i równomierny wydech.",
     adviceHigh:
-      "STATUS: WALKS_ON_WATER. Osiągnąłeś barierę nadprzewodnictwa. Wektor intencji zablokowany na 0.0 rad.",
+      "STATUS MODELU: WALKS_ON_WATER. Próg mapowania 94% osiągnięty; wektor wizualny ustawiony na 0.0 rad.",
 
   },
   en: {
@@ -124,27 +125,27 @@ const TXT = {
     lost: "Belt connection lost.",
     simpleBpm: "Heart pulse",
     simpleSync: "Synchronisation state",
-    simpleRitual: "Ritual time",
+    simpleRitual: "Model session time",
     syncSlow: "Slow the exhale — tuning the field",
     syncFast: "Speed up breathing — stabilising the vector",
     syncLocked: "FULL RESONANCE (Phase Locked)",
     syncWaiting: "Waiting for the first heartbeats",
     advancedTitle: "✦ Advanced Spectral Parameters (For Engineers) ✦",
-    ritualDoneTitle: "✦ Ritual Complete ✦",
+    ritualDoneTitle: "✦ Model Session Complete ✦",
     ritualDoneText:
-      "The result has been successfully implemented in your profile. Open the History tab to see your DNA progress chart.",
+      "The numerical mapping result was stored in your profile. Open History to view the session chart.",
     ritualSaveFailed:
-      "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
+      "The session is complete, but the result was not stored — sign in to save sessions in your profile.",
     modeProgress: "Study mode",
     switchingMode: "Saving the result and switching mode…",
     adapting: "Autonomic adaptation — measurement begins in {s} s",
     finalAverage: "Full-study average coherence",
     adviceLow:
-      "Your nervous system shows a high level of stress noise. Recommended: focus on extending the exhale in Mode 2 (Golden) for the next 7 days.",
+      "In this model the result is below 50%. You can repeat the session with a longer exhale in Mode 2; this is not medical advice.",
     adviceMid:
       "Coherence is developing steadily. Continue the full four-mode cycle while maintaining a calm, even exhale.",
     adviceHigh:
-      "STATUS: WALKS_ON_WATER. You have reached the superconductivity barrier. Intention vector locked at 0.0 rad.",
+      "MODEL STATUS: WALKS_ON_WATER. The 94% mapping threshold was reached; the visual vector is set to 0.0 rad.",
 
   },
 };
@@ -163,50 +164,6 @@ const buildPhotonBase = (): PhotonBase[] =>
       theta: Math.PI * (1 + Math.sqrt(5)) * index,
     };
   });
-
-/** Detrended linear interpolation of the RR series onto a 4 Hz grid. */
-const resampleRr = (rr: number[]): number[] => {
-  const times: number[] = [];
-  let acc = 0;
-  for (const v of rr) {
-    acc += v;
-    times.push(acc);
-  }
-  const start = times[0];
-  const end = times[times.length - 1];
-  const out: number[] = [];
-  for (let t = start; t < end; t += 0.25) {
-    let j = 1;
-    while (j < times.length - 1 && times[j] < t) j += 1;
-    const t0 = times[j - 1];
-    const t1 = times[j];
-    const w = t1 === t0 ? 0 : (t - t0) / (t1 - t0);
-    out.push(rr[j - 1] + w * (rr[j] - rr[j - 1]));
-  }
-  const mean = out.reduce((s, v) => s + v, 0) / (out.length || 1);
-  return out.map((v) => v - mean);
-};
-
-/** Hann-windowed periodogram (single-segment Welch estimate) at 4 Hz. */
-const periodogram = (signal: number[], fs = 4.0) => {
-  const n = signal.length;
-  const windowed = signal.map((v, i) => v * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (n - 1))));
-  const bins = Math.floor(n / 2);
-  const freqs: number[] = [];
-  const psd: number[] = [];
-  for (let k = 1; k <= bins; k += 1) {
-    let re = 0;
-    let im = 0;
-    for (let i = 0; i < n; i += 1) {
-      const angle = (-2 * Math.PI * k * i) / n;
-      re += windowed[i] * Math.cos(angle);
-      im += windowed[i] * Math.sin(angle);
-    }
-    freqs.push((k * fs) / n);
-    psd.push((re * re + im * im) / n);
-  }
-  return { freqs, psd };
-};
 
 export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerProps) => {
   const { language } = useLanguage();
@@ -245,6 +202,7 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const maxCoherenceRef = useRef(0);
   const bpmRef = useRef<number | null>(null);
   const transitionRef = useRef(false);
+  const analysisRunningRef = useRef(false);
   const modeCoherencesRef = useRef<number[]>([]);
   const ritualSecondsRef = useRef(ritualSeconds);
   ritualSecondsRef.current = ritualSeconds;
@@ -342,28 +300,16 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
 
 
 
-  const analyse = useCallback(() => {
+  const analyse = useCallback(async () => {
     const rr = rrRef.current;
     const total = rr.reduce((s, v) => s + v, 0);
-    if (total < 40) return;
-
-    const series = resampleRr(rr);
-    if (series.length < 32) return;
-
-    const { freqs, psd } = periodogram(series);
-    let peakFreq = 0;
-    let peakPower = -1;
-    freqs.forEach((f, i) => {
-      if (f >= 0.04 && f <= 0.15 && psd[i] > peakPower) {
-        peakPower = psd[i];
-        peakFreq = f;
-      }
+    if (total < 40 || analysisRunningRef.current) return;
+    analysisRunningRef.current = true;
+    const analysis = await mathWorker.analyzeRr([...rr], breathDurationRef.current).finally(() => {
+      analysisRunningRef.current = false;
     });
-    if (peakFreq === 0) return;
-
-    // DPLL: deviation between the operator's real HRV peak and the metronome.
-    const targetBreathFreq = 1 / (breathDurationRef.current * 2);
-    const err = 2 * Math.PI * (peakFreq - targetBreathFreq);
+    if (!analysis) return;
+    const err = analysis.phaseError;
     if (Math.abs(err) < 0.01) {
       setGamma(PHI);
       setDpllStatus(T.locked);
@@ -378,22 +324,13 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     buf.push(err);
     if (buf.length > 10) buf.shift();
 
-    let narrow = 0;
-    let totalPower = 0;
-    freqs.forEach((f, i) => {
-      if (f <= 0.4) totalPower += psd[i];
-      if (f >= peakFreq - 0.015 && f <= peakFreq + 0.015) narrow += psd[i];
-    });
-    if (totalPower > 0) {
-      const value = Math.min(1, (narrow / totalPower) * 1.4);
-      coherenceRef.current = value;
-      if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
-      setCoherence(value);
-    }
-
-    setBeats(rr.length);
-    setWindowSeconds(total);
-    const nextBpm = Math.round(60 / (total / rr.length));
+    const value = analysis.coherence;
+    coherenceRef.current = value;
+    if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
+    setCoherence(value);
+    setBeats(analysis.beats);
+    setWindowSeconds(analysis.windowSeconds);
+    const nextBpm = analysis.bpm;
     bpmRef.current = nextBpm;
     setBpm(nextBpm);
 
@@ -436,7 +373,7 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       if (added) {
         setBeats(rrRef.current.length);
         setWindowSeconds(rrRef.current.reduce((s, v) => s + v, 0));
-        if (rrRef.current.length > 10) analyse();
+        if (rrRef.current.length > 10) void analyse();
       }
     },
     [analyse],

@@ -1,123 +1,46 @@
-# Zeta-Core Industrial Diagnostic Engine
+# Zeta-Core — Open Browser Analytics
 
-### Phase-Coherence Analytics for High-End Predictive Maintenance
+Zeta-Core is the open-source signal-analysis layer maintained by NovaStream88 Ltd. The active test release runs entirely inside the browser: no `.exe`, `.app`, `.so`, launcher, terminal command, or native installation is distributed.
 
-Official repository for the Zeta-Core DSP Engine, developed as an independent component under the Brama-DNA718 platform. Designed for white-label licensing and direct integration into Industrial IoT sensor systems, SCADA platforms, and condition monitoring networks.
+Public source: https://github.com/greg718gate/brama-dna718
 
-## Technical Overview
+## Test-phase architecture
 
-Unlike standard FFT analysis, which detects mechanical issues only after a significant rise in vibration amplitude or temperature, Zeta-Core operates on the micro-radian phase level.
+- **Status:** `test_phase` — open access, no payment.
+- **Runtime:** browser sandbox only.
+- **Background calculations:** typed Web Worker modules keep numerical workloads away from the interface thread.
+- **Input privacy:** signal buffers stay in browser memory. Only a completed session summary is stored when a signed-in operator deliberately runs a session.
+- **Auditability:** every computational source line can be reviewed before use.
 
-By utilizing phase-coherence tracking against a mathematically pure reference wave, the engine calculates:
+## Mathematical modules
 
-* *Topological Friction ($T_f$)* – Identifying structural phase de-coherence before physical damage occurs.
-* *Fault Condensation Index ($M_c$)* – Dimensionless metric (0.0 to 1.0) optimized for real-time SCADA operator dashboards.
+The browser worker covers:
 
-## Release Tiers
+1. 18×18 Hamiltonian matrix construction and time evolution.
+2. Wavefunction Ψ calculations using the critical-line Riemann ζ approximation.
+3. Numerical integration of the VI Intention Vector.
+4. RR resampling, Hann-windowed spectrum estimation and DPLL phase mapping.
 
-Three separated maturity tiers, each in its own folder. All engines are shipped as **stripped native ELF shared objects** (`.so`) compiled from C with GCC (`-O2 -fPIC -fvisibility=hidden -Wl,--strip-all -Wl,--gc-sections`). Only two symbols are exported globally via linker version scripts — everything else, including the license verifier and internal DSP routines, is fully hidden.
+Canonical constants remain unchanged:
 
-### `v1.0-standard-core/` — Standard Core (Laboratory Baseline)
-Clean, lightweight phase algorithm for **ideal laboratory conditions** and reference benchmarking.
-* `ZETA_ENGINE.so` — stripped ELF, single exported symbol `run_zeta_diagnostic`
-* `ZETA_INTEGRATION_README.txt` — integration guide
-* `ZETA_FORENSIC_REPORT.txt` — validation logs
+- carrier / 448th Riemann-zero reference: `718.57012515426885574359120304128340312332181477461 Hz`
+- Schumann model frequency: `7.83 Hz`
+- lunar model frequency: `18.6 Hz`
+- golden ratio: `φ = (1 + √5) / 2`
+- 18 rCRS coordinates: `1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393, 7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179`
 
-### `v1.1-adaptive-engine/` — Production / Adaptive Engine (Live Single-Axis Workhorse)
-Noise-resistant production build for **live single-axis sensors**. Stateful narrow-band biquad bandpass (no edge artefacts on streaming windows) plus adaptive RPM drift tracking that locks the reference wave to the instantaneous median frequency within a ±5 Hz mechanical tolerance band.
-* `ZETA-CORE_v1.1.so` — stripped ELF, exports `run_zeta_diagnostic` only
+JavaScript executes arithmetic as IEEE-754 doubles. The complete decimal notation of the 718.570125… reference remains in source for traceability; this does not imply 75-decimal runtime precision in the browser.
 
-### `v2.0-spatial-multi-axis/` — Spatial Multi-Axis (X, Y, Z Vectorized)
-Vectorized 3-axis (X, Y, Z) spatial-coherence tracking for multi-dimensional asset diagnostics. Per-axis coherence plus Euclidean-norm global spatial friction.
-* `ZETA-CORE_v2.0.so` — stripped ELF, exports `run_zeta_spatial` only
+## Scope statement
 
-ZETA-CORE v2.0 now supports native 3-axis (X, Y, Z) spatial coherence tracking with zero-loop vectorization for advanced multi-dimensional asset diagnostics.
+“DNA Gates”, “Photon Geometry”, “Lenses” and “Ritual” are terms in an interactive mathematical-linguistic model and artistic scientific visualisation. They are not medical, clinical, cardiology or diagnostic tools.
 
-## Public C ABI (Single Gate)
+SENTINEL-718/SCIENCE.GOD operates in an open test phase. Its data and visualisations are mathematical mappings of a signal and do not constitute medical analysis or a clinical assessment of health.
 
-Only these two symbols are visible to any client wrapper. Every other function — SHA-256, HMAC, base64url, license verifier, filter kernel, RPM tracker, per-axis coherence — is `local` in the linker version script and cannot be called externally.
+## Verification
 
-```c
-int run_zeta_diagnostic(
-    const double* input,        // raw time-series (mono, PCM double)
-    double*       output,       // caller-allocated, >=8 doubles
-    int           length,       // number of samples
-    int           sample_rate,  // Hz
-    double        target_freq,  // Hz (nominal rotational / carrier freq)
-    const char*   license_key   // signed license token, see below
-);
+The numerical regression suite lives alongside the TypeScript source and includes the Gate 18 reference `VI = 1.1628`, matrix dimensions and wavefunction finite-value checks. Architecture decisions and performance notes remain under `docs/`.
 
-int run_zeta_spatial(
-    const double* input,        // interleaved [x0,y0,z0, x1,y1,z1, ...]
-    double*       output,       // caller-allocated, >=8 doubles
-    int           n_samples,    // per axis
-    int           sample_rate,
-    double        target_freq,
-    const char*   license_key
-);
-```
+## Licence and contact
 
-**Return codes** — 0 on success, negative on error:
-
-| Code | Meaning |
-|------|---------|
-|  0 | OK |
-| -1 | Invalid arguments |
-| -2 | Malformed license token |
-| -3 | Signature mismatch (token tampered or wrong secret) |
-| -4 | License expired (`not_after` passed) |
-| -5 | Machine binding failed (machine-hash mismatch) |
-| -6 | Wrong product (e.g. v1.0 token used against v2.0 binary) |
-| -7 | Required feature bit not licensed |
-
-## License Model
-
-The engine will not process any signal without a valid signed license token.
-
-Token wire format (ASCII, safe to email, ~120 chars):
-
-```
-ZC1.<base64url_payload>.<base64url_hmac_sha256>
-```
-
-Binding options:
-- **Perpetual & floating** — no expiry, works on any machine.
-- **Time-boxed** — `not_after` unix timestamp; hard cut-off, no grace period.
-- **Machine-locked** — bound to SHA-256 of `/etc/machine-id` + first non-loopback MAC. Copying the `.so` to another factory will not activate.
-- **Feature-flagged** — bitmask; e.g. v2.0 SPATIAL analytics is a separate flag (`0x0002`) on top of CORE (`0x0001`).
-
-The HMAC-SHA256 signing secret is stored inside each binary in XOR-scrambled form (two-round XOR with a rotating pad). Reassembled in RAM only during verification and wiped after use. There is no way to forge tokens without breaking the binary.
-
-Full integration workflow, token-issuing procedure, and hand-off checklist for factories: **[INSTRUKCJA_ZETA-CORE.md](./INSTRUKCJA_ZETA-CORE.md)**.
-
-## Source Protection
-
-The `.so` files are compiled machine code, stripped of all debug information and internal symbol names. GitHub renders them as *"binary file not shown"*. Verification:
-
-```
-$ file ZETA_ENGINE.so
-ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, stripped
-
-$ nm -D --defined-only ZETA_ENGINE.so
-0000000000001XX0 T run_zeta_diagnostic
-```
-
-No `.py`, `.pyc`, `.c`, `.h`, or plaintext source of the engine internals is committed to this repo.
-
-## Integration & Documentation
-
-- **Full project snapshot** — [`docs/STATUS_REPORT.md`](./docs/STATUS_REPORT.md) — single owner-facing document: what ships, how it is protected, what is still open.
-- **Python bindings** — [`bindings/zeta_client.txt`](./bindings/zeta_client.txt) — reference `ctypes` wrapper with dataclass / JSON output and `HEALTHY/WATCH/DEGRADED/CRITICAL` classification. Rename to `.py` on the integrating machine.
-- **Reference numerical engine** — [`bindings/zeta_reference_engine.txt`](./bindings/zeta_reference_engine.txt) — the DSP contract as pure Python, used by the regression tests.
-- **Tests** — [`tests/README.md`](./tests/README.md) — reference-engine regression suite locking every ADR-002 fix.
-- **Benchmarks** — [`benchmarks/README.md`](./benchmarks/README.md) — CWRU / MFPT / NASA IMS harness and latency-report template.
-- **Roadmap** — [`ROADMAP.md`](./ROADMAP.md) — v2.1 Temporal Coherence, v3.0 Fleet Aggregation, edge deployment.
-- **Changelog** — [`CHANGELOG.md`](./CHANGELOG.md) — ABI-level changes per engine version.
-- **Security policy** — [`SECURITY.md`](./SECURITY.md) — vulnerability reporting and integrator hardening notes.
-- **License** — [`LICENSE`](./LICENSE) — proprietary, evaluation-only. Runtime use requires a signed commercial agreement.
-- **Architecture Decision Records** — [`docs/adr/`](./docs/adr/) — ADR-001 (biquad vs STFT), ADR-002 (numerical hardening), ADR-003 (v2.1 temporal ABI), ADR-004 (threshold re-baseline / migration).
-- **Performance budget** — [`docs/PERFORMANCE_BUDGET.md`](./docs/PERFORMANCE_BUDGET.md) — CPU, RAM, latency ceilings per engine.
-
-## Licensing & Contact
-
-This technology is available for proprietary white-label integration. For laboratory access keys, full source code review under NDA, or benchmarking support, contact **contact@zeta-core-dsp.com**.
+The project is published for transparent source review under the repository's stated licence. Contact: **contact@zeta-core-dsp.com**.

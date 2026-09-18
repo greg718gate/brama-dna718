@@ -1,26 +1,21 @@
 # Zeta-Core Fleet API Specification — v3.0 (stub)
 
-Status: **Draft / stub**. The v3.0 native fleet aggregator is not shipped.
-This document is the contract that dashboard, backend, and DevOps teams
-build against **now**, using the Python-side aggregator in
-`examples/03_fleet_aggregation.txt`. When the native aggregator lands,
-the wire format and endpoint shapes below do not change — only the
-implementation behind them.
+Status: **Draft / test_phase**. This is a future interoperability contract.
+The active analyser runs locally in a browser Web Worker; this specification
+does not describe an active server-side computation path.
 
 Date: 2026-07-15.
-Related: ADR-003 (Temporal ABI), ADR-006 (Serialization),
-ADR-007 (State migration), `examples/03_fleet_aggregation.txt`.
 
 ---
 
 ## 1. Architecture
 
 ```text
-┌──────────────────┐   binary/JSON    ┌──────────────────┐   REST/WS   ┌──────────────────┐
-│  Edge node       │  Edge Report     │  Fleet Gateway   │             │  Dashboard /     │
-│  (asset-local)   │ ───────────────► │  (aggregator +   │ ──────────► │  Alerting /      │
-│  ZETA-CORE v2.1  │                  │   REST + WS API) │             │  Ops tooling     │
-│  .so + wrapper   │                  │                  │             │                  │
+┌──────────────────┐      JSON        ┌──────────────────┐   REST/WS   ┌──────────────────┐
+│  Browser Worker  │  Edge Report     │  Fleet Gateway   │             │  Dashboard /     │
+│  (asset-local)   │ ───────────────► │  (future opt-in  │ ──────────► │  Alerting /      │
+│  open TypeScript │                  │   aggregation)   │             │  Ops tooling     │
+│  sandbox         │                  │                  │             │                  │
 └──────────────────┘                  │        │         │             └──────────────────┘
                                       │        │         │
                                       │        ▼         │
@@ -30,9 +25,8 @@ ADR-007 (State migration), `examples/03_fleet_aggregation.txt`.
                                       └──────────────────┘
 ```
 
-- **Edge node**: one process per asset. Runs the v2.1 `.so` via the
-  Python wrapper, produces one **Edge Report** per analysis window,
-  persists engine state locally (ADR-006 envelope).
+- **Browser Worker**: processes one local analysis window and produces an
+  **Edge Report**. Transmission requires a separate, explicit future opt-in.
 - **Fleet Gateway**: stateless HTTP + WebSocket service. Aggregates
   reports across assets, writes to time-series DB, evaluates alert
   rules, serves dashboards.

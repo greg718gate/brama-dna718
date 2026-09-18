@@ -1,115 +1,56 @@
-# Unified Intent Vector Engine (UIVE) v1.0
+# SENTINEL-718 / SCIENCE.GOD — Open Test Phase
 
-### Opis Techniczny
-Projekt stanowi cyfrową implementację Operatora Macierzy Kwantowej, służącą do obliczania kolapsu funkcji falowej (Psi_total) w oparciu o sprzężone rezonanse geofizyczne i biologiczne. System weryfikuje interakcję między świadomością obserwatora a polem informacyjnym.
+**Status subskrypcji: `test_phase` / faza testowa — dostęp otwarty, bez opłat.**
 
-### Kluczowe Parametry Obliczeniowe:
-* Częstotliwość Nośna (f): 718 Hz (Centralny punkt rezonansu).
-* Modulacja Planetarna (wS): 7.83 Hz (Rezonans Schumanna).
-* Modulacja Lunarna (wL): 18.6 Hz (Cykl węzłów księżycowych).
-* Stała Strukturalna: Złoty podział phi (1.618034) jako mnożnik stabilności fraktalnej.
+Publiczne repozytorium: https://github.com/greg718gate/brama-dna718
 
-### Funkcjonalność:
-1. Obliczanie Wektora Intencji (VI): System wykonuje całkowanie funkcji falowej w czasie rzeczywistym: VI = całka_0_T Psi_total(t) dt.
-2. Materializacja Wyniku: Algorytm wskazuje precyzyjną wartość liczbową materializacji wektora mocy (np. -0.0012), która jest zależna od parametrów wejściowych obserwatora.
-3. Wizualizacja 3D: Dynamiczna matryca wektorowa prezentująca punkty rezonansu w przestrzeni n-wymiarowej.
+Platforma działa wyłącznie w bezpiecznej piaskownicy przeglądarki. Nie dystrybuuje instalatorów ani natywnych plików wykonywalnych. Intensywne obliczenia są wykonywane lokalnie przez typowany Web Worker, aby nie blokować głównego wątku interfejsu.
 
-### Zastosowanie:
-Symulacja wpływu pól zewnętrznych na stabilność kwantową DNA oraz badanie korelacji między stanem psychofizycznym operatora a wynikiem kolapsu funkcji falowej.
+## Rdzeń obliczeniowy
 
----
+Worker obejmuje:
 
-## SYSTEM UNIFICATION vφ.718
+- całkowanie numeryczne Wektora Intencji VI;
+- ewolucję funkcji falowej Ψ z komponentem ζ na linii krytycznej;
+- konstrukcję i ewolucję Hamiltonianu 18×18;
+- resampling RR, widmo z oknem Hanna i mapowanie fazy DPLL;
+- pełną ścieżkę UNIFICATION.
 
-### Pełna Implementacja Macierzy Świadomości Kwantowej
+Wzorce integracji znajdują się w:
 
-**Referencyjny skrypt Python:** [`src/scripts/system_unification.py`](src/scripts/system_unification.py)
+- `src/lib/browserMathCore.ts` — czyste funkcje obliczeniowe;
+- `src/workers/math.worker.ts` — lokalny worker;
+- `src/lib/mathWorkerClient.ts` — typowany klient Promise.
 
-#### Równanie Główne:
+## Zachowane stałe
+
+Źródłem prawdy pozostaje `src/lib/gatca718Constants.ts`:
+
+- `718.57012515426885574359120304128340312332181477461 Hz`;
+- `7.83 Hz`;
+- `18.6 Hz`;
+- `φ = (1 + √5) / 2`;
+- 18 pozycji mtDNA rCRS;
+- referencja Gate 18: `VI = 1.1628`.
+
+JavaScript wykonuje działania jako liczby IEEE-754 (około 17 cyfr znaczących). Pełny zapis dziesiętny stałej pozostaje w kodzie dla identyfikowalności danych wejściowych.
+
+## Znaczenie terminów i ograniczenia
+
+„Bramy DNA”, „Geometria fotonowa”, „Soczewki” i „Rytuał” oznaczają interaktywny model matematyczno-lingwistyczny oraz artystyczną wizualizację naukową. Nie są narzędziami diagnostycznymi, medycznymi ani kardiologicznymi.
+
+> Platforma SENTINEL-718/SCIENCE.GOD działa w otwartej fazie testowej (`test_phase`). Prezentowane dane i wizualizacje są wynikiem matematycznego mapowania sygnału i nie stanowią analizy medycznej ani klinicznej oceny stanu zdrowia.
+
+## Testy
+
+```text
+bunx vitest run
 ```
-Ψ = e^(i·718·t) · ζ(1/2 + iE/ħ) · γ
-VI = ∫₀ᵀ Ψ_total(t) dt
-```
 
-#### Moduły:
-
-| Moduł | Klasa | Opis |
-|---|---|---|
-| Pole Świadomości | `ConsciousnessField` | Ψ = A · e^(i·718·t) · e^(-i·k·x) · ζ(1/2 + iE/ħ) · γ |
-| Wektor Intencji | `VectorIntention` | VI = ∫₀ᵀ Ψ(t) dt — potencjał materializacji |
-| Zeta Riemanna | `ZetaRiemann` | ζ(1/2 + i·t) na linii krytycznej Re(s)=1/2 |
-| Symfonia DNA | `DNASymphony` | 18 bram GATCA → audio 108s + binaural beats |
-| Dekoder Biblijny | `BiblicalDecoder` | Mapowanie wersetów → bramy DNA → obliczanie VI |
-| Geometria Święta | `SacredGeometry` | Pentagram 3D, helisa DNA (kąt 137.5°), Wektor M |
-
-#### 18 Bram GATCA (mtDNA rCRS):
-```
-1, 740, 951, 1227, 2996, 3424, 4166, 4832, 6393,
-7756, 8415, 10059, 11200, 11336, 11915, 13703, 14784, 16179
-```
-
-#### Stałe Fundamentalne:
-* γ = 1/φ = 0.618033988749895... (Klucz Boga)
-* φ = 1.618033988749895... (Proporcja Boska)
-* 718 / 7.83 ≈ 91.7 ≈ 89 (Fibonacci)
-* 718 / γ ≈ 1161.8 ≈ 1152 = 12³
-
----
+Pakiet regresyjny kontroluje między innymi `VI = 1.1628`, wymiar macierzy 18×18, skończone wartości Ψ oraz istniejące funkcje referencyjne Zeta-Core.
 
 ## Licencja
 
-© 2026 Grzegorz | BRAMA-718-UNIFIED
+© 2026 Grzegorz | NovaStream88 Ltd | BRAMA-718-UNIFIED
 
-Licencja: [Creative Commons BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
-
-Pełne warunki licencji: [LICENSE.md](LICENSE.md)
-
-❌ Zakaz użycia komercyjnego | ❌ Zakaz przypisywania sobie autorstwa
-
-📧 bramadna718@gmail.com
-
----
-
-## Ψ-718 Decoder — Stable Version Reference (v2.0.0)
-
-**Od wersji 2.0.0 stała bazowa dekodera = Zero Riemanna nr 448 (718.57012515 Hz)**
-
-Configuration: `2026-03-31`
-
-| Threshold | Value |
-|---|---|
-| Fragmentation (F₁) | 30 |
-| Cs-Cm Divergence (F₂) | 20 |
-| Entropy max (F₃) | 40 |
-| Entropy min (F₃) | 20 |
-| T₂ Semantic (F₆) | 30 |
-| H chaos (F₇) | 0.30 |
-| H excess (F₇) | 0.95 |
-| Gematria mod (F₈) | 718.57012515 |
-
-| Weight | Value |
-|---|---|
-| F₁ | 0.15 |
-| F₂ | 0.10 |
-| F₃ | 0.15 |
-| F₄ | 0.20 |
-| F₅ | 0.15 |
-| F₆ | 0.10 |
-| F₇ | 0.10 |
-| F₈ | 0.05 |
-
-### Reference Text Results (v1.0.0 — archiwalne)
-
-| Text | C_total | IM | Status |
-|---|---|---|---|
-| Ap 22,13 (Greek) | 96.3% | 5% | AUTENTYCZNY |
-| Wj 3,14 (Hebrew) | 63.3% | 12% | AUTENTYCZNY |
-| Kohelet 3,21 (Hebrew) | 50.6% | 8% | AUTENTYCZNY |
-| 1 J 5,7 — Comma Johanneum (Latin) | 31.2% | 82% | INTERPOLACJA |
-| Tabliczka z Koptos (fragment) | 25.6% | 51% | USZKODZONY |
-
-*Wyniki v1.0.0 są archiwalne. Od v2.0.0 stała bazowa = 718.57012515 Hz (Zero Riemanna #448).*
-
----
-
-*"Prawda jest matematyką. Matematyka jest kwantowa. Jesteś funkcją falową."*
+Licencja projektu: [LICENSE.md](LICENSE.md)
