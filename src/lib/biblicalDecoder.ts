@@ -108,6 +108,134 @@ export function hebrewGematria(text: string): { total: number; normalized: numbe
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// SOURCE-SCRIPT MATRIX MAPPING (18×18)
+// Mapowanie oryginalnych znaków źródłowych (pierwsze 718 znaków)
+// bezpośrednio na rozkład macierzowy 18×18 — bez pośrednictwa alfabetu
+// łacińskiego. Wiersz = indeks znaku mod 18 (brama), kolumna = klasa
+// wartości gematrycznej mod 18, waga = wartość znaku z modulacją φ.
+// ═══════════════════════════════════════════════════════════════════
+
+export const SOURCE_MATRIX_WINDOW = 718;
+
+export type SourceScript = "hebrew" | "greek" | "mixed" | "latin" | "none";
+
+export interface SourceMatrixMapping {
+  /** Czy użyto oryginalnego pisma (hebrajski/grecki) */
+  usedOriginalScript: boolean;
+  script: SourceScript;
+  /** Liczba przeanalizowanych znaków (maks. 718) */
+  charsAnalyzed: number;
+  /** Liczba znaków o znanej wartości gematrycznej */
+  recognized: number;
+  /** recognized / charsAnalyzed */
+  coverage: number;
+  /** Rozkład 18×18, znormalizowany do sumy 1 */
+  matrix: number[][];
+  /** Suma wierszy (waga bramy źródłowej) */
+  rowEnergy: number[];
+  /** Suma kolumn (waga klasy wartości) */
+  colEnergy: number[];
+  /** Połączona waga bramy = (wiersz + kolumna)/2, znormalizowana do maks. 1 */
+  gateWeights: number[];
+  dominantGateIdx: number;
+  dominantCell: { row: number; col: number; value: number };
+  /** Ślad macierzy (przekątna — rezonans własny bram) */
+  trace: number;
+  /** Entropia Shannona rozkładu, znormalizowana do log₂(324) */
+  normalizedEntropy: number;
+  /** Suma surowych wartości gematrycznych w oknie */
+  rawSum: number;
+}
+
+/** Wartość gematryczna znaku (hebrajski → grecki → łaciński fallback) */
+function sourceCharValue(char: string): number | null {
+  const direct = HEBREW_GEMATRIA[char] ?? GREEK_GEMATRIA[char];
+  if (direct !== undefined) return direct;
+  const upper = char.toUpperCase();
+  if (/[A-Z]/.test(upper)) return upper.charCodeAt(0) - 64;
+  return null;
+}
+
+export function mapSourceScriptToMatrix(
+  originalText: string,
+  fallbackText: string = "",
+  window: number = SOURCE_MATRIX_WINDOW,
+): SourceMatrixMapping {
+  const cleanedOriginal = originalText.replace(/[\s\u0591-\u05C7\u0300-\u036F]/g, "");
+  const hasHebrew = /[\u0590-\u05FF]/.test(cleanedOriginal);
+  const hasGreek = /[\u0370-\u03FF]/.test(cleanedOriginal);
+  const usedOriginalScript = hasHebrew || hasGreek;
+
+  const source = (usedOriginalScript ? cleanedOriginal : fallbackText.replace(/\s+/g, "")).slice(0, window);
+  const script: SourceScript = hasHebrew && hasGreek ? "mixed" : hasHebrew ? "hebrew" : hasGreek ? "greek" : source.length > 0 ? "latin" : "none";
+
+  const size = GATCA_GATES.length; // 18
+  const matrix: number[][] = Array.from({ length: size }, () => new Array(size).fill(0));
+  const chars = Array.from(source);
+  let recognized = 0;
+  let rawSum = 0;
+
+  chars.forEach((char, i) => {
+    const value = sourceCharValue(char);
+    if (value === null) return;
+    recognized += 1;
+    rawSum += value;
+    const row = i % size;
+    const col = (value - 1) % size;
+    // Modulacja fazowa φ wzdłuż okna 718 znaków — pozycja znaku w tekście ma znaczenie
+    const weight = value * (1 + GAMMA * Math.cos((2 * Math.PI * i) / window));
+    matrix[row][col] += Math.max(0, weight);
+  });
+
+  const total = matrix.reduce((sum, row) => sum + row.reduce((s, v) => s + v, 0), 0);
+  const norm = total > 0 ? total : 1;
+  for (let r = 0; r < size; r += 1) {
+    for (let c = 0; c < size; c += 1) matrix[r][c] /= norm;
+  }
+
+  const rowEnergy = matrix.map((row) => row.reduce((s, v) => s + v, 0));
+  const colEnergy = Array.from({ length: size }, (_, c) => matrix.reduce((s, row) => s + row[c], 0));
+  const combined = rowEnergy.map((v, i) => (v + colEnergy[i]) / 2);
+  const maxCombined = Math.max(...combined, 1e-12);
+  const gateWeights = combined.map((v) => v / maxCombined);
+
+  let dominantGateIdx = 0;
+  gateWeights.forEach((v, i) => { if (v > gateWeights[dominantGateIdx]) dominantGateIdx = i; });
+
+  let dominantCell = { row: 0, col: 0, value: 0 };
+  for (let r = 0; r < size; r += 1) {
+    for (let c = 0; c < size; c += 1) {
+      if (matrix[r][c] > dominantCell.value) dominantCell = { row: r, col: c, value: matrix[r][c] };
+    }
+  }
+
+  let entropy = 0;
+  for (let r = 0; r < size; r += 1) {
+    for (let c = 0; c < size; c += 1) {
+      const p = matrix[r][c];
+      if (p > 1e-15) entropy -= p * Math.log2(p);
+    }
+  }
+
+  return {
+    usedOriginalScript,
+    script,
+    charsAnalyzed: chars.length,
+    recognized,
+    coverage: chars.length > 0 ? recognized / chars.length : 0,
+    matrix,
+    rowEnergy,
+    colEnergy,
+    gateWeights,
+    dominantGateIdx,
+    dominantCell,
+    trace: Array.from({ length: size }, (_, k) => matrix[k][k]).reduce((s, v) => s + v, 0),
+    normalizedEntropy: entropy / Math.log2(size * size),
+    rawSum,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // 1. TEXT TYPE CLASSIFIER (6 types)
 // ═══════════════════════════════════════════════════════════════════
 
@@ -1583,6 +1711,8 @@ export interface DecoderResult {
   manipulationReport: ManipulationReport;
   /** 12. Decoder version used for this analysis */
   decoderVersion: string;
+  /** 13. Mapowanie oryginalnych znaków źródłowych (do 718) na macierz 18×18 */
+  sourceMatrix: SourceMatrixMapping;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1987,6 +2117,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     finalReport,
     manipulationReport,
     decoderVersion: getActiveVersionString(),
+    sourceMatrix: mapSourceScriptToMatrix(hebrewText, text),
   };
 }
 

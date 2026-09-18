@@ -11,6 +11,12 @@ import {
   type UnificationResult,
 } from "@/lib/bramaUnificationEngine";
 import { calculatePsi, runBramaUnification } from "@/lib/bramaUnificationEngine";
+import { buildHamiltonianMatrix } from "@/lib/hamiltonianMatrix";
+import { evolveLindblad, type LindbladInput, type LindbladResult } from "@/lib/lindbladCore";
+
+export function computeLindblad(input: LindbladInput): LindbladResult {
+  return evolveLindblad(input);
+}
 
 export type ComplexValue = { re: number; im: number };
 export type IntentionVectorInput = { amplitude: number; duration: number; frequency: number; samplesPerSecond?: number };
@@ -44,13 +50,7 @@ export function computeWavefunction(t: number, x: number, energy = CARRIER_FREQ 
 
 export function buildHamiltonianAndEvolve(time: number): HamiltonianEvolutionOutput {
   const size = GATCA_POSITIONS.length;
-  const matrix = Array.from({ length: size }, (_, row) =>
-    Array.from({ length: size }, (_, col) => {
-      if (row === col) return CARRIER_FREQ * (1 + GATCA_POSITIONS[row] / MTDNA_LENGTH);
-      const distance = Math.abs(row - col);
-      return GAMMA ** distance * Math.cos((GATCA_POSITIONS[row] - GATCA_POSITIONS[col]) / MTDNA_LENGTH * Math.PI);
-    }),
-  );
+  const matrix = buildHamiltonianMatrix();
   const amplitude = 1 / Math.sqrt(size);
   const psi = matrix.map((row) => {
     let re = 0;

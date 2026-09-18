@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen, Zap, Sparkles, Info, Atom, FlaskConical, BookMarke
 import { supabase } from "@/integrations/supabase/client";
 import { GateActivationPanel } from "@/components/GateActivationPanel";
 import { EmotionalBridge } from "@/components/EmotionalBridge";
+import { SourceMatrixHeatmap } from "@/components/SourceMatrixHeatmap";
 import { PhotonGeometry3D } from "@/components/PhotonGeometry3D";
 import { WillPowerController } from "@/components/WillPowerController";
 import { QuantumTranslationCard } from "@/components/QuantumTranslationCard";
@@ -1464,6 +1465,10 @@ const BiblicalDecoder = () => {
                     <div>{t('decoder.label.time')}: <span className="text-primary font-bold">{result.gematriaT.toFixed(6)}</span></div>
                   </div>
                 </div>
+                <Separator className="my-4" />
+
+                {/* Source-script matrix 18x18 */}
+                <SourceMatrixHeatmap data={result.sourceMatrix} />
                 <Separator className="my-4" />
 
                 {/* Fractal */}
