@@ -2117,6 +2117,7 @@ export function decodeVerse(reference: string, text: string, hebrewText: string 
     finalReport,
     manipulationReport,
     decoderVersion: getActiveVersionString(),
+    sourceMatrix: mapSourceScriptToMatrix(hebrewText, text),
   };
 }
 
