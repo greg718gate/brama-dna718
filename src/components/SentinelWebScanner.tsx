@@ -69,27 +69,27 @@ const TXT = {
     lost: "Połączenie z pasem przerwane.",
     simpleBpm: "Puls serca",
     simpleSync: "Stan synchronizacji",
-    simpleRitual: "Czas rytuału",
+    simpleRitual: "Czas sesji modelu",
     syncSlow: "Spowolnij wydech — dostrajam pole",
     syncFast: "Przyspiesz oddech — stabilizuję wektor",
     syncLocked: "PEŁNY REZONANS (Faza Zablokowana)",
     syncWaiting: "Oczekiwanie na pierwsze uderzenia serca",
     advancedTitle: "✦ Zaawansowane Parametry Spektralne (Dla Inżynierów) ✦",
-    ritualDoneTitle: "✦ Rytuał Ukończony ✦",
+    ritualDoneTitle: "✦ Sesja Modelu Ukończona ✦",
     ritualDoneText:
-      "Wynik został pomyślnie zaimplementowany w Twoim profilu. Przejdź do zakładki Historia, aby zobaczyć wykres progresu DNA.",
+      "Wynik mapowania numerycznego zapisano w profilu. Przejdź do Historii, aby zobaczyć wykres sesji.",
     ritualSaveFailed:
-      "Rytuał ukończony, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
+      "Sesja została ukończona, ale wynik nie został zapisany — zaloguj się, aby zapisywać sesje w swoim profilu.",
     modeProgress: "Tryb badania",
     switchingMode: "Zapisywanie wyniku i przełączanie trybu…",
     adapting: "Adaptacja układu autonomicznego — pomiar rozpocznie się za {s} s",
     finalAverage: "Średnia koherencja pełnego badania",
     adviceLow:
-      "Twój układ nerwowy wykazuje wysoki poziom szumu stresowego. Zalecane: Skup się na wydłużeniu wydechu w Trybie 2 (Złotym) przez kolejne 7 dni.",
+      "W tym modelu wynik jest poniżej 50%. Możesz powtórzyć sesję z dłuższym wydechem w Trybie 2; nie jest to zalecenie medyczne.",
     adviceMid:
       "Koherencja rozwija się prawidłowo. Kontynuuj pełny cykl czterech trybów, utrzymując spokojny i równomierny wydech.",
     adviceHigh:
-      "STATUS: WALKS_ON_WATER. Osiągnąłeś barierę nadprzewodnictwa. Wektor intencji zablokowany na 0.0 rad.",
+      "STATUS MODELU: WALKS_ON_WATER. Próg mapowania 94% osiągnięty; wektor wizualny ustawiony na 0.0 rad.",
 
   },
   en: {
@@ -125,27 +125,27 @@ const TXT = {
     lost: "Belt connection lost.",
     simpleBpm: "Heart pulse",
     simpleSync: "Synchronisation state",
-    simpleRitual: "Ritual time",
+    simpleRitual: "Model session time",
     syncSlow: "Slow the exhale — tuning the field",
     syncFast: "Speed up breathing — stabilising the vector",
     syncLocked: "FULL RESONANCE (Phase Locked)",
     syncWaiting: "Waiting for the first heartbeats",
     advancedTitle: "✦ Advanced Spectral Parameters (For Engineers) ✦",
-    ritualDoneTitle: "✦ Ritual Complete ✦",
+    ritualDoneTitle: "✦ Model Session Complete ✦",
     ritualDoneText:
-      "The result has been successfully implemented in your profile. Open the History tab to see your DNA progress chart.",
+      "The numerical mapping result was stored in your profile. Open History to view the session chart.",
     ritualSaveFailed:
-      "Ritual complete, but the result was not stored — sign in to save sessions in your profile.",
+      "The session is complete, but the result was not stored — sign in to save sessions in your profile.",
     modeProgress: "Study mode",
     switchingMode: "Saving the result and switching mode…",
     adapting: "Autonomic adaptation — measurement begins in {s} s",
     finalAverage: "Full-study average coherence",
     adviceLow:
-      "Your nervous system shows a high level of stress noise. Recommended: focus on extending the exhale in Mode 2 (Golden) for the next 7 days.",
+      "In this model the result is below 50%. You can repeat the session with a longer exhale in Mode 2; this is not medical advice.",
     adviceMid:
       "Coherence is developing steadily. Continue the full four-mode cycle while maintaining a calm, even exhale.",
     adviceHigh:
-      "STATUS: WALKS_ON_WATER. You have reached the superconductivity barrier. Intention vector locked at 0.0 rad.",
+      "MODEL STATUS: WALKS_ON_WATER. The 94% mapping threshold was reached; the visual vector is set to 0.0 rad.",
 
   },
 };

@@ -22,7 +22,6 @@ import { ToneGenerator } from "@/components/ToneGenerator";
 import { CircularTimer } from "@/components/CircularTimer";
 import { SentinelWebScanner } from "@/components/SentinelWebScanner";
 import { AudioModeSelector, type AudioStreamMode } from "@/components/AudioModeSelector";
-import { LicenseTokenWidget } from "@/components/LicenseTokenWidget";
 import { SessionHistoryChart } from "@/components/SessionHistoryChart";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -536,7 +535,6 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
             <p className="flex items-center gap-2 text-sm font-semibold text-accent"><Github className="h-4 w-4" />{t("biometric.pro.openSourceTitle")}</p>
             <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("biometric.pro.openSourceText")}</p>
             <a href="https://github.com/greg718gate/brama-dna718" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-secondary underline underline-offset-4">github.com/greg718gate/brama-dna718</a>
-            <LicenseTokenWidget />
             <SessionHistoryChart />
             {!PRO_SALES_ENABLED && (
               <p className="mt-2 text-xs leading-relaxed text-secondary">
