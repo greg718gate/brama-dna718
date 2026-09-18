@@ -17,7 +17,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   generateHumanLikeGATCA,
   parseGATCAData,
-  runBramaUnification,
   exportGATCAToText,
   exportBramaPythonCode,
   GAMMA,

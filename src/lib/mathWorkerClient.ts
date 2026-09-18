@@ -21,7 +21,7 @@ function getWorker() {
       if (!request) return;
       pending.delete(event.data.id);
       if (event.data.ok) request.resolve(event.data.result);
-      else request.reject(new Error(event.data.error));
+      else if ("error" in event.data) request.reject(new Error(event.data.error));
     };
     worker.onerror = (event) => {
       const error = new Error(event.message || "Math worker failed");

@@ -5,6 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Bluetooth, BluetoothOff, Heart, Waves, Activity, Sparkles, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { mathWorker } from "@/lib/mathWorkerClient";
 
 
 /**
@@ -164,50 +165,6 @@ const buildPhotonBase = (): PhotonBase[] =>
     };
   });
 
-/** Detrended linear interpolation of the RR series onto a 4 Hz grid. */
-const resampleRr = (rr: number[]): number[] => {
-  const times: number[] = [];
-  let acc = 0;
-  for (const v of rr) {
-    acc += v;
-    times.push(acc);
-  }
-  const start = times[0];
-  const end = times[times.length - 1];
-  const out: number[] = [];
-  for (let t = start; t < end; t += 0.25) {
-    let j = 1;
-    while (j < times.length - 1 && times[j] < t) j += 1;
-    const t0 = times[j - 1];
-    const t1 = times[j];
-    const w = t1 === t0 ? 0 : (t - t0) / (t1 - t0);
-    out.push(rr[j - 1] + w * (rr[j] - rr[j - 1]));
-  }
-  const mean = out.reduce((s, v) => s + v, 0) / (out.length || 1);
-  return out.map((v) => v - mean);
-};
-
-/** Hann-windowed periodogram (single-segment Welch estimate) at 4 Hz. */
-const periodogram = (signal: number[], fs = 4.0) => {
-  const n = signal.length;
-  const windowed = signal.map((v, i) => v * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (n - 1))));
-  const bins = Math.floor(n / 2);
-  const freqs: number[] = [];
-  const psd: number[] = [];
-  for (let k = 1; k <= bins; k += 1) {
-    let re = 0;
-    let im = 0;
-    for (let i = 0; i < n; i += 1) {
-      const angle = (-2 * Math.PI * k * i) / n;
-      re += windowed[i] * Math.cos(angle);
-      im += windowed[i] * Math.sin(angle);
-    }
-    freqs.push((k * fs) / n);
-    psd.push((re * re + im * im) / n);
-  }
-  return { freqs, psd };
-};
-
 export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerProps) => {
   const { language } = useLanguage();
   const T = TXT[language === "pl" ? "pl" : "en"];
@@ -245,6 +202,7 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
   const maxCoherenceRef = useRef(0);
   const bpmRef = useRef<number | null>(null);
   const transitionRef = useRef(false);
+  const analysisRunningRef = useRef(false);
   const modeCoherencesRef = useRef<number[]>([]);
   const ritualSecondsRef = useRef(ritualSeconds);
   ritualSecondsRef.current = ritualSeconds;
@@ -342,28 +300,16 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
 
 
 
-  const analyse = useCallback(() => {
+  const analyse = useCallback(async () => {
     const rr = rrRef.current;
     const total = rr.reduce((s, v) => s + v, 0);
-    if (total < 40) return;
-
-    const series = resampleRr(rr);
-    if (series.length < 32) return;
-
-    const { freqs, psd } = periodogram(series);
-    let peakFreq = 0;
-    let peakPower = -1;
-    freqs.forEach((f, i) => {
-      if (f >= 0.04 && f <= 0.15 && psd[i] > peakPower) {
-        peakPower = psd[i];
-        peakFreq = f;
-      }
+    if (total < 40 || analysisRunningRef.current) return;
+    analysisRunningRef.current = true;
+    const analysis = await mathWorker.analyzeRr([...rr], breathDurationRef.current).finally(() => {
+      analysisRunningRef.current = false;
     });
-    if (peakFreq === 0) return;
-
-    // DPLL: deviation between the operator's real HRV peak and the metronome.
-    const targetBreathFreq = 1 / (breathDurationRef.current * 2);
-    const err = 2 * Math.PI * (peakFreq - targetBreathFreq);
+    if (!analysis) return;
+    const err = analysis.phaseError;
     if (Math.abs(err) < 0.01) {
       setGamma(PHI);
       setDpllStatus(T.locked);
@@ -378,22 +324,13 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
     buf.push(err);
     if (buf.length > 10) buf.shift();
 
-    let narrow = 0;
-    let totalPower = 0;
-    freqs.forEach((f, i) => {
-      if (f <= 0.4) totalPower += psd[i];
-      if (f >= peakFreq - 0.015 && f <= peakFreq + 0.015) narrow += psd[i];
-    });
-    if (totalPower > 0) {
-      const value = Math.min(1, (narrow / totalPower) * 1.4);
-      coherenceRef.current = value;
-      if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
-      setCoherence(value);
-    }
-
-    setBeats(rr.length);
-    setWindowSeconds(total);
-    const nextBpm = Math.round(60 / (total / rr.length));
+    const value = analysis.coherence;
+    coherenceRef.current = value;
+    if (value > maxCoherenceRef.current) maxCoherenceRef.current = value;
+    setCoherence(value);
+    setBeats(analysis.beats);
+    setWindowSeconds(analysis.windowSeconds);
+    const nextBpm = analysis.bpm;
     bpmRef.current = nextBpm;
     setBpm(nextBpm);
 
@@ -436,7 +373,7 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
       if (added) {
         setBeats(rrRef.current.length);
         setWindowSeconds(rrRef.current.reduce((s, v) => s + v, 0));
-        if (rrRef.current.length > 10) analyse();
+        if (rrRef.current.length > 10) void analyse();
       }
     },
     [analyse],
