@@ -16,6 +16,7 @@ import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
 import { ResonanceTuner } from "./ResonanceTuner";
 import { EquationOfExit } from "./EquationOfExit";
 import { IntentionVectorCalculator } from "./IntentionVectorCalculator";
+import { LindbladDecoherencePanel } from "./LindbladDecoherencePanel";
 
 const MasterPanel = () => {
   const { 
@@ -127,6 +128,9 @@ const MasterPanel = () => {
 
       {/* SEKCJA 3.5: WEKTOR INTENCJI */}
       <IntentionVectorCalculator />
+
+      {/* SEKCJA 3.6: DEKOHERENCJA LINDBLADA + ENTROPIA SPLĄTANIA */}
+      <LindbladDecoherencePanel />
 
       {/* SEKCJA 4: BEBECHY - Panel Debug */}
       <Collapsible open={isDebugOpen} onOpenChange={setIsDebugOpen}>
