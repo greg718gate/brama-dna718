@@ -280,7 +280,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   };
 
   const handleStartScanner = async () => {
-    if (PRO_SALES_ENABLED) {
+    if (PRO_SALES_ENABLED && !isDevelopmentAdmin) {
       const subscribed = await checkSubscription();
       if (!subscribed) {
         setIsPaymentModalOpen(true);
