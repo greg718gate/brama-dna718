@@ -95,7 +95,7 @@ const Index = () => {
       {/* Top Navigation */}
       <nav
         aria-label={t("nav.main") !== "nav.main" ? t("nav.main") : "Główna nawigacja"}
-        className="fixed top-0 left-0 right-0 z-50 grid grid-cols-2 gap-2 border-b border-border bg-background/95 p-2 backdrop-blur-md md:left-auto md:top-4 md:right-4 md:flex md:w-auto md:border-0 md:bg-transparent md:p-0"
+        className="sticky top-0 left-0 right-0 z-50 grid grid-cols-2 gap-2 border-b border-border bg-background/95 p-2 backdrop-blur-md md:fixed md:left-auto md:top-4 md:right-4 md:flex md:w-auto md:border-0 md:bg-transparent md:p-0"
       >
         {operator?.email ? (
           <div
@@ -188,7 +188,7 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-8 pb-16 space-y-8 max-w-5xl">
         {/* Header */}
-        <div className="pt-32 md:pt-12">
+        <div className="pt-6 md:pt-12">
           <div className="text-center space-y-4 mb-8 animate-fade-in">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent leading-tight pb-2">
               {t("header.truth")}

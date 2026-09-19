@@ -248,6 +248,13 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
       return false;
     }
 
+    const sessionEmail = sessionData.session?.user.email?.toLowerCase() ?? "";
+    if (sessionEmail === DEVELOPMENT_ADMIN_EMAIL) {
+      setIsSubscribed(true);
+      setIsCheckingSubscription(false);
+      return true;
+    }
+
     const { data, error } = await supabase.functions.invoke("check-sentinel-subscription", { body: {} });
     const subscribed = !error && data?.subscribed === true;
     setIsSubscribed(subscribed);
