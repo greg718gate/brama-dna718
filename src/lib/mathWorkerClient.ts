@@ -2,6 +2,7 @@ import type { GATCASequence, UnificationResult } from "@/lib/bramaUnificationEng
 import type { HamiltonianEvolutionOutput, IntentionVectorInput, IntentionVectorOutput, RrSpectrumOutput } from "@/lib/browserMathCore";
 import type { ZetaAnalysisInput } from "@/lib/zetaReference";
 import type { LindbladInput, LindbladResult } from "@/lib/lindbladCore";
+import type { GateResonatorResult } from "@/lib/riemannHolographicMatrix";
 
 export type MathWorkerRequest =
   | { id: number; task: "intention-vector"; payload: IntentionVectorInput }
