@@ -2,6 +2,7 @@ import type { GATCASequence, UnificationResult } from "@/lib/bramaUnificationEng
 import type { HamiltonianEvolutionOutput, IntentionVectorInput, IntentionVectorOutput, RrSpectrumOutput } from "@/lib/browserMathCore";
 import type { ZetaAnalysisInput } from "@/lib/zetaReference";
 import type { LindbladInput, LindbladResult } from "@/lib/lindbladCore";
+import type { GateResonatorResult } from "@/lib/riemannHolographicMatrix";
 
 export type MathWorkerRequest =
   | { id: number; task: "intention-vector"; payload: IntentionVectorInput }
@@ -10,7 +11,8 @@ export type MathWorkerRequest =
   | { id: number; task: "wavefunction"; payload: { t: number; x: number; energy?: number; terms?: number } }
   | { id: number; task: "zeta-analysis"; payload: ZetaAnalysisInput }
   | { id: number; task: "unification"; payload: { sequences: GATCASequence[]; t: number; x: number } }
-  | { id: number; task: "lindblad"; payload: LindbladInput };
+  | { id: number; task: "lindblad"; payload: LindbladInput }
+  | { id: number; task: "gate-resonator"; payload: { gate: number; threshold?: number } };
 
 export type MathWorkerResponse = { id: number; ok: true; result: unknown } | { id: number; ok: false; error: string };
 let worker: Worker | null = null;
@@ -52,4 +54,5 @@ export const mathWorker = {
   zetaAnalysis: <T>(payload: ZetaAnalysisInput) => request<T>({ task: "zeta-analysis", payload }),
   unification: (sequences: GATCASequence[], t: number, x: number) => request<UnificationResult>({ task: "unification", payload: { sequences, t, x } }),
   lindblad: (payload: LindbladInput) => request<LindbladResult>({ task: "lindblad", payload }),
+  gateResonator: (gate: number, threshold?: number) => request<GateResonatorResult>({ task: "gate-resonator", payload: { gate, threshold } }),
 };
