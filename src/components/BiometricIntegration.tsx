@@ -281,15 +281,17 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
 
   // Bezwarunkowe wejście administratora do panelu operacyjnego (bypass paywall).
   useEffect(() => {
-    if (!isDevelopmentAdmin) return;
-    const onOpen = () => {
+    const onOpen = async () => {
+      const { data } = await supabase.auth.getUser();
+      const email = data.user?.email?.toLowerCase();
+      if (email !== DEVELOPMENT_ADMIN_EMAIL) return;
       setEngineReady(true);
       setIsProModalOpen(true);
       void checkSubscription();
     };
     window.addEventListener("sentinel-open-pro", onOpen);
     return () => window.removeEventListener("sentinel-open-pro", onOpen);
-  }, [isDevelopmentAdmin, checkSubscription]);
+  }, [checkSubscription]);
 
   const handleStartScanner = async () => {
     if (isDevelopmentAdmin) {
