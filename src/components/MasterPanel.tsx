@@ -16,8 +16,6 @@ import RiemannCorrelationAnalyzer from "./RiemannCorrelationAnalyzer";
 import { ResonanceTuner } from "./ResonanceTuner";
 import { EquationOfExit } from "./EquationOfExit";
 import { IntentionVectorCalculator } from "./IntentionVectorCalculator";
-import { LindbladDecoherencePanel } from "./LindbladDecoherencePanel";
-import { RiemannGateResonator } from "./RiemannGateResonator";
 
 const MasterPanel = () => {
   const { 
@@ -130,11 +128,6 @@ const MasterPanel = () => {
       {/* SEKCJA 3.5: WEKTOR INTENCJI */}
       <IntentionVectorCalculator />
 
-      {/* SEKCJA 3.6: DEKOHERENCJA LINDBLADA + ENTROPIA SPLĄTANIA */}
-      <LindbladDecoherencePanel />
-
-      {/* SEKCJA 3.7: REZONATOR HOLOGRAFICZNY RIEMANNA (Δφ → Hz) */}
-      <RiemannGateResonator />
 
       {/* SEKCJA 4: BEBECHY - Panel Debug */}
       <Collapsible open={isDebugOpen} onOpenChange={setIsDebugOpen}>
