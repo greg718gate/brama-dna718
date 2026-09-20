@@ -6,6 +6,8 @@ import { Bluetooth, BluetoothOff, Heart, Waves, Activity, Sparkles, ChevronDown 
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { mathWorker } from "@/lib/mathWorkerClient";
+import { LindbladDecoherencePanel } from "@/components/LindbladDecoherencePanel";
+import { RiemannGateResonator } from "@/components/RiemannGateResonator";
 
 
 /**
@@ -691,6 +693,11 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
                   </div>
                 ))}
               </dl>
+
+              <div className="mt-4 space-y-4">
+                <LindbladDecoherencePanel />
+                <RiemannGateResonator />
+              </div>
             </CollapsibleContent>
           </Collapsible>
 

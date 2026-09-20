@@ -279,8 +279,24 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
     await checkSubscription();
   };
 
+  // Bezwarunkowe wejście administratora do panelu operacyjnego (bypass paywall).
+  useEffect(() => {
+    if (!isDevelopmentAdmin) return;
+    const onOpen = () => {
+      setEngineReady(true);
+      setIsProModalOpen(true);
+      void checkSubscription();
+    };
+    window.addEventListener("sentinel-open-pro", onOpen);
+    return () => window.removeEventListener("sentinel-open-pro", onOpen);
+  }, [isDevelopmentAdmin, checkSubscription]);
+
   const handleStartScanner = async () => {
-    if (PRO_SALES_ENABLED && !isDevelopmentAdmin) {
+    if (isDevelopmentAdmin) {
+      setEngineReady(true);
+      return;
+    }
+    if (PRO_SALES_ENABLED) {
       const subscribed = await checkSubscription();
       if (!subscribed) {
         setIsPaymentModalOpen(true);
@@ -441,14 +457,23 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                 type="button"
                 variant="glow"
                 className="w-full sm:w-auto"
-                disabled={isTestPhase}
-                aria-disabled={isTestPhase}
-                title={language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"}
+                disabled={isTestPhase && !isDevelopmentAdmin}
+                aria-disabled={isTestPhase && !isDevelopmentAdmin}
+                onClick={isDevelopmentAdmin ? () => { setEngineReady(true); void openProDashboard(); } : undefined}
+                title={
+                  isDevelopmentAdmin
+                    ? language === "pl" ? "Panel operacyjny SENTINEL-718" : "SENTINEL-718 operational panel"
+                    : language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"
+                }
               >
                 <Crown className="h-4 w-4" />
-                {language === "pl"
-                  ? "Faza testowa / W trakcie prac rozwojowych"
-                  : "Test phase / Under development"}
+                {isDevelopmentAdmin
+                  ? language === "pl"
+                    ? "✦ OTWÓRZ PANEL SENTINEL-718 ✦"
+                    : "✦ OPEN SENTINEL-718 PANEL ✦"
+                  : language === "pl"
+                    ? "Faza testowa / W trakcie prac rozwojowych"
+                    : "Test phase / Under development"}
               </Button>
             </div>
           </CardContent>
@@ -557,7 +582,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                 size="xl"
                 className={`min-h-20 w-full whitespace-normal px-5 text-center text-base font-bold sm:text-lg ${engineReady ? "" : "animate-pulse"}`}
                 onClick={handleStartScanner}
-                disabled={isCheckingSubscription || engineReady}
+                disabled={(isCheckingSubscription && !isDevelopmentAdmin) || engineReady}
               >
                 {isCheckingSubscription ? <Loader2 className="h-6 w-6 animate-spin" /> : engineReady ? <Check className="h-6 w-6" /> : <ScanLine className="h-6 w-6" />}
                 {engineReady ? t("biometric.pro.engineReady") : t("biometric.pro.startScanner")}
