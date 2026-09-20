@@ -280,7 +280,11 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
   };
 
   const handleStartScanner = async () => {
-    if (PRO_SALES_ENABLED && !isDevelopmentAdmin) {
+    if (isDevelopmentAdmin) {
+      setEngineReady(true);
+      return;
+    }
+    if (PRO_SALES_ENABLED) {
       const subscribed = await checkSubscription();
       if (!subscribed) {
         setIsPaymentModalOpen(true);
@@ -566,7 +570,7 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                 size="xl"
                 className={`min-h-20 w-full whitespace-normal px-5 text-center text-base font-bold sm:text-lg ${engineReady ? "" : "animate-pulse"}`}
                 onClick={handleStartScanner}
-                disabled={isCheckingSubscription || engineReady}
+                disabled={(isCheckingSubscription && !isDevelopmentAdmin) || engineReady}
               >
                 {isCheckingSubscription ? <Loader2 className="h-6 w-6 animate-spin" /> : engineReady ? <Check className="h-6 w-6" /> : <ScanLine className="h-6 w-6" />}
                 {engineReady ? t("biometric.pro.engineReady") : t("biometric.pro.startScanner")}
