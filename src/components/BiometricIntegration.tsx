@@ -441,14 +441,23 @@ export const BiometricIntegration = ({ pricingRequest = 0 }: BiometricIntegratio
                 type="button"
                 variant="glow"
                 className="w-full sm:w-auto"
-                disabled={isTestPhase}
-                aria-disabled={isTestPhase}
-                title={language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"}
+                disabled={isTestPhase && !isDevelopmentAdmin}
+                aria-disabled={isTestPhase && !isDevelopmentAdmin}
+                onClick={isDevelopmentAdmin ? () => { setEngineReady(true); void openProDashboard(); } : undefined}
+                title={
+                  isDevelopmentAdmin
+                    ? language === "pl" ? "Panel operacyjny SENTINEL-718" : "SENTINEL-718 operational panel"
+                    : language === "pl" ? "Faza testowa / W trakcie prac rozwojowych" : "Test phase / Under development"
+                }
               >
                 <Crown className="h-4 w-4" />
-                {language === "pl"
-                  ? "Faza testowa / W trakcie prac rozwojowych"
-                  : "Test phase / Under development"}
+                {isDevelopmentAdmin
+                  ? language === "pl"
+                    ? "✦ OTWÓRZ PANEL SENTINEL-718 ✦"
+                    : "✦ OPEN SENTINEL-718 PANEL ✦"
+                  : language === "pl"
+                    ? "Faza testowa / W trakcie prac rozwojowych"
+                    : "Test phase / Under development"}
               </Button>
             </div>
           </CardContent>
