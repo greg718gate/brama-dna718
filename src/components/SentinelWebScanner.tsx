@@ -692,6 +692,38 @@ export const SentinelWebScanner = ({ onPhaseErrorChange }: SentinelWebScannerPro
           )}
         </>
       )}
+
+      {/* Advanced spectral parameters — dostępne niezależnie od połączenia z sensorem */}
+      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <CollapsibleTrigger asChild>
+          <Button type="button" variant="outline" size="sm" className="w-full justify-between whitespace-normal text-left text-xs">
+            <span className="break-words">{T.advancedTitle}</span>
+            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <dl className="mt-2 grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+            {[
+              [T.phase, `${phaseError.toFixed(4)} rad`],
+              [T.dpll, `γ=${gamma.toFixed(4)}${dpllStatus ? ` — ${dpllStatus}` : ""}`],
+              [T.lens, `R=${lensRadius.toFixed(3)} — 800 φ — 54.7356°`],
+              [T.buffer, `${beats} ${T.beats} — ${T.window} ${windowSeconds.toFixed(1)}s`],
+              [T.bpm, bpm ? `${bpm} BPM` : "—"],
+              [T.mode, `${BREATH_MODES[modeIndex].name} — ${breathDuration.toFixed(1)}s`],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-md border border-border bg-background/40 p-2">
+                <dt className="break-words text-[0.68rem] uppercase tracking-wider text-muted-foreground">{label}</dt>
+                <dd className="break-words font-mono text-foreground/90">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-4 space-y-4">
+            <LindbladDecoherencePanel />
+            <RiemannGateResonator />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
